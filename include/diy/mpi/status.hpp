@@ -6,6 +6,7 @@ namespace mpi
   {
     int             source() const          { return s.MPI_SOURCE; }
     int             tag() const             { return s.MPI_TAG; }
+    int             error() const           { return s.MPI_ERROR; }
     bool            cancelled() const       { int flag; MPI_Test_cancelled(&s, &flag); return flag; }
 
     template<class T>

@@ -24,6 +24,9 @@ namespace mpi
     T&          operator*()                     { return *reinterpret_cast<T*>(buf_); }
     const T&    operator*() const               { return *reinterpret_cast<const T*>(buf_); }
 
+    T*          operator->()                    { return &(operator*()); }
+    const T*    operator->() const              { return &(operator*()); }
+
     private:
       void      clear()                         { reinterpret_cast<T*>(buf_)->~T(); }
 
@@ -44,4 +47,6 @@ operator=(const optional& o)
   init_ = o.init_;
   if (init_)
     new (buf_) T(*o);
+
+  return *this;
 }

@@ -15,8 +15,9 @@ namespace diy
     inline void         load_binary(char* x, int count);
 
     void                reset()                                     { position = 0; }
+    void                swap(BinaryBuffer& o)                       { std::swap(position, o.position); std::swap(buffer, o.buffer); }
 
-    int position;
+    int                 position;
     std::vector<char>   buffer;
   };
 
