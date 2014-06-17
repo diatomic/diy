@@ -61,8 +61,8 @@ void local_average(void* b_, const diy::Master::ProxyWithLink& cp)
 
   for (unsigned i = 0; i < l->count(); ++i)
   {
-    std::cout << "Enqueueing: " << cp.gid()
-              << " -> (" << l->target(i).gid << "," << l->target(i).proc << ")" << std::endl;
+    //std::cout << "Enqueueing: " << cp.gid()
+    //          << " -> (" << l->target(i).gid << "," << l->target(i).proc << ")" << std::endl;
     cp.enqueue(l->target(i), total);
   }
 }
@@ -94,10 +94,14 @@ int main(int argc, char* argv[])
 
   int                       nblocks = 4*world.size();
 
+  diy::FileStorage          storage("./DIY.XXXXXX");
+
   diy::Communicator         comm(world);
   diy::Master               master(comm,
                                    &create_block,
                                    &destroy_block,
+                                   2,
+                                   &storage,
                                    &save_block,
                                    &load_block);
 

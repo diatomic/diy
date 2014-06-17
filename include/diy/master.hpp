@@ -5,6 +5,7 @@
 #include <map>
 
 #include "cover.hpp"
+#include "storage.hpp"
 
 namespace diy
 {
@@ -33,21 +34,30 @@ namespace diy
                     Master(Communicator&    comm,
                            CreateBlock      create,
                            DestroyBlock     destroy,
-                           SaveBlock        save,
-                           LoadBlock        load):
+                           int              limit    = -1,       // blocks to store in memory
+                           ExternalStorage* storage  = 0,
+                           SaveBlock        save     = 0,
+                           LoadBlock        load     = 0):
                       comm_(comm),
                       create_(create),
                       destroy_(destroy),
+                      limit_(limit),
+                      in_memory_(0),
+                      storage_(storage),
                       save_(save),
                       load_(load)                       {}
-                    ~Master()                           { destroy_blocks(); }
-      inline void   destroy_blocks();
+                    ~Master()                           { destroy_block_records(); }
+      inline void   destroy_block_records();
 
       inline void   add(int gid, void* b, Link* l);
       inline void*  release(int i);                     // release ownership of the block
 
       inline void*  block(int i) const;
       inline Link*  link(int i) const;
+
+      inline void   unload_all();
+      inline void   unload(int i);
+      inline void   load(int i);
 
       int           gid(int i) const                    { return gids_[i]; }
       int           lid(int gid) const                  { return local(gid) ?  lids_.find(gid)->second : -1; }
@@ -62,14 +72,23 @@ namespace diy
       template<class Functor>
       void          foreach(const Functor& f);
 
+    protected:
+      inline void*& block(int i);
+      inline Link*& link(int i);
+
     private:
       Communicator&                                     comm_;
       std::vector<BlockRecord*>                         blocks_;
+      std::vector<int>                                  external_;
       std::vector<int>                                  gids_;
       std::map<int, int>                                lids_;
 
       CreateBlock                                       create_;
       DestroyBlock                                      destroy_;
+
+      int                                               limit_;
+      int                                               in_memory_;
+      ExternalStorage*                                  storage_;
       SaveBlock                                         save_;
       LoadBlock                                         load_;
   };
@@ -105,14 +124,15 @@ namespace diy
 
 void
 diy::Master::
-destroy_blocks()
+destroy_block_records()
 {
   for (unsigned i = 0; i < size(); ++i)
-    if (blocks_[i])
+    if (block(i))
     {
       destroy_(block(i));
       delete blocks_[i];
-    }
+    } else if (external_[i] != -1)
+      storage_->destroy(i);
 }
 
 void*
@@ -120,9 +140,19 @@ diy::Master::
 block(int i) const
 { return blocks_[i]->block; }
 
+void*&
+diy::Master::
+block(int i)
+{ return blocks_[i]->block; }
+
 diy::Link*
 diy::Master::
 link(int i) const
+{ return blocks_[i]->link; }
+
+diy::Link*&
+diy::Master::
+link(int i)
 { return blocks_[i]->link; }
 
 
@@ -136,21 +166,72 @@ void
 diy::Master::
 add(int gid, void* b, Link* l)
 {
+  if (in_memory_ == limit_)
+    unload_all();
+
   blocks_.push_back(new BlockRecord(b,l));
+  external_.push_back(-1);
   gids_.push_back(gid);
   lids_[gid] = gids_.size() - 1;
   comm_.add_expected(l->count()); // NB: at every iteration we expect a message from each neighbor
+
+  ++in_memory_;
 }
 
 void*
 diy::Master::
 release(int i)
 {
+  if (block(i) == 0)
+  {
+    // assert(external_[i] != -1)
+    load(i);
+  }
+
   void* b = block(i);
-  blocks_[i] = 0;
+  block(i) = 0;
+  delete link(i);   link(i) = 0;
   lids_.erase(gid(i));
   return b;
 }
+
+void
+diy::Master::
+unload_all()
+{
+  for (unsigned i = 0; i < size(); ++i)
+    if (block(i))
+      unload(i);
+}
+
+void
+diy::Master::
+unload(int i)
+{
+  BinaryBuffer bb;
+  save_(block(i), bb);
+  external_[i] = storage_->put(bb);
+
+  destroy_(block(i));
+  block(i) = 0;
+
+  --in_memory_;
+}
+
+void
+diy::Master::
+load(int i)
+{
+  BinaryBuffer bb;
+  storage_->get(external_[i], bb);
+  void* b = create_();
+  load_(b, bb);
+  block(i) = b;
+  external_[i] = -1;
+
+  ++in_memory_;
+}
+
 
 template<class Functor>
 void
@@ -159,6 +240,13 @@ foreach(const Functor& f)
 {
   for (unsigned i = 0; i < size(); ++i)
   {
+    if (block(i) == 0 && external_[i] != -1)
+    {
+      if (in_memory_ == limit_)
+        unload_all();
+      load(i);
+    }
+
     f(block(i), proxy(i));
     // TODO: invoke opportunistic communication
   }
