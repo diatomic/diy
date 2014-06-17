@@ -16,7 +16,7 @@ namespace diy
 
     void                clear()                                     { buffer.clear(); reset(); }
     void                reset()                                     { position = 0; }
-    void                swap(BinaryBuffer& o)                       { std::swap(position, o.position); std::swap(buffer, o.buffer); }
+    void                swap(BinaryBuffer& o)                       { std::swap(position, o.position); buffer.swap(o.buffer); }
 
     int                 position;
     std::vector<char>   buffer;
