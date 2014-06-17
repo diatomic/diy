@@ -5,8 +5,9 @@
 #include <map>
 #include <fstream>
 
-#include <unistd.h>     // used for mkstemp()
-#include <cstdio>       // used for remove()
+#include <unistd.h>     // mkstemp() on Mac
+#include <cstdlib>      // mkstemp() on Linux
+#include <cstdio>       // remove()
 
 #include "serialization.hpp"
 
