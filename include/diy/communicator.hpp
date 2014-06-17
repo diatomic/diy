@@ -124,13 +124,10 @@ exchange()
     diy::BinaryBuffer bb;
     comm_.recv(ostatus->source(), tags::queue, bb.buffer);
 
-    // TODO: this is too tightly coupled; add footer routines to BinaryBuffer
-    typedef std::pair<int,int> FromToPair;
-    FromToPair from_to;
-    from_to = *reinterpret_cast<FromToPair*>(&bb.buffer[bb.buffer.size() - sizeof(FromToPair)]);
+    std::pair<int,int> from_to;
+    diy::load_back(bb, from_to);
     int from = from_to.first;
     int to   = from_to.second;
-    bb.buffer.resize(bb.buffer.size() - sizeof(FromToPair));
 
     incoming_[to][from] = diy::BinaryBuffer();
     incoming_[to][from].swap(bb);

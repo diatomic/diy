@@ -13,6 +13,7 @@ namespace diy
 
     inline void         save_binary(const char* x, int count);
     inline void         load_binary(char* x, int count);
+    inline void         load_binary_back(char* x, int count);
 
     void                clear()                                     { buffer.clear(); reset(); }
     void                reset()                                     { position = 0; }
@@ -22,6 +23,7 @@ namespace diy
     std::vector<char>   buffer;
   };
 
+  // Specialize this class for types that need special handling
   template<class T>
   struct Serialization
   {
@@ -29,12 +31,15 @@ namespace diy
     static void         load(BinaryBuffer& bb, T& x)                { bb.load_binary((char*)        &x, sizeof(T)); }
   };
 
-  // Specialize these functions for types that need special handling
   template<class T>
   void                  save(BinaryBuffer& bb, const T& x)          { Serialization<T>::save(bb, x); }
 
   template<class T>
   void                  load(BinaryBuffer& bb, T& x)                { Serialization<T>::load(bb, x); }
+
+  // Load back support only binary data copying (meant for simple footers)
+  template<class T>
+  void                  load_back(BinaryBuffer& bb, T& x)           { bb.load_binary_back((char*) &x, sizeof(T)); }
 
   // save/load for std::vector<U>
   template<class U>
@@ -123,6 +128,14 @@ load_binary(char* x, int count)
 {
   std::copy(&buffer[position], &buffer[position + count], x);
   position += count;
+}
+
+void
+diy::BinaryBuffer::
+load_binary_back(char* x, int count)
+{
+  std::copy(&buffer[buffer.size() - count], &buffer[buffer.size()], x);
+  buffer.resize(buffer.size() - count);
 }
 
 #endif
