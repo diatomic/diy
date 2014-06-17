@@ -64,6 +64,14 @@ namespace diy
         remove(fr.name.c_str());
       }
 
+                    ~FileStorage()
+      {
+        for (std::map<int,FileRecord>::const_iterator it = filenames_.begin(); it != filenames_.end(); ++it)
+        {
+          remove(it->second.name.c_str());
+        }
+      }
+
     private:
       struct FileRecord
       {
