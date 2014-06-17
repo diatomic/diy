@@ -12,6 +12,8 @@ namespace diy
   typedef   bb_d_t      DiscreteBounds;
   typedef   bb_c_t      ContinuousBounds;
 
+  typedef   dir_t       Direction;
+
   // Selector of bounds value type
   template<class Bounds_>
   struct BoundsValue;

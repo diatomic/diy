@@ -2,11 +2,39 @@
 #define DIY_DECOMPOSITION_HPP
 
 #include <vector>
+#include <algorithm>
 
 #include "cover.hpp"
+#include "assigner.hpp"
 
 namespace diy
 {
+namespace detail
+{
+  template<class Bounds_>
+  struct BoundsHelper;
+
+  template<>
+  struct BoundsHelper<DiscreteBounds>
+  {
+    static int      from(int i, int n, int min, int max)       { return min + (max - min + 1)/n * i; }
+    static int      to(int i, int n, int min, int max)
+    {
+      if (i == n - 1)
+        return max;
+      else
+        return from(i+1, n, min, max) - 1;
+    }
+  };
+
+  template<>
+  struct BoundsHelper<ContinuousBounds>
+  {
+    static float    from(int i, int n, float min, float max)   { return min + (max - min)/n * i; }
+    static float    to(int i, int n, float min, float max)     { return min + (max - min)/n * (i+1); }
+  };
+}
+
   // Decomposes a regular (discrete or continuous) domain into even blocks;
   // creates Links with Bounds along the way.
   template<class Bounds_>
@@ -18,32 +46,208 @@ namespace diy
 
     typedef         std::vector<bool>                               BoolVector;
     typedef         std::vector<Coordinate>                         CoordinateVector;
+    typedef         std::vector<int>                                DivisionsVector;
 
-    // Calls create(int gid, const Bounds& bounds, const Link& link)
     // assigner:  decides how processors are assigned to blocks (maps a gid to a rank)
     //            also communicates the total number of blocks
     // wrap:      indicates dimensions on which to wrap the boundary
     // ghosts:    indicates how many ghosts to use in each dimension 
     // divisions: indicates how many cuts to make along each dimension
     //            (0 means "no constraint," i.e., leave it up to the algorithm)
-    template<class Assigner, class Creator>
-    static
-    void            decompose(int                   dim,
-                              int                   rank,
-                              const Bounds&         domain,
-                              const Assigner&       assigner,
-                              const Creator&        create,
-                              BoolVector            wrap      = BoolVector(),
-                              CoordinateVector      ghosts    = CoordinateVector(),
-                              CoordinateVector      divisions = CoordinateVector())
+                    RegularDecomposer(int               dim_,
+                                      const Bounds&     domain_,
+                                      const Assigner&   assigner_,
+                                      BoolVector        wrap_      = BoolVector(),
+                                      CoordinateVector  ghosts_    = CoordinateVector(),
+                                      DivisionsVector   divisions_ = DivisionsVector()):
+                      dim(dim_), domain(domain_), assigner(assigner_),
+                      wrap(wrap_), ghosts(ghosts_), divisions(divisions_)
     {
-      if (ghosts.empty())       ghosts.resize(dim);
-      if (divisions.empty())    divisions.resize(dim);
-
-      // TODO: take wrap, ghosts, and divisions into account
+      if (ghosts.size() < dim)      ghosts.resize(dim);
+      if (divisions.size() < dim)   divisions.resize(dim);
 
       int nblocks = assigner.nblocks();
+      fill_divisions(nblocks);
     }
+
+    // Calls create(int gid, const Bounds& bounds, const Link& link)
+    template<class Creator>
+    void            decompose(int rank, const Creator& create)
+    {
+      int nblocks = assigner.nblocks();
+
+      // TODO: find a more efficient way than iterating over all gids
+      for (int gid = 0; gid < nblocks; ++gid)
+      {
+        if (assigner.rank(gid) == rank)
+        {
+          DivisionsVector coords;
+          gid_to_coords(gid, coords);
+
+          Bounds bounds;
+          fill_bounds(bounds, coords);
+
+          // Go through all neighbors
+          Link link(dim);
+          std::vector<int>  offsets(dim, -1);
+          offsets[0] = -2;
+          while (!all(offsets, 1))
+          {
+            // next offset
+            int i;
+            for (i = 0; i < dim; ++i)
+              if (offsets[i] == 1)
+                offsets[i] = -1;
+              else
+                break;
+            ++offsets[i];
+
+            if (all(offsets, 0)) continue;      // skip ourselves
+
+            DivisionsVector     nhbr_coords(dim);
+            int                 dir      = 0;
+            bool                inbounds = true;
+            for (int i = 0; i < dim; ++i)
+            {
+              nhbr_coords[i] = coords[i] + offsets[i];
+
+              // wrap
+              if (nhbr_coords[i] < 0)
+              {
+                if (wrap[i])
+                  nhbr_coords[i] = divisions[i] - 1;
+                else
+                  inbounds = false;
+              }
+
+              if (nhbr_coords[i] >= divisions[i])
+              {
+                if (wrap[i])
+                  nhbr_coords[i] = 0;
+                else
+                  inbounds = false;
+              }
+
+              // NB: this needs to match the addressing scheme in dir_t (in constants.h)
+              if (offsets[i] == -1)
+                dir |= 1 << (2*i + 1);
+              if (offsets[i] == 1)
+                dir |= 1 << (2*i + 2);
+            }
+            if (!inbounds) continue;
+
+            int nhbr_gid = coords_to_gid(nhbr_coords);
+            BlockID bid; bid.gid = nhbr_gid; bid.proc = assigner.rank(nhbr_gid);
+            link.add_neighbor(bid);
+
+            Bounds nhbr_bounds;
+            fill_bounds(nhbr_bounds, nhbr_coords);
+            link.add_bounds(nhbr_bounds);
+
+            link.add_direction(static_cast<Direction>(dir));
+          }
+
+          create(bounds, link);
+        }
+      }
+    }
+
+    static bool     all(const std::vector<int>& v, int x)
+    {
+      for (unsigned i = 0; i < v.size(); ++i)
+        if (v[i] != x)
+          return false;
+      return true;
+    }
+
+    int             point_to_gid();     // TODO
+
+    void            gid_to_coords(int gid, DivisionsVector& coords)
+    {
+      int dim = divisions.size();
+      for (int i = 0; i < dim; ++i)
+      {
+        coords.push_back(gid % divisions[i]);
+        gid /= divisions[i];
+      }
+    }
+
+    int             coords_to_gid(const DivisionsVector& coords)
+    {
+      int gid = 0;
+      for (int i = coords.size() - 1; i >= 0; --i)
+      {
+        gid *= divisions[i];
+        gid += coords[i];
+      }
+      return gid;
+    }
+
+    void            fill_bounds(Bounds& bounds, const DivisionsVector& coords)
+    {
+      // TODO: take ghosts (and therefore wrap) into account
+      for (int i = 0; i < dim; ++i)
+      {
+        bounds.min[i] = detail::BoundsHelper<Bounds>::from(coords[i], divisions[i], domain.min[i], domain.max[i]);
+        bounds.max[i] = detail::BoundsHelper<Bounds>::to(coords[i], divisions[i], domain.min[i], domain.max[i]);
+      }
+    }
+
+    void            fill_divisions(int nblocks)
+    {
+      int prod = 1; int c = 0;
+      for (unsigned i = 0; i < dim; ++i)
+        if (divisions[i] != 0)
+        {
+          prod *= divisions[i];
+          ++c;
+        }
+
+      if (nblocks % prod != 0)
+      {
+        std::cerr << "Incompatible requirements" << std::endl;
+        return;
+      }
+
+      if (c == divisions.size())
+        return;
+
+      std::vector<unsigned> factors;
+      factor(factors, nblocks/prod);
+
+      // Fill the missing divs using LPT algorithm
+      std::vector<unsigned> missing_divs(divisions.size() - c, 1);
+      for (int i = factors.size() - 1; i >= 0; --i)
+        *std::min_element(missing_divs.begin(), missing_divs.end()) *= factors[i];
+
+      c = 0;
+      for (unsigned i = 0; i < dim; ++i)
+        if (divisions[i] == 0)
+          divisions[i] = missing_divs[c++];
+    }
+
+    static
+    void            factor(std::vector<unsigned>& factors, int n)
+    {
+      while (n != 1)
+        for (unsigned i = 2; i <= n; ++i)
+        {
+          if (n % i == 0)
+          {
+            factors.push_back(i);
+            n /= i;
+            break;
+          }
+        }
+    }
+
+    int               dim;
+    const Bounds&     domain;
+    const Assigner&   assigner;
+    BoolVector        wrap;
+    CoordinateVector  ghosts;
+    DivisionsVector   divisions;
+
   };
 
   template<class Bounds, class Assigner, class Creator>
@@ -54,9 +258,9 @@ namespace diy
                  const Creator&     create,
                  typename RegularDecomposer<Bounds>::BoolVector       wrap   = typename RegularDecomposer<Bounds>::BoolVector(),
                  typename RegularDecomposer<Bounds>::CoordinateVector ghosts = typename RegularDecomposer<Bounds>::CoordinateVector(),
-                 typename RegularDecomposer<Bounds>::CoordinateVector divs   = typename RegularDecomposer<Bounds>::CoordinateVector())
+                 typename RegularDecomposer<Bounds>::DivisionsVector  divs   = typename RegularDecomposer<Bounds>::DivisionsVector())
   {
-    RegularDecomposer<Bounds>::decompose(dim, rank, domain, assigner, create, wrap, ghosts, divs);
+    RegularDecomposer<Bounds>(dim, domain, assigner, wrap, ghosts, divs).decompose(rank, create);
   }
 
 }

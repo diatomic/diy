@@ -9,15 +9,16 @@ namespace diy
   class Assigner
   {
     public:
-            Assigner(int size, int nblocks):
-              size_(size), nblocks_(nblocks)    {}
+                    Assigner(int size, int nblocks):
+                      size_(size), nblocks_(nblocks)    {}
 
-      int   size() const                        { return size_; }
-      int   nblocks() const                     { return nblocks_; }
+      int           size() const                        { return size_; }
+      int           nblocks() const                     { return nblocks_; }
+      virtual int   rank(int gid) const     =0;
 
     private:
-      int   size_;      // total number of ranks
-      int   nblocks_;   // total number of blocks
+      int           size_;      // total number of ranks
+      int           nblocks_;   // total number of blocks
   };
 
   class ContiguousAssigner: public Assigner

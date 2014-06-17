@@ -1,6 +1,9 @@
 #ifndef DIY_COVER_HPP
 #define DIY_COVER_HPP
 
+#include <vector>
+#include <map>
+
 #include "types.hpp"
 
 namespace diy
@@ -25,20 +28,20 @@ namespace diy
   class RegularLink: public Link
   {
     public:
-      typedef   dir_t       Direction;
+      typedef   std::map<Direction, int>            DirMap;
 
     public:
                 RegularLink(int dim):
                   dim_(dim)                         {}
 
       // convert direction to a neighbor
-      inline
-      BlockID   direction(Direction dir) const;
-
+      BlockID   direction(Direction dir) const      { return Link::target(directions_.find(dir)->second); }
       int       dimension() const                   { return dim_; }
+      void      add_direction(Direction dir)        { int c = directions_.size(); directions_[dir] = c; }
 
     private:
       int       dim_;
+      DirMap    directions_;
   };
 
   // stores block bounds associated with each neighbor
@@ -103,13 +106,6 @@ find(int gid) const
       return i;
   }
   return -1;
-}
-
-diy::BlockID
-diy::RegularLink::
-direction(Direction dir) const
-{
-  // FIXME
 }
 
 #endif
