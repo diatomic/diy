@@ -34,8 +34,7 @@ namespace diy
                 RegularLink(int dim):
                   dim_(dim)                         {}
 
-      // convert direction to a neighbor
-      BlockID   direction(Direction dir) const      { return Link::target(directions_.find(dir)->second); }
+      int       direction(Direction dir) const;     // convert direction to a neighbor (-1 if no neighbor)
       int       dimension() const                   { return dim_; }
       void      add_direction(Direction dir)        { int c = directions_.size(); directions_[dir] = c; }
 
@@ -106,6 +105,17 @@ find(int gid) const
       return i;
   }
   return -1;
+}
+
+int
+diy::RegularLink::
+direction(Direction dir) const
+{
+  DirMap::const_iterator it = directions_.find(dir);
+  if (it == directions_.end())
+    return -1;
+  else
+    return it->second;
 }
 
 #endif
