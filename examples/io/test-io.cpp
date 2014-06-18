@@ -3,6 +3,7 @@
 
 #include <diy/types.hpp>
 #include <diy/io/bov.hpp>
+#include <diy/io/numpy.hpp>
 
 int main()
 {
@@ -23,4 +24,13 @@ int main()
 
   for (unsigned i = 0; i < data.size(); ++i)
     std::cout << data[i] << std::endl;
+
+  std::cout << "---" << std::endl;
+  std::ifstream in2("test.npy", std::ios::binary);
+  diy::io::NumPyReader  reader2(in2);
+  std::vector<float> data2(16);
+  reader2.read(box, &data2[0]);
+
+  for (unsigned i = 0; i < data2.size(); ++i)
+    std::cout << data2[i] << std::endl;
 }

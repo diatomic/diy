@@ -15,24 +15,37 @@ namespace io
   class BOVReader
   {
     public:
-                    BOVReader(std::ifstream&                in,
-                              const std::vector<unsigned>&  shape,
-                              size_t                        offset = 0):
-                      in_(in), shape_(shape), offset_(offset)
+      typedef       std::vector<unsigned>                               Shape;
+    public:
+                    BOVReader(std::ifstream&    in,
+                              const Shape&      shape  = Shape(),
+                              size_t            offset = 0):
+                      in_(in), offset_(offset)                          { set_shape(shape); }
+
+      void          set_offset(size_t offset)                           { offset_ = offset; }
+      inline void   set_shape(const Shape& shape)
       {
+        shape_ = shape;
+        stride_.clear();
         stride_.push_back(1);
         for (unsigned i = 1; i < shape_.size(); ++i)
           stride_.push_back(stride_[i-1] * shape_[i-1]);
       }
 
-      inline void   read(const DiscreteBounds& bounds, char* buffer, size_t word_size);
+      const Shape&  shape() const                                       { return shape_; }
 
       template<class T>
       void          read(const DiscreteBounds& bounds, T* buffer)       { read(bounds, reinterpret_cast<char*>(buffer), sizeof(T)); }
+      inline void   read(const DiscreteBounds& bounds,
+                         char* buffer,
+                         size_t word_size);
+
+    protected:
+      std::ifstream&        in()                                        { return in_; }
 
     private:
       std::ifstream&        in_;
-      std::vector<unsigned> shape_;
+      Shape                 shape_;
       std::vector<size_t>   stride_;
       size_t                offset_;
   };
