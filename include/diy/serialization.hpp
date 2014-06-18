@@ -23,9 +23,14 @@ namespace diy
     std::vector<char>   buffer;
   };
 
+  namespace detail
+  {
+    struct Default {};
+  }
+
   // Specialize this class for types that need special handling
   template<class T>
-  struct Serialization
+  struct Serialization: public detail::Default
   {
     static void         save(BinaryBuffer& bb, const T& x)          { bb.save_binary((const char*)  &x, sizeof(T)); }
     static void         load(BinaryBuffer& bb, T& x)                { bb.load_binary((char*)        &x, sizeof(T)); }
@@ -41,6 +46,22 @@ namespace diy
   template<class T>
   void                  load_back(BinaryBuffer& bb, T& x)           { bb.load_binary_back((char*) &x, sizeof(T)); }
 
+
+  namespace detail
+  {
+    template<typename T>
+    struct is_default
+    {
+        typedef char    yes;
+        typedef int     no;
+
+        static yes      test(Default*);
+        static no       test(...);
+
+        enum { value = (sizeof(test((T*) 0)) == sizeof(yes)) };
+    };
+  }
+
   // save/load for std::vector<U>
   template<class U>
   struct Serialization< std::vector<U> >
@@ -51,8 +72,11 @@ namespace diy
     {
       unsigned s = v.size();
       diy::save(bb, s);
-      for (unsigned i = 0; i < s; ++i)
-        diy::save(bb, v[i]);
+      if (!detail::is_default< Serialization<U> >::value)
+        for (unsigned i = 0; i < s; ++i)
+          diy::save(bb, v[i]);
+      else        // if Serialization is not specialized for U, just save the binary data
+        bb.save_binary((const char*) &v[0], sizeof(U)*v.size());
     }
 
     static void         load(BinaryBuffer& bb, Vector& v)
@@ -60,8 +84,11 @@ namespace diy
       unsigned s;
       diy::load(bb, s);
       v.resize(s);
-      for (unsigned i = 0; i < s; ++i)
-        diy::load(bb, v[i]);
+      if (!detail::is_default< Serialization<U> >::value)
+        for (unsigned i = 0; i < s; ++i)
+          diy::load(bb, v[i]);
+      else      // if Serialization is not specialized for U, just load the binary data
+        bb.load_binary((char*) &v[0], sizeof(U)*s);
     }
   };
 
