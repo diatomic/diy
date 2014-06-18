@@ -208,6 +208,9 @@ void
 diy::Master::
 unload(int i)
 {
+  // TODO: could avoid the extra copy by asking storage_ for an instance derived
+  //       from BinaryBuffer, which could save the data directly
+
   BinaryBuffer bb;
   save_(block(i), bb);
   external_[i] = storage_->put(bb);
