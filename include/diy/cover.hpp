@@ -25,7 +25,7 @@ namespace diy
   };
 
   // for a regular decomposition, it makes sense to address the neighbors by direction
-  class RegularLink: public Link
+  class RegularLink: public virtual Link
   {
     public:
       typedef   std::map<Direction, int>            DirMap;
@@ -45,7 +45,7 @@ namespace diy
 
   // stores block bounds associated with each neighbor
   template<class Bounds_>
-  class BoundsLink
+  class BoundsLink: public virtual Link
   {
     public:
       typedef   Bounds_     Bounds;
