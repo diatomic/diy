@@ -15,33 +15,12 @@ struct Block
         Block(): count(0), all_done(false)      {}
 };
 
-namespace diy
-{
-  template<>
-  struct Serialization<Block>
-  {
-    static void save(BinaryBuffer& bb, const Block& b)
-    { diy::save(bb, b.count); diy::save(bb, b.all_done); }
-
-    static void load(BinaryBuffer& bb, Block& b)
-    { diy::load(bb, b.count); diy::load(bb, b.all_done); }
-  };
-}
-
-void* create_block()
-{
-  Block* b = new Block;
-  return b;
-}
-
-void destroy_block(void* b)
-{ delete static_cast<Block*>(b); }
-
-void save_block(const void* b, diy::BinaryBuffer& bb)
-{ diy::save(bb, *static_cast<const Block*>(b)); }
-
-void load_block(void* b, diy::BinaryBuffer& bb)
-{ diy::load(bb, *static_cast<Block*>(b)); }
+void*   create_block()                      { return new Block; }
+void    destroy_block(void* b)              { delete static_cast<Block*>(b); }
+void    save_block(const void* b,
+                   diy::BinaryBuffer& bb)   { diy::save(bb, *static_cast<const Block*>(b)); }
+void    load_block(void* b,
+                   diy::BinaryBuffer& bb)   { diy::load(bb, *static_cast<Block*>(b)); }
 
 void flip_coin(void* b_, const diy::Master::ProxyWithLink& cp)
 {
