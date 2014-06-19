@@ -7,12 +7,14 @@
 typedef     diy::DiscreteBounds         Bounds;
 //typedef     diy::ContinuousBounds       Bounds;
 
-void create(const Bounds& bounds, const diy::Link& link)
+void create(const Bounds& core, const Bounds& bounds, const diy::Link& link)
 {
   std::cout << "   "
             << "Creating block: "
+            << core.min[0]   << ' ' << core.min[1]   << ' ' << core.min[2] << " - "
+            << core.max[0]   << ' ' << core.max[1]   << ' ' << core.max[2] << " : "
             << bounds.min[0] << ' ' << bounds.min[1] << ' ' << bounds.min[2] << " - "
-            << bounds.max[0] << ' ' << bounds.max[1] << ' ' << bounds.max[2] << ": "
+            << bounds.max[0] << ' ' << bounds.max[1] << ' ' << bounds.max[2] << " : "
             << link.count() << std::endl;
 }
 
@@ -31,7 +33,10 @@ int main(int argc, char* argv[])
   for (int rank = 0; rank < size; ++ rank)
   {
     std::cout << "Rank " << rank << ":" << std::endl;
-    diy::decompose(3, rank, domain, assigner, create);
+    diy::RegularDecomposer<Bounds>::BoolVector          wrap;
+    diy::RegularDecomposer<Bounds>::CoordinateVector    ghosts;
+    ghosts.push_back(1); ghosts.push_back(2);
+    diy::decompose(3, rank, domain, assigner, create, wrap, ghosts);
   }
 }
 

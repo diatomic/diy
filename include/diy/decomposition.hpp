@@ -63,6 +63,7 @@ namespace detail
                       dim(dim_), domain(domain_), assigner(assigner_),
                       wrap(wrap_), ghosts(ghosts_), divisions(divisions_)
     {
+      if (wrap.size() < dim)        wrap.resize(dim);
       if (ghosts.size() < dim)      ghosts.resize(dim);
       if (divisions.size() < dim)   divisions.resize(dim);
 
@@ -84,10 +85,11 @@ namespace detail
           DivisionsVector coords;
           gid_to_coords(gid, coords);
 
-          Bounds bounds;
-          fill_bounds(bounds, coords);
+          Bounds core, bounds;
+          fill_bounds(core,   coords);
+          fill_bounds(bounds, coords, true);
 
-          // Go through all neighbors
+          // Fill link with all the neighbors
           Link link(dim);
           std::vector<int>  offsets(dim, -1);
           offsets[0] = -2;
@@ -147,7 +149,7 @@ namespace detail
             link.add_direction(static_cast<Direction>(dir));
           }
 
-          create(bounds, link);
+          create(core, bounds, link);
         }
       }
     }
@@ -183,13 +185,28 @@ namespace detail
       return gid;
     }
 
-    void            fill_bounds(Bounds& bounds, const DivisionsVector& coords)
+    void            fill_bounds(Bounds& bounds, const DivisionsVector& coords, bool add_ghosts = false)
     {
-      // TODO: take ghosts (and therefore wrap) into account
       for (int i = 0; i < dim; ++i)
       {
         bounds.min[i] = detail::BoundsHelper<Bounds>::from(coords[i], divisions[i], domain.min[i], domain.max[i]);
-        bounds.max[i] = detail::BoundsHelper<Bounds>::to(coords[i], divisions[i], domain.min[i], domain.max[i]);
+        bounds.max[i] = detail::BoundsHelper<Bounds>::to  (coords[i], divisions[i], domain.min[i], domain.max[i]);
+      }
+
+      if (!add_ghosts)
+        return;
+
+      for (int i = 0; i < dim; ++i)
+      {
+        if (wrap[i])
+        {
+          bounds.min[i] -= ghosts[i];
+          bounds.max[i] += ghosts[i];
+        } else
+        {
+          bounds.min[i] = std::max(domain.min[i], bounds.min[i] - ghosts[i]);
+          bounds.max[i] = std::min(domain.max[i], bounds.max[i] + ghosts[i]);
+        }
       }
     }
 
