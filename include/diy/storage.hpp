@@ -32,7 +32,7 @@ namespace diy
         std::string     filename = filename_template_.c_str();
         mkstemp(const_cast<char*>(filename.c_str()));
 
-        std::cout << "FileStorage::put(): " << filename << std::endl;
+        //std::cout << "FileStorage::put(): " << filename << std::endl;
         std::ofstream   out(filename.c_str(), std::ios::binary);
 
         int sz = bb.buffer.size();
@@ -49,7 +49,7 @@ namespace diy
         FileRecord      fr = filenames_[i];
         filenames_.erase(i);
 
-        std::cout << "FileStorage::get(): " << fr.name << std::endl;
+        //std::cout << "FileStorage::get(): " << fr.name << std::endl;
         std::ifstream   in(fr.name.c_str(), std::ios::binary);
 
         bb.buffer.resize(fr.size);

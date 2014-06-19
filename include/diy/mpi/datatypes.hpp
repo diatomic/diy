@@ -10,6 +10,7 @@ namespace detail
   template<>        MPI_Datatype  get_mpi_datatype<char>()      { return MPI_BYTE; }
   template<>        MPI_Datatype  get_mpi_datatype<int>()       { return MPI_INT; }
   template<>        MPI_Datatype  get_mpi_datatype<float>()     { return MPI_FLOAT; }
+  template<>        MPI_Datatype  get_mpi_datatype<bool>()      { return MPI_BYTE; }
 
   /* is_mpi_datatype */
   template<class T>
@@ -19,10 +20,12 @@ namespace detail
   template<>  const bool is_mpi_datatype<char>::value    = true;
   template<>  const bool is_mpi_datatype<int>::value     = true;
   template<>  const bool is_mpi_datatype<float>::value   = true;
+  template<>  const bool is_mpi_datatype<bool>::value    = true;
 
   template<>  const bool is_mpi_datatype< std::vector<char> >::value    = true;
   template<>  const bool is_mpi_datatype< std::vector<int> >::value     = true;
   template<>  const bool is_mpi_datatype< std::vector<float> >::value   = true;
+  template<>  const bool is_mpi_datatype< std::vector<bool> >::value    = true;
 
 
   /* mpi_datatype: helper routines, specialized for std::vector<...> */

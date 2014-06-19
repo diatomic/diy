@@ -53,7 +53,10 @@ namespace diy
       inline void*  release(int i);                     // release ownership of the block
 
       inline void*  block(int i) const;
+      template<class Block>
+      Block*        block(int i) const                  { return static_cast<Block*>(block(i)); }
       inline Link*  link(int i) const;
+      inline int    loaded_block() const                { int i = 0; while (block(i) == 0) ++i; return i; }
 
       inline void   unload_all();
       inline void   unload(int i);
@@ -71,6 +74,8 @@ namespace diy
       // f will be called with
       template<class Functor>
       void          foreach(const Functor& f);
+
+      void          extract_collectives(int i);
 
     protected:
       inline void*& block(int i);
@@ -251,17 +256,25 @@ foreach(const Functor& f)
     }
 
     // Copy out pending collectives
-    for (Communicator::CollectivesList::const_iterator it  = comm_.collectives(gid(i)).begin();
-                                                       it != comm_.collectives(gid(i)).end();
-                                                       ++it)
-    {
-      it->result_out(block(i));
-    }
-    comm_.collectives(gid(i)).clear();
+    extract_collectives(i);
 
     f(block(i), proxy(i));
     // TODO: invoke opportunistic communication
   }
+}
+
+void
+diy::Master::
+extract_collectives(int i)
+{
+  for (Communicator::CollectivesList::const_iterator
+        it  = comm_.collectives(gid(i)).begin();
+        it != comm_.collectives(gid(i)).end();
+        ++it)
+  {
+    it->result_out(block(i));
+  }
+  comm_.collectives(gid(i)).clear();
 }
 
 #endif
