@@ -116,14 +116,21 @@ namespace diy
   struct Master::ProxyWithLink: public Communicator::Proxy
   {
             ProxyWithLink(const Communicator::Proxy&    proxy,
+                          void*                         block,
                           Link*                         link):
               Communicator::Proxy(proxy),
+              block_(block),
               link_(link)                                           {}
 
-      Link* link() const                                            { return link_; }
+      Link*   link() const                                          { return link_; }
+
+      template<class T, class Op>
+      void    all_reduce(const T& in, T& out, Op op) const
+      { Communicator::Proxy::all_reduce(in, (char*) &out - (char*) block_, op); }
 
     private:
-      Link*     link_;
+      void*   block_;
+      Link*   link_;
   };
 }
 
@@ -164,7 +171,7 @@ link(int i)
 diy::Master::ProxyWithLink
 diy::Master::
 proxy(int i) const
-{ return ProxyWithLink(comm_.proxy(gid(i)),  link(i)); }
+{ return ProxyWithLink(comm_.proxy(gid(i)), block(i), link(i)); }
 
 
 void

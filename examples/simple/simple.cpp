@@ -67,7 +67,7 @@ void local_average(void* b_, const diy::Master::ProxyWithLink& cp)
     cp.enqueue(l->target(i), total);
   }
 
-  cp.all_reduce(total, offsetof(Block, all_total), std::plus<int>());
+  cp.all_reduce(total, b->all_total, std::plus<int>());
 }
 
 // Average the values received from the neighbors

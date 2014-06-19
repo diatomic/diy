@@ -29,7 +29,7 @@ void flip_coin(void* b_, const diy::Master::ProxyWithLink& cp)
   b->count++;
   bool done = rand() % 2;
   //std::cout << cp.gid() << "  " << done << " " << b->count << std::endl;
-  cp.all_reduce(done, offsetof(Block, all_done), std::logical_and<bool>());
+  cp.all_reduce(done, b->all_done, std::logical_and<bool>());
 }
 
 int main(int argc, char* argv[])

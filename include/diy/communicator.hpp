@@ -4,8 +4,6 @@
 #include <list>
 #include <map>
 
-#include <cstddef>
-
 #include "types.hpp"
 #include "cover.hpp"
 #include "serialization.hpp"
