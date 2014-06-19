@@ -250,6 +250,15 @@ foreach(const Functor& f)
       load(i);
     }
 
+    // Copy out pending collectives
+    for (Communicator::CollectivesList::const_iterator it  = comm_.collectives(gid(i)).begin();
+                                                       it != comm_.collectives(gid(i)).end();
+                                                       ++it)
+    {
+      it->result_out(block(i));
+    }
+    comm_.collectives(gid(i)).clear();
+
     f(block(i), proxy(i));
     // TODO: invoke opportunistic communication
   }

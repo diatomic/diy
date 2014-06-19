@@ -11,6 +11,7 @@ struct Block
 {
   std::vector<int>      values;
   float                 average;
+  int                   all_total;
 };
 
 namespace diy
@@ -57,7 +58,7 @@ void local_average(void* b_, const diy::Master::ProxyWithLink& cp)
   for (unsigned i = 0; i < b->values.size(); ++i)
     total += b->values[i];
 
-  std::cout << "Total (" << cp.gid() << "): " << total << std::endl;
+  std::cout << "Total     (" << cp.gid() << "): " << total        << std::endl;
 
   for (unsigned i = 0; i < l->count(); ++i)
   {
@@ -65,6 +66,8 @@ void local_average(void* b_, const diy::Master::ProxyWithLink& cp)
     //          << " -> (" << l->target(i).gid << "," << l->target(i).proc << ")" << std::endl;
     cp.enqueue(l->target(i), total);
   }
+
+  cp.all_reduce(total, offsetof(Block, all_total), std::plus<int>());
 }
 
 // Average the values received from the neighbors
@@ -72,6 +75,8 @@ void average_neighbors(void* b_, const diy::Master::ProxyWithLink& cp)
 {
   Block*        b = static_cast<Block*>(b_);
   diy::Link*    l = cp.link();
+
+  std::cout << "All total (" << cp.gid() << "): " << b->all_total << std::endl;
 
   std::vector<int> in;
   cp.incoming(in);
@@ -84,7 +89,7 @@ void average_neighbors(void* b_, const diy::Master::ProxyWithLink& cp)
     total += v;
   }
   b->average = float(total) / in.size();
-  std::cout << "Average (" << cp.gid() << "): " << b->average << std::endl;
+  std::cout << "Average   (" << cp.gid() << "): " << b->average   << std::endl;
 }
 
 int main(int argc, char* argv[])

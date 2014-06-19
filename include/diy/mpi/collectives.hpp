@@ -41,6 +41,16 @@ namespace mpi
                  root, comm);
     }
 
+    static void all_reduce(const communicator& comm, const T& in, T& out, const Op&)
+    {
+      MPI_Allreduce(Datatype::address(in),
+                    Datatype::address(out),
+                    Datatype::count(in),
+                    Datatype::datatype(),
+                    detail::mpi_op<Op>::get(),
+                    comm);
+    }
+
     static void all_to_all(const communicator& comm, const std::vector<T>& in, std::vector<T>& out, int n = 1)
     {
       // NB: this will fail if T is a vector
@@ -69,6 +79,12 @@ namespace mpi
   void      reduce(const communicator& comm, const T& in, int root, const Op& op)
   {
     Collectives<T, Op>::reduce(comm, in, root, op);
+  }
+
+  template<class T, class Op>
+  void      all_reduce(const communicator& comm, const T& in, T& out, const Op& op)
+  {
+    Collectives<T, Op>::all_reduce(comm, in, out, op);
   }
 
   template<class T>
