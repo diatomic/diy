@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 
+#include "communicator.hpp"
 #include "cover.hpp"
 #include "storage.hpp"
 

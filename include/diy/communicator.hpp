@@ -6,6 +6,7 @@
 
 #include "types.hpp"
 #include "cover.hpp"
+#include "mpi.hpp"
 #include "serialization.hpp"
 #include "detail/collectives.hpp"
 
