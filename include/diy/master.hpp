@@ -74,7 +74,7 @@ namespace diy
 
       // f will be called with
       template<class Functor>
-      void          foreach(const Functor& f);
+      void          foreach(const Functor& f, void* aux = 0);
 
       void          extract_collectives(int i);
 
@@ -252,7 +252,7 @@ load(int i)
 template<class Functor>
 void
 diy::Master::
-foreach(const Functor& f)
+foreach(const Functor& f, void* aux)
 {
   for (unsigned i = 0; i < size(); ++i)
   {
@@ -266,7 +266,7 @@ foreach(const Functor& f)
     // Copy out pending collectives
     extract_collectives(i);
 
-    f(block(i), proxy(i));
+    f(block(i), proxy(i), aux);
     // TODO: invoke opportunistic communication
   }
 }

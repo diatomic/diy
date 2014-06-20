@@ -49,7 +49,7 @@ void load_block(void* b, diy::BinaryBuffer& bb)
 }
 
 // Compute average of local values
-void local_average(void* b_, const diy::Master::ProxyWithLink& cp)
+void local_average(void* b_, const diy::Master::ProxyWithLink& cp, void*)
 {
   Block*        b = static_cast<Block*>(b_);
   diy::Link*    l = cp.link();
@@ -71,7 +71,7 @@ void local_average(void* b_, const diy::Master::ProxyWithLink& cp)
 }
 
 // Average the values received from the neighbors
-void average_neighbors(void* b_, const diy::Master::ProxyWithLink& cp)
+void average_neighbors(void* b_, const diy::Master::ProxyWithLink& cp, void*)
 {
   Block*        b = static_cast<Block*>(b_);
   diy::Link*    l = cp.link();

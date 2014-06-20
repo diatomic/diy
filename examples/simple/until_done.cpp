@@ -22,7 +22,7 @@ void    save_block(const void* b,
 void    load_block(void* b,
                    diy::BinaryBuffer& bb)   { diy::load(bb, *static_cast<Block*>(b)); }
 
-void flip_coin(void* b_, const diy::Master::ProxyWithLink& cp)
+void flip_coin(void* b_, const diy::Master::ProxyWithLink& cp, void*)
 {
   Block*        b = static_cast<Block*>(b_);
 
