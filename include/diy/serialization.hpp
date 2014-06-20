@@ -42,6 +42,12 @@ namespace diy
   template<class T>
   void                  load(BinaryBuffer& bb, T& x)                { Serialization<T>::load(bb, x); }
 
+  template<class T>
+  void                  save(BinaryBuffer& bb, const T* x, size_t n);
+
+  template<class T>
+  void                  load(BinaryBuffer& bb, T* x, size_t n);
+
   // Load back support only binary data copying (meant for simple footers)
   template<class T>
   void                  load_back(BinaryBuffer& bb, T& x)           { bb.load_binary_back((char*) &x, sizeof(T)); }
@@ -62,6 +68,26 @@ namespace diy
     };
   }
 
+  template<class T>
+  void                  save(BinaryBuffer& bb, const T* x, size_t n)
+  {
+    if (!detail::is_default< Serialization<T> >::value)
+      for (unsigned i = 0; i < n; ++i)
+        diy::save(bb, x[i]);
+    else        // if Serialization is not specialized for U, just save the binary data
+      bb.save_binary((const char*) &x[0], sizeof(T)*n);
+  }
+
+  template<class T>
+  void                  load(BinaryBuffer& bb, T* x, size_t n)
+  {
+    if (!detail::is_default< Serialization<T> >::value)
+      for (unsigned i = 0; i < n; ++i)
+        diy::load(bb, x[i]);
+    else      // if Serialization is not specialized for U, just load the binary data
+      bb.load_binary((char*) &x[0], sizeof(T)*n);
+  }
+
   // save/load for std::vector<U>
   template<class U>
   struct Serialization< std::vector<U> >
@@ -70,25 +96,17 @@ namespace diy
 
     static void         save(BinaryBuffer& bb, const Vector& v)
     {
-      unsigned s = v.size();
+      size_t s = v.size();
       diy::save(bb, s);
-      if (!detail::is_default< Serialization<U> >::value)
-        for (unsigned i = 0; i < s; ++i)
-          diy::save(bb, v[i]);
-      else        // if Serialization is not specialized for U, just save the binary data
-        bb.save_binary((const char*) &v[0], sizeof(U)*v.size());
+      diy::save(bb, &v[0], v.size());
     }
 
     static void         load(BinaryBuffer& bb, Vector& v)
     {
-      unsigned s;
+      size_t s;
       diy::load(bb, s);
       v.resize(s);
-      if (!detail::is_default< Serialization<U> >::value)
-        for (unsigned i = 0; i < s; ++i)
-          diy::load(bb, v[i]);
-      else      // if Serialization is not specialized for U, just load the binary data
-        bb.load_binary((char*) &v[0], sizeof(U)*s);
+      diy::load(bb, &v[0], s);
     }
   };
 
