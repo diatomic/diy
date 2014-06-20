@@ -7,10 +7,10 @@
 typedef     diy::DiscreteBounds         Bounds;
 //typedef     diy::ContinuousBounds       Bounds;
 
-void create(const Bounds& core, const Bounds& bounds, const diy::Link& link)
+void create(int gid, const Bounds& core, const Bounds& bounds, const diy::Link& link)
 {
   std::cout << "   "
-            << "Creating block: "
+            << "Creating block (" << gid << "): "
             << core.min[0]   << ' ' << core.min[1]   << ' ' << core.min[2] << " - "
             << core.max[0]   << ' ' << core.max[1]   << ' ' << core.max[2] << " : "
             << bounds.min[0] << ' ' << bounds.min[1] << ' ' << bounds.min[2] << " - "
