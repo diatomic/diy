@@ -45,6 +45,11 @@ int main(int argc, char** argv)
     mpi::reduce(world, in, 0, std::plus<int>());
   }
 
+  int in   = 3 + world.rank()*2,
+      out;
+  mpi::scan(world, in, out, std::plus<int>());
+  std::cout << "Scan (" << world.rank() << "): " << in << " -> " << out << std::endl;
+
   mpi::optional<mpi::status>  status = world.iprobe(mpi::any_source, mpi::any_tag);
   std::cout << "Messages pending (" << world.rank() << "): " << status << std::endl;
 }

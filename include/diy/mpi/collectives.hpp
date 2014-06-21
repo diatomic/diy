@@ -2,13 +2,12 @@
 
 #include "operations.hpp"
 
-// TODO: add scan and gather
+// TODO: add gather
 
 namespace diy
 {
 namespace mpi
 {
-  /* Broadcast */
   template<class T, class Op>
   struct Collectives
   {
@@ -51,6 +50,16 @@ namespace mpi
                     comm);
     }
 
+    static void scan(const communicator& comm, const T& in, T& out, const Op&)
+    {
+      MPI_Scan(Datatype::address(in),
+               Datatype::address(out),
+               Datatype::count(in),
+               Datatype::datatype(),
+               detail::mpi_op<Op>::get(),
+               comm);
+    }
+
     static void all_to_all(const communicator& comm, const std::vector<T>& in, std::vector<T>& out, int n = 1)
     {
       // NB: this will fail if T is a vector
@@ -85,6 +94,12 @@ namespace mpi
   void      all_reduce(const communicator& comm, const T& in, T& out, const Op& op)
   {
     Collectives<T, Op>::all_reduce(comm, in, out, op);
+  }
+
+  template<class T, class Op>
+  void      scan(const communicator& comm, const T& in, T& out, const Op& op)
+  {
+    Collectives<T, Op>::scan(comm, in, out, op);
   }
 
   template<class T>
