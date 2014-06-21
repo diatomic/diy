@@ -114,33 +114,34 @@ int main(int argc, char* argv[])
   diy::RoundRobinAssigner   assigner(world.size(), nblocks);
 
   // creates a linear chain of blocks
-  for (unsigned gid = 0; gid < nblocks; ++gid)
+  std::vector<int> gids;
+  assigner.local_gids(comm.rank(), gids);
+  for (unsigned i = 0; i < gids.size(); ++i)
   {
-    if (assigner.rank(gid) == comm.rank())
-    {
-      diy::Link*    link = new diy::Link;
-      diy::BlockID  neighbor;
-      if (gid < nblocks - 1)
-      {
-        neighbor.gid  = gid + 1;
-        neighbor.proc = assigner.rank(neighbor.gid);
-        link->add_neighbor(neighbor);
-      }
-      if (gid > 0)
-      {
-        neighbor.gid  = gid - 1;
-        neighbor.proc = assigner.rank(neighbor.gid);
-        link->add_neighbor(neighbor);
-      }
+    int gid = gids[i];
 
-      Block* b = new Block;
-      for (unsigned i = 0; i < 3; ++i)
-      {
-        b->values.push_back(gid*3 + i);
-        //std::cout << gid << ": " << b->values.back() << std::endl;
-      }
-      master.add(gid, b, link);
+    diy::Link*    link = new diy::Link;
+    diy::BlockID  neighbor;
+    if (gid < nblocks - 1)
+    {
+      neighbor.gid  = gid + 1;
+      neighbor.proc = assigner.rank(neighbor.gid);
+      link->add_neighbor(neighbor);
     }
+    if (gid > 0)
+    {
+      neighbor.gid  = gid - 1;
+      neighbor.proc = assigner.rank(neighbor.gid);
+      link->add_neighbor(neighbor);
+    }
+
+    Block* b = new Block;
+    for (unsigned i = 0; i < 3; ++i)
+    {
+      b->values.push_back(gid*3 + i);
+      //std::cout << gid << ": " << b->values.back() << std::endl;
+    }
+    master.add(gid, b, link);
   }
 
   master.foreach(&local_average);

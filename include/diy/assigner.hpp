@@ -1,6 +1,8 @@
 #ifndef DIY_ASSIGNER_HPP
 #define DIY_ASSIGNER_HPP
 
+#include <vector>
+
 namespace diy
 {
   // Derived types should define
@@ -14,6 +16,8 @@ namespace diy
 
       int           size() const                        { return size_; }
       int           nblocks() const                     { return nblocks_; }
+
+      virtual void  local_gids(int rank, std::vector<int>& gids) const   =0;
       virtual int   rank(int gid) const     =0;
 
     private:
@@ -31,6 +35,8 @@ namespace diy
       using Assigner::nblocks;
 
       int   rank(int gid) const                 { return gid / (nblocks() / size()); }
+      inline
+      void  local_gids(int rank, std::vector<int>& gids) const;
   };
 
   class RoundRobinAssigner: public Assigner
@@ -43,7 +49,34 @@ namespace diy
       using Assigner::nblocks;
 
       int   rank(int gid) const                 { return gid % size(); }
+      inline
+      void  local_gids(int rank, std::vector<int>& gids) const;
   };
+}
+
+void
+diy::ContiguousAssigner::
+local_gids(int rank, std::vector<int>& gids) const
+{
+  int batch = nblocks() / size();
+  int from  = batch * rank;
+  int to    = batch * (rank + 1);
+  if (rank == size())
+    to = nblocks();
+  for (int gid = from; gid < to; ++gid)
+    gids.push_back(gid);
+}
+
+void
+diy::RoundRobinAssigner::
+local_gids(int rank, std::vector<int>& gids) const
+{
+  int cur = rank;
+  while (cur < nblocks())
+  {
+    gids.push_back(cur);
+    cur += size();
+  }
 }
 
 #endif

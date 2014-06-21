@@ -77,80 +77,80 @@ namespace detail
     {
       int nblocks = assigner.nblocks();
 
-      // TODO: find a more efficient way than iterating over all gids
-      for (int gid = 0; gid < nblocks; ++gid)
+      std::vector<int> gids;
+      assigner.local_gids(rank, gids);
+      for (int i = 0; i < gids.size(); ++i)
       {
-        if (assigner.rank(gid) == rank)
+        int gid = gids[i];
+
+        DivisionsVector coords;
+        gid_to_coords(gid, coords);
+
+        Bounds core, bounds;
+        fill_bounds(core,   coords);
+        fill_bounds(bounds, coords, true);
+
+        // Fill link with all the neighbors
+        Link link(dim);
+        std::vector<int>  offsets(dim, -1);
+        offsets[0] = -2;
+        while (!all(offsets, 1))
         {
-          DivisionsVector coords;
-          gid_to_coords(gid, coords);
+          // next offset
+          int i;
+          for (i = 0; i < dim; ++i)
+            if (offsets[i] == 1)
+              offsets[i] = -1;
+            else
+              break;
+          ++offsets[i];
 
-          Bounds core, bounds;
-          fill_bounds(core,   coords);
-          fill_bounds(bounds, coords, true);
+          if (all(offsets, 0)) continue;      // skip ourselves
 
-          // Fill link with all the neighbors
-          Link link(dim);
-          std::vector<int>  offsets(dim, -1);
-          offsets[0] = -2;
-          while (!all(offsets, 1))
+          DivisionsVector     nhbr_coords(dim);
+          int                 dir      = 0;
+          bool                inbounds = true;
+          for (int i = 0; i < dim; ++i)
           {
-            // next offset
-            int i;
-            for (i = 0; i < dim; ++i)
-              if (offsets[i] == 1)
-                offsets[i] = -1;
-              else
-                break;
-            ++offsets[i];
+            nhbr_coords[i] = coords[i] + offsets[i];
 
-            if (all(offsets, 0)) continue;      // skip ourselves
-
-            DivisionsVector     nhbr_coords(dim);
-            int                 dir      = 0;
-            bool                inbounds = true;
-            for (int i = 0; i < dim; ++i)
+            // wrap
+            if (nhbr_coords[i] < 0)
             {
-              nhbr_coords[i] = coords[i] + offsets[i];
-
-              // wrap
-              if (nhbr_coords[i] < 0)
-              {
-                if (wrap[i])
-                  nhbr_coords[i] = divisions[i] - 1;
-                else
-                  inbounds = false;
-              }
-
-              if (nhbr_coords[i] >= divisions[i])
-              {
-                if (wrap[i])
-                  nhbr_coords[i] = 0;
-                else
-                  inbounds = false;
-              }
-
-              // NB: this needs to match the addressing scheme in dir_t (in constants.h)
-              if (offsets[i] == -1)
-                dir |= 1 << (2*i + 1);
-              if (offsets[i] == 1)
-                dir |= 1 << (2*i + 2);
+              if (wrap[i])
+                nhbr_coords[i] = divisions[i] - 1;
+              else
+                inbounds = false;
             }
-            if (!inbounds) continue;
 
-            int nhbr_gid = coords_to_gid(nhbr_coords);
-            BlockID bid; bid.gid = nhbr_gid; bid.proc = assigner.rank(nhbr_gid);
-            link.add_neighbor(bid);
+            if (nhbr_coords[i] >= divisions[i])
+            {
+              if (wrap[i])
+                nhbr_coords[i] = 0;
+              else
+                inbounds = false;
+            }
 
-            Bounds nhbr_bounds;
-            fill_bounds(nhbr_bounds, nhbr_coords);
-            link.add_bounds(nhbr_bounds);
-
-            link.add_direction(static_cast<Direction>(dir));
+            // NB: this needs to match the addressing scheme in dir_t (in constants.h)
+            if (offsets[i] == -1)
+              dir |= 1 << (2*i + 1);
+            if (offsets[i] == 1)
+              dir |= 1 << (2*i + 2);
           }
+          if (!inbounds) continue;
 
-          create(gid, core, bounds, link);
+          int nhbr_gid = coords_to_gid(nhbr_coords);
+          BlockID bid; bid.gid = nhbr_gid; bid.proc = assigner.rank(nhbr_gid);
+          link.add_neighbor(bid);
+
+          Bounds nhbr_bounds;
+          fill_bounds(nhbr_bounds, nhbr_coords);
+          link.add_bounds(nhbr_bounds);
+
+          link.add_direction(static_cast<Direction>(dir));
         }
+
+        create(gid, core, bounds, link);
       }
     }
 
