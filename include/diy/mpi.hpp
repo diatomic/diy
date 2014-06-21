@@ -11,6 +11,7 @@
 #include "mpi/point-to-point.hpp"
 #include "mpi/communicator.hpp"
 #include "mpi/collectives.hpp"
+#include "mpi/io.hpp"
 
 namespace diy
 {
