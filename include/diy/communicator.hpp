@@ -76,10 +76,15 @@ namespace diy
     int                 gid() const                                     { return gid_; }
 
     template<class T>
-    void                enqueue(const BlockID& to, const T& x) const    { OutgoingQueues& out = *outgoing_; save(out[to], x); }
+    void                enqueue(const BlockID& to, const T& x,
+                                void (*save)(BinaryBuffer&, const T&) = &::diy::save<T>) const
+    { OutgoingQueues& out = *outgoing_; save(out[to], x); }
 
     template<class T>
-    void                dequeue(int from, T& x) const                   { IncomingQueues& in  = *incoming_; load(in[from], x); }
+    void                dequeue(int from, T& x,
+                                void (*load)(BinaryBuffer&, T&) = &::diy::load<T>) const
+    { IncomingQueues& in  = *incoming_; load(in[from], x); }
+
     inline void         incoming(std::vector<int>& v) const;            // fill v with every gid from which we have a message
 
     template<class T, class Op>
