@@ -67,6 +67,8 @@ namespace diy
       int           lid(int gid) const                  { return local(gid) ?  lids_.find(gid)->second : -1; }
       bool          local(int gid) const                { return lids_.find(gid) != lids_.end(); }
 
+      inline void   exchange();
+
       inline
       ProxyWithLink proxy(int i) const;
 
@@ -269,6 +271,7 @@ foreach(const Functor& f, void* aux)
 
     f(block(i), proxy(i), aux);
     // TODO: invoke opportunistic communication
+    //       don't forget to adjust Master::exchange()
   }
 }
 
@@ -284,6 +287,23 @@ extract_collectives(int i)
     it->result_out(block(i));
   }
   comm_.collectives(gid(i)).clear();
+}
+
+void
+diy::Master::
+exchange()
+{
+  // make sure there is a queue for each neighbor
+  for (int i = 0; i < size(); ++i)
+  {
+    Communicator::OutgoingQueues& outgoing = comm_.outgoing(gid(i));
+    if (outgoing.size() < link(i)->count())
+      for (unsigned j = 0; j < link(i)->count(); ++j)
+        outgoing[link(i)->target(j)];       // touch the outgoing queue, creating it if necessary
+  }
+
+  comm_.exchange();
+  comm_.flush();
 }
 
 #endif
