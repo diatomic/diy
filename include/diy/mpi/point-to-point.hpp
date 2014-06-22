@@ -7,11 +7,11 @@ namespace mpi
 namespace detail
 {
   // send
-  template<class T, bool is_mpi_datatype_ = is_mpi_datatype<T>::value>
+  template< class T, class is_mpi_datatype_ = typename is_mpi_datatype<T>::type >
   struct send;
 
   template<class T>
-  struct send<T, true>
+  struct send<T, true_type>
   {
     void operator()(MPI_Comm comm, int dest, int tag, const T& x) const
     {
@@ -24,11 +24,11 @@ namespace detail
   };
 
   // recv
-  template<class T, bool is_mpi_datatype_ = is_mpi_datatype<T>::value>
+  template< class T, class is_mpi_datatype_ = typename is_mpi_datatype<T>::type >
   struct recv;
 
   template<class T>
-  struct recv<T, true>
+  struct recv<T, true_type>
   {
     status operator()(MPI_Comm comm, int source, int tag, T& x) const
     {
@@ -40,7 +40,7 @@ namespace detail
   };
 
   template<class U>
-  struct recv<std::vector<U>, true>
+  struct recv<std::vector<U>, true_type>
   {
     status operator()(MPI_Comm comm, int source, int tag, std::vector<U>& x) const
     {
@@ -55,11 +55,11 @@ namespace detail
   };
 
   // isend
-  template<class T, bool is_mpi_datatype_ = is_mpi_datatype<T>::value>
+  template< class T, class is_mpi_datatype_ = typename is_mpi_datatype<T>::type >
   struct isend;
 
   template<class T>
-  struct isend<T, true>
+  struct isend<T, true_type>
   {
     request operator()(MPI_Comm comm, int dest, int tag, const T& x) const
     {
@@ -74,11 +74,11 @@ namespace detail
   };
 
   // irecv
-  template<class T, bool is_mpi_datatype_ = is_mpi_datatype<T>::value>
+  template< class T, class is_mpi_datatype_ = typename is_mpi_datatype<T>::type >
   struct irecv;
 
   template<class T>
-  struct irecv<T, true>
+  struct irecv<T, true_type>
   {
     request operator()(MPI_Comm comm, int source, int tag, T& x) const
     {

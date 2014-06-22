@@ -8,15 +8,17 @@ namespace detail
 {
   template<class T> MPI_Datatype  get_mpi_datatype();
 
+  struct true_type  {};
+  struct false_type {};
+
   /* is_mpi_datatype */
   template<class T>
-  struct is_mpi_datatype
-  { static const bool value; };
+  struct is_mpi_datatype        { typedef false_type    type; };
 
-#define DIY_MPI_DATATYPE_MAP(type, mpi_type) \
-  template<>  MPI_Datatype  get_mpi_datatype<type>()                        { return mpi_type; }  \
-  template<>  const bool    is_mpi_datatype<type>::value                    = true;     \
-  template<>  const bool    is_mpi_datatype< std::vector<type> >::value     = true;
+#define DIY_MPI_DATATYPE_MAP(cpp_type, mpi_type) \
+  template<>  inline MPI_Datatype  get_mpi_datatype<cpp_type>() { return mpi_type; }  \
+  template<>  struct is_mpi_datatype<cpp_type>                  { typedef true_type type; };    \
+  template<>  struct is_mpi_datatype< std::vector<cpp_type> >   { typedef true_type type; };
 
   DIY_MPI_DATATYPE_MAP(char,                  MPI_BYTE);
   DIY_MPI_DATATYPE_MAP(bool,                  MPI_BYTE);
