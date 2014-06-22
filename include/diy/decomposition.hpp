@@ -133,9 +133,9 @@ namespace detail
 
             // NB: this needs to match the addressing scheme in dir_t (in constants.h)
             if (offsets[i] == -1)
-              dir |= 1 << (2*i + 1);
+              dir |= 1 << (2*i + 0);
             if (offsets[i] == 1)
-              dir |= 1 << (2*i + 2);
+              dir |= 1 << (2*i + 1);
           }
           if (!inbounds) continue;
 
