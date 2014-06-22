@@ -57,7 +57,7 @@ namespace diy
       template<class Block>
       Block*        block(int i) const                  { return static_cast<Block*>(block(i)); }
       inline Link*  link(int i) const;
-      inline int    loaded_block() const                { int i = 0; while (block(i) == 0) ++i; return i; }
+      inline int    loaded_block() const                { int i = 0; for (; i < size(); ++i) if (block(i) != 0) break; return i; }
 
       inline void   unload_all();
       inline void   unload(int i);
@@ -302,7 +302,6 @@ exchange()
         outgoing[link(i)->target(j)];       // touch the outgoing queue, creating it if necessary
   }
 
-  comm_.exchange();
   comm_.flush();
 }
 

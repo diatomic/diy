@@ -198,6 +198,9 @@ void
 diy::Communicator::
 process_collectives()
 {
+  if (collectives_.empty())
+      return;
+
   typedef       CollectivesList::iterator       CollectivesIterator;
   std::vector<CollectivesIterator>  iters;
   std::vector<int>                  gids;
