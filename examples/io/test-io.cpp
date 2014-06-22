@@ -5,8 +5,11 @@
 #include <diy/io/bov.hpp>
 #include <diy/io/numpy.hpp>
 
-int main()
+int main(int argc, char* argv[])
 {
+  diy::mpi::environment     env(argc, argv);
+  diy::mpi::communicator    world;
+
   std::vector<unsigned> shape;
   shape.push_back(16);
   shape.push_back(16);
@@ -15,8 +18,8 @@ int main()
   box.min[0] = box.min[1] = 4;
   box.max[0] = box.max[1] = 7;
 
-  std::ifstream in("test.bin", std::ios::binary);
-  diy::io::BOVReader reader(in, shape);
+  diy::mpi::io::file in(world, "test.bin", diy::mpi::io::file::rdonly);
+  diy::io::BOV reader(in, shape);
 
   std::cout << "Reading" << std::endl;
   std::vector<float> data(16);
@@ -26,8 +29,8 @@ int main()
     std::cout << data[i] << std::endl;
 
   std::cout << "---" << std::endl;
-  std::ifstream in2("test.npy", std::ios::binary);
-  diy::io::NumPyReader  reader2(in2);
+  diy::mpi::io::file in2(world, "test.npy", diy::mpi::io::file::rdonly);
+  diy::io::NumPy  reader2(in2);
   std::vector<float> data2(16);
   reader2.read(box, &data2[0]);
 

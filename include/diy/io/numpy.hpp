@@ -8,19 +8,19 @@ namespace diy
 {
 namespace io
 {
-  class NumPyReader: public BOVReader
+  class NumPy: public BOV
   {
     public:
-      typedef       BOVReader::Shape                Shape;
+      typedef       BOV::Shape              Shape;
     public:
-                    NumPyReader(std::ifstream& in):
-                      BOVReader(in)
+                    NumPy(mpi::io::file& f):
+                      BOV(f)
       {
         Shape  shape;
         bool   fortran;
         size_t offset = parse_npy_header(shape, fortran);
-        BOVReader::set_offset(offset);
-        BOVReader::set_shape(shape);
+        BOV::set_offset(offset);
+        BOV::set_shape(shape);
       }
 
       unsigned          word_size() const                       { return word_size_; }
@@ -39,16 +39,17 @@ namespace io
 // Released under MIT License
 // license available at http://www.opensource.org/licenses/mit-license.php
 size_t
-diy::io::NumPyReader::
+diy::io::NumPy::
 parse_npy_header(Shape& shape, bool& fortran_order)
 {
     char buffer[256];
-    in().read(buffer,11);
-    if(!in())
-        throw std::runtime_error("parse_npy_header: failed fread");
-    std::string header;
-    std::getline(in(), header);
-    size_t header_size = header.size() + 1 + 11;
+    file().read_at_all(0, buffer, 256);
+    std::string header(buffer, buffer + 256);
+    size_t nl = header.find('\n');
+    if (nl == std::string::npos)
+        throw std::runtime_error("parse_npy_header: failed to read the header");
+    header = header.substr(11, nl - 11 + 1);
+    size_t header_size = nl + 1;
 
     int loc1, loc2;
 

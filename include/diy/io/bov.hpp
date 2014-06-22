@@ -6,23 +6,24 @@
 #include <numeric>
 
 #include "../types.hpp"
+#include "../mpi.hpp"
 
 namespace diy
 {
 namespace io
 {
   // Reads and writes (TODO) subsets of a block of values into specified block bounds
-  class BOVReader
+  class BOV
   {
     public:
       typedef       std::vector<unsigned>                               Shape;
     public:
-                    BOVReader(std::ifstream&    in,
-                              const Shape&      shape  = Shape(),
-                              size_t            offset = 0):
-                      in_(in), offset_(offset)                          { set_shape(shape); }
+                    BOV(mpi::io::file&    f,
+                        const Shape&      shape  = Shape(),
+                        mpi::io::offset   offset = 0):
+                      f_(f), offset_(offset)                            { set_shape(shape); }
 
-      void          set_offset(size_t offset)                           { offset_ = offset; }
+      void          set_offset(mpi::io::offset offset)                  { offset_ = offset; }
       inline void   set_shape(const Shape& shape)
       {
         shape_ = shape;
@@ -41,10 +42,10 @@ namespace io
                          size_t word_size);
 
     protected:
-      std::ifstream&        in()                                        { return in_; }
+      mpi::io::file&        file()                                        { return f_; }
 
     private:
-      std::ifstream&        in_;
+      mpi::io::file&        f_;
       Shape                 shape_;
       std::vector<size_t>   stride_;
       size_t                offset_;
@@ -53,7 +54,7 @@ namespace io
 }
 
 void
-diy::io::BOVReader::
+diy::io::BOV::
 read(const DiscreteBounds& bounds, char* buffer, size_t word_size)
 {
   long int sz = bounds.max[0] - bounds.min[0] + 1;
@@ -68,12 +69,12 @@ read(const DiscreteBounds& bounds, char* buffer, size_t word_size)
   for (unsigned i = 0; i < shape_.size(); ++i)
     v.push_back(bounds.min[i]);
 
-  long int mv = std::inner_product(v.begin(), v.end(), stride_.begin(), 0);
-  in_.seekg(offset_ + mv*word_size, in_.beg);
+  long int        mv = std::inner_product(v.begin(), v.end(), stride_.begin(), 0);
+  mpi::io::offset o  = offset_ + mv*word_size;
   while (true)
   {
     // read data
-    in_.read(buffer + c*word_size*sz, word_size*sz);
+    f_.read_at(o, buffer + c*word_size*sz, word_size*sz);
     ++c;
 
     // increment v and compute mv and c
@@ -89,7 +90,7 @@ read(const DiscreteBounds& bounds, char* buffer, size_t word_size)
       break;
     v[i] += 1;
     mv += stride_[i];
-    in_.seekg(mv*word_size, in_.cur);
+    o += mv*word_size;
   }
 }
 
