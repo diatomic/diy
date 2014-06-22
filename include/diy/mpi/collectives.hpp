@@ -20,6 +20,52 @@ namespace mpi
                 Datatype::datatype(), root, comm);
     }
 
+    static void gather(const communicator& comm, const T& in, std::vector<T>& out, int root)
+    {
+      out.resize(comm.size() * Datatype::count(in));
+      MPI_Gather(Datatype::address(in),
+                 Datatype::count(in),
+                 Datatype::datatype(),
+                 Datatype::address(&out[0]),
+                 Datatype::count(in),
+                 Datatype::datatype(),
+                 root, comm);
+    }
+
+    static void gather(const communicator& comm, const std::vector<T>& in, std::vector<T>& out, int root)
+    {
+      out.resize(comm.size() * in.size());
+      MPI_Gather(Datatype::address(in[0]),
+                 in.size(),
+                 Datatype::datatype(),
+                 Datatype::address(out[0]),
+                 in.size(),
+                 Datatype::datatype(),
+                 root, comm);
+    }
+
+    static void gather(const communicator& comm, const T& in, int root)
+    {
+      MPI_Gather(Datatype::address(in),
+                 Datatype::count(in),
+                 Datatype::datatype(),
+                 Datatype::address(const_cast<T&>(in)),
+                 Datatype::count(in),
+                 Datatype::datatype(),
+                 root, comm);
+    }
+
+    static void gather(const communicator& comm, const std::vector<T>& in, int root)
+    {
+      MPI_Gather(Datatype::address(in[0]),
+                 in.size(),
+                 Datatype::datatype(),
+                 Datatype::address(const_cast<T&>(in[0])),
+                 in.size(),
+                 Datatype::datatype(),
+                 root, comm);
+    }
+
     static void reduce(const communicator& comm, const T& in, T& out, int root, const Op&)
     {
       MPI_Reduce(Datatype::address(in),
@@ -63,9 +109,9 @@ namespace mpi
     static void all_to_all(const communicator& comm, const std::vector<T>& in, std::vector<T>& out, int n = 1)
     {
       // NB: this will fail if T is a vector
-      MPI_Alltoall(Datatype::address(&in[0]), n,
+      MPI_Alltoall(Datatype::address(in[0]), n,
                    Datatype::datatype(),
-                   Datatype::address(&out[0]), n,
+                   Datatype::address(out[0]), n,
                    Datatype::datatype(),
                    comm);
     }
@@ -75,6 +121,30 @@ namespace mpi
   void      broadcast(const communicator& comm, T& x, int root)
   {
     Collectives<T,void*>::broadcast(comm, x, root);
+  }
+
+  template<class T>
+  void      gather(const communicator& comm, const T& in, std::vector<T>& out, int root)
+  {
+    Collectives<T,void*>::gather(comm, in, out, root);
+  }
+
+  template<class T>
+  void      gather(const communicator& comm, const std::vector<T>& in, std::vector<T>& out, int root)
+  {
+    Collectives<T,void*>::gather(comm, in, out, root);
+  }
+
+  template<class T>
+  void      gather(const communicator& comm, const T& in, int root)
+  {
+    Collectives<T,void*>::gather(comm, in, root);
+  }
+
+  template<class T>
+  void      gather(const communicator& comm, const std::vector<T>& in, int root)
+  {
+    Collectives<T,void*>::gather(comm, in, root);
   }
 
   template<class T, class Op>

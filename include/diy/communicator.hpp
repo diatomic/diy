@@ -41,6 +41,7 @@ namespace diy
                           received_(0)                  {}
 
       int               rank() const                    { return comm_.rank(); }
+      int               size() const                    { return comm_.size(); }
       inline Proxy      proxy(int gid);
 
       IncomingQueues&   incoming(int gid)               { return incoming_[gid]; }
@@ -80,6 +81,7 @@ namespace diy
                           collectives_(&comm_->collectives(gid))    {}
 
     int                 gid() const                                     { return gid_; }
+    const Communicator& comm() const                                    { return *comm_; }
 
     template<class T>
     void                enqueue(const BlockID& to, const T& x,

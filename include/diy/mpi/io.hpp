@@ -35,6 +35,8 @@ namespace io
                         comm_(comm)                         { MPI_File_open(comm, const_cast<char*>(filename.c_str()), mode, MPI_INFO_NULL, &fh); }
                     ~file()                                 { MPI_File_close(&fh); }
 
+      offset        size() const                            { offset sz; MPI_File_get_size(fh, &sz); return sz; }
+
       inline void   read_at(offset o, char* buffer, size_t size);
       inline void   read_at_all(offset o, char* buffer, size_t size);
       inline void   write_at(offset o, const char* buffer, size_t size);
@@ -94,7 +96,7 @@ void
 diy::mpi::io::file::
 read_at_all(offset o, std::vector<T>& data)
 {
-  read_at_all(o, &data[0], data.size()*sizeof(T));
+  read_at_all(o, (char*) &data[0], data.size()*sizeof(T));
 }
 
 void
@@ -110,7 +112,7 @@ void
 diy::mpi::io::file::
 write_at(offset o, const std::vector<T>& data)
 {
-  write_at(o, &data[0], data.size()*sizeof(T));
+  write_at(o, (const char*) &data[0], data.size()*sizeof(T));
 }
 
 void

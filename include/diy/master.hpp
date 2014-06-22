@@ -63,6 +63,9 @@ namespace diy
       inline void   unload(int i);
       inline void   load(int i);
 
+      // load if necessary
+      void*         get(int i)                          { if (block(i) == 0) load(i); return block(i); }
+
       int           gid(int i) const                    { return gids_[i]; }
       int           lid(int gid) const                  { return local(gid) ?  lids_.find(gid)->second : -1; }
       bool          local(int gid) const                { return lids_.find(gid) != lids_.end(); }
@@ -73,6 +76,9 @@ namespace diy
       ProxyWithLink proxy(int i) const;
 
       unsigned      size() const                        { return blocks_.size(); }
+      LoadBlock     loader() const                      { return load_; }
+      SaveBlock     saver() const                       { return save_; }
+      void*         create() const                      { return create_(); }
 
       // f will be called with
       template<class Functor>

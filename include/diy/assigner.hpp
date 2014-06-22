@@ -17,6 +17,8 @@ namespace diy
       int           size() const                        { return size_; }
       int           nblocks() const                     { return nblocks_; }
 
+      void          set_nblocks(int nblocks)            { nblocks_ = nblocks; }
+
       virtual void  local_gids(int rank, std::vector<int>& gids) const   =0;
       virtual int   rank(int gid) const     =0;
 
