@@ -124,6 +124,7 @@ namespace diy
               link_(link)                                           {}
 
       Link*   link() const                                          { return link_; }
+      void*   block() const                                         { return block_; }
 
       template<class T, class Op>
       void    all_reduce(const T& in, T& out, Op op) const
