@@ -34,7 +34,19 @@ namespace diy
       using Assigner::size;
       using Assigner::nblocks;
 
-      int   rank(int gid) const                 { return gid / (nblocks() / size()); }
+      int   rank(int gid) const
+      {
+          int div = nblocks() / size();
+          int mod = nblocks() % size();
+          int r = gid / (div + 1);
+          if (r < mod)
+          {
+              return r;
+          } else
+          {
+              return mod + (gid - (div + 1)*mod)/div;
+          }
+      }
       inline
       void  local_gids(int rank, std::vector<int>& gids) const;
   };
@@ -58,11 +70,20 @@ void
 diy::ContiguousAssigner::
 local_gids(int rank, std::vector<int>& gids) const
 {
-  int batch = nblocks() / size();
-  int from  = batch * rank;
-  int to    = batch * (rank + 1);
-  if (rank == size())
-    to = nblocks();
+  int div = nblocks() / size();
+  int mod = nblocks() % size();
+
+  int from, to;
+  if (rank < mod)
+      from = rank * (div + 1);
+  else
+      from = mod * (div + 1) + (rank - mod) * div;
+
+  if (rank + 1 < mod)
+      to = (rank + 1) * (div + 1);
+  else
+      to = mod * (div + 1) + (rank + 1 - mod) * div;
+
   for (int gid = from; gid < to; ++gid)
     gids.push_back(gid);
 }
