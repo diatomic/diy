@@ -18,19 +18,29 @@ namespace io
     public:
       typedef       std::vector<unsigned>                               Shape;
     public:
+                    BOV(mpi::io::file&    f):
+                      f_(f), offset_(0)                                 {}
+
+      template<class S>
                     BOV(mpi::io::file&    f,
-                        const Shape&      shape  = Shape(),
+                        const S&          shape  = S(),
                         mpi::io::offset   offset = 0):
                       f_(f), offset_(offset)                            { set_shape(shape); }
 
       void          set_offset(mpi::io::offset offset)                  { offset_ = offset; }
-      inline void   set_shape(const Shape& shape)
+
+      template<class S>
+      void          set_shape(const S& shape)
       {
-        shape_ = shape;
+        shape_.clear();
         stride_.clear();
-        stride_.push_back(1);
-        for (unsigned i = 1; i < shape_.size(); ++i)
-          stride_.push_back(stride_[i-1] * shape_[i-1]);
+        for (unsigned i = 0; i < shape.size(); ++i)
+        {
+            shape_.push_back(shape[i]);
+            stride_.push_back(1);
+        }
+        for (int i = shape_.size() - 2; i >=  0; --i)
+          stride_[i] = stride_[i+1] * shape_[i+1];
       }
 
       const Shape&  shape() const                                       { return shape_; }
@@ -40,6 +50,12 @@ namespace io
       inline void   read(const DiscreteBounds& bounds,
                          char* buffer,
                          size_t word_size);
+
+      template<class T>
+      void          write(const DiscreteBounds& bounds, const T* buffer){ write(bounds, reinterpret_cast<const char*>(buffer), sizeof(T)); }
+      inline void   write(const DiscreteBounds& bounds,
+                          const char* buffer,
+                          size_t word_size);
 
     protected:
       mpi::io::file&        file()                                        { return f_; }
@@ -57,16 +73,16 @@ void
 diy::io::BOV::
 read(const DiscreteBounds& bounds, char* buffer, size_t word_size)
 {
-  long int sz = bounds.max[0] - bounds.min[0] + 1;
-  long int c  = 0;
+  int       dim = shape_.size();
+  long int  sz  = bounds.max[dim - 1] - bounds.min[dim - 1] + 1;
+  long int  c   = 0;
 
-  std::vector<size_t>   bounds_stride;
-  bounds_stride.push_back(1);
-  for (int i = 1; i < shape_.size(); ++i)
-    bounds_stride.push_back(bounds_stride[i-1] * (bounds.max[i] - bounds.min[i] + 1));
+  std::vector<size_t> bounds_stride(dim, 1);
+  for (int i = dim - 2; i >= 0; --i)
+    bounds_stride[i] = bounds_stride[i+1] * (bounds.max[i] - bounds.min[i] + 1);
 
-  std::vector<int>      v, l;
-  for (unsigned i = 0; i < shape_.size(); ++i)
+  std::vector<int> v;
+  for (unsigned i = 0; i < dim; ++i)
     v.push_back(bounds.min[i]);
 
   long int        mv = std::inner_product(v.begin(), v.end(), stride_.begin(), 0);
@@ -78,15 +94,56 @@ read(const DiscreteBounds& bounds, char* buffer, size_t word_size)
     ++c;
 
     // increment v and compute mv and c
-    mv = -sz;
-    int i = 1;
-    while (i < v.size() && v[i] == bounds.max[i])
+    mv = 0;
+    int i = dim - 2;
+    while (i >= 0 && v[i] == bounds.max[i])
     {
       v[i] = bounds.min[i];
       mv -= (bounds.max[i] - bounds.min[i])*stride_[i];
-      ++i;
+      --i;
     }
-    if (i == v.size())
+    if (i == -1)
+      break;
+    v[i] += 1;
+    mv += stride_[i];
+    o += mv*word_size;
+  }
+}
+
+void
+diy::io::BOV::
+write(const DiscreteBounds& bounds, const char* buffer, size_t word_size)
+{
+  int       dim = shape_.size();
+  long int  sz  = bounds.max[dim - 1] - bounds.min[dim - 1] + 1;
+  long int  c   = 0;
+
+  std::vector<size_t> bounds_stride(dim, 1);
+  for (int i = dim - 2; i >= 0; --i)
+    bounds_stride[i] = bounds_stride[i+1] * (bounds.max[i] - bounds.min[i] + 1);
+
+  std::vector<int> v;
+  for (unsigned i = 0; i < dim; ++i)
+    v.push_back(bounds.min[i]);
+
+  long int        mv = std::inner_product(v.begin(), v.end(), stride_.begin(), 0);
+  mpi::io::offset o  = offset_ + mv*word_size;
+  while (true)
+  {
+    // write data
+    f_.write_at(o, buffer + c*word_size*sz, word_size*sz);
+    ++c;
+
+    // increment v and compute mv and c
+    mv = 0;
+    int i = dim - 2;
+    while (i >= 0 && v[i] == bounds.max[i])
+    {
+      v[i] = bounds.min[i];
+      mv -= (bounds.max[i] - bounds.min[i])*stride_[i];
+      --i;
+    }
+    if (i == -1)
       break;
     v[i] += 1;
     mv += stride_[i];

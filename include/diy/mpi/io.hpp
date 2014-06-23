@@ -31,7 +31,8 @@ namespace io
     public:
                     file(const communicator&    comm,
                          const std::string&     filename,
-                         int                    mode)       { MPI_File_open(comm, const_cast<char*>(filename.c_str()), mode, MPI_INFO_NULL, &fh); }
+                         int                    mode):
+                        comm_(comm)                         { MPI_File_open(comm, const_cast<char*>(filename.c_str()), mode, MPI_INFO_NULL, &fh); }
                     ~file()                                 { MPI_File_close(&fh); }
 
       inline void   read_at(offset o, char* buffer, size_t size);
@@ -51,8 +52,12 @@ namespace io
       template<class T>
       inline void   write_at_all(offset o, const std::vector<T>& data);
 
+      const communicator&
+                    comm() const                            { return comm_; }
+
     private:
-      MPI_File      fh;
+      const communicator&   comm_;
+      MPI_File              fh;
   };
 }
 }

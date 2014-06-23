@@ -31,9 +31,21 @@ int main(int argc, char* argv[])
   std::cout << "---" << std::endl;
   diy::mpi::io::file in2(world, "test.npy", diy::mpi::io::file::rdonly);
   diy::io::NumPy  reader2(in2);
+  reader2.read_header();
   std::vector<float> data2(16);
   reader2.read(box, &data2[0]);
 
   for (unsigned i = 0; i < data2.size(); ++i)
     std::cout << data2[i] << std::endl;
+
+  diy::mpi::io::file out(world, "out.npy", diy::mpi::io::file::wronly | diy::mpi::io::file::create);
+  diy::io::NumPy     writer(out);
+  std::vector<unsigned> box_shape;
+  box_shape.push_back(4);
+  box_shape.push_back(4);
+  diy::DiscreteBounds full_box;
+  full_box.min[0] = full_box.min[1] = 0;
+  full_box.max[0] = full_box.max[1] = 3;
+  writer.write_header<float>(box_shape);
+  writer.write(full_box, &data2[0]);
 }

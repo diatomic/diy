@@ -1,7 +1,11 @@
 #ifndef DIY_IO_NMPY_HPP
 #define DIY_IO_NMPY_HPP
 
+#include <sstream>
+#include <complex>
 #include <stdexcept>
+
+#include "../serialization.hpp"
 #include "bov.hpp"
 
 namespace diy
@@ -11,26 +15,45 @@ namespace io
   class NumPy: public BOV
   {
     public:
-      typedef       BOV::Shape              Shape;
-    public:
-                    NumPy(mpi::io::file& f):
-                      BOV(f)
-      {
-        Shape  shape;
-        bool   fortran;
-        size_t offset = parse_npy_header(shape, fortran);
-        BOV::set_offset(offset);
-        BOV::set_shape(shape);
-      }
+                        NumPy(mpi::io::file& f):
+                          BOV(f)                                {}
 
       unsigned          word_size() const                       { return word_size_; }
 
+      unsigned          read_header()
+      {
+        BOV::Shape  shape;
+        bool        fortran;
+        size_t      offset = parse_npy_header(shape, fortran);
+        BOV::set_offset(offset);
+        BOV::set_shape(shape);
+        return word_size_;
+      }
+
+      template<class T, class S>
+      void              write_header(const S& shape);
+
     private:
-      inline size_t     parse_npy_header(Shape& shape, bool& fortran_order);
+      inline size_t     parse_npy_header(BOV::Shape& shape, bool& fortran_order);
+      void              save(diy::BinaryBuffer& bb, const std::string& s)               { bb.save_binary(s.c_str(), s.size()); }
+      template<class T>
+      inline void       convert_and_save(diy::BinaryBuffer& bb, const T& x)
+      {
+          std::ostringstream oss;
+          oss << x;
+          save(bb, oss.str());
+      }
 
     private:
       unsigned          word_size_;
   };
+
+  namespace detail
+  {
+    inline char big_endian();
+    template<class T>
+    char map_numpy_type();
+  }
 }
 }
 
@@ -40,7 +63,7 @@ namespace io
 // license available at http://www.opensource.org/licenses/mit-license.php
 size_t
 diy::io::NumPy::
-parse_npy_header(Shape& shape, bool& fortran_order)
+parse_npy_header(BOV::Shape& shape, bool& fortran_order)
 {
     char buffer[256];
     file().read_at_all(0, buffer, 256);
@@ -86,6 +109,86 @@ parse_npy_header(Shape& shape, bool& fortran_order)
     word_size_ = atoi(str_ws.substr(0,loc2).c_str());
 
     return header_size;
+}
+
+template<class T, class S>
+void
+diy::io::NumPy::
+write_header(const S& shape)
+{
+    BOV::set_shape(shape);
+
+    diy::BinaryBuffer dict;
+    save(dict, "{'descr': '");
+    diy::save(dict, detail::big_endian());
+    diy::save(dict, detail::map_numpy_type<T>());
+    convert_and_save(dict, sizeof(T));
+    save(dict, "', 'fortran_order': False, 'shape': (");
+    convert_and_save(dict, shape[0]);
+    for (int i = 1; i < shape.size(); i++)
+    {
+        save(dict, ", ");
+        convert_and_save(dict, shape[i]);
+    }
+    if(shape.size() == 1) save(dict, ",");
+    save(dict, "), }");
+    //pad with spaces so that preamble+dict is modulo 16 bytes. preamble is 10 bytes. dict needs to end with \n
+    int remainder = 16 - (10 + dict.position) % 16;
+    for (int i = 0; i < remainder - 1; ++i)
+        diy::save(dict, ' ');
+    diy::save(dict, '\n');
+
+    diy::BinaryBuffer header;
+    diy::save(header, (char) 0x93);
+    save(header, "NUMPY");
+    diy::save(header, (char) 0x01);  // major version of numpy format
+    diy::save(header, (char) 0x00);  // minor version of numpy format
+    diy::save(header, (unsigned short) dict.position);
+    header.save_binary(&dict.buffer[0], dict.buffer.size());
+
+    BOV::set_offset(header.position);
+
+    if (file().comm().rank() == 0)
+        file().write_at(0, &header.buffer[0], header.buffer.size());
+}
+
+char
+diy::io::detail::big_endian()
+{
+  unsigned char x[] = {1,0};
+  short y = *(short*) x;
+  return y == 1 ? '<' : '>';
+}
+
+namespace diy
+{
+namespace io
+{
+namespace detail
+{
+template<> inline char map_numpy_type<float>()                         { return 'f'; }
+template<> inline char map_numpy_type<double>()                        { return 'f'; }
+template<> inline char map_numpy_type<long double>()                   { return 'f'; }
+
+template<> inline char map_numpy_type<int>()                           { return 'i'; }
+template<> inline char map_numpy_type<char>()                          { return 'i'; }
+template<> inline char map_numpy_type<short>()                         { return 'i'; }
+template<> inline char map_numpy_type<long>()                          { return 'i'; }
+template<> inline char map_numpy_type<long long>()                     { return 'i'; }
+
+template<> inline char map_numpy_type<unsigned int>()                  { return 'u'; }
+template<> inline char map_numpy_type<unsigned char>()                 { return 'u'; }
+template<> inline char map_numpy_type<unsigned short>()                { return 'u'; }
+template<> inline char map_numpy_type<unsigned long>()                 { return 'u'; }
+template<> inline char map_numpy_type<unsigned long long>()            { return 'u'; }
+
+template<> inline char map_numpy_type<bool>()                          { return 'b'; }
+
+template<> inline char map_numpy_type< std::complex<float> >()         { return 'c'; }
+template<> inline char map_numpy_type< std::complex<double> >()        { return 'c'; }
+template<> inline char map_numpy_type< std::complex<long double> >()   { return 'c'; }
+}
+}
 }
 
 #endif
