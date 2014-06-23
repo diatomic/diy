@@ -50,7 +50,7 @@ namespace diy
                     ~Master()                           { destroy_block_records(); }
       inline void   destroy_block_records();
 
-      inline void   add(int gid, void* b, Link* l);
+      inline int    add(int gid, void* b, Link* l);
       inline void*  release(int i);                     // release ownership of the block
 
       inline void*  block(int i) const;
@@ -178,7 +178,7 @@ proxy(int i) const
 { return ProxyWithLink(comm_.proxy(gid(i)), block(i), link(i)); }
 
 
-void
+int
 diy::Master::
 add(int gid, void* b, Link* l)
 {
@@ -188,10 +188,13 @@ add(int gid, void* b, Link* l)
   blocks_.push_back(new BlockRecord(b,l));
   external_.push_back(-1);
   gids_.push_back(gid);
-  lids_[gid] = gids_.size() - 1;
+  int lid = gids_.size() - 1;
+  lids_[gid] = lid;
   comm_.add_expected(l->count()); // NB: at every iteration we expect a message from each neighbor
 
   ++in_memory_;
+
+  return lid;
 }
 
 void*
