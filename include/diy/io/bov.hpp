@@ -16,7 +16,7 @@ namespace io
   class BOV
   {
     public:
-      typedef       std::vector<unsigned>                               Shape;
+      typedef       std::vector<int>                                    Shape;
     public:
                     BOV(mpi::io::file&    f):
                       f_(f), offset_(0)                                 {}
@@ -46,16 +46,10 @@ namespace io
       const Shape&  shape() const                                       { return shape_; }
 
       template<class T>
-      void          read(const DiscreteBounds& bounds, T* buffer)       { read(bounds, reinterpret_cast<char*>(buffer), sizeof(T)); }
-      inline void   read(const DiscreteBounds& bounds,
-                         char* buffer,
-                         size_t word_size);
+      void          read(const DiscreteBounds& bounds, T* buffer, bool collective = false);
 
       template<class T>
-      void          write(const DiscreteBounds& bounds, const T* buffer){ write(bounds, reinterpret_cast<const char*>(buffer), sizeof(T)); }
-      inline void   write(const DiscreteBounds& bounds,
-                          const char* buffer,
-                          size_t word_size);
+      void          write(const DiscreteBounds& bounds, const T* buffer, bool collective = false);
 
     protected:
       mpi::io::file&        file()                                        { return f_; }
@@ -69,86 +63,66 @@ namespace io
 }
 }
 
+template<class T>
 void
 diy::io::BOV::
-read(const DiscreteBounds& bounds, char* buffer, size_t word_size)
+read(const DiscreteBounds& bounds, T* buffer, bool collective)
 {
-  int       dim = shape_.size();
-  long int  sz  = bounds.max[dim - 1] - bounds.min[dim - 1] + 1;
-  long int  c   = 0;
-
-  std::vector<size_t> bounds_stride(dim, 1);
-  for (int i = dim - 2; i >= 0; --i)
-    bounds_stride[i] = bounds_stride[i+1] * (bounds.max[i] - bounds.min[i] + 1);
-
-  std::vector<int> v;
+  int dim   = shape_.size();
+  int total = 1;
+  std::vector<int> subsizes;
   for (unsigned i = 0; i < dim; ++i)
-    v.push_back(bounds.min[i]);
-
-  long int        mv = std::inner_product(v.begin(), v.end(), stride_.begin(), 0);
-  mpi::io::offset o  = offset_ + mv*word_size;
-  while (true)
   {
-    // read data
-    f_.read_at(o, buffer + c*word_size*sz, word_size*sz);
-    ++c;
-
-    // increment v and compute mv and c
-    mv = 0;
-    int i = dim - 2;
-    while (i >= 0 && v[i] == bounds.max[i])
-    {
-      v[i] = bounds.min[i];
-      mv -= (bounds.max[i] - bounds.min[i])*stride_[i];
-      --i;
-    }
-    if (i == -1)
-      break;
-    v[i] += 1;
-    mv += stride_[i];
-    o += mv*word_size;
+    subsizes.push_back(bounds.max[i] - bounds.min[i] + 1);
+    total *= subsizes.back();
   }
+
+  MPI_Datatype T_type = mpi::detail::get_mpi_datatype<T>();
+
+  MPI_Datatype fileblk;
+  MPI_Type_create_subarray(dim, &shape_[0], &subsizes[0], &bounds.min[0], MPI_ORDER_C, T_type, &fileblk);
+  MPI_Type_commit(&fileblk);
+
+  MPI_File_set_view(f_.handle(), offset_, T_type, fileblk, "native", MPI_INFO_NULL);
+
+  mpi::status s;
+  if (!collective)
+      MPI_File_read(f_.handle(), buffer, total, T_type, &s.s);
+  else
+      MPI_File_read_all(f_.handle(), buffer, total, T_type, &s.s);
+
+  MPI_Type_free(&fileblk);
 }
 
+template<class T>
 void
 diy::io::BOV::
-write(const DiscreteBounds& bounds, const char* buffer, size_t word_size)
+write(const DiscreteBounds& bounds, const T* buffer, bool collective)
 {
-  int       dim = shape_.size();
-  long int  sz  = bounds.max[dim - 1] - bounds.min[dim - 1] + 1;
-  long int  c   = 0;
-
-  std::vector<size_t> bounds_stride(dim, 1);
-  for (int i = dim - 2; i >= 0; --i)
-    bounds_stride[i] = bounds_stride[i+1] * (bounds.max[i] - bounds.min[i] + 1);
-
-  std::vector<int> v;
+  int dim   = shape_.size();
+  int total = 1;
+  std::vector<int> subsizes;
   for (unsigned i = 0; i < dim; ++i)
-    v.push_back(bounds.min[i]);
-
-  long int        mv = std::inner_product(v.begin(), v.end(), stride_.begin(), 0);
-  mpi::io::offset o  = offset_ + mv*word_size;
-  while (true)
   {
-    // write data
-    f_.write_at(o, buffer + c*word_size*sz, word_size*sz);
-    ++c;
-
-    // increment v and compute mv and c
-    mv = 0;
-    int i = dim - 2;
-    while (i >= 0 && v[i] == bounds.max[i])
-    {
-      v[i] = bounds.min[i];
-      mv -= (bounds.max[i] - bounds.min[i])*stride_[i];
-      --i;
-    }
-    if (i == -1)
-      break;
-    v[i] += 1;
-    mv += stride_[i];
-    o += mv*word_size;
+    subsizes.push_back(bounds.max[i] - bounds.min[i] + 1);
+    total *= subsizes.back();
   }
+
+  MPI_Datatype T_type = mpi::detail::get_mpi_datatype<T>();
+
+  MPI_Datatype fileblk;
+  MPI_Type_create_subarray(dim, &shape_[0], &subsizes[0], &bounds.min[0], MPI_ORDER_C, T_type, &fileblk);
+  MPI_Type_commit(&fileblk);
+
+  MPI_File_set_view(f_.handle(), offset_, T_type, fileblk, "native", MPI_INFO_NULL);
+
+  mpi::status s;
+  if (!collective)
+      MPI_File_write(f_.handle(), buffer, total, T_type, &s.s);
+  else
+      MPI_File_write_all(f_.handle(), buffer, total, T_type, &s.s);
+
+  MPI_Type_free(&fileblk);
 }
 
 #endif

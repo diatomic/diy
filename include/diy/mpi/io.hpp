@@ -55,6 +55,8 @@ namespace io
       const communicator&
                     comm() const                            { return comm_; }
 
+      MPI_File&     handle()                                { return fh; }
+
     private:
       const communicator&   comm_;
       MPI_File              fh;
