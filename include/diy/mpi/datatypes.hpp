@@ -21,6 +21,7 @@ namespace detail
   template<>  struct is_mpi_datatype< std::vector<cpp_type> >   { typedef true_type type; };
 
   DIY_MPI_DATATYPE_MAP(char,                  MPI_BYTE);
+  DIY_MPI_DATATYPE_MAP(unsigned char,         MPI_BYTE);
   DIY_MPI_DATATYPE_MAP(bool,                  MPI_BYTE);
   DIY_MPI_DATATYPE_MAP(int,                   MPI_INT);
   //DIY_MPI_DATATYPE_MAP(unsigned,              MPI_UNSIGNED_INT);
