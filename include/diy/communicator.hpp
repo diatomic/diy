@@ -10,6 +10,8 @@
 #include "serialization.hpp"
 #include "detail/collectives.hpp"
 
+#include "time.hpp"
+
 namespace diy
 {
   class Communicator
@@ -186,8 +188,24 @@ void
 diy::Communicator::
 flush()
 {
+#ifdef DEBUG
+  time_type start = get_time();
+  unsigned wait = 1;
+#endif
   while (!inflight_.empty() || received_ < expected_)
+  {
     exchange();
+
+#ifdef DEBUG
+    time_type cur = get_time();
+    if (cur - start > wait*1000)
+    {
+        std::cerr << "Waiting in flush [" << rank() << "]: "
+                  << inflight_.size() << " - " << received_ << " out of " << expected_ << std::endl;
+        wait *= 2;
+    }
+#endif
+  }
 
   process_collectives();
 
