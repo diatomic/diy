@@ -91,7 +91,7 @@ namespace detail
         fill_bounds(bounds, coords, true);
 
         // Fill link with all the neighbors
-        Link link(dim);
+        Link link(dim, core, bounds);
         std::vector<int>  offsets(dim, -1);
         offsets[0] = -2;
         while (!all(offsets, 1))

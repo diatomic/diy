@@ -48,12 +48,22 @@ namespace diy
   class BoundsLink: public virtual Link
   {
     public:
-      typedef   Bounds_     Bounds;
+      typedef       Bounds_     Bounds;
 
-      Bounds    bounds(int i) const                 { return bounds_[i]; }
-      void      add_bounds(const Bounds& bounds)    { bounds_.push_back(bounds); }
+                    BoundsLink(int dim, const Bounds& core, const Bounds& bounds):
+                        dim_(dim),
+                        core_(core),
+                        local_bounds_(bounds)           {}
+
+      const Bounds& core() const                        { return core_; }
+      const Bounds& bounds() const                      { return local_bounds_; }
+      const Bounds& bounds(int i) const                 { return bounds_[i]; }
+      void          add_bounds(const Bounds& bounds)    { bounds_.push_back(bounds); }
 
     private:
+      int                   dim_;
+      Bounds                core_;
+      Bounds                local_bounds_;
       std::vector<Bounds>   bounds_;
   };
 
@@ -61,19 +71,22 @@ namespace diy
   typedef       BoundsLink<ContinuousBounds>        ContinuousLink;
 
 
+  // dimension gets duplicated between the two parents, but I don't think it's a big deal
   class RegularGridLink: public RegularLink, public GridLink
   {
     public:
-                RegularGridLink(int dim):
-                  RegularLink(dim)                  {}
+                RegularGridLink(int dim, const Bounds& core, const Bounds& bounds):
+                  RegularLink(dim),
+                  GridLink(dim, core, bounds)       {}
 
   };
 
   class RegularContinuousLink: public RegularLink, public ContinuousLink
   {
     public:
-                RegularContinuousLink(int dim):
-                  RegularLink(dim)                  {}
+                RegularContinuousLink(int dim, const Bounds& core, const Bounds& bounds):
+                  RegularLink(dim),
+                  ContinuousLink(dim, core, bounds) {}
   };
 
   // Other cover candidates: KDTreeLink, AMRGridLink
