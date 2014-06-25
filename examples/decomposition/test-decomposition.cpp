@@ -16,16 +16,12 @@ void create(int gid, const Bounds& core, const Bounds& bounds, const diy::Link& 
             << bounds.min[0] << ' ' << bounds.min[1] << ' ' << bounds.min[2] << " - "
             << bounds.max[0] << ' ' << bounds.max[1] << ' ' << bounds.max[2] << " : "
             << link.count() << std::endl;
-  for (unsigned i = 0; i < link.count(); ++i)
-  {
-      std::cout << "  " << link.target(i).gid << " on " << link.target(i).proc << std::endl;
-  }
 }
 
 int main(int argc, char* argv[])
 {
-  int                       size    = 16;
-  int                       nblocks = 1000;
+  int                       size    = 8;
+  int                       nblocks = 32;
   diy::ContiguousAssigner   assigner(size, nblocks);
   //diy::RoundRobinAssigner   assigner(size, nblocks);
 
@@ -37,10 +33,12 @@ int main(int argc, char* argv[])
   for (int rank = 0; rank < size; ++ rank)
   {
     std::cout << "Rank " << rank << ":" << std::endl;
+    diy::RegularDecomposer<Bounds>::BoolVector          share_face;
+    share_face.push_back(true);
     diy::RegularDecomposer<Bounds>::BoolVector          wrap;
     diy::RegularDecomposer<Bounds>::CoordinateVector    ghosts;
     ghosts.push_back(1); ghosts.push_back(2);
-    diy::decompose(3, rank, domain, assigner, create, wrap, ghosts);
+    diy::decompose(3, rank, domain, assigner, create, share_face, wrap, ghosts);
   }
 }
 

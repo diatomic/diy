@@ -17,21 +17,21 @@ namespace detail
   template<>
   struct BoundsHelper<DiscreteBounds>
   {
-    static int      from(int i, int n, int min, int max)       { return min + (max - min + 1)/n * i; }
-    static int      to(int i, int n, int min, int max)
+    static int      from(int i, int n, int min, int max, bool)          { return min + (max - min + 1)/n * i; }
+    static int      to(int i, int n, int min, int max, bool shared_face)
     {
       if (i == n - 1)
         return max;
       else
-        return from(i+1, n, min, max) - 1;
+        return from(i+1, n, min, max, shared_face) - (shared_face ? 0 : 1);
     }
   };
 
   template<>
   struct BoundsHelper<ContinuousBounds>
   {
-    static float    from(int i, int n, float min, float max)   { return min + (max - min)/n * i; }
-    static float    to(int i, int n, float min, float max)     { return min + (max - min)/n * (i+1); }
+    static float    from(int i, int n, float min, float max, bool)      { return min + (max - min)/n * i; }
+    static float    to(int i, int n, float min, float max, bool)        { return min + (max - min)/n * (i+1); }
   };
 }
 
@@ -57,12 +57,15 @@ namespace detail
                     RegularDecomposer(int               dim_,
                                       const Bounds&     domain_,
                                       const Assigner&   assigner_,
-                                      BoolVector        wrap_      = BoolVector(),
-                                      CoordinateVector  ghosts_    = CoordinateVector(),
-                                      DivisionsVector   divisions_ = DivisionsVector()):
+                                      BoolVector        share_face_ = BoolVector(),
+                                      BoolVector        wrap_       = BoolVector(),
+                                      CoordinateVector  ghosts_     = CoordinateVector(),
+                                      DivisionsVector   divisions_  = DivisionsVector()):
                       dim(dim_), domain(domain_), assigner(assigner_),
+                      share_face(share_face_),
                       wrap(wrap_), ghosts(ghosts_), divisions(divisions_)
     {
+      if (share_face.size() < dim)  share_face.resize(dim);
       if (wrap.size() < dim)        wrap.resize(dim);
       if (ghosts.size() < dim)      ghosts.resize(dim);
       if (divisions.size() < dim)   divisions.resize(dim);
@@ -189,8 +192,8 @@ namespace detail
     {
       for (int i = 0; i < dim; ++i)
       {
-        bounds.min[i] = detail::BoundsHelper<Bounds>::from(coords[i], divisions[i], domain.min[i], domain.max[i]);
-        bounds.max[i] = detail::BoundsHelper<Bounds>::to  (coords[i], divisions[i], domain.min[i], domain.max[i]);
+        bounds.min[i] = detail::BoundsHelper<Bounds>::from(coords[i], divisions[i], domain.min[i], domain.max[i], share_face[i]);
+        bounds.max[i] = detail::BoundsHelper<Bounds>::to  (coords[i], divisions[i], domain.min[i], domain.max[i], share_face[i]);
       }
 
       if (!add_ghosts)
@@ -261,6 +264,7 @@ namespace detail
     int               dim;
     const Bounds&     domain;
     const Assigner&   assigner;
+    BoolVector        share_face;
     BoolVector        wrap;
     CoordinateVector  ghosts;
     DivisionsVector   divisions;
@@ -273,11 +277,12 @@ namespace detail
                  const Bounds&      domain,
                  const Assigner&    assigner,
                  const Creator&     create,
-                 typename RegularDecomposer<Bounds>::BoolVector       wrap   = typename RegularDecomposer<Bounds>::BoolVector(),
-                 typename RegularDecomposer<Bounds>::CoordinateVector ghosts = typename RegularDecomposer<Bounds>::CoordinateVector(),
-                 typename RegularDecomposer<Bounds>::DivisionsVector  divs   = typename RegularDecomposer<Bounds>::DivisionsVector())
+                 typename RegularDecomposer<Bounds>::BoolVector       share_face = typename RegularDecomposer<Bounds>::BoolVector(),
+                 typename RegularDecomposer<Bounds>::BoolVector       wrap       = typename RegularDecomposer<Bounds>::BoolVector(),
+                 typename RegularDecomposer<Bounds>::CoordinateVector ghosts     = typename RegularDecomposer<Bounds>::CoordinateVector(),
+                 typename RegularDecomposer<Bounds>::DivisionsVector  divs       = typename RegularDecomposer<Bounds>::DivisionsVector())
   {
-    RegularDecomposer<Bounds>(dim, domain, assigner, wrap, ghosts, divs).decompose(rank, create);
+    RegularDecomposer<Bounds>(dim, domain, assigner, share_face, wrap, ghosts, divs).decompose(rank, create);
   }
 
 }
