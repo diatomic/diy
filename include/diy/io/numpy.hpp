@@ -33,6 +33,9 @@ namespace io
       template<class T>
       void              write_header(int dim, const DiscreteBounds& bounds);
 
+      template<class T, class S>
+      void              write_header(const S& shape);
+
     private:
       inline size_t     parse_npy_header(BOV::Shape& shape, bool& fortran_order);
       void              save(diy::BinaryBuffer& bb, const std::string& s)               { bb.save_binary(s.c_str(), s.size()); }
@@ -120,6 +123,15 @@ write_header(int dim, const DiscreteBounds& bounds)
     for (int i = 0; i < dim; ++i)
         shape.push_back(bounds.max[i] - bounds.min[i] + 1);
 
+    write_header< T, std::vector<int> >(shape);
+}
+
+
+template<class T, class S>
+void
+diy::io::NumPy::
+write_header(const S& shape)
+{
     BOV::set_shape(shape);
 
     diy::BinaryBuffer dict;
