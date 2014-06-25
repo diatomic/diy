@@ -40,12 +40,13 @@ int main(int argc, char* argv[])
 
   diy::mpi::io::file out(world, "out.npy", diy::mpi::io::file::wronly | diy::mpi::io::file::create);
   diy::io::NumPy     writer(out);
-  std::vector<unsigned> box_shape;
-  box_shape.push_back(4);
-  box_shape.push_back(4);
-  diy::DiscreteBounds full_box;
+  diy::DiscreteBounds full_box, sub_box;
   full_box.min[0] = full_box.min[1] = 0;
   full_box.max[0] = full_box.max[1] = 3;
-  writer.write_header<float>(box_shape);
-  writer.write(full_box, &data2[0]);
+  sub_box.min[0] = sub_box.min[1] = 1;
+  sub_box.max[0] = sub_box.max[1] = 2;
+  //writer.write_header<float>(2, full_box);
+  //writer.write(full_box, &data2[0]);
+  writer.write_header<float>(2, sub_box);
+  writer.write(full_box, &data2[0], sub_box);
 }

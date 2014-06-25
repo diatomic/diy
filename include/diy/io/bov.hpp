@@ -51,6 +51,9 @@ namespace io
       template<class T>
       void          write(const DiscreteBounds& bounds, const T* buffer, bool collective = false);
 
+      template<class T>
+      void          write(const DiscreteBounds& bounds, const T* buffer, const DiscreteBounds& core, bool collective = false);
+
     protected:
       mpi::io::file&        file()                                        { return f_; }
 
@@ -99,30 +102,42 @@ void
 diy::io::BOV::
 write(const DiscreteBounds& bounds, const T* buffer, bool collective)
 {
+    write(bounds, buffer, bounds, collective);
+}
+
+template<class T>
+void
+diy::io::BOV::
+write(const DiscreteBounds& bounds, const T* buffer, const DiscreteBounds& core, bool collective)
+{
   int dim   = shape_.size();
-  int total = 1;
   std::vector<int> subsizes;
+  std::vector<int> buffer_shape, buffer_start;
   for (unsigned i = 0; i < dim; ++i)
   {
-    subsizes.push_back(bounds.max[i] - bounds.min[i] + 1);
-    total *= subsizes.back();
+    buffer_shape.push_back(bounds.max[i] - bounds.min[i] + 1);
+    buffer_start.push_back(core.min[i] - bounds.min[i]);
+    subsizes.push_back(core.max[i] - core.min[i] + 1);
   }
 
   MPI_Datatype T_type = mpi::detail::get_mpi_datatype<T>();
 
-  MPI_Datatype fileblk;
-  MPI_Type_create_subarray(dim, &shape_[0], &subsizes[0], &bounds.min[0], MPI_ORDER_C, T_type, &fileblk);
+  MPI_Datatype fileblk, subbuffer;
+  MPI_Type_create_subarray(dim, &shape_[0],       &subsizes[0], &bounds.min[0],   MPI_ORDER_C, T_type, &fileblk);
+  MPI_Type_create_subarray(dim, &buffer_shape[0], &subsizes[0], &buffer_start[0], MPI_ORDER_C, T_type, &subbuffer);
   MPI_Type_commit(&fileblk);
+  MPI_Type_commit(&subbuffer);
 
   MPI_File_set_view(f_.handle(), offset_, T_type, fileblk, "native", MPI_INFO_NULL);
 
   mpi::status s;
   if (!collective)
-      MPI_File_write(f_.handle(), buffer, total, T_type, &s.s);
+      MPI_File_write(f_.handle(), buffer, 1, subbuffer, &s.s);
   else
-      MPI_File_write_all(f_.handle(), buffer, total, T_type, &s.s);
+      MPI_File_write_all(f_.handle(), buffer, 1, subbuffer, &s.s);
 
   MPI_Type_free(&fileblk);
+  MPI_Type_free(&subbuffer);
 }
 
 #endif

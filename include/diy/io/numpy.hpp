@@ -30,8 +30,8 @@ namespace io
         return word_size_;
       }
 
-      template<class T, class S>
-      void              write_header(const S& shape);
+      template<class T>
+      void              write_header(int dim, const DiscreteBounds& bounds);
 
     private:
       inline size_t     parse_npy_header(BOV::Shape& shape, bool& fortran_order);
@@ -111,11 +111,15 @@ parse_npy_header(BOV::Shape& shape, bool& fortran_order)
     return header_size;
 }
 
-template<class T, class S>
+template<class T>
 void
 diy::io::NumPy::
-write_header(const S& shape)
+write_header(int dim, const DiscreteBounds& bounds)
 {
+    std::vector<int> shape;
+    for (int i = 0; i < dim; ++i)
+        shape.push_back(bounds.max[i] - bounds.min[i] + 1);
+
     BOV::set_shape(shape);
 
     diy::BinaryBuffer dict;
