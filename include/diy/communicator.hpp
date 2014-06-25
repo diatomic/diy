@@ -208,6 +208,7 @@ flush()
   }
 
   process_collectives();
+  comm_.barrier();
 
   received_ = 0;
 }
