@@ -3,6 +3,7 @@
 
 #include <list>
 #include <map>
+#include <iterator>
 
 #include "types.hpp"
 #include "cover.hpp"
@@ -68,6 +69,9 @@ namespace diy
 
   struct Communicator::Proxy
   {
+    template <class T>
+    struct EnqueueIterator;
+
                         Proxy(Communicator* comm, int gid):
                           gid_(gid),
                           comm_(comm),
@@ -87,6 +91,11 @@ namespace diy
                                 void (*load)(BinaryBuffer&, T&) = &::diy::load<T>) const
     { IncomingQueues& in  = *incoming_; load(in[from], x); }
 
+    template<class T>
+    void                enqueue_iterator(const T& x,
+                                         void (*save)(BinaryBuffer&, const T&) = &::diy::save<T>) const
+    { return EnqueueIterator<T>(this, x, save); }
+
     inline void         incoming(std::vector<int>& v) const;            // fill v with every gid from which we have a message
 
     template<class T, class Op>
@@ -98,6 +107,28 @@ namespace diy
       IncomingQueues*   incoming_;
       OutgoingQueues*   outgoing_;
       CollectivesList*  collectives_;
+  };
+
+  template<class T>
+  struct Communicator::Proxy::EnqueueIterator:
+    public std::iterator<std::output_iterator_tag, void, void, void, void>
+  {
+    typedef     void (*SaveT)(BinaryBuffer&, const T&);
+
+                        EnqueueIterator(Communicator::Proxy* proxy, const T& x,
+                                        SaveT save = &::diy::save<T>):
+                            proxy_(proxy), x_(x), save_(save)               {}
+
+    EnqueueIterator&    operator=(const BlockID& to)                        { proxy_->enqueue(to, x_, save_); return *this; }
+    EnqueueIterator&    operator*()                                         { return *this; }
+    EnqueueIterator&    operator++()                                        { return *this; }
+    EnqueueIterator&    operator++(int)                                     { return *this; }
+
+    private:
+      Proxy*    proxy_;
+      const T&  x_;
+      SaveT     save_;
+
   };
 
   struct Communicator::InFlight
