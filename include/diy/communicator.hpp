@@ -94,7 +94,7 @@ namespace diy
     { IncomingQueues& in  = *incoming_; load(in[from], x); }
 
     template<class T>
-    void                enqueuer(const T& x,
+    EnqueueIterator<T>  enqueuer(const T& x,
                                  void (*save)(BinaryBuffer&, const T&) = &::diy::save<T>) const
     { return EnqueueIterator<T>(this, x, save); }
 
@@ -117,7 +117,7 @@ namespace diy
   {
     typedef     void (*SaveT)(BinaryBuffer&, const T&);
 
-                        EnqueueIterator(Communicator::Proxy* proxy, const T& x,
+                        EnqueueIterator(const Communicator::Proxy* proxy, const T& x,
                                         SaveT save = &::diy::save<T>):
                             proxy_(proxy), x_(x), save_(save)               {}
 
@@ -127,9 +127,9 @@ namespace diy
     EnqueueIterator&    operator++(int)                                     { return *this; }
 
     private:
-      Proxy*    proxy_;
-      const T&  x_;
-      SaveT     save_;
+      const Proxy*  proxy_;
+      const T&      x_;
+      SaveT         save_;
 
   };
 
