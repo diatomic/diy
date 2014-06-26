@@ -92,8 +92,8 @@ namespace diy
     { IncomingQueues& in  = *incoming_; load(in[from], x); }
 
     template<class T>
-    void                enqueue_iterator(const T& x,
-                                         void (*save)(BinaryBuffer&, const T&) = &::diy::save<T>) const
+    void                enqueuer(const T& x,
+                                 void (*save)(BinaryBuffer&, const T&) = &::diy::save<T>) const
     { return EnqueueIterator<T>(this, x, save); }
 
     inline void         incoming(std::vector<int>& v) const;            // fill v with every gid from which we have a message
