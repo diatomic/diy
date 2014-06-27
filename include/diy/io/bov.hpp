@@ -12,7 +12,7 @@ namespace diy
 {
 namespace io
 {
-  // Reads and writes (TODO) subsets of a block of values into specified block bounds
+  // Reads and writes subsets of a block of values into specified block bounds
   class BOV
   {
     public:
