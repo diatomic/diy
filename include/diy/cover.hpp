@@ -64,6 +64,62 @@ namespace diy
       const Bounds& bounds(int i) const                 { return bounds_[i]; }
       void          add_bounds(const Bounds& bounds)    { bounds_.push_back(bounds); }
 
+    // TP start
+    // assumptions:
+    // 1. Point p needs to be in the current block
+    // 2. Only for a regular decomposition
+    template<class Point, class OutIter>
+    void near(const Point& p, float r, OutIter out)
+    {
+      int d; // current dimension
+      float dir[DIY_MAX_DIM]; // offset direction
+      float new_pt[DIY_MAX_DIM]; // offset point
+
+      // for all neighbors of lid
+      for (int n = 0; n < count(); n++) {
+
+        // compute normalized vector from my block to the neighbor block
+        // based on difference between mins
+        for (d = 0; d < dim_; d++) {
+          dir[d] = bounds(n).min[d] - bounds().min[d];
+          if (dir[d] > 0.0)
+            dir[d] = 1.0f;
+          else if (dir[d] < 0.0)
+            dir[d] = -1.0f;
+        }
+
+        // new point is offset from old point by dist in direction of vector
+        for(d = 0; d < dim_; d++)
+          new_pt[d] = p[d] + dir[d] * r;
+
+        // check if neighbor is near enough
+        for (d = 0; d < dim_; d++) {
+          // if shifted point did not move into or past the neighbor, break and
+          // proceed to next neighbor
+          // note dist can be large enough to shift the point beyond the neighbor
+          // that means the point was definitely near enough to neighbor
+          if ((p[d] < bounds(n).min[d] && new_pt[d] < bounds(n).min[d]) ||  
+              (p[d] > bounds(n).max[d] && new_pt[d] > bounds(n).max[d]))
+            break;
+        }
+        if (d < dim_)
+          continue; // next neighbor
+
+        // transform item if wrapping
+        // TODO: need to deal with the transform function when wrapping
+//         if (TransformItem && neighbors[n].wrap_dir)
+//           TransformItem(p, neighbors[n].wrap_dir);
+
+        // DPERECATED, return neighbor number (the edge) rather than the block
+        // *out++ = Link::target(n);
+
+        *out++ = n;
+
+      } // for all neighbors
+
+    }
+    // TP end
+
     private:
       int                   dim_;
       Bounds                core_;
