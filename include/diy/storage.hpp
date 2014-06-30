@@ -8,6 +8,7 @@
 #include <unistd.h>     // mkstemp() on Mac
 #include <cstdlib>      // mkstemp() on Linux
 #include <cstdio>       // remove()
+#include <fcntl.h>
 
 #include "serialization.hpp"
 
@@ -33,10 +34,11 @@ namespace diy
         mkstemp(const_cast<char*>(filename.c_str()));
 
         //std::cout << "FileStorage::put(): " << filename << std::endl;
-        std::ofstream   out(filename.c_str(), std::ios::binary);
 
         int sz = bb.buffer.size();
-        out.write(&bb.buffer[0], sz);
+        int fh = open(filename.c_str(), O_WRONLY | O_SYNC, 0600);
+        write(fh, &bb.buffer[0], sz);
+        close(fh);
         bb.clear();
 
         FileRecord  fr = { sz, filename };
@@ -50,10 +52,11 @@ namespace diy
         filenames_.erase(i);
 
         //std::cout << "FileStorage::get(): " << fr.name << std::endl;
-        std::ifstream   in(fr.name.c_str(), std::ios::binary);
 
         bb.buffer.resize(fr.size);
-        in.read(&bb.buffer[0], fr.size);
+        int fh = open(fr.name.c_str(), O_RDONLY | O_SYNC, 0600);
+        read(fh, &bb.buffer[0], fr.size);
+        close(fh);
 
         remove(fr.name.c_str());
       }
