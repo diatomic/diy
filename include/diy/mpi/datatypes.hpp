@@ -1,3 +1,6 @@
+#ifndef DIY_MPI_DATATYPES_HPP
+#define DIY_MPI_DATATYPES_HPP
+
 #include <vector>
 
 namespace diy
@@ -56,3 +59,5 @@ namespace detail
 }
 }
 }
+
+#endif

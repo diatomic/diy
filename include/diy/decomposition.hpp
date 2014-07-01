@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <iostream>
 
 #include "cover.hpp"
 #include "assigner.hpp"

@@ -3,6 +3,7 @@
 
 #include <list>
 #include <map>
+#include <iostream>
 #include <iterator>
 
 #include "types.hpp"
