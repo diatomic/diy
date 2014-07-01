@@ -15,7 +15,8 @@ void create(int gid, const Bounds& core, const Bounds& bounds, const diy::Link& 
             << core.max[0]   << ' ' << core.max[1]   << ' ' << core.max[2] << " : "
             << bounds.min[0] << ' ' << bounds.min[1] << ' ' << bounds.min[2] << " - "
             << bounds.max[0] << ' ' << bounds.max[1] << ' ' << bounds.max[2] << " : "
-            << link.count() << std::endl;
+            << link.count() << ' '
+            << std::bitset<32>(dynamic_cast<const diy::RegularLink&>(link).wrap()) << std::dec << std::endl;
 }
 
 int main(int argc, char* argv[])
@@ -36,6 +37,8 @@ int main(int argc, char* argv[])
     diy::RegularDecomposer<Bounds>::BoolVector          share_face;
     share_face.push_back(true);
     diy::RegularDecomposer<Bounds>::BoolVector          wrap;
+    wrap.push_back(true);
+    wrap.push_back(true);
     diy::RegularDecomposer<Bounds>::CoordinateVector    ghosts;
     ghosts.push_back(1); ghosts.push_back(2);
     diy::decompose(3, rank, domain, assigner, create, share_face, wrap, ghosts);

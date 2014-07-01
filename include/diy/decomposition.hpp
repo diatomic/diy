@@ -121,7 +121,10 @@ namespace detail
             if (nhbr_coords[i] < 0)
             {
               if (wrap[i])
+              {
                 nhbr_coords[i] = divisions[i] - 1;
+                link.add_wrap(Direction(1 << 2*i));
+              }
               else
                 inbounds = false;
             }
@@ -129,7 +132,10 @@ namespace detail
             if (nhbr_coords[i] >= divisions[i])
             {
               if (wrap[i])
+              {
                 nhbr_coords[i] = 0;
+                link.add_wrap(Direction(1 << (2*i + 1)));
+              }
               else
                 inbounds = false;
             }

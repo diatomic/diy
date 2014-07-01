@@ -31,16 +31,20 @@ namespace diy
       typedef   std::map<Direction, int>            DirMap;
 
     public:
-                RegularLink(int dim):
-                  dim_(dim)                         {}
+                RegularLink(int dim, Direction wrap = Direction(0)):
+                  dim_(dim), wrap_(wrap)            {}
 
       int       direction(Direction dir) const;     // convert direction to a neighbor (-1 if no neighbor)
       int       dimension() const                   { return dim_; }
       void      add_direction(Direction dir)        { int c = directions_.size(); directions_[dir] = c; }
 
+      void      add_wrap(Direction dir)             { wrap_ = static_cast<Direction>(wrap_ | dir); }
+      Direction wrap() const                        { return wrap_; }
+
     private:
       int       dim_;
       DirMap    directions_;
+      Direction wrap_;
   };
 
   // stores block bounds associated with each neighbor
