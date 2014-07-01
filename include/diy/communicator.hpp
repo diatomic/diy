@@ -99,6 +99,7 @@ namespace diy
                                  void (*save)(BinaryBuffer&, const T&) = &::diy::save<T>) const
     { return EnqueueIterator<T>(this, x, save); }
 
+    IncomingQueues*     incoming() const                                { return incoming_; }
     inline void         incoming(std::vector<int>& v) const;            // fill v with every gid from which we have a message
 
     template<class T, class Op>
