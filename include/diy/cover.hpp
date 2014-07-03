@@ -84,6 +84,7 @@ namespace diy
                   RegularLink(dim),
                   GridLink(dim, core, bounds)       {}
 
+      using RegularLink::dimension;
   };
 
   class RegularContinuousLink: public RegularLink, public ContinuousLink
@@ -92,6 +93,8 @@ namespace diy
                 RegularContinuousLink(int dim, const Bounds& core, const Bounds& bounds):
                   RegularLink(dim),
                   ContinuousLink(dim, core, bounds) {}
+
+      using RegularLink::dimension;
   };
 
   // Other cover candidates: KDTreeLink, AMRGridLink
