@@ -90,9 +90,17 @@ namespace diy
     { OutgoingQueues& out = *outgoing_; save(out[to], x); }
 
     template<class T>
+    void                enqueue(const BlockID& to, const T* x, size_t n,
+                                void (*save)(BinaryBuffer&, const T&) = &::diy::save<T>) const;
+
+    template<class T>
     void                dequeue(int from, T& x,
                                 void (*load)(BinaryBuffer&, T&) = &::diy::load<T>) const
     { IncomingQueues& in  = *incoming_; load(in[from], x); }
+
+    template<class T>
+    void                dequeue(int from, T* x, size_t n,
+                                void (*load)(BinaryBuffer&, T&) = &::diy::load<T>) const;
 
     template<class T>
     EnqueueIterator<T>  enqueuer(const T& x,
@@ -172,6 +180,8 @@ namespace diy
   };
 }
 
+
+/* Communicator */
 void
 diy::Communicator::
 exchange()
@@ -308,6 +318,8 @@ diy::Communicator::
 proxy(int gid)
 { return Proxy(this, gid); }
 
+
+/* Proxy */
 void
 diy::Communicator::Proxy::
 incoming(std::vector<int>& v) const
@@ -322,6 +334,36 @@ diy::Communicator::Proxy::
 all_reduce(const T& in, std::ptrdiff_t out, Op op) const
 {
   collectives_->push_back(Collective(out, new detail::AllReduceOp<T,Op>(in, op)));
+}
+
+template<class T>
+void
+diy::Communicator::Proxy::
+enqueue(const BlockID& to, const T* x, size_t n,
+        void (*save)(BinaryBuffer&, const T&)) const
+{
+    OutgoingQueues& out = *outgoing_;
+    BinaryBuffer&   bb  = out[to];
+    if (save == (void (*)(BinaryBuffer&, const T&)) &::diy::save<T>)
+        diy::save(bb, x, n);       // optimized for unspecialized types
+    else
+        for (size_t i = 0; i < n; ++i)
+            save(bb, x[i]);
+}
+
+template<class T>
+void
+diy::Communicator::Proxy::
+dequeue(int from, T* x, size_t n,
+        void (*load)(BinaryBuffer&, T&)) const
+{
+    IncomingQueues& in = *incoming_;
+    BinaryBuffer&   bb = in[from];
+    if (load == (void (*)(BinaryBuffer&, T&)) &::diy::load<T>)
+        diy::load(bb, x, n);       // optimized for unspecialized types
+    else
+        for (size_t i = 0; i < n; ++i)
+            load(bb, x[i]);
 }
 
 #endif
