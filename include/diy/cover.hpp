@@ -57,19 +57,19 @@ namespace diy
                     BoundsLink(int dim, const Bounds& core, const Bounds& bounds):
                         dim_(dim),
                         core_(core),
-                        local_bounds_(bounds)           {}
+                        bounds_(bounds)                 {}
 
       const Bounds& core() const                        { return core_; }
-      const Bounds& bounds() const                      { return local_bounds_; }
-      const Bounds& bounds(int i) const                 { return bounds_[i]; }
-      void          add_bounds(const Bounds& bounds)    { bounds_.push_back(bounds); }
+      const Bounds& bounds() const                      { return bounds_; }
+      const Bounds& bounds(int i) const                 { return nbr_bounds_[i]; }
+      void          add_bounds(const Bounds& bounds)    { nbr_bounds_.push_back(bounds); }
       int           dimension() const                   { return dim_; }
 
     private:
       int                   dim_;
       Bounds                core_;
-      Bounds                local_bounds_;
-      std::vector<Bounds>   bounds_;
+      Bounds                bounds_;
+      std::vector<Bounds>   nbr_bounds_;
   };
 
   typedef       BoundsLink<DiscreteBounds>          GridLink;
