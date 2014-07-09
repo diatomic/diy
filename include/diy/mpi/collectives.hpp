@@ -2,8 +2,6 @@
 
 #include "operations.hpp"
 
-// TODO: add gather
-
 namespace diy
 {
 namespace mpi
