@@ -24,7 +24,7 @@ namespace mpi
       MPI_Gather(Datatype::address(in),
                  Datatype::count(in),
                  Datatype::datatype(),
-                 Datatype::address(&out[0]),
+                 Datatype::address(out[0]),
                  Datatype::count(in),
                  Datatype::datatype(),
                  root, comm);
