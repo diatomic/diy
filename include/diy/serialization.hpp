@@ -147,9 +147,9 @@ namespace diy
     {
       unsigned s;
       diy::load(bb, s);
-      std::pair<K,V> p;
       for (unsigned i = 0; i < s; ++i)
       {
+        std::pair<K,V> p;
         diy::load(bb, p);
         m.insert(p);
       }
