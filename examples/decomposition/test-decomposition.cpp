@@ -1,5 +1,6 @@
 #include <vector>
 #include <iostream>
+#include <bitset>
 
 #include <diy/decomposition.hpp>
 #include <diy/assigner.hpp>

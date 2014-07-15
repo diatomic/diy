@@ -20,7 +20,9 @@ namespace mpi
 
     static void gather(const communicator& comm, const T& in, std::vector<T>& out, int root)
     {
-      out.resize(comm.size() * Datatype::count(in));
+      size_t s  = comm.size();
+             s *= Datatype::count(in);
+      out.resize(s);
       MPI_Gather(Datatype::address(in),
                  Datatype::count(in),
                  Datatype::datatype(),
@@ -30,16 +32,30 @@ namespace mpi
                  root, comm);
     }
 
-    static void gather(const communicator& comm, const std::vector<T>& in, std::vector<T>& out, int root)
+    static void gather(const communicator& comm, const std::vector<T>& in, std::vector< std::vector<T> >& out, int root)
     {
-      out.resize(comm.size() * in.size());
-      MPI_Gather(Datatype::address(in[0]),
-                 in.size(),
-                 Datatype::datatype(),
-                 Datatype::address(out[0]),
-                 in.size(),
-                 Datatype::datatype(),
-                 root, comm);
+      std::vector<int>  counts(comm.size());
+      Collectives<int,void*>::gather(comm, (int) in.size(), counts, root);
+
+      std::vector<int>  offsets(comm.size(), 0);
+      for (unsigned i = 1; i < offsets.size(); ++i)
+        offsets[i] = offsets[i-1] + counts[i-1];
+      std::vector<T> buffer(offsets.back() + counts.back());
+
+      MPI_Gatherv(Datatype::address(in[0]),
+                  in.size(),
+                  Datatype::datatype(),
+                  Datatype::address(buffer[0]),
+                  &counts[0],
+                  &offsets[0],
+                  Datatype::datatype(),
+                  root, comm);
+
+      out.resize(comm.size());
+      size_t cur = 0;
+      for (unsigned i = 0; i < comm.size(); ++i)
+          for (unsigned j = 0; j < counts[i]; ++j)
+              out[i].push_back(buffer[cur++]);
     }
 
     static void gather(const communicator& comm, const T& in, int root)
@@ -55,13 +71,14 @@ namespace mpi
 
     static void gather(const communicator& comm, const std::vector<T>& in, int root)
     {
-      MPI_Gather(Datatype::address(in[0]),
-                 in.size(),
-                 Datatype::datatype(),
-                 Datatype::address(const_cast<T&>(in[0])),
-                 in.size(),
-                 Datatype::datatype(),
-                 root, comm);
+      Collectives<int,void*>::gather(comm, (int) in.size(), root);
+
+      MPI_Gatherv(Datatype::address(in[0]),
+                  in.size(),
+                  Datatype::datatype(),
+                  0, 0, 0,
+                  Datatype::datatype(),
+                  root, comm);
     }
 
     static void reduce(const communicator& comm, const T& in, T& out, int root, const Op&)
@@ -128,7 +145,7 @@ namespace mpi
   }
 
   template<class T>
-  void      gather(const communicator& comm, const std::vector<T>& in, std::vector<T>& out, int root)
+  void      gather(const communicator& comm, const std::vector<T>& in, std::vector< std::vector<T> >& out, int root)
   {
     Collectives<T,void*>::gather(comm, in, out, root);
   }

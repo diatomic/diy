@@ -62,14 +62,15 @@ namespace io
 
     if (comm.rank() == 0)
     {
-      std::vector<offset_t> all_offsets, all_counts;
+      std::vector< std::vector<offset_t> > all_offsets, all_counts;
       mpi::gather(comm, offsets, all_offsets, 0);
       mpi::gather(comm, counts,  all_counts,  0);
 
       std::vector< std::pair<offset_t, offset_t> >  all_offset_counts;
       for (unsigned i = 0; i < all_offsets.size(); ++i)
-        if (all_counts[i] != 0)
-          all_offset_counts.push_back(std::make_pair(all_offsets[i], all_counts[i]));
+        for (unsigned j = 0; j < all_offsets[j].size(); ++j)
+          if (all_counts[i][j] != 0)
+            all_offset_counts.push_back(std::make_pair(all_offsets[i][j], all_counts[i][j]));
       std::sort(all_offset_counts.begin(), all_offset_counts.end());
 
       unsigned footer_size = all_offset_counts.size();        // should be the same as master.size();
