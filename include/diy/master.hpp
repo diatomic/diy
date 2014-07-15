@@ -88,7 +88,6 @@ namespace diy
 
     protected:
       inline void*& block(int i);
-      inline Link*& link(int i);
 
     private:
       Communicator&                                     comm_;
@@ -172,11 +171,6 @@ diy::Master::
 link(int i) const
 { return blocks_[i]->link; }
 
-diy::Link*&
-diy::Master::
-link(int i)
-{ return blocks_[i]->link; }
-
 
 diy::Master::ProxyWithLink
 diy::Master::
@@ -215,7 +209,7 @@ release(int i)
 
   void* b = block(i);
   block(i) = 0;
-  delete link(i);   link(i) = 0;
+  delete link(i);   blocks_[i]->link = 0;
   lids_.erase(gid(i));
   return b;
 }
