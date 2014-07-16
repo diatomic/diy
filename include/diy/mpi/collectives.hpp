@@ -40,8 +40,8 @@ namespace mpi
       std::vector<int>  offsets(comm.size(), 0);
       for (unsigned i = 1; i < offsets.size(); ++i)
         offsets[i] = offsets[i-1] + counts[i-1];
-      std::vector<T> buffer(offsets.back() + counts.back());
 
+      std::vector<T> buffer(offsets.back() + counts.back());
       MPI_Gatherv(Datatype::address(in[0]),
                   in.size(),
                   Datatype::datatype(),
@@ -54,8 +54,11 @@ namespace mpi
       out.resize(comm.size());
       size_t cur = 0;
       for (unsigned i = 0; i < comm.size(); ++i)
+      {
+          out[i].reserve(counts[i]);
           for (unsigned j = 0; j < counts[i]; ++j)
               out[i].push_back(buffer[cur++]);
+      }
     }
 
     static void gather(const communicator& comm, const T& in, int root)
