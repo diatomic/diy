@@ -31,12 +31,11 @@ namespace diy
       virtual int   put(BinaryBuffer& bb)
       {
         std::string     filename = filename_template_.c_str();
-        mkstemp(const_cast<char*>(filename.c_str()));
+        int fh = mkostemp(const_cast<char*>(filename.c_str()), O_WRONLY | O_SYNC);
 
         //std::cout << "FileStorage::put(): " << filename << std::endl;
 
         int sz = bb.buffer.size();
-        int fh = open(filename.c_str(), O_WRONLY | O_SYNC, 0600);
         write(fh, &bb.buffer[0], sz);
         close(fh);
         bb.clear();
