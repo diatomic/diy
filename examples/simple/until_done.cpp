@@ -10,9 +10,8 @@
 struct Block
 {
   int   count;
-  bool  all_done;
 
-        Block(): count(0), all_done(false)      {}
+        Block(): count(0)                   {}
 };
 
 void*   create_block()                      { return new Block; }
@@ -29,7 +28,8 @@ void flip_coin(void* b_, const diy::Master::ProxyWithLink& cp, void*)
   b->count++;
   bool done = rand() % 2;
   //std::cout << cp.gid() << "  " << done << " " << b->count << std::endl;
-  cp.all_reduce(done, b->all_done, std::logical_and<bool>());
+  cp.collectives()->clear();
+  cp.all_reduce(done, std::logical_and<bool>());
 }
 
 int main(int argc, char* argv[])
@@ -65,9 +65,7 @@ int main(int argc, char* argv[])
     master.foreach(&flip_coin);
     comm.exchange();
     comm.flush();
-
-    master.extract_collectives(master.loaded_block());
-    all_done = master.block<Block>(master.loaded_block())->all_done;
+    all_done = master.proxy(master.loaded_block()).read<bool>();
   }
 
   if (world.rank() == 0)

@@ -62,6 +62,7 @@ namespace diy
       inline void   unload_all();
       inline void   unload(int i);
       inline void   load(int i);
+      inline bool   has_incoming(int i) const;
 
       // load if necessary
       void*         get(int i)                          { if (block(i) == 0) load(i); return block(i); }
@@ -82,9 +83,7 @@ namespace diy
 
       // f will be called with
       template<class Functor>
-      void          foreach(const Functor& f, void* aux = 0);
-
-      void          extract_collectives(int i);
+      void          foreach(const Functor& f, void* aux = 0, bool load_on_incoming = false);
 
     protected:
       inline void*& block(int i);
@@ -132,10 +131,6 @@ namespace diy
 
       Link*   link() const                                          { return link_; }
       void*   block() const                                         { return block_; }
-
-      template<class T, class Op>
-      void    all_reduce(const T& in, T& out, Op op) const
-      { Communicator::Proxy::all_reduce(in, (char*) &out - (char*) block_, op); }
 
     private:
       void*   block_;
@@ -254,42 +249,38 @@ load(int i)
   ++in_memory_;
 }
 
+bool
+diy::Master::
+has_incoming(int i) const
+{
+  const Communicator::IncomingQueues& incoming = const_cast<Communicator&>(comm_).incoming(gid(i));
+  for (Communicator::IncomingQueues::const_iterator it = incoming.begin(); it != incoming.end(); ++it)
+  {
+    if (!it->second.empty())
+        return true;
+  }
+  return false;
+}
 
 template<class Functor>
 void
 diy::Master::
-foreach(const Functor& f, void* aux)
+foreach(const Functor& f, void* aux, bool load_on_incoming)
 {
   for (unsigned i = 0; i < size(); ++i)
   {
     if (block(i) == 0 && external_[i] != -1)
-    {
-      if (in_memory_ == limit_)
-        unload_all();
-      load(i);
-    }
-
-    // Copy out pending collectives
-    extract_collectives(i);
+      if (!load_on_incoming || has_incoming(i))
+      {
+          if (in_memory_ == limit_)
+            unload_all();
+          load(i);
+      }
 
     f(block(i), proxy(i), aux);
     // TODO: invoke opportunistic communication
     //       don't forget to adjust Master::exchange()
   }
-}
-
-void
-diy::Master::
-extract_collectives(int i)
-{
-  for (Communicator::CollectivesList::const_iterator
-        it  = comm_.collectives(gid(i)).begin();
-        it != comm_.collectives(gid(i)).end();
-        ++it)
-  {
-    it->result_out(block(i));
-  }
-  comm_.collectives(gid(i)).clear();
 }
 
 void

@@ -112,7 +112,16 @@ namespace diy
     inline void         incoming(std::vector<int>& v) const;            // fill v with every gid from which we have a message
 
     template<class T, class Op>
-    inline void         all_reduce(const T& in, std::ptrdiff_t out, Op op) const;
+    inline void         all_reduce(const T& in, Op op) const;
+    template<class T>
+    inline T            read() const;
+    template<class T>
+    inline T            get() const;
+
+    template<class T>
+    inline void         scratch(const T& in) const;
+
+    CollectivesList*    collectives() const                             { return collectives_; }
 
     private:
       Communicator*     comm_;
@@ -158,21 +167,20 @@ namespace diy
   {
             Collective():
               cop_(0)                           {}
-            Collective(std::ptrdiff_t out,
-                       detail::CollectiveOp* cop):
-              out_(out), cop_(cop)              {}
+            Collective(detail::CollectiveOp* cop):
+              cop_(cop)                         {}
             // this copy constructor is very ugly, but need it to insert Collectives into a list
             Collective(const Collective& other):
               cop_(0)                           { swap(const_cast<Collective&>(other)); }
             ~Collective()                       { delete cop_; }
 
-    void    swap(Collective& other)             { std::swap(cop_, other.cop_); std::swap(out_, other.out_); }
+    void    init()                              { cop_->init(); }
+    void    swap(Collective& other)             { std::swap(cop_, other.cop_); }
     void    update(const Collective& other)     { cop_->update(*other.cop_); }
     void    global(const mpi::communicator& c)  { cop_->global(c); }
     void    copy_from(Collective& other) const  { cop_->copy_from(*other.cop_); }
-    void    result_out(void* block) const       { cop_->result_out(static_cast<char*>(block) + out_); }
+    void    result_out(void* x) const           { cop_->result_out(x); }
 
-    std::ptrdiff_t                              out_;
     detail::CollectiveOp*                       cop_;
 
     private:
@@ -277,6 +285,7 @@ process_collectives()
 
   while (iters[0] != collectives_.begin()->second.end())
   {
+    iters[0]->init();
     for (unsigned j = 1; j < iters.size(); ++j)
     {
       // NB: this assumes that the operations are commutative
@@ -331,9 +340,37 @@ incoming(std::vector<int>& v) const
 template<class T, class Op>
 void
 diy::Communicator::Proxy::
-all_reduce(const T& in, std::ptrdiff_t out, Op op) const
+all_reduce(const T& in, Op op) const
 {
-  collectives_->push_back(Collective(out, new detail::AllReduceOp<T,Op>(in, op)));
+  collectives_->push_back(Collective(new detail::AllReduceOp<T,Op>(in, op)));
+}
+
+template<class T>
+T
+diy::Communicator::Proxy::
+read() const
+{
+  T res;
+  collectives_->front().result_out(&res);
+  return res;
+}
+
+template<class T>
+T
+diy::Communicator::Proxy::
+get() const
+{
+  T res = read<T>();
+  collectives_->pop_front();
+  return res;
+}
+
+template<class T>
+void
+diy::Communicator::Proxy::
+scratch(const T& in) const
+{
+  collectives_->push_back(Collective(new detail::Scratch<T>(in)));
 }
 
 template<class T>

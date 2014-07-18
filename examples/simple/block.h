@@ -2,7 +2,6 @@ struct Block
 {
   std::vector<int>      values;
   float                 average;
-  int                   all_total;
 };
 
 namespace diy
