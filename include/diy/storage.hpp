@@ -31,7 +31,12 @@ namespace diy
       virtual int   put(BinaryBuffer& bb)
       {
         std::string     filename = filename_template_.c_str();
+#ifdef __MACH__
+        // TODO: figure out how to open with O_SYNC
+        int fh = mkstemp(const_cast<char*>(filename.c_str()));
+#else
         int fh = mkostemp(const_cast<char*>(filename.c_str()), O_WRONLY | O_SYNC);
+#endif
 
         //std::cout << "FileStorage::put(): " << filename << std::endl;
 
