@@ -49,6 +49,7 @@ namespace diy
                       load_(load)                       {}
                     ~Master()                           { destroy_block_records(); }
       inline void   destroy_block_records();
+      inline void   destroy(int i);
 
       inline int    add(int gid, void* b, Link* l);
       inline void*  release(int i);                     // release ownership of the block
@@ -143,12 +144,20 @@ diy::Master::
 destroy_block_records()
 {
   for (unsigned i = 0; i < size(); ++i)
-    if (block(i))
-    {
-      destroy_(block(i));
-      delete blocks_[i];
-    } else if (external_[i] != -1)
+  {
+    destroy(i);
+    delete blocks_[i];
+    if (external_[i] != -1)
       storage_->destroy(i);
+  }
+}
+
+void
+diy::Master::
+destroy(int i)
+{
+  if (block(i))
+    destroy_(block(i));
 }
 
 void*
