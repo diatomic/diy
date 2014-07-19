@@ -1,7 +1,7 @@
 #ifndef DIY_PICK_HPP
 #define DIY_PICK_HPP
 
-#include "cover.hpp"
+#include "link.hpp"
 
 namespace diy
 {

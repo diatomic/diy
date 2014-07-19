@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <iostream>
 
-#include "cover.hpp"
+#include "link.hpp"
 #include "assigner.hpp"
 
 namespace diy

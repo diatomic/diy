@@ -5,7 +5,7 @@
 #include <map>
 
 #include "communicator.hpp"
-#include "cover.hpp"
+#include "link.hpp"
 #include "storage.hpp"
 
 namespace diy

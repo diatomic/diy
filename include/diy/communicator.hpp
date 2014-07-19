@@ -7,7 +7,7 @@
 #include <iterator>
 
 #include "types.hpp"
-#include "cover.hpp"
+#include "link.hpp"
 #include "mpi.hpp"
 #include "serialization.hpp"
 #include "detail/collectives.hpp"
