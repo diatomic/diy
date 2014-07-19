@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <map>
+#include <set>
 
 namespace diy
 {
@@ -152,6 +153,33 @@ namespace diy
       for (unsigned i = 0; i < s; ++i)
       {
         std::pair<K,V> p;
+        diy::load(bb, p);
+        m.insert(p);
+      }
+    }
+  };
+
+  // save/load for std::set<T>
+  template<class T>
+  struct Serialization< std::set<T> >
+  {
+    typedef             std::set<T>             Set;
+
+    static void         save(BinaryBuffer& bb, const Set& m)
+    {
+      unsigned s = m.size();
+      diy::save(bb, s);
+      for (typename std::set<T>::const_iterator it = m.begin(); it != m.end(); ++it)
+        diy::save(bb, *it);
+    }
+
+    static void         load(BinaryBuffer& bb, Set& m)
+    {
+      unsigned s;
+      diy::load(bb, s);
+      for (unsigned i = 0; i < s; ++i)
+      {
+        T p;
         diy::load(bb, p);
         m.insert(p);
       }
