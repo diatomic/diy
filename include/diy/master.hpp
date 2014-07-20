@@ -157,7 +157,10 @@ diy::Master::
 destroy(int i)
 {
   if (block(i))
+  {
     destroy_(block(i));
+    block(i) = 0;
+  }
 }
 
 void*
