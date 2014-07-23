@@ -16,7 +16,7 @@ namespace detail
     void operator()(MPI_Comm comm, int dest, int tag, const T& x) const
     {
       typedef       mpi_datatype<T>     Datatype;
-      MPI_Send(Datatype::address(x),
+      MPI_Send((void*) Datatype::address(x),
                Datatype::count(x),
                Datatype::datatype(),
                dest, tag, comm);
@@ -65,7 +65,7 @@ namespace detail
     {
       request r;
       typedef       mpi_datatype<T>     Datatype;
-      MPI_Isend(Datatype::address(x),
+      MPI_Isend((void*) Datatype::address(x),
                 Datatype::count(x),
                 Datatype::datatype(),
                 dest, tag, comm, &r.r);
