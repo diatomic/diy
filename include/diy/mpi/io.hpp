@@ -104,7 +104,7 @@ diy::mpi::io::file::
 write_at(offset o, const char* buffer, size_t size)
 {
   status s;
-  MPI_File_write_at(fh, o, buffer, size, detail::get_mpi_datatype<char>(), &s.s);
+  MPI_File_write_at(fh, o, (void *)buffer, size, detail::get_mpi_datatype<char>(), &s.s);
 }
 
 template<class T>
@@ -120,7 +120,7 @@ diy::mpi::io::file::
 write_at_all(offset o, const char* buffer, size_t size)
 {
   status s;
-  MPI_File_write_at_all(fh, o, buffer, size, detail::get_mpi_datatype<char>(), &s.s);
+  MPI_File_write_at_all(fh, o, (void *)buffer, size, detail::get_mpi_datatype<char>(), &s.s);
 }
 
 template<class T>
