@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <map>
+#include <algorithm>
 
 #include "types.hpp"
 
@@ -15,6 +16,8 @@ namespace diy
       virtual   ~Link()                             {}  // need to be able to delete derived classes
 
       int       count() const                       { return neighbors_.size(); }
+      inline
+      int       count_unique() const;
       BlockID   target(int i) const                 { return neighbors_[i]; }
       int       find(int gid) const;
 
@@ -126,6 +129,14 @@ find(int gid) const
       return i;
   }
   return -1;
+}
+int
+diy::Link::
+count_unique() const
+{
+    std::vector<BlockID> tmp(neighbors_.begin(), neighbors_.end());
+    std::sort(tmp.begin(), tmp.end());
+    return std::unique(tmp.begin(), tmp.end()) - tmp.begin();
 }
 
 int

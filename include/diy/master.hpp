@@ -197,7 +197,7 @@ add(int gid, void* b, Link* l)
   gids_.push_back(gid);
   int lid = gids_.size() - 1;
   lids_[gid] = lid;
-  comm_.add_expected(l->count()); // NB: at every iteration we expect a message from each neighbor
+  comm_.add_expected(l->count_unique()); // NB: at every iteration we expect a message from each unique neighbor
 
   ++in_memory_;
 

@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
   diy::mpi::environment     env(argc, argv);
   diy::mpi::communicator    world;
 
-  int                       nblocks = 4*world.size();
+  int                       nblocks = world.size();
 
   diy::FileStorage          storage("./DIY.XXXXXX");
 
@@ -98,6 +98,23 @@ int main(int argc, char* argv[])
       neighbor.proc = assigner.rank(neighbor.gid);
       link->add_neighbor(neighbor);
     }
+
+    // TP: added wrapping at start and end of chain
+    if (gid == nblocks - 1)
+    {
+      neighbor.gid  = 0;
+      neighbor.proc = assigner.rank(neighbor.gid);
+      link->add_neighbor(neighbor);
+      fprintf(stderr, "wrapping gid %d to neighbor 0\n", gid);
+    }
+    if (gid == 0)
+    {
+      neighbor.gid  = nblocks - 1;
+      neighbor.proc = assigner.rank(neighbor.gid);
+      link->add_neighbor(neighbor);
+      fprintf(stderr, "wrapping gid 0 to neighbor %d\n", nblocks - 1);
+    }
+    // TP: end of wrapped neighbors
 
     Block* b = new Block;
     for (unsigned i = 0; i < 3; ++i)

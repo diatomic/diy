@@ -35,4 +35,8 @@ bool
 operator<(const diy::BlockID& x, const diy::BlockID& y)
 { return x.gid < y.gid; }
 
+bool
+operator==(const diy::BlockID& x, const diy::BlockID& y)
+{ return x.gid == y.gid; }
+
 #endif
