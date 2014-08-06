@@ -32,21 +32,24 @@ namespace diy
   {
     public:
       typedef   std::map<Direction, int>            DirMap;
+      typedef   std::vector<Direction>              DirVec;
 
     public:
                 RegularLink(int dim, Direction wrap = Direction(0)):
                   dim_(dim), wrap_(wrap)            {}
 
       int       direction(Direction dir) const;     // convert direction to a neighbor (-1 if no neighbor)
+      Direction direction(int i) const              { return dir_vec_[i]; }
       int       dimension() const                   { return dim_; }
-      void      add_direction(Direction dir)        { int c = directions_.size(); directions_[dir] = c; }
+      void      add_direction(Direction dir)        { int c = dir_map_.size(); dir_map_[dir] = c; dir_vec_.push_back(dir); }
 
       void      add_wrap(Direction dir)             { wrap_ = static_cast<Direction>(wrap_ | dir); }
       Direction wrap() const                        { return wrap_; }
 
     private:
       int       dim_;
-      DirMap    directions_;
+      DirMap    dir_map_;
+      DirVec    dir_vec_;
       Direction wrap_;
   };
 
@@ -143,8 +146,8 @@ int
 diy::RegularLink::
 direction(Direction dir) const
 {
-  DirMap::const_iterator it = directions_.find(dir);
-  if (it == directions_.end())
+  DirMap::const_iterator it = dir_map_.find(dir);
+  if (it == dir_map_.end())
     return -1;
   else
     return it->second;
