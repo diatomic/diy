@@ -28,80 +28,52 @@ namespace diy
   };
 
   // for a regular decomposition, it makes sense to address the neighbors by direction
-  class RegularLink: public virtual Link
+  // and store local and neighbor bounds
+  template<class Bounds_>
+  class RegularLink: public Link
   {
     public:
+      typedef   Bounds_                             Bounds;
+
       typedef   std::map<Direction, int>            DirMap;
       typedef   std::vector<Direction>              DirVec;
 
     public:
-                RegularLink(int dim, Direction wrap = Direction(0)):
+                RegularLink(int dim, const Bounds& core, const Bounds& bounds, Direction wrap = Direction(0)):
                   dim_(dim), wrap_(wrap)            {}
 
+      int       dimension() const                   { return dim_; }
+
+      // direction
       int       direction(Direction dir) const;     // convert direction to a neighbor (-1 if no neighbor)
       Direction direction(int i) const              { return dir_vec_[i]; }
-      int       dimension() const                   { return dim_; }
       void      add_direction(Direction dir)        { int c = dir_map_.size(); dir_map_[dir] = c; dir_vec_.push_back(dir); }
 
+      // wrap
       void      add_wrap(Direction dir)             { wrap_ = static_cast<Direction>(wrap_ | dir); }
       Direction wrap() const                        { return wrap_; }
 
-    private:
-      int       dim_;
-      DirMap    dir_map_;
-      DirVec    dir_vec_;
-      Direction wrap_;
-  };
-
-  // stores block bounds associated with each neighbor
-  template<class Bounds_>
-  class BoundsLink: public virtual Link
-  {
-    public:
-      typedef       Bounds_     Bounds;
-
-                    BoundsLink(int dim, const Bounds& core, const Bounds& bounds):
-                        dim_(dim),
-                        core_(core),
-                        bounds_(bounds)                 {}
-
+      // bounds
       const Bounds& core() const                        { return core_; }
       const Bounds& bounds() const                      { return bounds_; }
       const Bounds& bounds(int i) const                 { return nbr_bounds_[i]; }
       void          add_bounds(const Bounds& bounds)    { nbr_bounds_.push_back(bounds); }
-      int           dimension() const                   { return dim_; }
 
     private:
-      int                   dim_;
+      int       dim_;
+
+      DirMap    dir_map_;
+      DirVec    dir_vec_;
+      Direction wrap_;
+
       Bounds                core_;
       Bounds                bounds_;
       std::vector<Bounds>   nbr_bounds_;
   };
 
-  typedef       BoundsLink<DiscreteBounds>          GridLink;
-  typedef       BoundsLink<ContinuousBounds>        ContinuousLink;
+  typedef       RegularLink<DiscreteBounds>         RegularGridLink;
+  typedef       RegularLink<ContinuousBounds>       RegularContinuousLink;
 
-
-  // dimension gets duplicated between the two parents, but I don't think it's a big deal
-  class RegularGridLink: public RegularLink, public GridLink
-  {
-    public:
-                RegularGridLink(int dim, const Bounds& core, const Bounds& bounds):
-                  RegularLink(dim),
-                  GridLink(dim, core, bounds)       {}
-
-      using RegularLink::dimension;
-  };
-
-  class RegularContinuousLink: public RegularLink, public ContinuousLink
-  {
-    public:
-                RegularContinuousLink(int dim, const Bounds& core, const Bounds& bounds):
-                  RegularLink(dim),
-                  ContinuousLink(dim, core, bounds) {}
-
-      using RegularLink::dimension;
-  };
 
   // Other cover candidates: KDTreeLink, AMRGridLink
 
@@ -142,8 +114,9 @@ count_unique() const
     return std::unique(tmp.begin(), tmp.end()) - tmp.begin();
 }
 
+template<class Bounds>
 int
-diy::RegularLink::
+diy::RegularLink<Bounds>::
 direction(Direction dir) const
 {
   DirMap::const_iterator it = dir_map_.find(dir);

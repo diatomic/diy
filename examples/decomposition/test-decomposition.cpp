@@ -10,18 +10,18 @@ typedef     diy::DiscreteBounds         Bounds;
 
 void create(int gid, const Bounds& core, const Bounds& bounds, const diy::Link& link)
 {
-  const diy::RegularLink& l = dynamic_cast<const diy::RegularLink&>(link);
+  const diy::RegularLink<Bounds>& l = static_cast<const diy::RegularLink<Bounds>&>(link);
   std::cout << "   "
             << "Creating block (" << gid << "): "
             << core.min[0]   << ' ' << core.min[1]   << ' ' << core.min[2] << " - "
             << core.max[0]   << ' ' << core.max[1]   << ' ' << core.max[2] << " : "
             << bounds.min[0] << ' ' << bounds.min[1] << ' ' << bounds.min[2] << " - "
             << bounds.max[0] << ' ' << bounds.max[1] << ' ' << bounds.max[2] << " : "
-            << link.count()  << ' ' << std::endl
-            << std::bitset<32>(l.wrap())   << std::endl
-            << std::bitset<32>(l.direction(0))   << std::endl
-            << std::bitset<32>(l.direction(0) & l.wrap()) << std::endl
-            << ((l.direction(0) & l.wrap()) == l.direction(0)) << ' '
+            << link.count()  << ' ' //<< std::endl
+            << std::bitset<32>(l.wrap()) //<< std::endl
+            //<< std::bitset<32>(l.direction(0))   << std::endl
+            //<< std::bitset<32>(l.direction(0) & l.wrap()) << std::endl
+            //<< ((l.direction(0) & l.wrap()) == l.direction(0)) << ' '
             << std::dec
             << std::endl;
 
