@@ -42,6 +42,7 @@ namespace diy
 
         int sz = bb.buffer.size();
         write(fh, &bb.buffer[0], sz);
+        fsync(fh);
         close(fh);
         bb.clear();
 

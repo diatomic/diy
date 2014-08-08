@@ -160,7 +160,7 @@ namespace detail
           link.add_direction(static_cast<Direction>(dir));
         }
 
-        create(gid, core, bounds, link);
+        create(gid, core, bounds, domain, link);
       }
     }
 

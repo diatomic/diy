@@ -8,7 +8,8 @@
 typedef     diy::DiscreteBounds         Bounds;
 //typedef     diy::ContinuousBounds       Bounds;
 
-void create(int gid, const Bounds& core, const Bounds& bounds, const diy::Link& link)
+void create(int gid, const Bounds& core, const Bounds& bounds, const Bounds& domain,
+            const diy::Link& link)
 {
   const diy::RegularLink<Bounds>& l = static_cast<const diy::RegularLink<Bounds>&>(link);
   std::cout << "   "
