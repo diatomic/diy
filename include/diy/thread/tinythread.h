@@ -586,6 +586,8 @@ class thread::id {
       return *this;
     }
 
+    operator unsigned long int() const  { return mId; }
+
     inline friend bool operator==(const id &aId1, const id &aId2)
     {
       return (aId1.mId == aId2.mId);

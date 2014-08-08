@@ -11,6 +11,7 @@
 #include <fcntl.h>
 
 #include "serialization.hpp"
+#include "thread.hpp"
 
 namespace diy
 {
@@ -46,15 +47,21 @@ namespace diy
         close(fh);
         bb.clear();
 
+        int res = (*count_.access())++;
         FileRecord  fr = { sz, filename };
-        filenames_[count_] = fr;
-        return count_++;
+        (*filenames_.access())[res] = fr;
+
+        return res;
       }
 
       virtual void   get(int i, BinaryBuffer& bb)
       {
-        FileRecord      fr = filenames_[i];
-        filenames_.erase(i);
+        FileRecord      fr;
+        {
+          CriticalMapAccessor accessor = filenames_.access();
+          fr = (*accessor)[i];
+          accessor->erase(i);
+        }
 
         //std::cout << "FileStorage::get(): " << fr.name << std::endl;
 
@@ -68,14 +75,20 @@ namespace diy
 
       virtual void  destroy(int i)
       {
-        FileRecord      fr = filenames_[i];
-        filenames_.erase(i);
+        FileRecord      fr;
+        {
+          CriticalMapAccessor accessor = filenames_.access();
+          fr = (*accessor)[i];
+          accessor->erase(i);
+        }
         remove(fr.name.c_str());
       }
 
                     ~FileStorage()
       {
-        for (std::map<int,FileRecord>::const_iterator it = filenames_.begin(); it != filenames_.end(); ++it)
+        for (FileRecordMap::const_iterator it =  filenames_.const_access()->begin();
+                                           it != filenames_.const_access()->end();
+                                         ++it)
         {
           remove(it->second.name.c_str());
         }
@@ -88,10 +101,14 @@ namespace diy
         std::string     name;
       };
 
+      typedef           std::map<int, FileRecord>                   FileRecordMap;
+      typedef           critical_resource<FileRecordMap>            CriticalMap;
+      typedef           CriticalMap::accessor                       CriticalMapAccessor;
+
     private:
-      int                           count_;
+      critical_resource<int>        count_;
       std::string                   filename_template_;
-      std::map<int, FileRecord>     filenames_;
+      CriticalMap                   filenames_;
   };
 }
 

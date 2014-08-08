@@ -171,6 +171,7 @@ int main(int argc, char* argv[])
   int                       nblocks     = 64;
   size_t                    num_points  = 100;      // points per block
   int                       mem_blocks  = -1;
+  int                       threads     = -1;
 
   diy::mpi::environment     env(argc, argv);
 
@@ -181,6 +182,7 @@ int main(int argc, char* argv[])
                                    &Block::create,
                                    &Block::destroy,
                                    mem_blocks,
+                                   threads,
                                    &storage,
                                    &Block::save,
                                    &Block::load);

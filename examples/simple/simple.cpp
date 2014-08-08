@@ -60,13 +60,15 @@ int main(int argc, char* argv[])
 {
   diy::mpi::environment     env(argc, argv);
   diy::mpi::communicator    world;
-  int                       nblocks = 4*world.size();
+  //int                       nblocks = 4*world.size();
+  int                       nblocks = 128;
   diy::FileStorage          storage("./DIY.XXXXXX");
   diy::Communicator         comm(world);
   diy::Master               master(comm,
                                    &create_block,
                                    &destroy_block,
-                                   2,
+                                   8,
+                                   4,
                                    &storage,
                                    &save_block,
                                    &load_block);

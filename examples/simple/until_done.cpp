@@ -46,6 +46,7 @@ int main(int argc, char* argv[])
                                    &create_block,
                                    &destroy_block,
                                    2,
+                                   -1,
                                    &storage,
                                    &save_block,
                                    &load_block);

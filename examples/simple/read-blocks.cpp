@@ -19,6 +19,7 @@ int main(int argc, char* argv[])
                                    &create_block,
                                    &destroy_block,
                                    -1,
+                                   -1,
                                    0,
                                    &save_block,
                                    &load_block);
