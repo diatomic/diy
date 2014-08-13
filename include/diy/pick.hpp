@@ -7,7 +7,10 @@ namespace diy
 {
   template<class Bounds, class Point, class OutIter>
   void near(const RegularLink<Bounds>& link, const Point& p, float r, OutIter out, Bounds& domain);
-  void wrap_bounds(Bounds& bounds, int wrap_dir, Bounds& domain, int dim);
+  namespace detail
+  {
+    void wrap_bounds(Bounds& bounds, int wrap_dir, Bounds& domain, int dim);
+  }
 }
 
 // finds the neighbors within radius r of a target point
@@ -22,21 +25,20 @@ near(const RegularLink<Bounds>& link, const Point& p, float r, OutIter out, Boun
   int d; // current dimension
   float dir[DIY_MAX_DIM]; // offset direction
   float new_pt[DIY_MAX_DIM]; // offset point
-  Bounds bounds; // neighbor block bounds
+  Bounds neigh_bounds; // neighbor block bounds
 
-  // for all neighbors of lid
+  // for all neighbors of this block
   for (int n = 0; n < link.count(); n++)
   {
     // wrap neighbor bounds, if necessary, otherwise bounds will be unchanged
-    bounds = link.bounds(n);
-    if ((link.wrap() & link.direction(n)) == link.direction(n))
-      wrap_bounds(bounds, link.direction(n), domain, link.dimension());
+    neigh_bounds = link.bounds(n);
+    detail::wrap_bounds(neigh_bounds, link.wrap() & link.direction(n), domain, link.dimension());
 
     // compute normalized vector from my block to the neighbor block
     // based on difference between mins
     for (d = 0; d < link.dimension(); d++)
     {
-      dir[d] = bounds.min[d] - link.bounds().min[d];
+      dir[d] = neigh_bounds.min[d] - link.bounds().min[d];
       if (dir[d] > 0.0)
         dir[d] = 1.0f;
       else if (dir[d] < 0.0)
@@ -54,8 +56,8 @@ near(const RegularLink<Bounds>& link, const Point& p, float r, OutIter out, Boun
       // break and proceed to next neighbor
       // note dist can be large enough to shift the point beyond the neighbor
       // that means the point was definitely near enough to neighbor
-      if ((p[d] < bounds.min[d] && new_pt[d] < bounds.min[d]) ||
-          (p[d] > bounds.max[d] && new_pt[d] > bounds.max[d]))
+      if ((p[d] < neigh_bounds.min[d] && new_pt[d] < neigh_bounds.min[d]) ||
+          (p[d] > neigh_bounds.max[d] && new_pt[d] > neigh_bounds.max[d]))
         break;
     }
 
@@ -70,7 +72,7 @@ near(const RegularLink<Bounds>& link, const Point& p, float r, OutIter out, Boun
 // wrap dir is the wrapping direction from original block to wrapped neighbor block
 // overall domain bounds and dimensionality are also needed
 void
-diy::
+diy::detail::
 wrap_bounds(Bounds& bounds, int wrap_dir, Bounds& domain, int dim)
 {
   // wrapping toward the left transforms block bounds to the left, and vice versa
@@ -80,7 +82,7 @@ wrap_bounds(Bounds& bounds, int wrap_dir, Bounds& domain, int dim)
     bounds.max[0] -= (domain.max[0] - domain.min[0]);
   }
   if (dim > 0 && (wrap_dir & DIY_X1) == DIY_X1)
-  {     
+  {
     bounds.min[0] += (domain.max[0] - domain.min[0]);
     bounds.max[0] += (domain.max[0] - domain.min[0]);
   }
@@ -91,7 +93,7 @@ wrap_bounds(Bounds& bounds, int wrap_dir, Bounds& domain, int dim)
     bounds.max[1] -= (domain.max[1] - domain.min[1]);
   }
   if (dim > 1 && (wrap_dir & DIY_Y1) == DIY_Y1)
-  {     
+  {
     bounds.min[1] += (domain.max[1] - domain.min[1]);
     bounds.max[1] += (domain.max[1] - domain.min[1]);
   }
@@ -102,7 +104,7 @@ wrap_bounds(Bounds& bounds, int wrap_dir, Bounds& domain, int dim)
     bounds.max[2] -= (domain.max[2] - domain.min[2]);
   }
   if (dim > 2 && (wrap_dir & DIY_Z1) == DIY_Z1)
-  {     
+  {
     bounds.min[2] += (domain.max[2] - domain.min[2]);
     bounds.max[2] += (domain.max[2] - domain.min[2]);
   }
@@ -113,7 +115,7 @@ wrap_bounds(Bounds& bounds, int wrap_dir, Bounds& domain, int dim)
     bounds.max[3] -= (domain.max[3] - domain.min[3]);
   }
   if (dim > 3 && (wrap_dir & DIY_T1) == DIY_T1)
-  {     
+  {
     bounds.min[3] += (domain.max[3] - domain.min[3]);
     bounds.max[3] += (domain.max[3] - domain.min[3]);
   }
