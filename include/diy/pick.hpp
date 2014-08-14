@@ -6,10 +6,11 @@
 namespace diy
 {
   template<class Bounds, class Point, class OutIter>
-  void near(const RegularLink<Bounds>& link, const Point& p, float r, OutIter out, Bounds& domain);
+  void near(const RegularLink<Bounds>& link, const Point& p, float r, OutIter out, 
+            const Bounds& domain);
   namespace detail
   {
-    void wrap_bounds(Bounds& bounds, int wrap_dir, Bounds& domain, int dim);
+    void wrap_bounds(Bounds& bounds, int wrap_dir, const Bounds& domain, int dim);
   }
 }
 
@@ -20,7 +21,7 @@ namespace diy
 template<class Bounds, class Point, class OutIter>
 void
 diy::
-near(const RegularLink<Bounds>& link, const Point& p, float r, OutIter out, Bounds& domain)
+near(const RegularLink<Bounds>& link, const Point& p, float r, OutIter out, const Bounds& domain)
 {
   int d; // current dimension
   float dir[DIY_MAX_DIM]; // offset direction
@@ -73,7 +74,7 @@ near(const RegularLink<Bounds>& link, const Point& p, float r, OutIter out, Boun
 // overall domain bounds and dimensionality are also needed
 void
 diy::detail::
-wrap_bounds(Bounds& bounds, int wrap_dir, Bounds& domain, int dim)
+wrap_bounds(Bounds& bounds, int wrap_dir, const Bounds& domain, int dim)
 {
   // wrapping toward the left transforms block bounds to the left, and vice versa
   if (dim > 0 && (wrap_dir & DIY_X0) == DIY_X0)
