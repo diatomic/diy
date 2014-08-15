@@ -155,7 +155,7 @@ namespace diy
 
   struct Communicator::InFlight
   {
-    BinaryBuffer        queue;
+    BinaryBuffer        message;
     mpi::request        request;
 
     // for debug purposes:
@@ -208,9 +208,9 @@ exchange()
       inflight_.push_back(InFlight());
       inflight_.back().from = from;
       inflight_.back().to   = to;
-      inflight_.back().queue.swap(cur->second);
-      diy::save(inflight_.back().queue, std::make_pair(from, to));
-      inflight_.back().request = comm_.isend(proc, tags::queue, inflight_.back().queue.buffer);
+      inflight_.back().message.swap(cur->second);
+      diy::save(inflight_.back().message, std::make_pair(from, to));
+      inflight_.back().request = comm_.isend(proc, tags::queue, inflight_.back().message.buffer);
     }
   }
   outgoing_.clear();
