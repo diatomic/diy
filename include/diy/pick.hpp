@@ -6,11 +6,14 @@
 namespace diy
 {
   template<class Bounds, class Point, class OutIter>
-  void near(const RegularLink<Bounds>& link, const Point& p, float r, OutIter out, 
+  void near(const RegularLink<Bounds>& link, const Point& p, float r, OutIter out,
             const Bounds& domain);
   namespace detail
   {
     void wrap_bounds(Bounds& bounds, int wrap_dir, const Bounds& domain, int dim);
+
+    template<class Point>
+    void shift(float new_pt[DIY_MAX_DIM], const Point& p, float r, Direction dir, int dim);
   }
 }
 
@@ -35,20 +38,7 @@ near(const RegularLink<Bounds>& link, const Point& p, float r, OutIter out, cons
     neigh_bounds = link.bounds(n);
     detail::wrap_bounds(neigh_bounds, link.wrap() & link.direction(n), domain, link.dimension());
 
-    // compute normalized vector from my block to the neighbor block
-    // based on difference between mins
-    for (d = 0; d < link.dimension(); d++)
-    {
-      dir[d] = neigh_bounds.min[d] - link.bounds().min[d];
-      if (dir[d] > 0.0)
-        dir[d] = 1.0f;
-      else if (dir[d] < 0.0)
-        dir[d] = -1.0f;
-    }
-
-    // new point is offset from old point by dist in direction of vector
-    for(d = 0; d < link.dimension(); d++)
-      new_pt[d] = p[d] + dir[d] * r;
+    detail::shift(new_pt, p, r, link.direction(n), link.dimension());
 
     // check if neighbor is near enough
     for (d = 0; d < link.dimension(); d++)
@@ -121,5 +111,29 @@ wrap_bounds(Bounds& bounds, int wrap_dir, const Bounds& domain, int dim)
     bounds.max[3] += (domain.max[3] - domain.min[3]);
   }
 }
+
+template<class Point>
+void
+diy::detail::
+shift(float new_pt[DIY_MAX_DIM], const Point& p, float r, Direction dir, int dim)
+{
+  if (dim > 0 && (dir & DIY_X0))
+      new_pt[0] = p[0] - r;
+  if (dim > 0 && (dir & DIY_X1))
+      new_pt[0] = p[0] + r;
+  if (dim > 1 && (dir & DIY_Y0))
+      new_pt[1] = p[1] - r;
+  if (dim > 1 && (dir & DIY_Y1))
+      new_pt[1] = p[1] + r;
+  if (dim > 2 && (dir & DIY_Z0))
+      new_pt[2] = p[2] - r;
+  if (dim > 2 && (dir & DIY_Z1))
+      new_pt[2] = p[2] + r;
+  if (dim > 3 && (dir & DIY_T0))
+      new_pt[3] = p[3] - r;
+  if (dim > 3 && (dir & DIY_T1))
+      new_pt[3] = p[3] + r;
+}
+
 
 #endif
