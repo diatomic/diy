@@ -47,8 +47,8 @@ near(const RegularLink<Bounds>& link, const Point& p, float r, OutIter out, cons
       // break and proceed to next neighbor
       // note dist can be large enough to shift the point beyond the neighbor
       // that means the point was definitely near enough to neighbor
-      if ((p[d] < neigh_bounds.min[d] && new_pt[d] < neigh_bounds.min[d]) ||
-          (p[d] > neigh_bounds.max[d] && new_pt[d] > neigh_bounds.max[d]))
+      if (((link.direction(n) & (1 << (2*d + 1)))   && new_pt[d] < neigh_bounds.min[d]) ||
+          ((link.direction(n) & (1 << (2*d)))       && new_pt[d] > neigh_bounds.max[d]))
         break;
     }
 
