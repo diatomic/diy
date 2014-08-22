@@ -393,7 +393,7 @@ class condition_variable {
   public:
     /// Constructor.
 #if defined(_TTHREAD_WIN32_)
-    condition_variable();
+    inline condition_variable();
 #else
     condition_variable()
     {
@@ -403,7 +403,7 @@ class condition_variable {
 
     /// Destructor.
 #if defined(_TTHREAD_WIN32_)
-    ~condition_variable();
+    inline ~condition_variable();
 #else
     ~condition_variable()
     {
@@ -441,7 +441,7 @@ class condition_variable {
     /// @note Only threads that started waiting prior to this call will be
     /// woken up.
 #if defined(_TTHREAD_WIN32_)
-    void notify_one();
+    inline void notify_one();
 #else
     inline void notify_one()
     {
@@ -455,7 +455,7 @@ class condition_variable {
     /// @note Only threads that started waiting prior to this call will be
     /// woken up.
 #if defined(_TTHREAD_WIN32_)
-    void notify_all();
+    inline void notify_all();
 #else
     inline void notify_all()
     {
@@ -505,33 +505,33 @@ class thread {
     /// @note This constructor is not fully compatible with the standard C++
     /// thread class. It is more similar to the pthread_create() (POSIX) and
     /// CreateThread() (Windows) functions.
-    thread(void (*aFunction)(void *), void * aArg);
+    inline thread(void (*aFunction)(void *), void * aArg);
 
     /// Destructor.
     /// @note If the thread is joinable upon destruction, @c std::terminate()
     /// will be called, which terminates the process. It is always wise to do
     /// @c join() before deleting a thread object.
-    ~thread();
+    inline ~thread();
 
     /// Wait for the thread to finish (join execution flows).
     /// After calling @c join(), the thread object is no longer associated with
     /// a thread of execution (i.e. it is not joinable, and you may not join
     /// with it nor detach from it).
-    void join();
+    inline void join();
 
     /// Check if the thread is joinable.
     /// A thread object is joinable if it has an associated thread of execution.
-    bool joinable() const;
+    inline bool joinable() const;
 
     /// Detach from the thread.
     /// After calling @c detach(), the thread object is no longer assicated with
     /// a thread of execution (i.e. it is not joinable). The thread continues
     /// execution without the calling thread blocking, and when the thread
     /// ends execution, any owned resources are released.
-    void detach();
+    inline void detach();
 
     /// Return the thread ID of a thread object.
-    id get_id() const;
+    inline id get_id() const;
 
     /// Get the native handle for this thread.
     /// @note Under Windows, this is a @c HANDLE, and under POSIX systems, this
@@ -675,7 +675,7 @@ namespace chrono {
 /// calling thread.
 namespace this_thread {
   /// Return the thread ID of the calling thread.
-  thread::id get_id();
+  inline thread::id get_id();
 
   /// Yield execution to another thread.
   /// Offers the operating system the opportunity to schedule another thread
@@ -712,5 +712,7 @@ namespace this_thread {
 
 // Define/macro cleanup
 #undef _TTHREAD_DISABLE_ASSIGNMENT
+
+#include "tinythread.cpp"
 
 #endif // _TINYTHREAD_H_

@@ -31,13 +31,10 @@ include_directories         (${CMAKE_CURRENT_BINARY_DIR}
                              ${CMAKE_CURRENT_SOURCE_DIR}/include
                              SYSTEM ${MPI_INCLUDE_PATH})
 
-add_library                 (diy       src/tinythread.cpp)
-
 find_package                (Threads)
 
 # Set libraries
 set                         (libraries
-                             diy
                              ${CMAKE_THREAD_LIBS_INIT}
                              ${mpi_libraries})
 

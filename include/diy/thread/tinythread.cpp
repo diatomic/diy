@@ -22,7 +22,6 @@ freely, subject to the following restrictions:
 */
 
 #include <exception>
-#include "diy/thread/tinythread.h"
 
 #if defined(_TTHREAD_POSIX_)
   #include <unistd.h>
