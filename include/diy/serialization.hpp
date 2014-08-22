@@ -20,6 +20,7 @@ namespace diy
     void                reset()                                     { position = 0; }
     void                swap(BinaryBuffer& o)                       { std::swap(position, o.position); buffer.swap(o.buffer); }
     bool                empty() const                               { return buffer.empty(); }
+    size_t              size() const                                { return buffer.size(); }
                         operator bool() const                       { return position < buffer.size(); }
 
     int                 position;
