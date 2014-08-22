@@ -30,6 +30,7 @@ namespace io
     mpi::all_reduce(comm, size, max_size, mpi::maximum<unsigned>());
     mpi::all_reduce(comm, size, min_size, mpi::minimum<unsigned>());
 
+    // TODO: this will not truncate an existing file
     mpi::io::file f(comm, outfilename, mpi::io::file::wronly | mpi::io::file::create);
 
     offset_t  start = 0, shift;
@@ -68,7 +69,7 @@ namespace io
 
       std::vector< std::pair<offset_t, offset_t> >  all_offset_counts;
       for (unsigned i = 0; i < all_offsets.size(); ++i)
-        for (unsigned j = 0; j < all_offsets[j].size(); ++j)
+        for (unsigned j = 0; j < all_offsets[i].size(); ++j)
           if (all_counts[i][j] != 0)
             all_offset_counts.push_back(std::make_pair(all_offsets[i][j], all_counts[i][j]));
       std::sort(all_offset_counts.begin(), all_offset_counts.end());
