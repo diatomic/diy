@@ -393,6 +393,15 @@ void
 diy::Master::
 foreach(const Functor& f, void* aux, bool load_on_incoming)
 {
+  // touch the outgoing and incoming queues as well as collectives to make sure they exist
+  for (unsigned i = 0; i < size(); ++i)
+  {
+    comm_.outgoing(gid(i));
+    comm_.incoming(gid(i));
+    comm_.collectives(gid(i));
+  }
+
+
   // Order the blocks, so the loaded ones come first
   std::deque<int>   blocks;
   for (unsigned i = 0; i < size(); ++i)
