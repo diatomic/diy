@@ -65,6 +65,10 @@ namespace diy
       inline void   load(int i);
       inline bool   has_incoming(int i) const;
 
+      const Communicator&
+                    communicator() const                { return comm_; }
+      Communicator& communicator()                      { return comm_; }
+
       // load if necessary
       void*         get(int i)                          { if (block(i) == 0) load(i); return block(i); }
 
