@@ -160,7 +160,7 @@ namespace detail
           partners.fill(round, cp.gid(), outgoing_gids);            // send to the next round
 
       SwapReduceProxy   srp(cp, b, round, assigner, incoming_gids, outgoing_gids);
-      reduce(b, srp, &partners);
+      reduce(b, srp, partners);
 
       // touch the outgoing queues to make sure they exist
       Communicator::OutgoingQueues& outgoing = const_cast<Communicator&>(cp.comm()).outgoing(cp.gid());

@@ -71,10 +71,9 @@ struct AddBlock
   size_t        num_points;
 };
 
-void redistribute(void* b_, const diy::SwapReduceProxy& srp, const void* partners_)
+void redistribute(void* b_, const diy::SwapReduceProxy& srp, const diy::RegularPartners& partners)
 {
     Block*                      b        = static_cast<Block*>(b_);
-    const diy::RegularPartners* partners = static_cast<const diy::RegularPartners*>(partners_);
     unsigned                    round    = srp.round();
 
     //fprintf(stderr, "in_link.size():  %d\n", srp.in_link().count());
@@ -103,7 +102,7 @@ void redistribute(void* b_, const diy::SwapReduceProxy& srp, const void* partner
 
     std::vector< std::vector<Block::Point> > out_points(srp.out_link().count());
     int group_size = srp.out_link().count();
-    int cur_dim    = partners->dim(round);
+    int cur_dim    = partners.dim(round);
     for (size_t i = 0; i < b->points.size(); ++i)
     {
       int loc = floor((b->points[i][cur_dim] - b->box.min[cur_dim]) / (b->box.max[cur_dim] - b->box.min[cur_dim]) * group_size);
