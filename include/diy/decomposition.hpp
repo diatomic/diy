@@ -174,7 +174,7 @@ namespace detail
 
     int             point_to_gid();     // TODO
 
-    void            gid_to_coords(int gid, DivisionsVector& coords)
+    static void     gid_to_coords(int gid, DivisionsVector& coords, const DivisionsVector& divisions)
     {
       int dim = divisions.size();
       for (int i = 0; i < dim; ++i)
@@ -184,7 +184,12 @@ namespace detail
       }
     }
 
-    int             coords_to_gid(const DivisionsVector& coords)
+    void            gid_to_coords(int gid, DivisionsVector& coords)
+    {
+      gid_to_coords(gid, coords, divisions);
+    }
+
+    static int      coords_to_gid(const DivisionsVector& coords, const DivisionsVector& divisions)
     {
       int gid = 0;
       for (int i = coords.size() - 1; i >= 0; --i)
@@ -193,6 +198,11 @@ namespace detail
         gid += coords[i];
       }
       return gid;
+    }
+
+    int             coords_to_gid(const DivisionsVector& coords)
+    {
+      return coords_to_gid(coords, divisions);
     }
 
     void            fill_bounds(Bounds& bounds, const DivisionsVector& coords, bool add_ghosts = false)
@@ -221,6 +231,11 @@ namespace detail
     }
 
     void            fill_divisions(int nblocks)
+    {
+        fill_divisions(dim, nblocks, divisions);
+    }
+
+    static void     fill_divisions(int dim, int nblocks, std::vector<int>& divisions)
     {
       int prod = 1; int c = 0;
       for (unsigned i = 0; i < dim; ++i)

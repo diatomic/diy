@@ -51,6 +51,7 @@ namespace diy
 
       void              set_expected(int expected)      { expected_ = expected; }
       void              add_expected(int i)             { expected_ += i; }
+      int               expected() const                { return expected_; }
 
       inline void       exchange();     // possibly called in between block computations
       inline void       flush();        // makes sure all the serialized queues migrate to their target processors
