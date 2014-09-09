@@ -19,6 +19,7 @@ namespace diy
       inline
       int       count_unique() const;
       BlockID   target(int i) const                 { return neighbors_[i]; }
+      inline
       int       find(int gid) const;
 
       void      add_neighbor(const BlockID& block)  { neighbors_.push_back(block); }

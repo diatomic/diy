@@ -13,7 +13,7 @@ namespace diy
 
 typedef     unsigned long       time_type;
 
-time_type get_time()
+inline time_type get_time()
 {
 #ifdef __MACH__ // OS X does not have clock_gettime, use clock_get_time
     clock_serv_t cclock;

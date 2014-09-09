@@ -31,10 +31,12 @@ namespace diy
   };
 }
 
+inline
 bool
 operator<(const diy::BlockID& x, const diy::BlockID& y)
 { return x.gid < y.gid; }
 
+inline
 bool
 operator==(const diy::BlockID& x, const diy::BlockID& y)
 { return x.gid == y.gid; }
