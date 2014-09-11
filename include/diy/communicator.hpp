@@ -44,6 +44,8 @@ namespace diy
       int               rank() const                    { return comm_.rank(); }
       int               size() const                    { return comm_.size(); }
       inline Proxy      proxy(int gid);
+      mpi::communicator&        comm()                  { return comm_; }
+      const mpi::communicator&  comm() const            { return comm_; }
 
       IncomingQueues&   incoming(int gid)               { return incoming_[gid]; }
       OutgoingQueues&   outgoing(int gid)               { return outgoing_[gid]; }
