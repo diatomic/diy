@@ -546,7 +546,7 @@ class thread {
     /// use for a task.
     /// @return The number of hardware thread contexts in the system.
     /// @note If this value is not defined, the function returns zero (0).
-    static unsigned hardware_concurrency();
+    inline static unsigned hardware_concurrency();
 
     _TTHREAD_DISABLE_ASSIGNMENT(thread)
 
@@ -560,9 +560,9 @@ class thread {
 
     // This is the internal thread wrapper function.
 #if defined(_TTHREAD_WIN32_)
-    static unsigned WINAPI wrapper_function(void * aArg);
+    inline static unsigned WINAPI wrapper_function(void * aArg);
 #else
-    static void * wrapper_function(void * aArg);
+    inline static void * wrapper_function(void * aArg);
 #endif
 };
 
