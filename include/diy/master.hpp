@@ -173,7 +173,7 @@ namespace diy
 
     void    process()
     {
-      fprintf(stdout, "Processing with thread: %d\n",  (int) this_thread::get_id());
+      //fprintf(stdout, "Processing with thread: %d\n",  (int) this_thread::get_id());
 
       std::vector<int>      local;
       do
@@ -204,6 +204,7 @@ namespace diy
           local.push_back(i);
         }
 
+#if 0
         const char* time_format = "%Y-%m-%d %H:%M:%S";
 
         char s[1000];
@@ -211,14 +212,16 @@ namespace diy
         struct tm * p = localtime(&t);
         strftime(s, 1000, time_format, p);
         fprintf(stdout, "%s [%d]: Launching block %d\n", s, (int) this_thread::get_id(), i);
+#endif
 
         f(master.block(i), master.proxy(i), aux);
 
+#if 0
         t = time(NULL);
         p = localtime(&t);
         strftime(s, 1000, time_format, p);
         fprintf(stdout, "%s [%d]: Done with block %d\n", s, (int) this_thread::get_id(), i);
-
+#endif
       } while(true);
 
       // TODO: invoke opportunistic communication
@@ -453,7 +456,7 @@ void
 diy::Master::
 exchange()
 {
-  fprintf(stdout, "Starting exchange\n");
+  //fprintf(stdout, "Starting exchange\n");
 
   // make sure there is a queue for each neighbor
   for (int i = 0; i < size(); ++i)
@@ -465,7 +468,7 @@ exchange()
   }
 
   comm_.flush();
-  fprintf(stdout, "Finished exchange\n");
+  //fprintf(stdout, "Finished exchange\n");
 }
 
 #endif
