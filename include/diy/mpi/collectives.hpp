@@ -6,6 +6,9 @@ namespace diy
 {
 namespace mpi
 {
+  //!\addtogroup MPI
+  //!@{
+
   template<class T, class Op>
   struct Collectives
   {
@@ -135,65 +138,81 @@ namespace mpi
     }
   };
 
+  //! Broadcast to all processes in `comm`.
   template<class T>
   void      broadcast(const communicator& comm, T& x, int root)
   {
     Collectives<T,void*>::broadcast(comm, x, root);
   }
 
+  //! Gather from all processes in `comm`.
+  //!  On `root` process, `out` is resized to `comm.size()` and filled with
+  //! elements from the respective ranks.
   template<class T>
   void      gather(const communicator& comm, const T& in, std::vector<T>& out, int root)
   {
     Collectives<T,void*>::gather(comm, in, out, root);
   }
 
+  //! Same as above, but each process is expected to send the same number of
+  //! elements, so out is resized to `comm.size() * in.size()` and the elements
+  //! from different ranks appear in order (with the elements from the same rank
+  //! arranged contiguously).
   template<class T>
   void      gather(const communicator& comm, const std::vector<T>& in, std::vector< std::vector<T> >& out, int root)
   {
     Collectives<T,void*>::gather(comm, in, out, root);
   }
 
+  //! Simplified version (without `out`) for use on non-root processes.
   template<class T>
   void      gather(const communicator& comm, const T& in, int root)
   {
     Collectives<T,void*>::gather(comm, in, root);
   }
 
+  //! Simplified version (without `out`) for use on non-root processes.
   template<class T>
   void      gather(const communicator& comm, const std::vector<T>& in, int root)
   {
     Collectives<T,void*>::gather(comm, in, root);
   }
 
+  //! reduce
   template<class T, class Op>
   void      reduce(const communicator& comm, const T& in, T& out, int root, const Op& op)
   {
     Collectives<T, Op>::reduce(comm, in, out, root, op);
   }
 
-  // Should not be called on the root process
+  //! Simplified version (without `out`) for use on non-root processes.
   template<class T, class Op>
   void      reduce(const communicator& comm, const T& in, int root, const Op& op)
   {
     Collectives<T, Op>::reduce(comm, in, root, op);
   }
 
+  //! all_reduce
   template<class T, class Op>
   void      all_reduce(const communicator& comm, const T& in, T& out, const Op& op)
   {
     Collectives<T, Op>::all_reduce(comm, in, out, op);
   }
 
+  //! scan
   template<class T, class Op>
   void      scan(const communicator& comm, const T& in, T& out, const Op& op)
   {
     Collectives<T, Op>::scan(comm, in, out, op);
   }
 
+  //! all_to_all
   template<class T>
   void      all_to_all(const communicator& comm, const std::vector<T>& in, std::vector<T>& out, int n = 1)
   {
     Collectives<T, void*>::all_to_all(comm, in, out, n);
   }
+
+  //!@}
 }
 }

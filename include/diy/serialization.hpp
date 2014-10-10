@@ -7,14 +7,15 @@
 
 namespace diy
 {
+  //! A serialization buffer. \ingroup Serialization
   struct BinaryBuffer
   {
                         BinaryBuffer(int position_ = 0):
                           position(position_)                       {}
 
-    inline void         save_binary(const char* x, int count);
-    inline void         load_binary(char* x, int count);
-    inline void         load_binary_back(char* x, int count);
+    inline void         save_binary(const char* x, int count);      //!< copy `count` bytes from `x` into the buffer
+    inline void         load_binary(char* x, int count);            //!< copy `count` bytes into `x` from the buffer
+    inline void         load_binary_back(char* x, int count);       //!< copy `count` bytes into `x` from the back of the buffer
 
     void                clear()                                     { buffer.clear(); reset(); }
     void                reset()                                     { position = 0; }
@@ -32,7 +33,24 @@ namespace diy
     struct Default {};
   }
 
-  // Specialize this class for types that need special handling
+  //!\addtogroup Serialization
+  //!@{
+
+  /**
+   * \brief Main interface to serialization, meant to be specialized for the
+   * types that require special handling.  `diy::save()` and `diy::load()` call
+   * the static member functions of this class.
+   *
+   * The default (unspecialized) version copies
+   * `sizeof(T)` bytes from `&x` to or from `bb` via
+   * its `diy::BinaryBuffer::save_binary()` and `diy::BinaryBuffer::load_binary()`
+   * functions.  This works out perfectly for plain old data (e.g., simple structs).
+   * To save a more complicated type, one has to specialize
+   * `diy::Serialization<T>` for that type. Specializations are already provided for
+   * `std::vector<T>`, `std::map<K,V>`, and `std::pair<T,U>`.
+   * As a result one can quickly add a specialization of one's own
+   *
+   */
   template<class T>
   struct Serialization: public detail::Default
   {
@@ -40,21 +58,29 @@ namespace diy
     static void         load(BinaryBuffer& bb, T& x)                { bb.load_binary((char*)        &x, sizeof(T)); }
   };
 
+  //! Saves `x` to `bb` by calling `diy::Serialization<T>::save(bb,x)`.
   template<class T>
   void                  save(BinaryBuffer& bb, const T& x)          { Serialization<T>::save(bb, x); }
 
+  //! Loads `x` from `bb` by calling `diy::Serialization<T>::load(bb,x)`.
   template<class T>
   void                  load(BinaryBuffer& bb, T& x)                { Serialization<T>::load(bb, x); }
 
+  //! Optimization for arrays. If `diy::Serialization` is not specialized for `T`,
+  //! the array will be copied all at once. Otherwise, it's copied element by element.
   template<class T>
   void                  save(BinaryBuffer& bb, const T* x, size_t n);
 
+  //! Optimization for arrays. If `diy::Serialization` is not specialized for `T`,
+  //! the array will be filled all at once. Otherwise, it's filled element by element.
   template<class T>
   void                  load(BinaryBuffer& bb, T* x, size_t n);
 
-  // Load back support only binary data copying (meant for simple footers)
+  //! Supports only binary data copying (meant for simple footers).
   template<class T>
   void                  load_back(BinaryBuffer& bb, T& x)           { bb.load_binary_back((char*) &x, sizeof(T)); }
+
+  //@}
 
 
   namespace detail

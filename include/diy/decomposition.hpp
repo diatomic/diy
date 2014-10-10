@@ -36,8 +36,9 @@ namespace detail
   };
 }
 
-  // Decomposes a regular (discrete or continuous) domain into even blocks;
-  // creates Links with Bounds along the way.
+  //! \ingroup Decomposition
+  //! Decomposes a regular (discrete or continuous) domain into even blocks;
+  //! creates Links with Bounds along the way.
   template<class Bounds_>
   struct RegularDecomposer
   {
@@ -49,12 +50,12 @@ namespace detail
     typedef         std::vector<Coordinate>                         CoordinateVector;
     typedef         std::vector<int>                                DivisionsVector;
 
-    // assigner:  decides how processors are assigned to blocks (maps a gid to a rank)
-    //            also communicates the total number of blocks
-    // wrap:      indicates dimensions on which to wrap the boundary
-    // ghosts:    indicates how many ghosts to use in each dimension 
-    // divisions: indicates how many cuts to make along each dimension
-    //            (0 means "no constraint," i.e., leave it up to the algorithm)
+    /// @param assigner:  decides how processors are assigned to blocks (maps a gid to a rank)
+    ///                   also communicates the total number of blocks
+    /// @param wrap:      indicates dimensions on which to wrap the boundary
+    /// @param ghosts:    indicates how many ghosts to use in each dimension 
+    /// @param divisions: indicates how many cuts to make along each dimension
+    ///                   (0 means "no constraint," i.e., leave it up to the algorithm)
                     RegularDecomposer(int               dim_,
                                       const Bounds&     domain_,
                                       const Assigner&   assigner_,
@@ -293,6 +294,22 @@ namespace detail
 
   };
 
+  /**
+   * \ingroup Decomposition
+   * \brief Decomposes the domain into a prescribed pattern of blocks.
+   *
+   * @param dim        dimension of the domain
+   * @param rank       local rank
+   * @param assigner   decides how processors are assigned to blocks (maps a gid to a rank)
+   *                   also communicates the total number of blocks
+   * @param create     the callback functor
+   * @param wrap       indicates dimensions on which to wrap the boundary
+   * @param ghosts     indicates how many ghosts to use in each dimension 
+   * @param divs       indicates how many cuts to make along each dimension
+   *                   (0 means "no constraint," i.e., leave it up to the algorithm)
+   *
+   * `create(...)` is called with each block assigned to the local domain. See [decomposition example](#decomposition-example).
+   */
   template<class Bounds, class Assigner, class Creator>
   void decompose(int                dim,
                  int                rank,
@@ -307,6 +324,7 @@ namespace detail
     RegularDecomposer<Bounds>(dim, domain, assigner, share_face, wrap, ghosts, divs).decompose(rank, create);
   }
 
+  //! Decomposition example: \example decomposition/test-decomposition.cpp
 }
 
 #endif

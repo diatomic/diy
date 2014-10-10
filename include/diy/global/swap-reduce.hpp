@@ -117,6 +117,12 @@ namespace detail
   struct ReductionProxy;
 }
 
+/**
+ * \ingroup Communication
+ * \brief Implementation of the swap-reduce communication pattern.
+ *
+ * \TODO Detailed explanation.
+ */
 template<class Reduce, class Partners>
 void swap_reduce(Master&                    master,
                  const Assigner&            assigner,

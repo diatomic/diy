@@ -18,6 +18,7 @@ namespace diy
 namespace mpi
 {
 
+//! \ingroup MPI
 struct environment
 {
   environment()                           { int argc = 0; char** argv; MPI_Init(&argc, &argv); }

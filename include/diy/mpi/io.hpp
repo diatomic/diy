@@ -12,6 +12,7 @@ namespace io
 {
   typedef               MPI_Offset              offset;
 
+  //! Wraps MPI file IO. \ingroup MPI
   class file
   {
     public:

@@ -59,10 +59,10 @@ namespace diy
       inline void   destroy_block_records();
       inline void   destroy(int i);
 
-      inline int    add(int gid, void* b, Link* l);
-      inline void*  release(int i);                     // release ownership of the block
+      inline int    add(int gid, void* b, Link* l);     //!< add a block
+      inline void*  release(int i);                     //!< release ownership of the block
 
-      inline void*  block(int i) const;
+      inline void*  block(int i) const;                 //!< return the `i`-th block
       template<class Block>
       Block*        block(int i) const                  { return static_cast<Block*>(block(i)); }
       inline Link*  link(int i) const;
@@ -78,13 +78,14 @@ namespace diy
                     communicator() const                { return comm_; }
       Communicator& communicator()                      { return comm_; }
 
-      // load if necessary
+      //! return the `i`-th block, loading it if necessary
       void*         get(int i)                          { if (block(i) == 0) load(i); return block(i); }
 
       int           gid(int i) const                    { return gids_[i]; }
       int           lid(int gid) const                  { return local(gid) ?  lids_.find(gid)->second : -1; }
       bool          local(int gid) const                { return lids_.find(gid) != lids_.end(); }
 
+      //! exchange the queues between all the blocks (collective operation)
       inline void   exchange();
 
       inline
@@ -95,7 +96,7 @@ namespace diy
       SaveBlock     saver() const                       { return save_; }
       void*         create() const                      { return create_(); }
 
-      // f will be called with
+      //! call `f` with every block
       template<class Functor>
       void          foreach(const Functor& f, void* aux = 0, bool load_on_incoming = false);
 
