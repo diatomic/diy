@@ -96,6 +96,10 @@ namespace diy
       SaveBlock     saver() const                       { return save_; }
       void*         create() const                      { return create_(); }
 
+      // accessors
+      int           limit() const                       { return limit_; }
+      int           threads() const                     { return threads_; }
+
       //! call `f` with every block
       template<class Functor>
       void          foreach(const Functor& f, void* aux = 0, bool load_on_incoming = false);
