@@ -2,6 +2,7 @@
 
 #include <diy/master.hpp>
 #include <diy/reduce.hpp>
+#include <diy/partners/swap.hpp>
 #include <diy/decomposition.hpp>
 #include <diy/assigner.hpp>
 
