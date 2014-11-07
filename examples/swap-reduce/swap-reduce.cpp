@@ -1,7 +1,7 @@
 #include <cmath>
 
 #include <diy/master.hpp>
-#include <diy/global.hpp>
+#include <diy/reduce.hpp>
 #include <diy/decomposition.hpp>
 #include <diy/assigner.hpp>
 
@@ -71,7 +71,7 @@ struct AddBlock
   size_t        num_points;
 };
 
-void redistribute(void* b_, const diy::SwapReduceProxy& srp, const diy::RegularPartners& partners)
+void redistribute(void* b_, const diy::ReduceProxy& srp, const diy::RegularSwapPartners& partners)
 {
     Block*                      b        = static_cast<Block*>(b_);
     unsigned                    round    = srp.round();
@@ -198,10 +198,10 @@ int main(int argc, char* argv[])
   diy::decompose(dim, world.rank(), domain, assigner, create);
 
   int   k = 2;
-  diy::RegularPartners  partners(dim, nblocks, k, false);
+  diy::RegularSwapPartners  partners(dim, nblocks, k, false);
   //fprintf(stderr, "%d %d %d\n", dim, nblocks, k);
   //fprintf(stderr, "partners.rounds(): %d\n", (int) partners.rounds());
-  diy::swap_reduce(master, assigner, partners, redistribute);
+  diy::reduce(master, assigner, partners, redistribute);
 
   bool  verbose = false;
   master.foreach(print_block, &verbose);

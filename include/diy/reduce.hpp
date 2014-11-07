@@ -1,18 +1,18 @@
-#ifndef DIY_SWAP_REDUCE_HPP
-#define DIY_SWAP_REDUCE_HPP
+#ifndef DIY_REDUCE_HPP
+#define DIY_REDUCE_HPP
 
 #include <vector>
-#include "../master.hpp"
-#include "../assigner.hpp"
-#include "../decomposition.hpp"
-#include "../types.hpp"
+#include "master.hpp"
+#include "assigner.hpp"
+#include "decomposition.hpp"
+#include "types.hpp"
 
 // TODO: create KDTreePartners
 
 namespace diy
 {
 
-struct RegularPartners
+struct RegularSwapPartners
 {
   // The record of group size per round in a dimension
   struct DimK
@@ -36,10 +36,10 @@ struct RegularPartners
                 // contiguous parameter indicates whether to match partners contiguously or in a round-robin fashion;
                 // contiguous is useful when data needs to be united;
                 // round-robin is useful for vector-"halving"
-                RegularPartners(int dim, int nblocks, int k, bool contiguous = true):
+                RegularSwapPartners(int dim, int nblocks, int k, bool contiguous = true):
                   divisions_(dim, 0),
                   contiguous_(contiguous)                       { Decomposer::fill_divisions(dim, nblocks, divisions_); factor(k, divisions_, kvs_); }
-                RegularPartners(const DivisionVector&   divs,
+                RegularSwapPartners(const DivisionVector&   divs,
                                 const KVSVector&        kvs,
                                 bool  contiguous = true):
                   divisions_(divs), kvs_(kvs),
@@ -64,16 +64,16 @@ struct RegularPartners
 };
 
 
-struct SwapReduceProxy: public Communicator::Proxy
+struct ReduceProxy: public Communicator::Proxy
 {
     typedef     std::vector<int>                            GIDVector;
 
-                SwapReduceProxy(const Communicator::Proxy&  proxy,
-                                void*                       block,
-                                unsigned                    round,
-                                const Assigner&             assigner,
-                                const GIDVector&            incoming_gids,
-                                const GIDVector&            outgoing_gids):
+                ReduceProxy(const Communicator::Proxy&      proxy,
+                            void*                           block,
+                            unsigned                        round,
+                            const Assigner&                 assigner,
+                            const GIDVector&                incoming_gids,
+                            const GIDVector&                outgoing_gids):
                     Communicator::Proxy(proxy),
                     block_(block),
                     round_(round)
@@ -114,28 +114,29 @@ struct SwapReduceProxy: public Communicator::Proxy
 namespace detail
 {
   template<class Reduce, class Partners>
-  struct ReductionProxy;
+  struct ReductionFunctor;
 }
 
 /**
  * \ingroup Communication
- * \brief Implementation of the swap-reduce communication pattern.
+ * \brief Implementation of the reduce communication pattern (includes
+ *        swap-reduce, merge-reduce, and any other global communication).
  *
  * \TODO Detailed explanation.
  */
 template<class Reduce, class Partners>
-void swap_reduce(Master&                    master,
-                 const Assigner&            assigner,
-                 const Partners&            partners,
-                 const Reduce&              reduce)
+void reduce(Master&                    master,
+            const Assigner&            assigner,
+            const Partners&            partners,
+            const Reduce&              reduce)
 {
   int original_expected = master.communicator().expected();
 
   unsigned round;
   for (round = 0; round < partners.rounds(); ++round)
   {
-    //fprintf(stderr, "== Round %d\n", round);
-    master.foreach(detail::ReductionProxy<Reduce,Partners>(round, reduce, partners, assigner));
+    fprintf(stderr, "== Round %d\n", round);
+    master.foreach(detail::ReductionFunctor<Reduce,Partners>(round, reduce, partners, assigner));
 
     int expected = master.size() * partners.size(round);
     master.communicator().set_expected(expected);
@@ -144,7 +145,7 @@ void swap_reduce(Master&                    master,
     master.communicator().flush();
   }
   //fprintf(stderr, "== Round %d\n", round);
-  master.foreach(detail::ReductionProxy<Reduce,Partners>(round, reduce, partners, assigner));     // final round
+  master.foreach(detail::ReductionFunctor<Reduce,Partners>(round, reduce, partners, assigner));     // final round
 
   master.communicator().set_expected(original_expected);
 }
@@ -152,9 +153,9 @@ void swap_reduce(Master&                    master,
 namespace detail
 {
   template<class Reduce, class Partners>
-  struct ReductionProxy
+  struct ReductionFunctor
   {
-                ReductionProxy(unsigned round_, const Reduce& reduce_, const Partners& partners_, const Assigner& assigner_):
+                ReductionFunctor(unsigned round_, const Reduce& reduce_, const Partners& partners_, const Assigner& assigner_):
                     round(round_), reduce(reduce_), partners(partners_), assigner(assigner_)        {}
 
     void        operator()(void* b, const Master::ProxyWithLink& cp, void*) const
@@ -165,14 +166,14 @@ namespace detail
       if (round < partners.rounds())
           partners.fill(round, cp.gid(), outgoing_gids);            // send to the next round
 
-      SwapReduceProxy   srp(cp, b, round, assigner, incoming_gids, outgoing_gids);
-      reduce(b, srp, partners);
+      ReduceProxy   rp(cp, b, round, assigner, incoming_gids, outgoing_gids);
+      reduce(b, rp, partners);
 
       // touch the outgoing queues to make sure they exist
       Communicator::OutgoingQueues& outgoing = const_cast<Communicator&>(cp.comm()).outgoing(cp.gid());
-      if (outgoing.size() < srp.out_link().count())
-        for (unsigned j = 0; j < srp.out_link().count(); ++j)
-          outgoing[srp.out_link().target(j)];       // touch the outgoing queue, creating it if necessary
+      if (outgoing.size() < rp.out_link().count())
+        for (unsigned j = 0; j < rp.out_link().count(); ++j)
+          outgoing[rp.out_link().target(j)];       // touch the outgoing queue, creating it if necessary
     }
 
     unsigned        round;
@@ -185,7 +186,7 @@ namespace detail
 }
 
 void
-diy::RegularPartners::
+diy::RegularSwapPartners::
 fill(int round, int gid, std::vector<int>& partners) const
 {
   const DimK&   kv  = kvs_[round];
@@ -234,7 +235,7 @@ fill(int round, int gid, std::vector<int>& partners) const
 
 // Tom's GetGrpPos
 int
-diy::RegularPartners::
+diy::RegularSwapPartners::
 group_position(int round, int c, int step) const
 {
   // the second term in the following expression does not simplify to
@@ -251,7 +252,7 @@ group_position(int round, int c, int step) const
 }
 
 void
-diy::RegularPartners::
+diy::RegularSwapPartners::
 factor(int k, const DivisionVector& divisions, KVSVector& kvs)
 {
   // factor in each dimension
@@ -280,7 +281,7 @@ factor(int k, const DivisionVector& divisions, KVSVector& kvs)
 
 // Tom's FactorK
 void
-diy::RegularPartners::
+diy::RegularSwapPartners::
 factor(int k, int tot_b, std::vector<int>& kv)
 {
   int rem = tot_b; // unfactored remaining portion of tot_b
@@ -315,4 +316,4 @@ factor(int k, int tot_b, std::vector<int>& kv)
   } // while
 }
 
-#endif // DIY_SWAP_REDUCE_HPP
+#endif // DIY_REDUCE_HPP
