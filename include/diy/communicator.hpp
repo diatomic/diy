@@ -249,6 +249,7 @@ flush()
   time_type start = get_time();
   unsigned wait = 1;
 #endif
+  exchange();
   while (!inflight_.empty() || received_ < expected_)
   {
     exchange();
