@@ -79,13 +79,23 @@ void reduce(Master&                    master,
   unsigned round;
   for (round = 0; round < partners.rounds(); ++round)
   {
+    // TODO: add mechanism for skipping blocks that have dropped out (through partners)
+
     fprintf(stderr, "== Round %d\n", round);
     master.foreach(detail::ReductionFunctor<Reduce,Partners>(round, reduce, partners, assigner));
 
-    int expected = master.size() * partners.size(round);
+    int expected = 0;
+    for (int i = 0; i < master.size(); ++i)
+    {
+      if (partners.active(round + 1, master.gid(i)))
+      {
+        std::vector<int> incoming_gids;
+        partners.incoming(round + 1, master.gid(i), incoming_gids);
+        expected += incoming_gids.size();
+        master.communicator().incoming(master.gid(i)).clear();
+      }
+    }
     master.communicator().set_expected(expected);
-    for (unsigned i = 0; i < master.size(); ++i)
-      master.communicator().incoming(master.gid(i)).clear();
     master.communicator().flush();
   }
   //fprintf(stderr, "== Round %d\n", round);
@@ -104,11 +114,14 @@ namespace detail
 
     void        operator()(void* b, const Master::ProxyWithLink& cp, void*) const
     {
+      if (!partners.active(round, cp.gid()))
+          return;
+
       std::vector<int> incoming_gids, outgoing_gids;
       if (round > 0)
-          partners.fill(round - 1, cp.gid(), incoming_gids);        // receive from the previous round
+          partners.incoming(round, cp.gid(), incoming_gids);        // receive from the previous round
       if (round < partners.rounds())
-          partners.fill(round, cp.gid(), outgoing_gids);            // send to the next round
+          partners.outgoing(round, cp.gid(), outgoing_gids);        // send to the next round
 
       ReduceProxy   rp(cp, b, round, assigner, incoming_gids, outgoing_gids);
       reduce(b, rp, partners);
