@@ -44,7 +44,6 @@ namespace detail
   {
     status operator()(MPI_Comm comm, int source, int tag, std::vector<U>& x) const
     {
-      int count;
       status s;
 
       MPI_Probe(source, tag, comm, &s.s);
