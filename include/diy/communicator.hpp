@@ -78,8 +78,8 @@ namespace diy
     struct EnqueueIterator;
 
                         Proxy(Communicator* comm, int gid):
-                          gid_(gid),
                           comm_(comm),
+                          gid_(gid),
                           incoming_(&comm_->incoming(gid)),
                           outgoing_(&comm_->outgoing(gid)),
                           collectives_(&comm_->collectives(gid))    {}

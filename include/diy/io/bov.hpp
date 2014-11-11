@@ -46,7 +46,7 @@ namespace io
       const Shape&  shape() const                                       { return shape_; }
 
       template<class T>
-      void          read(const DiscreteBounds& bounds, T* buffer, bool collective = false);
+      void          read(const DiscreteBounds& bounds, T* buffer, bool collective = false) const;
 
       template<class T>
       void          write(const DiscreteBounds& bounds, const T* buffer, bool collective = false);
@@ -69,7 +69,7 @@ namespace io
 template<class T>
 void
 diy::io::BOV::
-read(const DiscreteBounds& bounds, T* buffer, bool collective)
+read(const DiscreteBounds& bounds, T* buffer, bool collective) const
 {
   int dim   = shape_.size();
   int total = 1;

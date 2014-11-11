@@ -106,8 +106,8 @@ namespace diy
       typedef           CriticalMap::accessor                       CriticalMapAccessor;
 
     private:
-      critical_resource<int>        count_;
       std::string                   filename_template_;
+      critical_resource<int>        count_;
       CriticalMap                   filenames_;
   };
 }
