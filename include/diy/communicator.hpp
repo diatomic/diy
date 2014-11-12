@@ -20,7 +20,14 @@ namespace diy
   {
     public:
       struct Proxy;                 // passed to the block: encapsulates information like block id
-      struct InFlight;
+      struct InFlight
+      {
+        BinaryBuffer        message;
+        mpi::request        request;
+
+        // for debug purposes:
+        int from, to;
+      };
       struct Collective;
       struct tags       { enum { queue }; };
 
@@ -154,16 +161,6 @@ namespace diy
       const T&      x_;
       SaveT         save_;
 
-  };
-
-  struct Communicator::InFlight
-  {
-    BinaryBuffer        message;
-    mpi::request        request;
-
-    // for debug purposes:
-    int from;
-    int to;
   };
 
   struct Communicator::Collective
