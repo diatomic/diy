@@ -81,7 +81,7 @@ void reduce(Master&                    master,
   {
     // TODO: add mechanism for skipping blocks that have dropped out (through partners)
 
-    fprintf(stderr, "== Round %d\n", round);
+    //fprintf(stderr, "== Round %d\n", round);
     master.foreach(detail::ReductionFunctor<Reduce,Partners>(round, reduce, partners, assigner));
 
     int expected = 0;
