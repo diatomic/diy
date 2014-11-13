@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <cmath>
 
 #include "link.hpp"
 #include "assigner.hpp"
@@ -26,6 +27,24 @@ namespace detail
       else
         return from(i+1, n, min, max, shared_face) - (shared_face ? 0 : 1);
     }
+
+    static int      lower(int x, int n, int min, int max, bool shared)
+    {
+        int width = (max - min + 1)/n;
+        int res = (x - min)/width;
+
+        if (shared && x == from(res, n, min, max, shared))
+            --res;
+        return res;
+    }
+    static int      upper(int x, int n, int min, int max, bool shared)
+    {
+        int width = (max - min + 1)/n;
+        int res = (x - min)/width + 1;
+        if (shared && x == from(res, n, min, max, shared))
+            ++res;
+        return res;
+    }
   };
 
   template<>
@@ -33,6 +52,9 @@ namespace detail
   {
     static float    from(int i, int n, float min, float max, bool)      { return min + (max - min)/n * i; }
     static float    to(int i, int n, float min, float max, bool)        { return min + (max - min)/n * (i+1); }
+
+    static int      lower(float x, int n, float min, float max)         { float width = (max - min)/n; float res = std::floor((x - min)/width); if (res == x) return (res - 1); else return res; }
+    static int      upper(float x, int n, float min, float max)         { float width = (max - min)/n; float res = std::ceil ((x - min)/width); if (res == x) return (res + 1); else return res; }
   };
 }
 
@@ -80,6 +102,10 @@ namespace detail
     template<class Creator>
     void            decompose(int rank, const Creator& create);
 
+    // find lowest gid that owns a particular point
+    template<class Point>
+    int             lowest_gid(const Point& p) const;
+
     void            gid_to_coords(int gid, DivisionsVector& coords) const       { gid_to_coords(gid, coords, divisions); }
     int             coords_to_gid(const DivisionsVector& coords) const          { return coords_to_gid(coords, divisions); }
     void            fill_divisions(int nblocks)                                 { fill_divisions(dim, nblocks, divisions); }
@@ -91,6 +117,17 @@ namespace detail
     static int      coords_to_gid(const DivisionsVector& coords, const DivisionsVector& divisions);
     static void     fill_divisions(int dim, int nblocks, std::vector<int>& divisions);
     static void     factor(std::vector<unsigned>& factors, int n);
+
+    // Point to GIDs functions
+    template<class Point>
+    void            point_to_gids(std::vector<int>& gids, const Point& p) const;
+
+    template<class Point>
+    int             num_gids(const Point& p) const;
+
+    template<class Point>
+    void            top_bottom(int& top, int& bottom, const Point& p, int axis) const;
+
 
     int               dim;
     const Bounds&     domain;
@@ -341,6 +378,87 @@ factor(std::vector<unsigned>& factors, int n)
         break;
       }
     }
+}
+
+// Point to GIDs
+// TODO: deal with wrap correctly
+// TODO: add an optional ghosts argument to ignore ghosts (if we want to find the true owners, or something like that)
+template<class Bounds>
+template<class Point>
+void
+diy::RegularDecomposer<Bounds>::
+point_to_gids(std::vector<int>& gids, const Point& p) const
+{
+    std::vector< std::pair<int, int> > ranges(dim);
+    for (int i = 0; i < dim; ++i)
+        top_bottom(ranges[i].second, ranges[i].first, p, i);
+
+    // look up gids for all combinations
+    DivisionsVector coords(dim), location(dim);
+    while(location.back() < ranges.back().second - ranges.back().first)
+    {
+        for (int i = 0; i < dim; ++i)
+            coords[i] = ranges[i].first + location[i];
+        gids.push_back(coords_to_gid(coords, divisions));
+
+        location[0]++;
+        unsigned i = 0;
+        while (i < dim-1 && location[i] == ranges[i].second - ranges[i].first)
+        {
+            location[i] = 0;
+            ++i;
+            location[i]++;
+        }
+    }
+}
+
+template<class Bounds>
+template<class Point>
+int
+diy::RegularDecomposer<Bounds>::
+num_gids(const Point& p) const
+{
+    int res = 1;
+    for (int i = 0; i < dim; ++i)
+    {
+        int top, bottom;
+        top_bottom(top, bottom, p, i);
+        res *= top - bottom;
+    }
+    return res;
+}
+
+template<class Bounds>
+template<class Point>
+void
+diy::RegularDecomposer<Bounds>::
+top_bottom(int& top, int& bottom, const Point& p, int axis) const
+{
+    Coordinate l = p[axis] - ghosts[axis];
+    Coordinate r = p[axis] + ghosts[axis];
+
+    top     = detail::BoundsHelper<Bounds>::upper(r, divisions[axis], domain.min[axis], domain.max[axis], share_face[axis]);
+    bottom  = detail::BoundsHelper<Bounds>::lower(l, divisions[axis], domain.min[axis], domain.max[axis], share_face[axis]);
+
+    if (!wrap[axis])
+    {
+        bottom  = std::max(0, bottom);
+        top     = std::min(divisions[axis], top);
+    }
+}
+
+// find lowest gid that owns a particular point
+template<class Bounds>
+template<class Point>
+int
+diy::RegularDecomposer<Bounds>::
+lowest_gid(const Point& p) const
+{
+    // TODO: optimize - no need to compute all gids
+    std::vector<int> gids;
+    point_to_gids(gids, p);
+    std::sort(gids.begin(), gids.end());
+    return gids[0];
 }
 
 #endif
