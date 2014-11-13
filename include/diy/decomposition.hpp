@@ -78,211 +78,19 @@ namespace detail
 
     // Calls create(int gid, const Bounds& bounds, const Link& link)
     template<class Creator>
-    void            decompose(int rank, const Creator& create)
-    {
-      int nblocks = assigner.nblocks();
+    void            decompose(int rank, const Creator& create);
 
-      std::vector<int> gids;
-      assigner.local_gids(rank, gids);
-      for (int i = 0; i < gids.size(); ++i)
-      {
-        int gid = gids[i];
+    void            gid_to_coords(int gid, DivisionsVector& coords) const       { gid_to_coords(gid, coords, divisions); }
+    int             coords_to_gid(const DivisionsVector& coords) const          { return coords_to_gid(coords, divisions); }
+    void            fill_divisions(int nblocks)                                 { fill_divisions(dim, nblocks, divisions); }
 
-        DivisionsVector coords;
-        gid_to_coords(gid, coords);
+    void            fill_bounds(Bounds& bounds, const DivisionsVector& coords, bool add_ghosts = false);
 
-        Bounds core, bounds;
-        fill_bounds(core,   coords);
-        fill_bounds(bounds, coords, true);
-
-        // Fill link with all the neighbors
-        Link link(dim, core, bounds);
-        std::vector<int>  offsets(dim, -1);
-        offsets[0] = -2;
-        while (!all(offsets, 1))
-        {
-          // next offset
-          int i;
-          for (i = 0; i < dim; ++i)
-            if (offsets[i] == 1)
-              offsets[i] = -1;
-            else
-              break;
-          ++offsets[i];
-
-          if (all(offsets, 0)) continue;      // skip ourselves
-
-          DivisionsVector     nhbr_coords(dim);
-          int                 dir      = 0;
-          bool                inbounds = true;
-          for (int i = 0; i < dim; ++i)
-          {
-            nhbr_coords[i] = coords[i] + offsets[i];
-
-            // wrap
-            if (nhbr_coords[i] < 0)
-            {
-              if (wrap[i])
-              {
-                nhbr_coords[i] = divisions[i] - 1;
-                link.add_wrap(Direction(1 << 2*i));
-              }
-              else
-                inbounds = false;
-            }
-
-            if (nhbr_coords[i] >= divisions[i])
-            {
-              if (wrap[i])
-              {
-                nhbr_coords[i] = 0;
-                link.add_wrap(Direction(1 << (2*i + 1)));
-              }
-              else
-                inbounds = false;
-            }
-
-            // NB: this needs to match the addressing scheme in dir_t (in constants.h)
-            if (offsets[i] == -1)
-              dir |= 1 << (2*i + 0);
-            if (offsets[i] == 1)
-              dir |= 1 << (2*i + 1);
-          }
-          if (!inbounds) continue;
-
-          int nhbr_gid = coords_to_gid(nhbr_coords);
-          BlockID bid; bid.gid = nhbr_gid; bid.proc = assigner.rank(nhbr_gid);
-          link.add_neighbor(bid);
-
-          Bounds nhbr_bounds;
-          fill_bounds(nhbr_bounds, nhbr_coords);
-          link.add_bounds(nhbr_bounds);
-
-          link.add_direction(static_cast<Direction>(dir));
-        }
-
-        create(gid, core, bounds, domain, link);
-      }
-    }
-
-    static bool     all(const std::vector<int>& v, int x)
-    {
-      for (unsigned i = 0; i < v.size(); ++i)
-        if (v[i] != x)
-          return false;
-      return true;
-    }
-
-    int             point_to_gid();     // TODO
-
-    static void     gid_to_coords(int gid, DivisionsVector& coords, const DivisionsVector& divisions)
-    {
-      int dim = divisions.size();
-      for (int i = 0; i < dim; ++i)
-      {
-        coords.push_back(gid % divisions[i]);
-        gid /= divisions[i];
-      }
-    }
-
-    void            gid_to_coords(int gid, DivisionsVector& coords)
-    {
-      gid_to_coords(gid, coords, divisions);
-    }
-
-    static int      coords_to_gid(const DivisionsVector& coords, const DivisionsVector& divisions)
-    {
-      int gid = 0;
-      for (int i = coords.size() - 1; i >= 0; --i)
-      {
-        gid *= divisions[i];
-        gid += coords[i];
-      }
-      return gid;
-    }
-
-    int             coords_to_gid(const DivisionsVector& coords)
-    {
-      return coords_to_gid(coords, divisions);
-    }
-
-    void            fill_bounds(Bounds& bounds, const DivisionsVector& coords, bool add_ghosts = false)
-    {
-      for (int i = 0; i < dim; ++i)
-      {
-        bounds.min[i] = detail::BoundsHelper<Bounds>::from(coords[i], divisions[i], domain.min[i], domain.max[i], share_face[i]);
-        bounds.max[i] = detail::BoundsHelper<Bounds>::to  (coords[i], divisions[i], domain.min[i], domain.max[i], share_face[i]);
-      }
-
-      if (!add_ghosts)
-        return;
-
-      for (int i = 0; i < dim; ++i)
-      {
-        if (wrap[i])
-        {
-          bounds.min[i] -= ghosts[i];
-          bounds.max[i] += ghosts[i];
-        } else
-        {
-          bounds.min[i] = std::max(domain.min[i], bounds.min[i] - ghosts[i]);
-          bounds.max[i] = std::min(domain.max[i], bounds.max[i] + ghosts[i]);
-        }
-      }
-    }
-
-    void            fill_divisions(int nblocks)
-    {
-        fill_divisions(dim, nblocks, divisions);
-    }
-
-    static void     fill_divisions(int dim, int nblocks, std::vector<int>& divisions)
-    {
-      int prod = 1; int c = 0;
-      for (unsigned i = 0; i < dim; ++i)
-        if (divisions[i] != 0)
-        {
-          prod *= divisions[i];
-          ++c;
-        }
-
-      if (nblocks % prod != 0)
-      {
-        std::cerr << "Incompatible requirements" << std::endl;
-        return;
-      }
-
-      if (c == divisions.size())
-        return;
-
-      std::vector<unsigned> factors;
-      factor(factors, nblocks/prod);
-
-      // Fill the missing divs using LPT algorithm
-      std::vector<unsigned> missing_divs(divisions.size() - c, 1);
-      for (int i = factors.size() - 1; i >= 0; --i)
-        *std::min_element(missing_divs.begin(), missing_divs.end()) *= factors[i];
-
-      c = 0;
-      for (unsigned i = 0; i < dim; ++i)
-        if (divisions[i] == 0)
-          divisions[i] = missing_divs[c++];
-    }
-
-    static
-    void            factor(std::vector<unsigned>& factors, int n)
-    {
-      while (n != 1)
-        for (unsigned i = 2; i <= n; ++i)
-        {
-          if (n % i == 0)
-          {
-            factors.push_back(i);
-            n /= i;
-            break;
-          }
-        }
-    }
+    static bool     all(const std::vector<int>& v, int x);
+    static void     gid_to_coords(int gid, DivisionsVector& coords, const DivisionsVector& divisions);
+    static int      coords_to_gid(const DivisionsVector& coords, const DivisionsVector& divisions);
+    static void     fill_divisions(int dim, int nblocks, std::vector<int>& divisions);
+    static void     factor(std::vector<unsigned>& factors, int n);
 
     int               dim;
     const Bounds&     domain;
@@ -325,6 +133,214 @@ namespace detail
   }
 
   //! Decomposition example: \example decomposition/test-decomposition.cpp
+}
+
+template<class Bounds>
+template<class Creator>
+void
+diy::RegularDecomposer<Bounds>::
+decompose(int rank, const Creator& create)
+{
+  std::vector<int> gids;
+  assigner.local_gids(rank, gids);
+  for (int i = 0; i < gids.size(); ++i)
+  {
+    int gid = gids[i];
+
+    DivisionsVector coords;
+    gid_to_coords(gid, coords);
+
+    Bounds core, bounds;
+    fill_bounds(core,   coords);
+    fill_bounds(bounds, coords, true);
+
+    // Fill link with all the neighbors
+    Link link(dim, core, bounds);
+    std::vector<int>  offsets(dim, -1);
+    offsets[0] = -2;
+    while (!all(offsets, 1))
+    {
+      // next offset
+      int i;
+      for (i = 0; i < dim; ++i)
+        if (offsets[i] == 1)
+          offsets[i] = -1;
+        else
+          break;
+      ++offsets[i];
+
+      if (all(offsets, 0)) continue;      // skip ourselves
+
+      DivisionsVector     nhbr_coords(dim);
+      int                 dir      = 0;
+      bool                inbounds = true;
+      for (int i = 0; i < dim; ++i)
+      {
+        nhbr_coords[i] = coords[i] + offsets[i];
+
+        // wrap
+        if (nhbr_coords[i] < 0)
+        {
+          if (wrap[i])
+          {
+            nhbr_coords[i] = divisions[i] - 1;
+            link.add_wrap(Direction(1 << 2*i));
+          }
+          else
+            inbounds = false;
+        }
+
+        if (nhbr_coords[i] >= divisions[i])
+        {
+          if (wrap[i])
+          {
+            nhbr_coords[i] = 0;
+            link.add_wrap(Direction(1 << (2*i + 1)));
+          }
+          else
+            inbounds = false;
+        }
+
+        // NB: this needs to match the addressing scheme in dir_t (in constants.h)
+        if (offsets[i] == -1)
+          dir |= 1 << (2*i + 0);
+        if (offsets[i] == 1)
+          dir |= 1 << (2*i + 1);
+      }
+      if (!inbounds) continue;
+
+      int nhbr_gid = coords_to_gid(nhbr_coords);
+      BlockID bid; bid.gid = nhbr_gid; bid.proc = assigner.rank(nhbr_gid);
+      link.add_neighbor(bid);
+
+      Bounds nhbr_bounds;
+      fill_bounds(nhbr_bounds, nhbr_coords);
+      link.add_bounds(nhbr_bounds);
+
+      link.add_direction(static_cast<Direction>(dir));
+    }
+
+    create(gid, core, bounds, domain, link);
+  }
+}
+
+template<class Bounds>
+bool
+diy::RegularDecomposer<Bounds>::
+all(const std::vector<int>& v, int x)
+{
+  for (unsigned i = 0; i < v.size(); ++i)
+    if (v[i] != x)
+      return false;
+  return true;
+}
+
+template<class Bounds>
+void
+diy::RegularDecomposer<Bounds>::
+gid_to_coords(int gid, DivisionsVector& coords, const DivisionsVector& divisions)
+{
+  int dim = divisions.size();
+  for (int i = 0; i < dim; ++i)
+  {
+    coords.push_back(gid % divisions[i]);
+    gid /= divisions[i];
+  }
+}
+
+template<class Bounds>
+int
+diy::RegularDecomposer<Bounds>::
+coords_to_gid(const DivisionsVector& coords, const DivisionsVector& divisions)
+{
+  int gid = 0;
+  for (int i = coords.size() - 1; i >= 0; --i)
+  {
+    gid *= divisions[i];
+    gid += coords[i];
+  }
+  return gid;
+}
+
+template<class Bounds>
+void
+diy::RegularDecomposer<Bounds>::
+fill_bounds(Bounds& bounds, const DivisionsVector& coords, bool add_ghosts)
+{
+  for (int i = 0; i < dim; ++i)
+  {
+    bounds.min[i] = detail::BoundsHelper<Bounds>::from(coords[i], divisions[i], domain.min[i], domain.max[i], share_face[i]);
+    bounds.max[i] = detail::BoundsHelper<Bounds>::to  (coords[i], divisions[i], domain.min[i], domain.max[i], share_face[i]);
+  }
+
+  if (!add_ghosts)
+    return;
+
+  for (int i = 0; i < dim; ++i)
+  {
+    if (wrap[i])
+    {
+      bounds.min[i] -= ghosts[i];
+      bounds.max[i] += ghosts[i];
+    } else
+    {
+      bounds.min[i] = std::max(domain.min[i], bounds.min[i] - ghosts[i]);
+      bounds.max[i] = std::min(domain.max[i], bounds.max[i] + ghosts[i]);
+    }
+  }
+}
+
+template<class Bounds>
+void
+diy::RegularDecomposer<Bounds>::
+fill_divisions(int dim, int nblocks, std::vector<int>& divisions)
+{
+  int prod = 1; int c = 0;
+  for (unsigned i = 0; i < dim; ++i)
+    if (divisions[i] != 0)
+    {
+      prod *= divisions[i];
+      ++c;
+    }
+
+  if (nblocks % prod != 0)
+  {
+    std::cerr << "Incompatible requirements" << std::endl;
+    return;
+  }
+
+  if (c == divisions.size())
+    return;
+
+  std::vector<unsigned> factors;
+  factor(factors, nblocks/prod);
+
+  // Fill the missing divs using LPT algorithm
+  std::vector<unsigned> missing_divs(divisions.size() - c, 1);
+  for (int i = factors.size() - 1; i >= 0; --i)
+    *std::min_element(missing_divs.begin(), missing_divs.end()) *= factors[i];
+
+  c = 0;
+  for (unsigned i = 0; i < dim; ++i)
+    if (divisions[i] == 0)
+      divisions[i] = missing_divs[c++];
+}
+
+template<class Bounds>
+void
+diy::RegularDecomposer<Bounds>::
+factor(std::vector<unsigned>& factors, int n)
+{
+  while (n != 1)
+    for (unsigned i = 2; i <= n; ++i)
+    {
+      if (n % i == 0)
+      {
+        factors.push_back(i);
+        n /= i;
+        break;
+      }
+    }
 }
 
 #endif
