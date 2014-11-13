@@ -52,4 +52,16 @@ int main(int argc, char** argv)
 
   mpi::optional<mpi::status>  status = world.iprobe(mpi::any_source, mpi::any_tag);
   std::cout << "Messages pending (" << world.rank() << "): " << status << std::endl;
+
+  std::cout << "all_gather:" << std::endl;
+  std::vector<int> in_vec;
+  in_vec.push_back(world.rank()*3 + 0);
+  in_vec.push_back(world.rank()*3 + 1);
+  in_vec.push_back(world.rank()*3 + 2);
+
+  std::vector< std::vector<int> > all_vec;
+  mpi::all_gather(world, in_vec, all_vec);
+  for (unsigned i = 0; i < all_vec.size(); ++i)
+      for (unsigned j = 0; j < all_vec[i].size(); ++j)
+          std::cout << world.rank() << ": " << all_vec[i][j] << std::endl;
 }

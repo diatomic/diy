@@ -87,6 +87,49 @@ namespace mpi
                   root, comm);
     }
 
+    static void all_gather(const communicator& comm, const T& in, std::vector<T>& out)
+    {
+      size_t s  = comm.size();
+             s *= Datatype::count(in);
+      out.resize(s);
+      MPI_Allgather(Datatype::address(in),
+                    Datatype::count(in),
+                    Datatype::datatype(),
+                    Datatype::address(out[0]),
+                    Datatype::count(in),
+                    Datatype::datatype(),
+                    comm);
+    }
+
+    static void all_gather(const communicator& comm, const std::vector<T>& in, std::vector< std::vector<T> >& out)
+    {
+      std::vector<int>  counts(comm.size());
+      Collectives<int,void*>::all_gather(comm, (int) in.size(), counts);
+
+      std::vector<int>  offsets(comm.size(), 0);
+      for (unsigned i = 1; i < offsets.size(); ++i)
+        offsets[i] = offsets[i-1] + counts[i-1];
+
+      std::vector<T> buffer(offsets.back() + counts.back());
+      MPI_Allgatherv(Datatype::address(in[0]),
+                     in.size(),
+                     Datatype::datatype(),
+                     Datatype::address(buffer[0]),
+                     &counts[0],
+                     &offsets[0],
+                     Datatype::datatype(),
+                     comm);
+
+      out.resize(comm.size());
+      size_t cur = 0;
+      for (unsigned i = 0; i < comm.size(); ++i)
+      {
+          out[i].reserve(counts[i]);
+          for (unsigned j = 0; j < counts[i]; ++j)
+              out[i].push_back(buffer[cur++]);
+      }
+    }
+
     static void reduce(const communicator& comm, const T& in, T& out, int root, const Op&)
     {
       MPI_Reduce(Datatype::address(in),
@@ -154,10 +197,7 @@ namespace mpi
     Collectives<T,void*>::gather(comm, in, out, root);
   }
 
-  //! Same as above, but each process is expected to send the same number of
-  //! elements, so out is resized to `comm.size() * in.size()` and the elements
-  //! from different ranks appear in order (with the elements from the same rank
-  //! arranged contiguously).
+  //! Same as above, but for vectors.
   template<class T>
   void      gather(const communicator& comm, const std::vector<T>& in, std::vector< std::vector<T> >& out, int root)
   {
@@ -176,6 +216,22 @@ namespace mpi
   void      gather(const communicator& comm, const std::vector<T>& in, int root)
   {
     Collectives<T,void*>::gather(comm, in, root);
+  }
+
+  //! all_gather from all processes in `comm`.
+  //! `out` is resized to `comm.size()` and filled with
+  //! elements from the respective ranks.
+  template<class T>
+  void      all_gather(const communicator& comm, const T& in, std::vector<T>& out)
+  {
+    Collectives<T,void*>::all_gather(comm, in, out);
+  }
+
+  //! Same as above, but for vectors.
+  template<class T>
+  void      all_gather(const communicator& comm, const std::vector<T>& in, std::vector< std::vector<T> >& out)
+  {
+    Collectives<T,void*>::all_gather(comm, in, out);
   }
 
   //! reduce
