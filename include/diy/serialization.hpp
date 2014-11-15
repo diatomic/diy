@@ -4,6 +4,8 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <string>
+#include <fstream>
 
 namespace diy
 {
@@ -23,6 +25,17 @@ namespace diy
     bool                empty() const                               { return buffer.empty(); }
     size_t              size() const                                { return buffer.size(); }
                         operator bool() const                       { return position < buffer.size(); }
+
+    // simple file IO
+    void                write(const std::string& fn) const          { std::ofstream out(fn.c_str()); out.write(&buffer[0], size()); }
+    void                read(const std::string& fn)
+    {
+        std::ifstream in(fn.c_str(), std::ios::binary | std::ios::ate);
+        buffer.resize(in.tellg());
+        in.seekg(0);
+        in.read(&buffer[0], size());
+        position = 0;
+    }
 
     int                 position;
     std::vector<char>   buffer;
