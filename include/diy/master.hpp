@@ -25,8 +25,11 @@ namespace diy
     public:
       struct BlockRecord;
       struct ProxyWithLink;
-      template<class Functor>
+      template<class Functor, class Skip>
       struct ProcessBlock;
+
+      struct SkipNoIncoming;
+      struct NeverSkip { bool    operator()(int i, const Master& master) const   { return false; } };
 
       typedef       void* (*CreateBlock)();
       typedef       void  (*DestroyBlock)(void*);
@@ -102,7 +105,13 @@ namespace diy
 
       //! call `f` with every block
       template<class Functor>
-      void          foreach(const Functor& f, void* aux = 0, bool load_on_incoming = false);
+      void          foreach(const Functor& f)           { foreach(f, NeverSkip(), 0); }
+
+      template<class Functor, class T>
+      void          foreach(const Functor& f, T* aux)   { foreach(f, NeverSkip(), aux); }
+
+      template<class Functor, class Skip>
+      void          foreach(const Functor& f, const Skip& skip, void* aux = 0);
 
     protected:
       inline void*& block(int i);
@@ -158,19 +167,18 @@ namespace diy
       Link*   link_;
   };
 
-  template<class Functor>
+  template<class Functor, class Skip>
   struct Master::ProcessBlock
   {
             ProcessBlock(const Functor&             f_,
+                         const Skip&                skip_,
                          void*                      aux_,
                          Master&                    master_,
-                         bool                       load_on_incoming_,
                          const std::deque<int>&     blocks_,
                          int                        local_limit_,
                          critical_resource<int>&    idx_):
-                f(f_), aux(aux_),
+                f(f_), skip(skip_), aux(aux_),
                 master(master_),
-                load_on_incoming(load_on_incoming_),
                 blocks(blocks_),
                 local_limit(local_limit_),
                 idx(idx_)
@@ -190,43 +198,24 @@ namespace diy
 
         int i = blocks[cur];
 
-        if (master.block(i) == 0)                               // block unloaded
+        if (skip(i, master))
+            f(0, master.proxy(i), aux);     // 0 signals that we are skipping the block (even if it's loaded)
+        else
         {
-          if (master.external_[i] != -1)                        // it actually exists externally
-            if (!load_on_incoming || master.has_incoming(i))    // and we do need to load it
+            if (master.block(i) == 0)                               // block unloaded
             {
-              if (local.size() == local_limit)                  // reached the local limit
-                master.unload(local);
+              if (master.external_[i] != -1)                        // it actually exists externally; currently redundant: how can it not?
+              {
+                if (local.size() == local_limit)                    // reached the local limit
+                  master.unload(local);
 
-              master.load(i);
-              local.push_back(i);
+                master.load(i);
+                local.push_back(i);
+              }
             }
-        } else                                                  // block already in memory
-        {
-          if (local.size() == local_limit)                      // reached local block limit
-            master.unload(local);
 
-          local.push_back(i);
+            f(master.block(i), master.proxy(i), aux);
         }
-
-#if 0
-        const char* time_format = "%Y-%m-%d %H:%M:%S";
-
-        char s[1000];
-        time_t t = time(NULL);
-        struct tm * p = localtime(&t);
-        strftime(s, 1000, time_format, p);
-        fprintf(stdout, "%s [%d]: Launching block %d\n", s, (int) this_thread::get_id(), i);
-#endif
-
-        f(master.block(i), master.proxy(i), aux);
-
-#if 0
-        t = time(NULL);
-        p = localtime(&t);
-        strftime(s, 1000, time_format, p);
-        fprintf(stdout, "%s [%d]: Done with block %d\n", s, (int) this_thread::get_id(), i);
-#endif
       } while(true);
 
       // TODO: invoke opportunistic communication
@@ -236,13 +225,16 @@ namespace diy
     static void run(void* bf)                   { static_cast<ProcessBlock*>(bf)->process(); }
 
     const Functor&          f;
+    const Skip&             skip;
     void*                   aux;
     Master&                 master;
-    bool                    load_on_incoming;
     const std::deque<int>&  blocks;
     int                     local_limit;
     critical_resource<int>& idx;
   };
+
+  struct Master::SkipNoIncoming
+  { bool operator()(int i, const Master& master) const   { return !master.has_incoming(i); } };
 }
 
 void
@@ -396,10 +388,10 @@ has_incoming(int i) const
   return false;
 }
 
-template<class Functor>
+template<class Functor, class Skip>
 void
 diy::Master::
-foreach(const Functor& f, void* aux, bool load_on_incoming)
+foreach(const Functor& f, const Skip& skip, void* aux)
 {
   // touch the outgoing and incoming queues as well as collectives to make sure they exist
   for (unsigned i = 0; i < size(); ++i)
@@ -436,13 +428,13 @@ foreach(const Functor& f, void* aux, bool load_on_incoming)
   critical_resource<int> idx(0);
 
   // launch the threads
-  typedef               ProcessBlock<Functor>                           BlockFunctor;
+  typedef               ProcessBlock<Functor,Skip>                      BlockFunctor;
   typedef               std::pair<thread*, BlockFunctor*>               ThreadFunctorPair;
   typedef               std::list<ThreadFunctorPair>                    ThreadFunctorList;
   ThreadFunctorList     threads;
   for (unsigned i = 0; i < num_threads; ++i)
   {
-      BlockFunctor* bf = new BlockFunctor(f, aux, *this, load_on_incoming, blocks, blocks_per_thread, idx);
+      BlockFunctor* bf = new BlockFunctor(f, skip, aux, *this, blocks, blocks_per_thread, idx);
       threads.push_back(ThreadFunctorPair(new thread(&BlockFunctor::run, bf), bf));
   }
 

@@ -59,6 +59,9 @@ namespace detail
 {
   template<class Reduce, class Partners>
   struct ReductionFunctor;
+
+  template<class Partners>
+  struct SkipInactive;
 }
 
 /**
@@ -79,10 +82,9 @@ void reduce(Master&                    master,
   unsigned round;
   for (round = 0; round < partners.rounds(); ++round)
   {
-    // TODO: add mechanism for skipping blocks that have dropped out (through partners)
-
     //fprintf(stderr, "== Round %d\n", round);
-    master.foreach(detail::ReductionFunctor<Reduce,Partners>(round, reduce, partners, assigner));
+    master.foreach(detail::ReductionFunctor<Reduce,Partners>(round, reduce, partners, assigner),
+                   detail::SkipInactive<Partners>(round, partners));
 
     int expected = 0;
     for (int i = 0; i < master.size(); ++i)
@@ -98,8 +100,10 @@ void reduce(Master&                    master,
     master.communicator().set_expected(expected);
     master.communicator().flush();
   }
+  // final round
   //fprintf(stderr, "== Round %d\n", round);
-  master.foreach(detail::ReductionFunctor<Reduce,Partners>(round, reduce, partners, assigner));     // final round
+  master.foreach(detail::ReductionFunctor<Reduce,Partners>(round, reduce, partners, assigner),
+                 detail::SkipInactive<Partners>(round, partners));
 
   master.communicator().set_expected(original_expected);
 }
@@ -114,8 +118,7 @@ namespace detail
 
     void        operator()(void* b, const Master::ProxyWithLink& cp, void*) const
     {
-      if (!partners.active(round, cp.gid()))
-          return;
+      if (!b) return;
 
       std::vector<int> incoming_gids, outgoing_gids;
       if (round > 0)
@@ -137,6 +140,16 @@ namespace detail
     const Reduce&   reduce;
     const Partners& partners;
     const Assigner& assigner;
+  };
+
+  template<class Partners>
+  struct SkipInactive
+  {
+                    SkipInactive(int round_, const Partners& partners_):
+                        round(round_), partners(partners_)          {}
+    bool            operator()(int i, const Master& master) const   { return !partners.active(round, master.gid(i)); }
+    int             round;
+    const Partners& partners;
   };
 }
 
