@@ -32,7 +32,7 @@ near(const RegularLink<Bounds>& link, const Point& p, float r, OutIter out, cons
   Bounds neigh_bounds; // neighbor block bounds
 
   // for all neighbors of this block
-  for (int n = 0; n < link.count(); n++)
+  for (int n = 0; n < link.size(); n++)
   {
     // wrap neighbor bounds, if necessary, otherwise bounds will be unchanged
     neigh_bounds = link.bounds(n);

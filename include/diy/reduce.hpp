@@ -128,8 +128,8 @@ namespace detail
 
       // touch the outgoing queues to make sure they exist
       Communicator::OutgoingQueues& outgoing = const_cast<Communicator&>(cp.comm()).outgoing(cp.gid());
-      if (outgoing.size() < rp.out_link().count())
-        for (unsigned j = 0; j < rp.out_link().count(); ++j)
+      if (outgoing.size() < rp.out_link().size())
+        for (unsigned j = 0; j < rp.out_link().size(); ++j)
           outgoing[rp.out_link().target(j)];       // touch the outgoing queue, creating it if necessary
     }
 

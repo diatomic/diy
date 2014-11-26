@@ -66,7 +66,7 @@ void sum(void* b_, const diy::ReduceProxy& rp, const diy::RegularMergePartners& 
     unsigned                    round    = rp.round();
 
     // step 1: dequeue and merge
-    for (unsigned i = 0; i < rp.in_link().count(); ++i)
+    for (unsigned i = 0; i < rp.in_link().size(); ++i)
     {
       int nbr_gid = rp.in_link().target(i).gid;
       if (nbr_gid == rp.gid())
@@ -80,7 +80,7 @@ void sum(void* b_, const diy::ReduceProxy& rp, const diy::RegularMergePartners& 
     }
 
     // step 2: enqueue
-    for (int i = 0; i < rp.out_link().count(); ++i)     // this is redundant since count should equal to 1
+    for (int i = 0; i < rp.out_link().size(); ++i)     // this is redundant since size should equal to 1
     {
       // only send to root of group, but not self
       if (rp.out_link().target(i).gid != rp.gid())

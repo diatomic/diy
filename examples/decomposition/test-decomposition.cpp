@@ -18,7 +18,7 @@ void create(int gid, const Bounds& core, const Bounds& bounds, const Bounds& dom
             << core.max[0]   << ' ' << core.max[1]   << ' ' << core.max[2] << " : "
             << bounds.min[0] << ' ' << bounds.min[1] << ' ' << bounds.min[2] << " - "
             << bounds.max[0] << ' ' << bounds.max[1] << ' ' << bounds.max[2] << " : "
-            << link.count()  << ' ' //<< std::endl
+            << link.size()   << ' ' //<< std::endl
             << std::bitset<32>(l.wrap()) //<< std::endl
             //<< std::bitset<32>(l.direction(0))   << std::endl
             //<< std::bitset<32>(l.direction(0) & l.wrap()) << std::endl

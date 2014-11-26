@@ -23,7 +23,7 @@ void local_average(void* b_, const diy::Master::ProxyWithLink& cp, void*)
 
   std::cout << "Total     (" << cp.gid() << "): " << total        << std::endl;
 
-  for (unsigned i = 0; i < l->count(); ++i)
+  for (unsigned i = 0; i < l->size(); ++i)
   {
     //std::cout << "Enqueueing: " << cp.gid()
     //          << " -> (" << l->target(i).gid << "," << l->target(i).proc << ")" << std::endl;

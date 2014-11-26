@@ -303,7 +303,7 @@ add(int gid, void* b, Link* l)
   gids_.push_back(gid);
   int lid = gids_.size() - 1;
   lids_[gid] = lid;
-  comm_.add_expected(l->count_unique()); // NB: at every iteration we expect a message from each unique neighbor
+  comm_.add_expected(l->size_unique()); // NB: at every iteration we expect a message from each unique neighbor
 
   ++(*in_memory_.access());
 
@@ -467,8 +467,8 @@ exchange()
   for (int i = 0; i < size(); ++i)
   {
     Communicator::OutgoingQueues& outgoing = comm_.outgoing(gid(i));
-    if (outgoing.size() < link(i)->count())
-      for (unsigned j = 0; j < link(i)->count(); ++j)
+    if (outgoing.size() < link(i)->size())
+      for (unsigned j = 0; j < link(i)->size(); ++j)
         outgoing[link(i)->target(j)];       // touch the outgoing queue, creating it if necessary
   }
 

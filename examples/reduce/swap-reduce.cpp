@@ -77,13 +77,13 @@ void redistribute(void* b_, const diy::ReduceProxy& srp, const diy::RegularSwapP
     Block*                      b        = static_cast<Block*>(b_);
     unsigned                    round    = srp.round();
 
-    //fprintf(stderr, "in_link.size():  %d\n", srp.in_link().count());
-    //fprintf(stderr, "out_link.size(): %d\n", srp.out_link().count());
+    //fprintf(stderr, "in_link.size():  %d\n", srp.in_link().size());
+    //fprintf(stderr, "out_link.size(): %d\n", srp.out_link().size());
 
     // step 1: dequeue and merge
     // dequeue all the incoming points and add them to this block's vector
     // could use srp.incoming() instead
-    for (unsigned i = 0; i < srp.in_link().count(); ++i)
+    for (unsigned i = 0; i < srp.in_link().size(); ++i)
     {
       int nbr_gid = srp.in_link().target(i).gid;
       if (nbr_gid == srp.gid())
@@ -97,12 +97,12 @@ void redistribute(void* b_, const diy::ReduceProxy& srp, const diy::RegularSwapP
     }
 
     // step 2: subset and enqueue
-    //fprintf(stderr, "[%d] out_link().count(): %d\n", srp.gid(), srp.out_link().count());
-    if (srp.out_link().count() == 0)        // final round; nothing needs to be sent
+    //fprintf(stderr, "[%d] out_link().size(): %d\n", srp.gid(), srp.out_link().size());
+    if (srp.out_link().size() == 0)        // final round; nothing needs to be sent
         return;
 
-    std::vector< std::vector<Block::Point> > out_points(srp.out_link().count());
-    int group_size = srp.out_link().count();
+    std::vector< std::vector<Block::Point> > out_points(srp.out_link().size());
+    int group_size = srp.out_link().size();
     int cur_dim    = partners.dim(round);
     for (size_t i = 0; i < b->points.size(); ++i)
     {

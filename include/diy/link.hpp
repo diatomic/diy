@@ -15,9 +15,9 @@ namespace diy
     public:
       virtual   ~Link()                             {}  // need to be able to delete derived classes
 
-      int       count() const                       { return neighbors_.size(); }
+      int       size() const                        { return neighbors_.size(); }
       inline
-      int       count_unique() const;
+      int       size_unique() const;
       BlockID   target(int i) const                 { return neighbors_[i]; }
       inline
       int       find(int gid) const;
@@ -99,7 +99,7 @@ int
 diy::Link::
 find(int gid) const
 {
-  for (unsigned i = 0; i < count(); ++i)
+  for (unsigned i = 0; i < size(); ++i)
   {
     if (target(i).gid == gid)
       return i;
@@ -108,7 +108,7 @@ find(int gid) const
 }
 int
 diy::Link::
-count_unique() const
+size_unique() const
 {
     std::vector<BlockID> tmp(neighbors_.begin(), neighbors_.end());
     std::sort(tmp.begin(), tmp.end());
