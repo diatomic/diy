@@ -3,9 +3,11 @@ cmake_minimum_required      (VERSION 2.8)
 
 option                      (debug              "Build DIY with debugging on"                OFF)
 option                      (optimize           "Build DIY with optimization"                ON)
+option                      (threads            "Build DIY with threading"                   ON)
 
 find_package                (MPI REQUIRED)
 set                         (mpi_libraries              ${MPI_C_LIBRARIES} ${MPI_CXX_LIBRARIES})
+set                         (libraries ${libraries}     ${mpi_libraries})
 
 # Debugging
 if                          (debug)
@@ -24,18 +26,18 @@ else                        (debug)
 endif                       (debug)
 add_definitions             (${cxx_flags})
 
+if                          (NOT threads)
+    add_definitions         (-DDIY_NO_THREADS)
+else                        (NOT threads)
+    find_package            (Threads)
+    set                     (libraries ${libraries}     ${CMAKE_THREAD_LIBS_INIT})
+endif                       (NOT threads)
+
 # Set includes
 set                         (CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem")
 include_directories         (${CMAKE_CURRENT_BINARY_DIR}
                              ${CMAKE_CURRENT_SOURCE_DIR}
                              ${CMAKE_CURRENT_SOURCE_DIR}/include
                              SYSTEM ${MPI_INCLUDE_PATH})
-
-find_package                (Threads)
-
-# Set libraries
-set                         (libraries
-                             ${CMAKE_THREAD_LIBS_INIT}
-                             ${mpi_libraries})
 
 add_subdirectory            (examples)

@@ -9,7 +9,6 @@
 #include "link.hpp"
 #include "storage.hpp"
 
-// TODO: provide a "nothread.h" header that defines all the same functionality, but in serial
 #include "thread.hpp"
 
 namespace diy
