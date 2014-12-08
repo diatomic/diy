@@ -7,6 +7,11 @@
 #include <string>
 #include <fstream>
 
+#if __cplusplus > 199711L           // C++11
+#include <tuple>
+#include <unordered_map>
+#endif
+
 namespace diy
 {
   //! A serialization buffer. \ingroup Serialization
@@ -225,6 +230,35 @@ namespace diy
       }
     }
   };
+
+#if __cplusplus > 199711L           // C++11
+  // save/load for std::unordered_map<K,V>
+  template<class K, class V>
+  struct Serialization< std::unordered_map<K,V> >
+  {
+    typedef             std::unordered_map<K,V>         Map;
+
+    static void         save(BinaryBuffer& bb, const Map& m)
+    {
+      unsigned s = m.size();
+      diy::save(bb, s);
+      for (auto& x : m)
+        diy::save(bb, x);
+    }
+
+    static void         load(BinaryBuffer& bb, Map& m)
+    {
+      unsigned s;
+      diy::load(bb, s);
+      for (unsigned i = 0; i < s; ++i)
+      {
+        std::pair<K,V> p;
+        diy::load(bb, p);
+        m.emplace(std::move(p));
+      }
+    }
+  };
+#endif
 }
 
 void
