@@ -120,7 +120,7 @@ namespace diy
   void                  save(BinaryBuffer& bb, const T* x, size_t n)
   {
     if (!detail::is_default< Serialization<T> >::value)
-      for (unsigned i = 0; i < n; ++i)
+      for (size_t i = 0; i < n; ++i)
         diy::save(bb, x[i]);
     else        // if Serialization is not specialized for U, just save the binary data
       bb.save_binary((const char*) &x[0], sizeof(T)*n);
@@ -130,7 +130,7 @@ namespace diy
   void                  load(BinaryBuffer& bb, T* x, size_t n)
   {
     if (!detail::is_default< Serialization<T> >::value)
-      for (unsigned i = 0; i < n; ++i)
+      for (size_t i = 0; i < n; ++i)
         diy::load(bb, x[i]);
     else      // if Serialization is not specialized for U, just load the binary data
       bb.load_binary((char*) &x[0], sizeof(T)*n);
@@ -185,7 +185,7 @@ namespace diy
 
     static void         save(BinaryBuffer& bb, const Map& m)
     {
-      unsigned s = m.size();
+      size_t s = m.size();
       diy::save(bb, s);
       for (typename std::map<K,V>::const_iterator it = m.begin(); it != m.end(); ++it)
         diy::save(bb, *it);
@@ -193,9 +193,9 @@ namespace diy
 
     static void         load(BinaryBuffer& bb, Map& m)
     {
-      unsigned s;
+      size_t s;
       diy::load(bb, s);
-      for (unsigned i = 0; i < s; ++i)
+      for (size_t i = 0; i < s; ++i)
       {
         std::pair<K,V> p;
         diy::load(bb, p);
@@ -220,9 +220,9 @@ namespace diy
 
     static void         load(BinaryBuffer& bb, Set& m)
     {
-      unsigned s;
+      size_t s;
       diy::load(bb, s);
-      for (unsigned i = 0; i < s; ++i)
+      for (size_t i = 0; i < s; ++i)
       {
         T p;
         diy::load(bb, p);
@@ -240,7 +240,7 @@ namespace diy
 
     static void         save(BinaryBuffer& bb, const Map& m)
     {
-      unsigned s = m.size();
+      size_t s = m.size();
       diy::save(bb, s);
       for (auto& x : m)
         diy::save(bb, x);
@@ -248,15 +248,49 @@ namespace diy
 
     static void         load(BinaryBuffer& bb, Map& m)
     {
-      unsigned s;
+      size_t s;
       diy::load(bb, s);
-      for (unsigned i = 0; i < s; ++i)
+      for (size_t i = 0; i < s; ++i)
       {
         std::pair<K,V> p;
         diy::load(bb, p);
         m.emplace(std::move(p));
       }
     }
+  };
+
+  // save/load for std::tuple<...>
+  // TODO: this ought to be default (copying) serialization
+  //       if all arguments are default
+  template<class... Args>
+  struct Serialization< std::tuple<Args...> >
+  {
+    typedef             std::tuple<Args...>     Tuple;
+
+    static void         save(BinaryBuffer& bb, const Tuple& t)          { save<0>(bb, t); }
+
+    template<std::size_t I = 0>
+    static
+    typename std::enable_if<I == sizeof...(Args), void>::type
+                        save(BinaryBuffer&, const Tuple&)               {}
+
+    template<std::size_t I = 0>
+    static
+    typename std::enable_if<I < sizeof...(Args), void>::type
+                        save(BinaryBuffer& bb, const Tuple& t)          { diy::save(bb, std::get<I>(t)); save<I+1>(bb, t); }
+
+    static void         load(BinaryBuffer& bb, Tuple& t)                { load<0>(bb, t); }
+
+    template<std::size_t I = 0>
+    static
+    typename std::enable_if<I == sizeof...(Args), void>::type
+                        load(BinaryBuffer&, Tuple&)                     {}
+
+    template<std::size_t I = 0>
+    static
+    typename std::enable_if<I < sizeof...(Args), void>::type
+                        load(BinaryBuffer& bb, Tuple& t)                { diy::load(bb, std::get<I>(t)); load<I+1>(bb, t); }
+
   };
 #endif
 }
