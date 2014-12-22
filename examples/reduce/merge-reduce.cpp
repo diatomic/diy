@@ -7,12 +7,12 @@
 #include <diy/decomposition.hpp>
 #include <diy/assigner.hpp>
 
+#include "../opts.h"
+
 using namespace std;
 
 typedef     diy::ContinuousBounds       Bounds;
 typedef     diy::RegularContinuousLink  RCLink;
-
-static const unsigned DIM = 3;
 
 struct Block
 {
@@ -70,11 +70,14 @@ void sum(void* b_, const diy::ReduceProxy& rp, const diy::RegularMergePartners& 
     {
       int nbr_gid = rp.in_link().target(i).gid;
       if (nbr_gid == rp.gid())
+      {
+          fprintf(stderr, "[%d:%d] Skipping receiving from self\n", rp.gid(), round);
           continue;
+      }
 
       std::vector<int>    in_vals;
       rp.dequeue(nbr_gid, in_vals);
-      fprintf(stderr, "[%d] Received %d values from [%d]\n", rp.gid(), (int)in_vals.size(), nbr_gid);
+      fprintf(stderr, "[%d:%d] Received %d values from [%d]\n", rp.gid(), round, (int)in_vals.size(), nbr_gid);
       for (size_t j = 0; j < in_vals.size(); ++j)
         (b->data)[j] += in_vals[j];
     }
@@ -86,8 +89,10 @@ void sum(void* b_, const diy::ReduceProxy& rp, const diy::RegularMergePartners& 
       if (rp.out_link().target(i).gid != rp.gid())
       {
         rp.enqueue(rp.out_link().target(i), b->data);
-        fprintf(stderr, "[%d] Sent %d valuess to [%d]\n", rp.gid(), (int)b->data.size(), rp.out_link().target(i).gid);
-      }
+        fprintf(stderr, "[%d:%d] Sent %d valuess to [%d]\n", rp.gid(), round, (int)b->data.size(), rp.out_link().target(i).gid);
+      } else
+          fprintf(stderr, "[%d:%d] Skipping sending to self\n", rp.gid(), round);
+
     }
 }
 
@@ -112,15 +117,34 @@ void print_block(void* b_, const diy::Master::ProxyWithLink& cp, void* verbose_)
 
 int main(int argc, char* argv[])
 {
+  diy::mpi::environment     env(argc, argv);
+  diy::mpi::communicator    world;
+
+  using namespace opts;
+  Options ops(argc, argv);
+
   // TODO: read from the command line
-  int                       nblocks     = 4;
+  int                       nblocks     = world.size();
   size_t                    num_points  = 10;      // points per block
   int                       mem_blocks  = -1;
   int                       threads     = 1;
+  int                       dim         = 3;
+  bool                      verbose     = ops >> Present('v', "verbose",    "verbose output");
+  bool                      contiguous  = ops >> Present('c', "contiguous", "use contiguous partners");
 
-  diy::mpi::environment     env(argc, argv);
+  ops
+      >> Option('d', "dim",     dim,            "dimension")
+      >> Option('b', "blocks",  nblocks,        "number of blocks")
+      >> Option('t', "thread",  threads,        "number of threads")
+  ;
 
-  diy::mpi::communicator    world;
+  if (ops >> Present('h', "help", "show help"))
+  {
+      std::cout << "Usage: " << argv[0] << " [OPTIONS]\n";
+      std::cout << ops;
+      return 1;
+  }
+
   diy::FileStorage          storage("./DIY.XXXXXX");
   diy::Communicator         comm(world);
   diy::Master               master(comm,
@@ -132,10 +156,12 @@ int main(int argc, char* argv[])
                                    &Block::save,
                                    &Block::load);
 
-  int dim = DIM;
   Bounds domain;
-  domain.min[0] = domain.min[1] = domain.min[2] = 0;
-  domain.max[0] = domain.max[1] = domain.max[2] = 100.;
+  for (int i = 0; i < dim; ++i)
+  {
+      domain.min[i] = 0;
+      domain.max[i] = 128.;
+  }
 
   diy::ContiguousAssigner   assigner(world.size(), nblocks);
   //diy::RoundRobinAssigner   assigner(world.size(), nblocks);
@@ -143,12 +169,11 @@ int main(int argc, char* argv[])
   diy::decompose(dim, world.rank(), domain, assigner, create);
 
   int k = 2;
-  diy::RegularMergePartners  partners(dim, nblocks, k, false);
+  diy::RegularMergePartners  partners(dim, nblocks, k, contiguous);
 //   fprintf(stderr, "%d %d %d\n", dim, nblocks, k);
 //   fprintf(stderr, "partners.rounds(): %d\n", (int) partners.rounds());
   diy::reduce(master, assigner, partners, sum);
 
-  bool verbose = true;
   master.foreach(print_block, &verbose);
 }
 
