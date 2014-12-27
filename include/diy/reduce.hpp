@@ -47,6 +47,9 @@ struct ReduceProxy: public Communicator::Proxy
       const Link&   in_link() const                         { return in_link_; }
       const Link&   out_link() const                        { return out_link_; }
 
+      // advanced
+      void          set_round(unsigned r)                   { round_ = r; }
+
     private:
       void*         block_;
       unsigned      round_;
@@ -60,8 +63,8 @@ namespace detail
   template<class Reduce, class Partners>
   struct ReductionFunctor;
 
-  template<class Partners>
-  struct SkipInactive;
+  template<class Partners, class Skip>
+  struct SkipInactiveOr;
 }
 
 /**
@@ -71,11 +74,12 @@ namespace detail
  *
  * \TODO Detailed explanation.
  */
-template<class Reduce, class Partners>
+template<class Reduce, class Partners, class Skip>
 void reduce(Master&                    master,
             const Assigner&            assigner,
             const Partners&            partners,
-            const Reduce&              reduce)
+            const Reduce&              reduce,
+            const Skip&                skip)
 {
   int original_expected = master.communicator().expected();
 
@@ -84,7 +88,7 @@ void reduce(Master&                    master,
   {
     //fprintf(stderr, "== Round %d\n", round);
     master.foreach(detail::ReductionFunctor<Reduce,Partners>(round, reduce, partners, assigner),
-                   detail::SkipInactive<Partners>(round, partners));
+                   detail::SkipInactiveOr<Partners,Skip>(round, partners, skip));
 
     int expected = 0;
     for (int i = 0; i < master.size(); ++i)
@@ -103,9 +107,18 @@ void reduce(Master&                    master,
   // final round
   //fprintf(stderr, "== Round %d\n", round);
   master.foreach(detail::ReductionFunctor<Reduce,Partners>(round, reduce, partners, assigner),
-                 detail::SkipInactive<Partners>(round, partners));
+                 detail::SkipInactiveOr<Partners,Skip>(round, partners, skip));
 
   master.communicator().set_expected(original_expected);
+}
+
+template<class Reduce, class Partners>
+void reduce(Master&                    master,
+            const Assigner&            assigner,
+            const Partners&            partners,
+            const Reduce&              reducer)
+{
+  reduce(master, assigner, partners, reducer, Master::NeverSkip());
 }
 
 namespace detail
@@ -118,7 +131,7 @@ namespace detail
 
     void        operator()(void* b, const Master::ProxyWithLink& cp, void*) const
     {
-      if (!b) return;
+      if (!partners.active(round, cp.gid())) return;
 
       std::vector<int> incoming_gids, outgoing_gids;
       if (round > 0)
@@ -142,14 +155,15 @@ namespace detail
     const Assigner& assigner;
   };
 
-  template<class Partners>
-  struct SkipInactive
+  template<class Partners, class Skip>
+  struct SkipInactiveOr
   {
-                    SkipInactive(int round_, const Partners& partners_):
-                        round(round_), partners(partners_)          {}
-    bool            operator()(int i, const Master& master) const   { return !partners.active(round, master.gid(i)); }
+                    SkipInactiveOr(int round_, const Partners& partners_, const Skip& skip_):
+                        round(round_), partners(partners_), skip(skip_)         {}
+    bool            operator()(int i, const Master& master) const               { return !partners.active(round, master.gid(i)) || skip(i, master); }
     int             round;
     const Partners& partners;
+    const Skip&     skip;
   };
 }
 
