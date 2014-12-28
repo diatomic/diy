@@ -10,9 +10,19 @@
 
 #include "../opts.h"
 
-typedef     int                         Value;
+//typedef     int                         Value;
+typedef     float                       Value;
 typedef     diy::Link                   Link;
 
+
+template<class T>
+T random(T min, T max);
+
+template<>
+int random(int min, int max)            { return min + rand() % (max - min); }
+
+template<>
+float random(float min, float max)      { return min + float(rand() % 1024) / 1024 * (max - min); }
 
 template<class T>
 struct Block
@@ -30,7 +40,7 @@ struct Block
   {
     values.resize(n);
     for (size_t i = 0; i < n; ++i)
-      values[i] = min + rand() % (max - min);
+      values[i] = random<Value>(min, max);
   }
 
   T                     min, max;
@@ -245,7 +255,7 @@ void dequeue_exchange(void* b_, const diy::ReduceProxy& srp)
       {
         if (in_values[j] < b->min)
         {
-            fprintf(stderr, "Warning: %d < min = %d\n", in_values[j], b->min);
+            std::cerr << "Warning: " << in_values[j] << " < min = " << b->min << std::endl;
             std::abort();
         }
         b->values.push_back(in_values[j]);
@@ -290,11 +300,11 @@ void print_block(void* b_, const diy::Master::ProxyWithLink& cp, void* verbose_)
   Block<Value>*   b         = static_cast<Block<Value>*>(b_);
   bool            verbose   = *static_cast<bool*>(verbose_);
 
-  fprintf(stdout, "%d: %d - %d\n", cp.gid(), b->min, b->max);
+  std::cout << cp.gid() << ": " << b->min << " - " << b->max << std::endl;
 
   if (verbose)
     for (size_t i = 0; i < b->values.size(); ++i)
-      fprintf(stdout, "  %d\n", b->values[i]);
+      std::cout << "  " << b->values[i] << std::endl;
 }
 
 void verify_block(void* b_, const diy::Master::ProxyWithLink& cp, void*)
@@ -303,7 +313,7 @@ void verify_block(void* b_, const diy::Master::ProxyWithLink& cp, void*)
 
   for (size_t i = 0; i < b->values.size(); ++i)
     if (b->values[i] < b->min || b->values[i] > b->max)
-      fprintf(stdout, "Warning: %d outside of [%d,%d]\n", b->values[i], b->min, b->max);
+      std::cout << "Warning: " << b->values[i] << " outside of [" << b->min << "," << b->max << "]" << std::endl;
 }
 
 
