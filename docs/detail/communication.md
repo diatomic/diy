@@ -1,10 +1,14 @@
 \defgroup Communication
 
-DIY currently supports two communication patterns: neighborhood exchange and swap-reduce.
+DIY currently supports two communication patterns: neighborhood exchange and reduction.
 
 Neighborhood Exchange
 ---------------------
 
 
-Swap-Reduce
+Reduction
 -----------
+
+- Swap-reduce
+- Merge-reduce
+- All-reduce

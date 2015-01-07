@@ -7,20 +7,22 @@
 
 namespace diy
 {
-
+//! Enables communication within a group during a reduction.
+//! DIY creates the ReduceProxy for you in diy::reduce()
+//! and provides a reference to ReduceProxy each time the user's reduction function is called
 struct ReduceProxy: public Communicator::Proxy
 {
     typedef     std::vector<int>                            GIDVector;
 
-                ReduceProxy(const Communicator::Proxy&      proxy,
-                            void*                           block,
-                            unsigned                        round,
-                            const Assigner&                 assigner,
-                            const GIDVector&                incoming_gids,
-                            const GIDVector&                outgoing_gids):
-                    Communicator::Proxy(proxy),
-                    block_(block),
-                    round_(round)
+    ReduceProxy(const Communicator::Proxy&      proxy, //!< parent communicator proxy
+                void*                           block, //!< diy block
+                unsigned                        round, //!< current round
+                const Assigner&                 assigner, //!< assigner
+                const GIDVector&                incoming_gids, //!< incoming gids in this group
+                const GIDVector&                outgoing_gids): //!< outgoing gids in this group
+      Communicator::Proxy(proxy),
+      block_(block),
+      round_(round)
     {
       // setup in_link
       for (unsigned i = 0; i < incoming_gids.size(); ++i)
@@ -41,13 +43,16 @@ struct ReduceProxy: public Communicator::Proxy
       }
     }
 
+      //! returns pointer to block
       void*         block() const                           { return block_; }
+      //! returns current round number
       unsigned      round() const                           { return round_; }
-
+      //! returns incoming link
       const Link&   in_link() const                         { return in_link_; }
+      //! returns outgoing link
       const Link&   out_link() const                        { return out_link_; }
 
-      // advanced
+      //! advanced: change current round number
       void          set_round(unsigned r)                   { round_ = r; }
 
     private:
