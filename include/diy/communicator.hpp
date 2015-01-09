@@ -194,8 +194,6 @@ void
 diy::Communicator::
 exchange()
 {
-  // TODO: currently isends to self; should probably optimize
-
   // isend outgoing queues
   for (OutgoingQueuesMap::iterator it = outgoing_.begin(); it != outgoing_.end(); ++it)
   {
@@ -204,6 +202,15 @@ exchange()
     {
       int to   = cur->first.gid;
       int proc = cur->first.proc;
+
+      if (proc == comm_.rank())     // sending to ourselves: simply swap buffers
+      {
+          incoming_[to][from] = diy::BinaryBuffer();
+          incoming_[to][from].swap(cur->second);
+          incoming_[to][from].reset();      // buffer position = 0
+          ++received_;
+          continue;
+      }
 
       inflight_.push_back(InFlight());
       inflight_.back().from = from;
