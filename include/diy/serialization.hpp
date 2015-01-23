@@ -137,6 +137,24 @@ namespace diy
       bb.load_binary((char*) &x[0], sizeof(T)*n);
   }
 
+
+  // save/load for BinaryBuffer
+  template<>
+  struct Serialization< BinaryBuffer >
+  {
+    static void         save(BinaryBuffer& bb, const BinaryBuffer& x)
+    {
+      diy::save(bb, x.position);
+      diy::save(bb, x.buffer);
+    }
+
+    static void         load(BinaryBuffer& bb, BinaryBuffer& x)
+    {
+      diy::load(bb, x.position);
+      diy::load(bb, x.buffer);
+    }
+  };
+
   // save/load for std::vector<U>
   template<class U>
   struct Serialization< std::vector<U> >
