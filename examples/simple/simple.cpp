@@ -9,6 +9,8 @@
 
 #include <diy/io/block.hpp>
 
+#include "../opts.h"
+
 #include "block.h"
 
 // Compute average of local values
@@ -60,15 +62,37 @@ int main(int argc, char* argv[])
 {
   diy::mpi::environment     env(argc, argv);
   diy::mpi::communicator    world;
+
   //int                       nblocks = 4*world.size();
-  int                       nblocks = 128;
-  diy::FileStorage          storage("./DIY.XXXXXX");
+  int                       nblocks   = 128;
+  int                       threads   = 4;
+  int                       in_memory = 8;
+  std::string               prefix    = "./DIY.XXXXXX";
+
+  using namespace opts;
+  Options ops(argc, argv);
+  ops
+      >> Option('b', "blocks",  nblocks,        "number of blocks")
+      >> Option('t', "thread",  threads,        "number of threads")
+      >> Option('m', "memory",  in_memory,      "maximum blocks to store in memory")
+      >> Option(     "prefix",  prefix,         "prefix for external storage")
+  ;
+
+  if (ops >> Present('h', "help", "show help"))
+  {
+    if (world.rank() == 0)
+        std::cout << ops;
+
+    return 1;
+  }
+
+  diy::FileStorage          storage(prefix);
   diy::Communicator         comm(world);
   diy::Master               master(comm,
                                    &create_block,
                                    &destroy_block,
-                                   8,
-                                   4,
+                                   in_memory,
+                                   threads,
                                    &storage,
                                    &save_block,
                                    &load_block);
