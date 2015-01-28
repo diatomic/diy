@@ -6,7 +6,6 @@ DIY is a data-parallel out-of-core library.
 Components:
 
  - \ref Initialization
- - \ref AddBlock
  - \ref Serialization
  - \ref Decomposition
  - \ref Communication
