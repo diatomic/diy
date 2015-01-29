@@ -7,7 +7,7 @@
 
 #include "communicator.hpp"
 #include "link.hpp"
-#include "storage.hpp"
+#include "collection.hpp"
 
 #include "thread.hpp"
 
@@ -22,7 +22,6 @@ namespace diy
   class Master
   {
     public:
-      struct BlockRecord;
       struct ProxyWithLink;
       template<class Functor, class Skip>
       struct ProcessBlock;
@@ -30,10 +29,10 @@ namespace diy
       struct SkipNoIncoming;
       struct NeverSkip { bool    operator()(int i, const Master& master) const   { return false; } };
 
-      typedef       void* (*CreateBlock)();
-      typedef       void  (*DestroyBlock)(void*);
-      typedef       void  (*SaveBlock)(const void*, BinaryBuffer& buf);
-      typedef       void  (*LoadBlock)(void*,       BinaryBuffer& buf);
+      typedef Collection::Create            CreateBlock;
+      typedef Collection::Destroy           DestroyBlock;
+      typedef Collection::Save              SaveBlock;
+      typedef Collection::Load              LoadBlock;
 
     public:
       // Helper functions specify how to:
@@ -49,31 +48,28 @@ namespace diy
                            SaveBlock        save     = 0,
                            LoadBlock        load     = 0):
                       comm_(comm),
-                      create_(create),
-                      destroy_(destroy),
+                      blocks_(create, destroy, storage, save, load),
                       limit_(limit),
-                      in_memory_(0),
-                      threads_(threads == -1 ? thread::hardware_concurrency() : threads),
-                      storage_(storage),
-                      save_(save),
-                      load_(load)                       {}
+                      threads_(threads == -1 ? thread::hardware_concurrency() : threads)
+                                                        {}
                     ~Master()                           { destroy_block_records(); }
       inline void   destroy_block_records();
-      inline void   destroy(int i);
+      inline void   destroy(int i)                      { blocks_.destroy(i); }
 
       inline int    add(int gid, void* b, Link* l);     //!< add a block
       inline void*  release(int i);                     //!< release ownership of the block
 
-      inline void*  block(int i) const;                 //!< return the `i`-th block
+      //!< return the `i`-th block
+      inline void*  block(int i) const                  { return blocks_.find(i); }
       template<class Block>
       Block*        block(int i) const                  { return static_cast<Block*>(block(i)); }
-      inline Link*  link(int i) const;
-      inline int    loaded_block() const                { int i = 0; for (; i < size(); ++i) if (block(i) != 0) break; return i; }
+      inline Link*  link(int i) const                   { return links_[i]; }
+      inline int    loaded_block() const                { return blocks_.available(); }
 
-      inline void   unload_all();
-      inline void   unload(int i);
-      inline void   unload(std::vector<int>& loaded);
-      inline void   load(int i);
+      inline void   unload(int i)                       { blocks_.unload(i); }
+      inline void   unload(std::vector<int>& loaded)    { blocks_.unload(loaded); }
+      inline void   unload_all()                        { blocks_.unload_all(); }
+      inline void   load(int i)                         { blocks_.load(i); }
       inline bool   has_incoming(int i) const;
 
       const Communicator&
@@ -81,7 +77,7 @@ namespace diy
       Communicator& communicator()                      { return comm_; }
 
       //! return the `i`-th block, loading it if necessary
-      void*         get(int i)                          { if (block(i) == 0) load(i); return block(i); }
+      void*         get(int i)                          { return blocks_.get(i); }
 
       int           gid(int i) const                    { return gids_[i]; }
       int           lid(int gid) const                  { return local(gid) ?  lids_.find(gid)->second : -1; }
@@ -94,9 +90,9 @@ namespace diy
       ProxyWithLink proxy(int i) const;
 
       unsigned      size() const                        { return blocks_.size(); }
-      LoadBlock     loader() const                      { return load_; }
-      SaveBlock     saver() const                       { return save_; }
-      void*         create() const                      { return create_(); }
+      LoadBlock     loader() const                      { return blocks_.loader(); }
+      SaveBlock     saver() const                       { return blocks_.saver(); }
+      void*         create() const                      { return blocks_.create(); }
 
       // accessors
       int           limit() const                       { return limit_; }
@@ -112,41 +108,15 @@ namespace diy
       template<class Functor, class Skip>
       void          foreach(const Functor& f, const Skip& skip, void* aux = 0);
 
-    protected:
-      inline void*& block(int i);
-
     private:
       Communicator&                                     comm_;
-      std::vector<BlockRecord*>                         blocks_;
-      std::vector<int>                                  external_;
+      std::vector<Link*>                                links_;
+      Collection                                        blocks_;
       std::vector<int>                                  gids_;
       std::map<int, int>                                lids_;
 
-      CreateBlock                                       create_;
-      DestroyBlock                                      destroy_;
-
       int                                               limit_;
-      critical_resource<int, recursive_mutex>           in_memory_;
       int                                               threads_;
-
-      ExternalStorage*                                  storage_;
-      SaveBlock                                         save_;
-      LoadBlock                                         load_;
-  };
-
-  struct Master::BlockRecord
-  {
-            BlockRecord(void* block_, Link* link_):
-              block(block_), link(link_)                    {}
-            ~BlockRecord()                                  { delete link; }
-
-    void*   block;      // the block is assumed to be properly destroyed before this object is deleted
-    Link*   link;       // takes ownership of the link
-
-    private:
-        // disallow copies for now
-                    BlockRecord(const BlockRecord& other)   {}
-      BlockRecord&  operator=(const BlockRecord& o)         { return *this; }
   };
 
   struct Master::ProxyWithLink: public Communicator::Proxy
@@ -203,14 +173,11 @@ namespace diy
         {
             if (master.block(i) == 0)                               // block unloaded
             {
-              if (master.external_[i] != -1)                        // it actually exists externally; currently redundant: how can it not?
-              {
-                if (local.size() == local_limit)                    // reached the local limit
-                  master.unload(local);
+              if (local.size() == local_limit)                    // reached the local limit
+                master.unload(local);
 
-                master.load(i);
-                local.push_back(i);
-              }
+              master.load(i);
+              local.push_back(i);
             }
 
             f(master.block(i), master.proxy(i), aux);
@@ -243,38 +210,9 @@ destroy_block_records()
   for (unsigned i = 0; i < size(); ++i)
   {
     destroy(i);
-    delete blocks_[i];
-    if (external_[i] != -1)
-      storage_->destroy(i);
+    delete links_[i];
   }
 }
-
-void
-diy::Master::
-destroy(int i)
-{
-  if (block(i))
-  {
-    destroy_(block(i));
-    block(i) = 0;
-  }
-}
-
-void*
-diy::Master::
-block(int i) const
-{ return blocks_[i]->block; }
-
-void*&
-diy::Master::
-block(int i)
-{ return blocks_[i]->block; }
-
-diy::Link*
-diy::Master::
-link(int i) const
-{ return blocks_[i]->link; }
-
 
 diy::Master::ProxyWithLink
 diy::Master::
@@ -286,17 +224,16 @@ int
 diy::Master::
 add(int gid, void* b, Link* l)
 {
-  if (*in_memory_.const_access() == limit_)
+  if (*blocks_.in_memory().const_access() == limit_)
     unload_all();
 
-  blocks_.push_back(new BlockRecord(b,l));
-  external_.push_back(-1);
+  blocks_.add(b);
+  links_.push_back(l);
   gids_.push_back(gid);
+
   int lid = gids_.size() - 1;
   lids_[gid] = lid;
   comm_.add_expected(l->size_unique()); // NB: at every iteration we expect a message from each unique neighbor
-
-  ++(*in_memory_.access());
 
   return lid;
 }
@@ -305,73 +242,10 @@ void*
 diy::Master::
 release(int i)
 {
-  if (block(i) == 0)
-  {
-    // assert(external_[i] != -1)
-    load(i);
-  }
-
-  void* b = block(i);
-  block(i) = 0;
-  delete link(i);   blocks_[i]->link = 0;
+  void* b = blocks_.release(i);
+  delete link(i);   links_[i] = 0;
   lids_.erase(gid(i));
   return b;
-}
-
-void
-diy::Master::
-unload_all()
-{
-  for (unsigned i = 0; i < size(); ++i)
-    if (block(i))
-      unload(i);
-}
-
-void
-diy::Master::
-unload(int i)
-{
-  fprintf(stdout, "Unloading block: %d\n", i);
-
-  // TODO: could avoid the extra copy by asking storage_ for an instance derived
-  //       from BinaryBuffer, which could save the data directly
-
-  BinaryBuffer bb;
-  save_(block(i), bb);
-  external_[i] = storage_->put(bb);
-
-  destroy_(block(i));
-  block(i) = 0;
-
-  --(*in_memory_.access());
-}
-
-void
-diy::Master::
-unload(std::vector<int>& loaded)
-{
-  for (unsigned i = 0; i < loaded.size(); ++i)
-  {
-    // TODO: assert that block(loaded(i)) != 0
-    unload(loaded[i]);
-  }
-  loaded.clear();
-}
-
-void
-diy::Master::
-load(int i)
-{
-  fprintf(stdout, "Loading block: %d\n", i);
-
-  BinaryBuffer bb;
-  storage_->get(external_[i], bb);
-  void* b = create_();
-  load_(b, bb);
-  block(i) = b;
-  external_[i] = -1;
-
-  ++(*in_memory_.access());
 }
 
 bool
