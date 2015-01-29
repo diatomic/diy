@@ -1,12 +1,12 @@
 #ifndef DIY_THREAD_H
 #define DIY_THREAD_H
 
-#include "thread/tinythread.h"
-#include "thread/fast_mutex.h"
-
 #ifdef DIY_NO_THREADS
 #include "no-thread.hpp"
 #else
+#include "thread/tinythread.h"
+#include "thread/fast_mutex.h"
+
 namespace diy
 {
   using tthread::thread;
