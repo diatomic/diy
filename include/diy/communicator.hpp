@@ -135,8 +135,10 @@ namespace diy
     { return EnqueueIterator<T>(this, x, save); }
 
     IncomingQueues*     incoming() const                                { return incoming_; }
-    BinaryBuffer&       incoming(int gid) const                         { return (*incoming_)[gid]; }
+    BinaryBuffer&       incoming(int from) const                        { return (*incoming_)[from]; }
     inline void         incoming(std::vector<int>& v) const;            // fill v with every gid from which we have a message
+
+    BinaryBuffer&       outgoing(const BlockID& to) const               { return (*outgoing_)[to]; }
 
     template<class T, class Op>
     inline void         all_reduce(const T& in, Op op) const;

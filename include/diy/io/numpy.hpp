@@ -25,6 +25,8 @@ namespace io
         BOV::Shape  shape;
         bool        fortran;
         size_t      offset = parse_npy_header(shape, fortran);
+        if (fortran)
+            throw std::runtime_error("diy::io::NumPy cannot read data in fortran order");
         BOV::set_offset(offset);
         BOV::set_shape(shape);
         return word_size_;
