@@ -45,7 +45,7 @@ namespace diy
         write(fh, &bb.buffer[0], sz);
         fsync(fh);
         close(fh);
-        bb.clear();
+        bb.wipe();
 
         int res = (*count_.access())++;
         FileRecord  fr = { sz, filename };
