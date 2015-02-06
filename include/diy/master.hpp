@@ -3,11 +3,17 @@
 
 #include <vector>
 #include <map>
+#include <list>
 #include <deque>
 
-#include "communicator.hpp"
 #include "link.hpp"
 #include "collection.hpp"
+
+// Communicator functionality
+#include "mpi.hpp"
+#include "serialization.hpp"
+#include "detail/collectives.hpp"
+#include "time.hpp"
 
 #include "thread.hpp"
 
@@ -22,7 +28,6 @@ namespace diy
   class Master
   {
     public:
-      struct ProxyWithLink;
       template<class Functor, class Skip>
       struct ProcessBlock;
 
@@ -35,22 +40,54 @@ namespace diy
       typedef Collection::Load              LoadBlock;
 
     public:
+      // Communicator types
+
+      struct Proxy;
+      struct ProxyWithLink;
+
+      struct InFlight
+      {
+        BinaryBuffer        message;
+        mpi::request        request;
+
+        // for debug purposes:
+        int from, to;
+      };
+      struct Collective;
+      struct tags       { enum { queue }; };
+
+      typedef           std::list<InFlight>                 InFlightList;
+      typedef           std::list<Collective>               CollectivesList;
+      typedef           std::map<int, CollectivesList>      CollectivesMap;     // gid          -> [collectives]
+
+
+      // TODO: these types will have to be adjusted to support multi-threading
+      typedef           std::map<int,     BinaryBuffer>     IncomingQueues;     //  gid         -> queue
+      typedef           std::map<BlockID, BinaryBuffer>     OutgoingQueues;     // (gid, proc)  -> queue
+      typedef           std::map<int,     IncomingQueues>   IncomingQueuesMap;  //  gid         -> {  gid       -> queue }
+      typedef           std::map<int,     OutgoingQueues>   OutgoingQueuesMap;  //  gid         -> { (gid,proc) -> queue }
+
+
+    public:
       // Helper functions specify how to:
       //   * create an empty block,
       //   * destroy a block (a function that's expected to upcast and delete),
       //   * serialize a block
-                    Master(Communicator&    comm,
-                           CreateBlock      create,
-                           DestroyBlock     destroy,
-                           int              limit    = -1,       // blocks to store in memory
-                           int              threads  = -1,
-                           ExternalStorage* storage  = 0,
-                           SaveBlock        save     = 0,
-                           LoadBlock        load     = 0):
+                    Master(mpi::communicator    comm,
+                           CreateBlock          create,
+                           DestroyBlock         destroy,
+                           int                  limit    = -1,       // blocks to store in memory
+                           int                  threads  = -1,
+                           ExternalStorage*     storage  = 0,
+                           SaveBlock            save     = 0,
+                           LoadBlock            load     = 0):
                       comm_(comm),
                       blocks_(create, destroy, storage, save, load),
                       limit_(limit),
-                      threads_(threads == -1 ? thread::hardware_concurrency() : threads)
+                      threads_(threads == -1 ? thread::hardware_concurrency() : threads),
+                      // Communicator functionality
+                      expected_(0),
+                      received_(0)
                                                         {}
                     ~Master()                           { destroy_block_records(); }
       inline void   destroy_block_records();
@@ -72,9 +109,8 @@ namespace diy
       inline void   load(int i)                         { blocks_.load(i); }
       inline bool   has_incoming(int i) const;
 
-      const Communicator&
-                    communicator() const                { return comm_; }
-      Communicator& communicator()                      { return comm_; }
+      const mpi::communicator&  communicator() const    { return comm_; }
+      mpi::communicator&        communicator()          { return comm_; }
 
       //! return the `i`-th block, loading it if necessary
       void*         get(int i)                          { return blocks_.get(i); }
@@ -108,32 +144,46 @@ namespace diy
       template<class Functor, class Skip>
       void          foreach(const Functor& f, const Skip& skip, void* aux = 0);
 
-    private:
-      Communicator&                                     comm_;
-      std::vector<Link*>                                links_;
-      Collection                                        blocks_;
-      std::vector<int>                                  gids_;
-      std::map<int, int>                                lids_;
+    public:
+      // Communicator functionality
+      IncomingQueues&   incoming(int gid)               { return incoming_[gid]; }
+      OutgoingQueues&   outgoing(int gid)               { return outgoing_[gid]; }
+      CollectivesList&  collectives(int gid)            { return collectives_[gid]; }
 
-      int                                               limit_;
-      int                                               threads_;
-  };
+      void              set_expected(int expected)      { expected_ = expected; }
+      void              add_expected(int i)             { expected_ += i; }
+      int               expected() const                { return expected_; }
 
-  struct Master::ProxyWithLink: public Communicator::Proxy
-  {
-            ProxyWithLink(const Communicator::Proxy&    proxy,
-                          void*                         block,
-                          Link*                         link):
-              Communicator::Proxy(proxy),
-              block_(block),
-              link_(link)                                           {}
-
-      Link*   link() const                                          { return link_; }
-      void*   block() const                                         { return block_; }
+    public:
+      // Communicator functionality
+      inline void       flush();            // makes sure all the serialized queues migrate to their target processors
 
     private:
-      void*   block_;
-      Link*   link_;
+      // Communicator functionality
+      inline void       comm_exchange();    // possibly called in between block computations
+      inline bool       nudge();
+      inline void       process_collectives();
+
+      void              cancel_requests();              // TODO
+
+    private:
+      std::vector<Link*>    links_;
+      Collection            blocks_;
+      std::vector<int>      gids_;
+      std::map<int, int>    lids_;
+
+      int                   limit_;
+      int                   threads_;
+
+    private:
+      // Communicator
+      mpi::communicator     comm_;
+      IncomingQueuesMap     incoming_;
+      OutgoingQueuesMap     outgoing_;
+      InFlightList          inflight_;
+      CollectivesMap        collectives_;
+      int                   expected_;
+      int                   received_;
   };
 
   template<class Functor, class Skip>
@@ -201,7 +251,33 @@ namespace diy
 
   struct Master::SkipNoIncoming
   { bool operator()(int i, const Master& master) const   { return !master.has_incoming(i); } };
+
+  struct Master::Collective
+  {
+            Collective():
+              cop_(0)                           {}
+            Collective(detail::CollectiveOp* cop):
+              cop_(cop)                         {}
+            // this copy constructor is very ugly, but need it to insert Collectives into a list
+            Collective(const Collective& other):
+              cop_(0)                           { swap(const_cast<Collective&>(other)); }
+            ~Collective()                       { delete cop_; }
+
+    void    init()                              { cop_->init(); }
+    void    swap(Collective& other)             { std::swap(cop_, other.cop_); }
+    void    update(const Collective& other)     { cop_->update(*other.cop_); }
+    void    global(const mpi::communicator& c)  { cop_->global(c); }
+    void    copy_from(Collective& other) const  { cop_->copy_from(*other.cop_); }
+    void    result_out(void* x) const           { cop_->result_out(x); }
+
+    detail::CollectiveOp*                       cop_;
+
+    private:
+    Collective& operator=(const Collective& other);
+  };
 }
+
+#include "proxy.hpp"
 
 void
 diy::Master::
@@ -217,7 +293,7 @@ destroy_block_records()
 diy::Master::ProxyWithLink
 diy::Master::
 proxy(int i) const
-{ return ProxyWithLink(comm_.proxy(gid(i)), block(i), link(i)); }
+{ return ProxyWithLink(Proxy(const_cast<Master*>(this), gid(i)), block(i), link(i)); }
 
 
 int
@@ -233,7 +309,7 @@ add(int gid, void* b, Link* l)
 
   int lid = gids_.size() - 1;
   lids_[gid] = lid;
-  comm_.add_expected(l->size_unique()); // NB: at every iteration we expect a message from each unique neighbor
+  add_expected(l->size_unique()); // NB: at every iteration we expect a message from each unique neighbor
 
   return lid;
 }
@@ -252,8 +328,8 @@ bool
 diy::Master::
 has_incoming(int i) const
 {
-  const Communicator::IncomingQueues& incoming = const_cast<Communicator&>(comm_).incoming(gid(i));
-  for (Communicator::IncomingQueues::const_iterator it = incoming.begin(); it != incoming.end(); ++it)
+  const IncomingQueues& incoming_queues = const_cast<Master&>(*this).incoming(gid(i));
+  for (IncomingQueues::const_iterator it = incoming_queues.begin(); it != incoming_queues.end(); ++it)
   {
     if (!it->second.empty())
         return true;
@@ -269,9 +345,9 @@ foreach(const Functor& f, const Skip& skip, void* aux)
   // touch the outgoing and incoming queues as well as collectives to make sure they exist
   for (unsigned i = 0; i < size(); ++i)
   {
-    comm_.outgoing(gid(i));
-    comm_.incoming(gid(i));
-    comm_.collectives(gid(i));
+    outgoing(gid(i));
+    incoming(gid(i));
+    collectives(gid(i));
   }
 
 
@@ -331,14 +407,156 @@ exchange()
   // make sure there is a queue for each neighbor
   for (int i = 0; i < size(); ++i)
   {
-    Communicator::OutgoingQueues& outgoing = comm_.outgoing(gid(i));
-    if (outgoing.size() < link(i)->size())
+    OutgoingQueues& outgoing_queues = outgoing(gid(i));
+    if (outgoing_queues.size() < link(i)->size())
       for (unsigned j = 0; j < link(i)->size(); ++j)
-        outgoing[link(i)->target(j)];       // touch the outgoing queue, creating it if necessary
+        outgoing_queues[link(i)->target(j)];       // touch the outgoing queue, creating it if necessary
   }
 
-  comm_.flush();
+  flush();
   //fprintf(stdout, "Finished exchange\n");
 }
+
+/* Communicator */
+void
+diy::Master::
+comm_exchange()
+{
+  // isend outgoing queues
+  for (OutgoingQueuesMap::iterator it = outgoing_.begin(); it != outgoing_.end(); ++it)
+  {
+    int from  = it->first;
+    for (OutgoingQueues::iterator cur = it->second.begin(); cur != it->second.end(); ++cur)
+    {
+      int to   = cur->first.gid;
+      int proc = cur->first.proc;
+
+      if (proc == comm_.rank())     // sending to ourselves: simply swap buffers
+      {
+          incoming_[to][from] = diy::BinaryBuffer();
+          incoming_[to][from].swap(cur->second);
+          incoming_[to][from].reset();      // buffer position = 0
+          ++received_;
+          continue;
+      }
+
+      inflight_.push_back(InFlight());
+      inflight_.back().from = from;
+      inflight_.back().to   = to;
+      inflight_.back().message.swap(cur->second);
+      diy::save(inflight_.back().message, std::make_pair(from, to));
+      inflight_.back().request = comm_.isend(proc, tags::queue, inflight_.back().message.buffer);
+    }
+  }
+  outgoing_.clear();
+
+  // kick requests
+  while(nudge());
+
+  // check incoming queues
+  mpi::optional<mpi::status>        ostatus = comm_.iprobe(mpi::any_source, tags::queue);
+  while(ostatus)
+  {
+    diy::BinaryBuffer bb;
+    comm_.recv(ostatus->source(), tags::queue, bb.buffer);
+
+    std::pair<int,int> from_to;
+    diy::load_back(bb, from_to);
+    int from = from_to.first;
+    int to   = from_to.second;
+
+    incoming_[to][from] = diy::BinaryBuffer();
+    incoming_[to][from].swap(bb);
+    ++received_;
+
+    ostatus = comm_.iprobe(mpi::any_source, tags::queue);
+  }
+}
+
+void
+diy::Master::
+flush()
+{
+#ifdef DEBUG
+  time_type start = get_time();
+  unsigned wait = 1;
+#endif
+  comm_exchange();
+  while (!inflight_.empty() || received_ < expected_)
+  {
+    comm_exchange();
+
+#ifdef DEBUG
+    time_type cur = get_time();
+    if (cur - start > wait*1000)
+    {
+        std::cerr << "Waiting in flush [" << comm_.rank() << "]: "
+                  << inflight_.size() << " - " << received_ << " out of " << expected_ << std::endl;
+        wait *= 2;
+    }
+#endif
+  }
+
+  process_collectives();
+  comm_.barrier();
+
+  received_ = 0;
+}
+
+void
+diy::Master::
+process_collectives()
+{
+  if (collectives_.empty())
+      return;
+
+  typedef       CollectivesList::iterator       CollectivesIterator;
+  std::vector<CollectivesIterator>  iters;
+  std::vector<int>                  gids;
+  for (CollectivesMap::iterator cur = collectives_.begin(); cur != collectives_.end(); ++cur)
+  {
+    gids.push_back(cur->first);
+    iters.push_back(cur->second.begin());
+  }
+
+  while (iters[0] != collectives_.begin()->second.end())
+  {
+    iters[0]->init();
+    for (unsigned j = 1; j < iters.size(); ++j)
+    {
+      // NB: this assumes that the operations are commutative
+      iters[0]->update(*iters[j]);
+    }
+    iters[0]->global(comm_);        // do the mpi collective
+
+    for (unsigned j = 1; j < iters.size(); ++j)
+    {
+      iters[j]->copy_from(*iters[0]);
+      ++iters[j];
+    }
+
+    ++iters[0];
+  }
+}
+
+bool
+diy::Master::
+nudge()
+{
+  bool success = false;
+  for (InFlightList::iterator it = inflight_.begin(); it != inflight_.end(); ++it)
+  {
+    mpi::optional<mpi::status> ostatus = it->request.test();
+    if (ostatus)
+    {
+      success = true;
+      InFlightList::iterator rm = it;
+      --it;
+      inflight_.erase(rm);
+    }
+  }
+  return success;
+}
+
 
 #endif

@@ -365,8 +365,7 @@ int main(int argc, char* argv[])
   }
 
   diy::FileStorage          storage(prefix);
-  diy::Communicator         comm(world);
-  diy::Master               master(comm,
+  diy::Master               master(world,
                                    &Block::create,
                                    &Block::destroy,
                                    mem_blocks,

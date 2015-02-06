@@ -10,17 +10,17 @@ namespace diy
 //! Enables communication within a group during a reduction.
 //! DIY creates the ReduceProxy for you in diy::reduce()
 //! and provides a reference to ReduceProxy each time the user's reduction function is called
-struct ReduceProxy: public Communicator::Proxy
+struct ReduceProxy: public Master::Proxy
 {
     typedef     std::vector<int>                            GIDVector;
 
-    ReduceProxy(const Communicator::Proxy&      proxy, //!< parent communicator proxy
-                void*                           block, //!< diy block
-                unsigned                        round, //!< current round
-                const Assigner&                 assigner, //!< assigner
-                const GIDVector&                incoming_gids, //!< incoming gids in this group
-                const GIDVector&                outgoing_gids): //!< outgoing gids in this group
-      Communicator::Proxy(proxy),
+    ReduceProxy(const Master::Proxy&    proxy, //!< parent proxy
+                void*                   block, //!< diy block
+                unsigned                round, //!< current round
+                const Assigner&         assigner, //!< assigner
+                const GIDVector&        incoming_gids, //!< incoming gids in this group
+                const GIDVector&        outgoing_gids): //!< outgoing gids in this group
+      Master::Proxy(proxy),
       block_(block),
       round_(round)
     {
@@ -86,7 +86,7 @@ void reduce(Master&                    master,
             const Reduce&              reduce,
             const Skip&                skip)
 {
-  int original_expected = master.communicator().expected();
+  int original_expected = master.expected();
 
   unsigned round;
   for (round = 0; round < partners.rounds(); ++round)
@@ -103,18 +103,18 @@ void reduce(Master&                    master,
         std::vector<int> incoming_gids;
         partners.incoming(round + 1, master.gid(i), incoming_gids);
         expected += incoming_gids.size();
-        master.communicator().incoming(master.gid(i)).clear();
+        master.incoming(master.gid(i)).clear();
       }
     }
-    master.communicator().set_expected(expected);
-    master.communicator().flush();
+    master.set_expected(expected);
+    master.flush();
   }
   // final round
   //fprintf(stderr, "== Round %d\n", round);
   master.foreach(detail::ReductionFunctor<Reduce,Partners>(round, reduce, partners, assigner),
                  detail::SkipInactiveOr<Partners,Skip>(round, partners, skip));
 
-  master.communicator().set_expected(original_expected);
+  master.set_expected(original_expected);
 }
 
 template<class Reduce, class Partners>
@@ -148,7 +148,7 @@ namespace detail
       reduce(b, rp, partners);
 
       // touch the outgoing queues to make sure they exist
-      Communicator::OutgoingQueues& outgoing = const_cast<Communicator&>(cp.comm()).outgoing(cp.gid());
+      Master::OutgoingQueues& outgoing = *cp.outgoing();
       if (outgoing.size() < rp.out_link().size())
         for (unsigned j = 0; j < rp.out_link().size(); ++j)
           outgoing[rp.out_link().target(j)];       // touch the outgoing queue, creating it if necessary
