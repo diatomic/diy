@@ -178,8 +178,7 @@ int main(int argc, char* argv[])
 
   diy::mpi::communicator    world;
   diy::FileStorage          storage("./DIY.XXXXXX");
-  diy::Communicator         comm(world);
-  diy::Master               master(comm,
+  diy::Master               master(world,
                                    &Block::create,
                                    &Block::destroy,
                                    mem_blocks,

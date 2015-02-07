@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <diy/master.hpp>
 #include <diy/io/block.hpp>
 
@@ -14,8 +16,7 @@ int main(int argc, char* argv[])
   diy::mpi::environment     env(argc, argv);
   diy::mpi::communicator    world;
 
-  diy::Communicator         comm(world);
-  diy::Master               master(comm,
+  diy::Master               master(world,
                                    &create_block,
                                    &destroy_block,
                                    -1,

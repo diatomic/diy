@@ -2,7 +2,6 @@
 #include <iostream>
 
 #include <diy/mpi.hpp>
-#include <diy/communicator.hpp>
 #include <diy/master.hpp>
 #include <diy/assigner.hpp>
 #include <diy/serialization.hpp>
@@ -41,8 +40,7 @@ int main(int argc, char* argv[])
 
   diy::FileStorage          storage("./DIY.XXXXXX");
 
-  diy::Communicator         comm(world);
-  diy::Master               master(comm,
+  diy::Master               master(world,
                                    &create_block,
                                    &destroy_block,
                                    2,
@@ -64,8 +62,7 @@ int main(int argc, char* argv[])
   while (!all_done)
   {
     master.foreach(&flip_coin);
-    comm.exchange();
-    comm.flush();
+    master.exchange();
     all_done = master.proxy(master.loaded_block()).read<bool>();
   }
 

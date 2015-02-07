@@ -2,7 +2,6 @@
 #include <iostream>
 
 #include <diy/mpi.hpp>
-#include <diy/communicator.hpp>
 #include <diy/master.hpp>
 #include <diy/assigner.hpp>
 #include <diy/serialization.hpp>
@@ -87,8 +86,7 @@ int main(int argc, char* argv[])
   }
 
   diy::FileStorage          storage(prefix);
-  diy::Communicator         comm(world);
-  diy::Master               master(comm,
+  diy::Master               master(world,
                                    &create_block,
                                    &destroy_block,
                                    in_memory,
@@ -102,7 +100,7 @@ int main(int argc, char* argv[])
 
   // creates a linear chain of blocks
   std::vector<int> gids;
-  assigner.local_gids(comm.rank(), gids);
+  assigner.local_gids(world.rank(), gids);
   for (unsigned i = 0; i < gids.size(); ++i)
   {
     int gid = gids[i];
@@ -132,8 +130,7 @@ int main(int argc, char* argv[])
   }
 
   master.foreach(&local_average);
-  comm.exchange();
-  comm.flush();
+  master.exchange();
 
   master.foreach(&average_neighbors);
 

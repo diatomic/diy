@@ -30,7 +30,11 @@ namespace diy
     void                swap(BinaryBuffer& o)                       { std::swap(position, o.position); buffer.swap(o.buffer); }
     bool                empty() const                               { return buffer.empty(); }
     size_t              size() const                                { return buffer.size(); }
+    void                reserve(size_t s)                           { buffer.reserve(s); }
                         operator bool() const                       { return position < buffer.size(); }
+
+    //! multiplier used for the geometric growth of the container
+    static const float  growth_multiplier()                         { return 1.5; }
 
     // simple file IO
     void                write(const std::string& fn) const          { std::ofstream out(fn.c_str()); out.write(&buffer[0], size()); }
@@ -318,8 +322,12 @@ void
 diy::BinaryBuffer::
 save_binary(const char* x, int count)
 {
+  if (position + count > buffer.capacity())
+    buffer.reserve((position + count) * growth_multiplier());           // if we have to grow, grow geometrically
+
   if (position + count > buffer.size())
-    buffer.resize(position + count);        // TODO: double-check that this does the right thing with capacity
+    buffer.resize(position + count);
+
   std::copy(x, x + count, &buffer[position]);
   position += count;
 }
