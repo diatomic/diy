@@ -48,13 +48,13 @@ namespace diy
 
       inline void   load(int i);
       inline void   unload(int i);
-      void          unload(std::vector<int>& v)     { for(unsigned i = 0; i < v.size(); ++i) unload(v[i]); v.clear(); }
-      void          unload_all()                    { for(unsigned i = 0; i < size(); ++i)   if (find(i) != 0) unload(i); }
 
       Load          loader() const                  { return load_; }
       Save          saver() const                   { return save_; }
       void*         create() const                  { return create_(); }
       void          destroy(int i)                  { if (find(i)) { destroy_(find(i)); elements_[i] = 0; } else if (external_[i] != -1) storage_->destroy(external_[i]); }
+
+      ExternalStorage*      storage() const         { return storage_; }
 
     private:
       Create                create_;
@@ -73,8 +73,6 @@ void
 diy::Collection::
 unload(int i)
 {
-  fprintf(stdout, "Unloading element: %d\n", i);
-
   // TODO: could avoid the extra copy by asking storage_ for an instance derived
   //       from BinaryBuffer, which could save the data directly
 
@@ -93,8 +91,6 @@ void
 diy::Collection::
 load(int i)
 {
-  fprintf(stdout, "Loading element: %d\n", i);
-
   BinaryBuffer bb;
   storage_->get(external_[i], bb);
   void* e = create_();

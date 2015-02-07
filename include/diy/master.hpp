@@ -62,10 +62,23 @@ namespace diy
 
 
       // TODO: these types will have to be adjusted to support multi-threading
+      struct QueueRecord
+      {
+                        QueueRecord(size_t s = 0, int e = -1): size(s), external(e)     {}
+        size_t          size;
+        int             external;
+      };
+
+      typedef           std::map<int,     QueueRecord>      QueueRecords;
       typedef           std::map<int,     BinaryBuffer>     IncomingQueues;     //  gid         -> queue
       typedef           std::map<BlockID, BinaryBuffer>     OutgoingQueues;     // (gid, proc)  -> queue
-      typedef           std::map<int,     IncomingQueues>   IncomingQueuesMap;  //  gid         -> {  gid       -> queue }
-      typedef           std::map<int,     OutgoingQueues>   OutgoingQueuesMap;  //  gid         -> { (gid,proc) -> queue }
+      struct IncomingQueuesRecords
+      {
+        QueueRecords    records;
+        IncomingQueues  queues;
+      };
+      typedef           std::map<int,     IncomingQueuesRecords>    IncomingQueuesMap;  //  gid         -> {  gid       -> queue }
+      typedef           std::map<int,     OutgoingQueues>           OutgoingQueuesMap;  //  gid         -> { (gid,proc) -> queue }
 
 
     public:
@@ -85,6 +98,7 @@ namespace diy
                       blocks_(create, destroy, storage, save, load),
                       limit_(limit),
                       threads_(threads == -1 ? thread::hardware_concurrency() : threads),
+                      storage_(storage),
                       // Communicator functionality
                       expected_(0),
                       received_(0)
@@ -103,10 +117,10 @@ namespace diy
       inline Link*  link(int i) const                   { return links_[i]; }
       inline int    loaded_block() const                { return blocks_.available(); }
 
-      inline void   unload(int i)                       { blocks_.unload(i); }
-      inline void   unload(std::vector<int>& loaded)    { blocks_.unload(loaded); }
-      inline void   unload_all()                        { blocks_.unload_all(); }
-      inline void   load(int i)                         { blocks_.load(i); }
+      inline void   unload(int i);
+      inline void   load(int i);
+      void          unload(std::vector<int>& loaded)    { for(unsigned i = 0; i < loaded.size(); ++i) unload(loaded[i]); loaded.clear(); }
+      void          unload_all()                        { for(unsigned i = 0; i < size(); ++i) if (block(i) != 0) unload(i); }
       inline bool   has_incoming(int i) const;
 
       const mpi::communicator&  communicator() const    { return comm_; }
@@ -146,7 +160,7 @@ namespace diy
 
     public:
       // Communicator functionality
-      IncomingQueues&   incoming(int gid)               { return incoming_[gid]; }
+      IncomingQueues&   incoming(int gid)               { return incoming_[gid].queues; }
       OutgoingQueues&   outgoing(int gid)               { return outgoing_[gid]; }
       CollectivesList&  collectives(int gid)            { return collectives_[gid]; }
 
@@ -174,6 +188,7 @@ namespace diy
 
       int                   limit_;
       int                   threads_;
+      ExternalStorage*      storage_;
 
     private:
       // Communicator
@@ -290,6 +305,45 @@ destroy_block_records()
   }
 }
 
+void
+diy::Master::
+unload(int i)
+{
+  fprintf(stdout, "Unloading element: %d\n", gid(i));
+
+  blocks_.unload(i);
+  IncomingQueuesRecords& in_qrs = incoming_[gid(i)];
+  for (QueueRecords::iterator it = in_qrs.records.begin(); it != in_qrs.records.end(); ++it)
+  {
+    QueueRecord& qr = it->second;
+    if (qr.size > 0)
+    {
+        fprintf(stderr, "Unloading queue: %d <- %d\n", gid(i), it->first);
+        qr.external = storage_->put(in_qrs.queues[it->first]);
+    }
+  }
+}
+
+void
+diy::Master::
+load(int i)
+{
+  fprintf(stdout, "Loading element: %d\n", gid(i));
+
+  blocks_.load(i);
+  IncomingQueuesRecords& in_qrs = incoming_[gid(i)];
+  for (QueueRecords::iterator it = in_qrs.records.begin(); it != in_qrs.records.end(); ++it)
+  {
+    QueueRecord& qr = it->second;
+    if (qr.external != -1)
+    {
+        fprintf(stderr, "Loading queue: %d <- %d\n", gid(i), it->first);
+        storage_->get(qr.external, in_qrs.queues[it->first]);
+        qr.external = -1;
+    }
+  }
+}
+
 diy::Master::ProxyWithLink
 diy::Master::
 proxy(int i) const
@@ -328,10 +382,11 @@ bool
 diy::Master::
 has_incoming(int i) const
 {
-  const IncomingQueues& incoming_queues = const_cast<Master&>(*this).incoming(gid(i));
-  for (IncomingQueues::const_iterator it = incoming_queues.begin(); it != incoming_queues.end(); ++it)
+  const IncomingQueuesRecords& in_qrs = const_cast<Master&>(*this).incoming_[gid(i)];
+  for (QueueRecords::const_iterator it = in_qrs.records.begin(); it != in_qrs.records.end(); ++it)
   {
-    if (!it->second.empty())
+    const QueueRecord& qr = it->second;
+    if (qr.size != 0)
         return true;
   }
   return false;
@@ -433,9 +488,24 @@ comm_exchange()
 
       if (proc == comm_.rank())     // sending to ourselves: simply swap buffers
       {
-          incoming_[to][from] = diy::BinaryBuffer();
-          incoming_[to][from].swap(cur->second);
-          incoming_[to][from].reset();      // buffer position = 0
+          diy::BinaryBuffer& bb = cur->second;
+
+          int size     = bb.size();
+          int external = -1;
+
+          incoming_[to].queues[from] = diy::BinaryBuffer();
+          if (block(lid(to)) != 0)
+          {
+              incoming_[to].queues[from].swap(bb);
+              incoming_[to].queues[from].reset();       // buffer position = 0
+          } else if (size > 0)
+          {
+              fprintf(stderr, "Directly unloading queue: %d <- %d\n", to, from);
+              external = storage_->put(bb);    // unload directly
+          }
+
+          incoming_[to].records[from] = QueueRecord(size, external);
+
           ++received_;
           continue;
       }
@@ -465,8 +535,19 @@ comm_exchange()
     int from = from_to.first;
     int to   = from_to.second;
 
-    incoming_[to][from] = diy::BinaryBuffer();
-    incoming_[to][from].swap(bb);
+    int size     = bb.size();
+    int external = -1;
+
+    incoming_[to].queues[from] = diy::BinaryBuffer();
+    if (block(lid(to)) != 0)
+    {
+        incoming_[to].queues[from].swap(bb);
+        incoming_[to].queues[from].reset();       // buffer position = 0
+    } else if (size > 0)
+        external = storage_->put(bb);    // unload directly
+
+    incoming_[to].records[from] = QueueRecord(size, external);
+
     ++received_;
 
     ostatus = comm_.iprobe(mpi::any_source, tags::queue);
