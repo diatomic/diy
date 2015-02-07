@@ -5,6 +5,7 @@
 #include <map>
 #include <list>
 #include <deque>
+#include <iostream>
 
 #include "link.hpp"
 #include "collection.hpp"
