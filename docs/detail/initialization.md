@@ -70,8 +70,7 @@ int main(int argc, char** argv)
     diy::Bounds               domain;
     diy::mpi::communicator    world(comm);
     diy::FileStorage          storage("./DIY.XXXXXX");
-    diy::Communicator         diy_comm(world);
-    diy::Master               master(diy_comm,
+    diy::Master               master(world,
                                      &Block::create,
                                      &Block::destroy,
                                      mem_blocks,
