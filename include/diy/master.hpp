@@ -129,9 +129,11 @@ namespace diy
 
       //! return the `i`-th block, loading it if necessary
       void*         get(int i)                          { return blocks_.get(i); }
-
+      //! return gid of the `i`-th block
       int           gid(int i) const                    { return gids_[i]; }
+      //! return the local id of the local block with global id gid, or -1 if not local
       int           lid(int gid) const                  { return local(gid) ?  lids_.find(gid)->second : -1; }
+      //! whether the block with global id gid is local
       bool          local(int gid) const                { return lids_.find(gid) != lids_.end(); }
 
       //! exchange the queues between all the blocks (collective operation)

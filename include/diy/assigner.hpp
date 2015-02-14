@@ -20,6 +20,7 @@ namespace diy
       void          set_nblocks(int nblocks)            { nblocks_ = nblocks; }
 
       virtual void  local_gids(int rank, std::vector<int>& gids) const   =0;
+      //! returns the process rank of the block with global id gid (need not be local)
       virtual int   rank(int gid) const     =0;
 
     private:
