@@ -235,7 +235,7 @@ namespace diy
 
     static void         save(BinaryBuffer& bb, const Set& m)
     {
-      unsigned s = m.size();
+      size_t s = m.size();
       diy::save(bb, s);
       for (typename std::set<T>::const_iterator it = m.begin(); it != m.end(); ++it)
         diy::save(bb, *it);
