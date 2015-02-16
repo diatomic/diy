@@ -507,10 +507,14 @@ exchange()
   // make sure there is a queue for each neighbor
   for (int i = 0; i < size(); ++i)
   {
-    OutgoingQueues& outgoing_queues = outgoing(gid(i));
-    if (outgoing_queues.size() < link(i)->size())
+    OutgoingQueues&  outgoing_queues  = outgoing_[gid(i)].queues;
+    OutQueueRecords& outgoing_records = outgoing_[gid(i)].records;
+    if (outgoing_queues.size() < link(i)->size() || outgoing_records.size() < link(i)->size())
       for (unsigned j = 0; j < link(i)->size(); ++j)
-        outgoing_queues[link(i)->target(j)];       // touch the outgoing queue, creating it if necessary
+      {
+        outgoing_queues[link(i)->target(j)];        // touch the outgoing queue, creating it if necessary
+        outgoing_records[link(i)->target(j)];       // touch the outgoing record, creating it if necessary
+      }
   }
 
   flush();
@@ -655,6 +659,7 @@ flush()
         to_send.push_back(std::make_pair(it->first, cur->first));
     }
   }
+  //fprintf(stderr, "to_send.size(): %lu\n", to_send.size());
 
   // XXX: we probably want a cleverer limit than block limit times average number of queues per block
   // XXX: with queues we could easily maintain a specific space limit
@@ -681,7 +686,7 @@ flush()
 
   outgoing_.clear();
 
-  fprintf(stderr, "Done in flush\n");
+  //fprintf(stderr, "Done in flush\n");
   //show_incoming_records();
 
   process_collectives();
