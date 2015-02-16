@@ -142,6 +142,7 @@ namespace diy
       inline
       ProxyWithLink proxy(int i) const;
 
+      //! return the number of local blocks
       unsigned      size() const                        { return blocks_.size(); }
       LoadBlock     loader() const                      { return blocks_.loader(); }
       SaveBlock     saver() const                       { return blocks_.saver(); }

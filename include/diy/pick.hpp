@@ -18,14 +18,17 @@ namespace diy
   }
 }
 
-// finds the neighbors within radius r of a target point
-// assumptions:
-// 1. Point p needs to be in the current block
-// 2. Only for a regular decomposition
+//! Finds the neighbors within radius r of a target point. Assumptions:
+//! 1. Point p needs to be in the current block
+//! 2. Only for a regular decomposition
 template<class Bounds, class Point, class OutIter>
 void
 diy::
-near(const RegularLink<Bounds>& link, const Point& p, float r, OutIter out, const Bounds& domain)
+near(const RegularLink<Bounds>& link,  //!< neighbors
+     const Point& p,                   //!< target point (must be in current block)
+     float r,                          //!< target radius (>= 0.0)
+     OutIter out,                      //!< insert iterator for output set of neighbors
+     const Bounds& domain)             //!< global domain bounds
 {
   int d; // current dimension
   float dir[DIY_MAX_DIM]; // offset direction
