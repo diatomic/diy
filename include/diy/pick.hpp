@@ -8,6 +8,8 @@ namespace diy
   template<class Bounds, class Point, class OutIter>
   void near(const RegularLink<Bounds>& link, const Point& p, float r, OutIter out,
             const Bounds& domain);
+  template<class Bounds, class Point, class OutIter>
+  void in(const RegularLink<Bounds>& link, const Point& p, OutIter out, const Bounds& domain);
   namespace detail
   {
     template<class Bounds>
@@ -53,6 +55,42 @@ near(const RegularLink<Bounds>& link,  //!< neighbors
       // that means the point was definitely near enough to neighbor
       if (((link.direction(n) & (1 << (2*d + 1)))   && new_pt[d] < neigh_bounds.min[d]) ||
           ((link.direction(n) & (1 << (2*d)))       && new_pt[d] > neigh_bounds.max[d]))
+        break;
+    }
+
+    if (d < link.dimension())
+      continue; // next neighbor
+
+    *out++ = n;
+  } // for all neighbors
+}
+
+//! Finds the neighbor(s) containing the target point. Assumptions:
+//! 1. Only for a regular decomposition
+template<class Bounds, class Point, class OutIter>
+void
+diy::
+in(const RegularLink<Bounds>& link,  //!< neighbors
+   const Point& p,                   //!< target point
+   OutIter out,                      //!< insert iterator for output set of neighbors
+   const Bounds& domain)             //!< global domain bounds
+{
+  int d; // current dimension
+  float dir[DIY_MAX_DIM]; // offset direction
+  float new_pt[DIY_MAX_DIM]; // offset point
+  Bounds neigh_bounds; // neighbor block bounds
+
+  // for all neighbors of this block
+  for (int n = 0; n < link.size(); n++)
+  {
+    // wrap neighbor bounds, if necessary, otherwise bounds will be unchanged
+    neigh_bounds = link.bounds(n);
+    detail::wrap_bounds(neigh_bounds, link.wrap() & link.direction(n), domain, link.dimension());
+
+    // check if p is in neighbor
+    for (d = 0; d < link.dimension(); d++)
+    {
+      if (p[d] < neigh_bounds.min[d] || p[d] > neigh_bounds.max[d])
         break;
     }
 
