@@ -10,6 +10,7 @@ namespace diy
             const Bounds& domain);
   namespace detail
   {
+    template<class Bounds>
     void wrap_bounds(Bounds& bounds, int wrap_dir, const Bounds& domain, int dim);
 
     template<class Point>
@@ -62,6 +63,7 @@ near(const RegularLink<Bounds>& link, const Point& p, float r, OutIter out, cons
 // wraps block bounds
 // wrap dir is the wrapping direction from original block to wrapped neighbor block
 // overall domain bounds and dimensionality are also needed
+template<class Bounds>
 void
 diy::detail::
 wrap_bounds(Bounds& bounds, int wrap_dir, const Bounds& domain, int dim)
