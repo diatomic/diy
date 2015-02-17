@@ -47,6 +47,15 @@ namespace diy
         close(fh);
         bb.wipe();
 
+#if 0       // double-check the written file size: only for extreme debugging
+        FILE* fp = fopen(filename.c_str(), "r");
+        fseek(fp, 0L, SEEK_END);
+        int fsz = ftell(fp);
+        if (fsz != sz)
+            fprintf(stderr, "Warning: file size doesn't match the buffer size, %d vs %d\n", fsz, sz);
+        fclose(fp);
+#endif
+
         int res = (*count_.access())++;
         FileRecord  fr = { sz, filename };
         (*filenames_.access())[res] = fr;

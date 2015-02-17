@@ -561,7 +561,7 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
           // just move the records
           //fprintf(stderr, "Moving records: %d <- %d\n", to, from);
           in_qr  = out_qr;
-          out_qr = -1;
+          out_qr = QueueRecord();
         } else if (!out_external && !in_external)
         {
           //fprintf(stderr, "Swapping in memory: %d <- %d\n", to, from);
@@ -576,7 +576,10 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
           //fprintf(stderr, "Unloading outgoing directly as incoming: %d <- %d\n", to, from);
           diy::BinaryBuffer& bb = outgoing_[from].queues[to_proc];
           in_qr.size = bb.size();
-          in_qr.external = storage_->put(bb);
+          if (in_qr.size > 0)
+              in_qr.external = storage_->put(bb);
+          else
+              in_qr.external = -1;
         }
 
         ++received_;
