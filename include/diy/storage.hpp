@@ -18,9 +18,9 @@ namespace diy
   class ExternalStorage
   {
     public:
-      virtual int   put(BinaryBuffer& bb)           =0;
-      virtual void  get(int i, BinaryBuffer& bb)    =0;
-      virtual void  destroy(int i)                  =0;
+      virtual int   put(BinaryBuffer& bb)                               =0;
+      virtual void  get(int i, BinaryBuffer& bb, size_t extra = 0)      =0;
+      virtual void  destroy(int i)                                      =0;
   };
 
   class FileStorage: public ExternalStorage
@@ -54,7 +54,7 @@ namespace diy
         return res;
       }
 
-      virtual void   get(int i, BinaryBuffer& bb)
+      virtual void   get(int i, BinaryBuffer& bb, size_t extra)
       {
         FileRecord      fr;
         {
@@ -65,6 +65,7 @@ namespace diy
 
         //std::cout << "FileStorage::get(): " << fr.name << std::endl;
 
+        bb.buffer.reserve(fr.size + extra);
         bb.buffer.resize(fr.size);
         int fh = open(fr.name.c_str(), O_RDONLY | O_SYNC, 0600);
         read(fh, &bb.buffer[0], fr.size);

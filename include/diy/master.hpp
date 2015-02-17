@@ -5,7 +5,7 @@
 #include <map>
 #include <list>
 #include <deque>
-#include <iostream>
+#include <algorithm>
 
 #include "link.hpp"
 #include "collection.hpp"
@@ -58,11 +58,11 @@ namespace diy
       struct tags       { enum { queue }; };
 
       typedef           std::list<InFlight>                 InFlightList;
+      typedef           std::list< std::pair<int, BlockID> >    ToSendList;     // [(gid, (gid, proc)]
       typedef           std::list<Collective>               CollectivesList;
       typedef           std::map<int, CollectivesList>      CollectivesMap;     // gid          -> [collectives]
 
 
-      // TODO: these types will have to be adjusted to support multi-threading
       struct QueueRecord
       {
                         QueueRecord(size_t s = 0, int e = -1): size(s), external(e)     {}
@@ -70,16 +70,22 @@ namespace diy
         int             external;
       };
 
-      typedef           std::map<int,     QueueRecord>      QueueRecords;
+      typedef           std::map<int,     QueueRecord>      InQueueRecords;     //  gid         -> (size, external)
       typedef           std::map<int,     BinaryBuffer>     IncomingQueues;     //  gid         -> queue
+      typedef           std::map<BlockID, QueueRecord>      OutQueueRecords;    // (gid, proc)  -> (size, external)
       typedef           std::map<BlockID, BinaryBuffer>     OutgoingQueues;     // (gid, proc)  -> queue
       struct IncomingQueuesRecords
       {
-        QueueRecords    records;
+        InQueueRecords  records;
         IncomingQueues  queues;
       };
+      struct OutgoingQueuesRecords
+      {
+        OutQueueRecords  records;
+        OutgoingQueues   queues;
+      };
       typedef           std::map<int,     IncomingQueuesRecords>    IncomingQueuesMap;  //  gid         -> {  gid       -> queue }
-      typedef           std::map<int,     OutgoingQueues>           OutgoingQueuesMap;  //  gid         -> { (gid,proc) -> queue }
+      typedef           std::map<int,     OutgoingQueuesRecords>    OutgoingQueuesMap;  //  gid         -> { (gid,proc) -> queue }
 
 
     public:
@@ -101,6 +107,7 @@ namespace diy
                       threads_(threads == -1 ? thread::hardware_concurrency() : threads),
                       storage_(storage),
                       // Communicator functionality
+                      inflight_size_(0),
                       expected_(0),
                       received_(0)
                                                         {}
@@ -165,7 +172,7 @@ namespace diy
     public:
       // Communicator functionality
       IncomingQueues&   incoming(int gid)               { return incoming_[gid].queues; }
-      OutgoingQueues&   outgoing(int gid)               { return outgoing_[gid]; }
+      OutgoingQueues&   outgoing(int gid)               { return outgoing_[gid].queues; }
       CollectivesList&  collectives(int gid)            { return collectives_[gid]; }
 
       void              set_expected(int expected)      { expected_ = expected; }
@@ -178,11 +185,14 @@ namespace diy
 
     private:
       // Communicator functionality
-      inline void       comm_exchange();    // possibly called in between block computations
+      inline void       comm_exchange(ToSendList& to_send, int out_queues_limit);     // possibly called in between block computations
       inline bool       nudge();
       inline void       process_collectives();
 
       void              cancel_requests();              // TODO
+
+      // debug
+      inline void       show_incoming_records() const;
 
     private:
       std::vector<Link*>    links_;
@@ -200,6 +210,7 @@ namespace diy
       IncomingQueuesMap     incoming_;
       OutgoingQueuesMap     outgoing_;
       InFlightList          inflight_;
+      size_t                inflight_size_;
       CollectivesMap        collectives_;
       int                   expected_;
       int                   received_;
@@ -250,6 +261,11 @@ namespace diy
             }
 
             f(master.block(i), master.proxy(i), aux);
+
+            // update outgoing queue records
+            OutgoingQueuesRecords& out = master.outgoing_[master.gid(i)];
+            for (OutgoingQueues::iterator it = out.queues.begin(); it != out.queues.end(); ++it)
+              out.records[it->first] = QueueRecord(it->second.size());
         }
       } while(true);
 
@@ -313,17 +329,29 @@ void
 diy::Master::
 unload(int i)
 {
-  fprintf(stdout, "Unloading element: %d\n", gid(i));
+  //fprintf(stdout, "Unloading block: %d\n", gid(i));
 
   blocks_.unload(i);
+
   IncomingQueuesRecords& in_qrs = incoming_[gid(i)];
-  for (QueueRecords::iterator it = in_qrs.records.begin(); it != in_qrs.records.end(); ++it)
+  for (InQueueRecords::iterator it = in_qrs.records.begin(); it != in_qrs.records.end(); ++it)
   {
     QueueRecord& qr = it->second;
     if (qr.size > 0)
     {
-        fprintf(stderr, "Unloading queue: %d <- %d\n", gid(i), it->first);
+        //fprintf(stderr, "Unloading queue: %d <- %d\n", gid(i), it->first);
         qr.external = storage_->put(in_qrs.queues[it->first]);
+    }
+  }
+
+  OutgoingQueuesRecords& out_qrs = outgoing_[gid(i)];
+  for (OutQueueRecords::iterator it = out_qrs.records.begin(); it != out_qrs.records.end(); ++it)
+  {
+    QueueRecord& qr = it->second;
+    if (qr.size > 0)
+    {
+        //fprintf(stderr, "Unloading queue: %d -> %d\n", gid(i), it->first.gid);
+        qr.external = storage_->put(out_qrs.queues[it->first]);
     }
   }
 }
@@ -332,17 +360,30 @@ void
 diy::Master::
 load(int i)
 {
-  fprintf(stdout, "Loading element: %d\n", gid(i));
+  //fprintf(stdout, "Loading block: %d\n", gid(i));
 
   blocks_.load(i);
+
   IncomingQueuesRecords& in_qrs = incoming_[gid(i)];
-  for (QueueRecords::iterator it = in_qrs.records.begin(); it != in_qrs.records.end(); ++it)
+  for (InQueueRecords::iterator it = in_qrs.records.begin(); it != in_qrs.records.end(); ++it)
   {
     QueueRecord& qr = it->second;
     if (qr.external != -1)
     {
-        fprintf(stderr, "Loading queue: %d <- %d\n", gid(i), it->first);
+        //fprintf(stderr, "Loading queue: %d <- %d\n", gid(i), it->first);
         storage_->get(qr.external, in_qrs.queues[it->first]);
+        qr.external = -1;
+    }
+  }
+
+  OutgoingQueuesRecords& out_qrs = outgoing_[gid(i)];
+  for (OutQueueRecords::iterator it = out_qrs.records.begin(); it != out_qrs.records.end(); ++it)
+  {
+    QueueRecord& qr = it->second;
+    if (qr.external != -1)
+    {
+        //fprintf(stderr, "Loading queue: %d -> %d\n", gid(i), it->first.gid);
+        storage_->get(qr.external, out_qrs.queues[it->first]);
         qr.external = -1;
     }
   }
@@ -387,7 +428,7 @@ diy::Master::
 has_incoming(int i) const
 {
   const IncomingQueuesRecords& in_qrs = const_cast<Master&>(*this).incoming_[gid(i)];
-  for (QueueRecords::const_iterator it = in_qrs.records.begin(); it != in_qrs.records.end(); ++it)
+  for (InQueueRecords::const_iterator it = in_qrs.records.begin(); it != in_qrs.records.end(); ++it)
   {
     const QueueRecord& qr = it->second;
     if (qr.size != 0)
@@ -405,7 +446,7 @@ foreach(const Functor& f, const Skip& skip, void* aux)
   for (unsigned i = 0; i < size(); ++i)
   {
     outgoing(gid(i));
-    incoming(gid(i));
+    incoming(gid(i));           // implicitly touches queue records
     collectives(gid(i));
   }
 
@@ -455,6 +496,9 @@ foreach(const Functor& f, const Skip& skip, void* aux)
       delete t;
       delete bf;
   }
+
+  // clear incoming queues
+  incoming_.clear();
 }
 
 void
@@ -466,10 +510,14 @@ exchange()
   // make sure there is a queue for each neighbor
   for (int i = 0; i < size(); ++i)
   {
-    OutgoingQueues& outgoing_queues = outgoing(gid(i));
-    if (outgoing_queues.size() < link(i)->size())
+    OutgoingQueues&  outgoing_queues  = outgoing_[gid(i)].queues;
+    OutQueueRecords& outgoing_records = outgoing_[gid(i)].records;
+    if (outgoing_queues.size() < link(i)->size() || outgoing_records.size() < link(i)->size())
       for (unsigned j = 0; j < link(i)->size(); ++j)
-        outgoing_queues[link(i)->target(j)];       // touch the outgoing queue, creating it if necessary
+      {
+        outgoing_queues[link(i)->target(j)];        // touch the outgoing queue, creating it if necessary
+        outgoing_records[link(i)->target(j)];       // touch the outgoing record, creating it if necessary
+      }
   }
 
   flush();
@@ -479,50 +527,82 @@ exchange()
 /* Communicator */
 void
 diy::Master::
-comm_exchange()
+comm_exchange(ToSendList& to_send, int out_queues_limit)
 {
-  // isend outgoing queues
-  for (OutgoingQueuesMap::iterator it = outgoing_.begin(); it != outgoing_.end(); ++it)
+  // isend outgoing queues, up to the out_queues_limit
+  while(inflight_size_ < out_queues_limit && !to_send.empty())
   {
-    int from  = it->first;
-    for (OutgoingQueues::iterator cur = it->second.begin(); cur != it->second.end(); ++cur)
+    int     from    = to_send.front().first;
+    BlockID to_proc = to_send.front().second;
+    int     to      = to_proc.gid;
+    int     proc    = to_proc.proc;
+    to_send.pop_front();
+
+    if (proc == comm_.rank())     // sending to ourselves: simply swap buffers
     {
-      int to   = cur->first.gid;
-      int proc = cur->first.proc;
+        //fprintf(stderr, "Moving queue in-place: %d <- %d\n", to, from);
 
-      if (proc == comm_.rank())     // sending to ourselves: simply swap buffers
-      {
-          diy::BinaryBuffer& bb = cur->second;
+        QueueRecord& out_qr = outgoing_[from].records[to_proc];
+        QueueRecord& in_qr  = incoming_[to].records[from];
+        bool out_external = out_qr.external != -1;
+        bool in_external  = block(lid(to)) == 0;
+        if (out_external && !in_external)
+        {
+          // load the queue directly into its incoming place
+          if (out_qr.size == 0)
+            fprintf(stderr, "Warning: unexpected external empty queue\n");
+          //fprintf(stderr, "Loading outgoing directly as incoming: %d <- %d\n", to, from);
+          BinaryBuffer& bb = incoming_[to].queues[from];
+          storage_->get(out_qr.external, bb);
+          out_qr.external = -1;
+          in_qr.size = bb.size();
+        } else if (out_external && in_external)
+        {
+          // just move the records
+          //fprintf(stderr, "Moving records: %d <- %d\n", to, from);
+          in_qr  = out_qr;
+          out_qr = -1;
+        } else if (!out_external && !in_external)
+        {
+          //fprintf(stderr, "Swapping in memory: %d <- %d\n", to, from);
+          BinaryBuffer& bb = incoming_[to].queues[from];
+          bb.swap(outgoing_[from].queues[to_proc]);
+          bb.reset();
+          in_qr = out_qr;
+          if (bb.position != 0 || bb.size() != in_qr.size || in_qr.external != -1)
+              fprintf(stderr, "Warning: inconsistency after in-memory swap: %d <- %d\n", to, from);
+        } else // !out_external && in_external
+        {
+          //fprintf(stderr, "Unloading outgoing directly as incoming: %d <- %d\n", to, from);
+          diy::BinaryBuffer& bb = outgoing_[from].queues[to_proc];
+          in_qr.size = bb.size();
+          in_qr.external = storage_->put(bb);
+        }
 
-          int size     = bb.size();
-          int external = -1;
-
-          incoming_[to].queues[from] = diy::BinaryBuffer();
-          if (block(lid(to)) != 0)
-          {
-              incoming_[to].queues[from].swap(bb);
-              incoming_[to].queues[from].reset();       // buffer position = 0
-          } else if (size > 0)
-          {
-              fprintf(stderr, "Directly unloading queue: %d <- %d\n", to, from);
-              external = storage_->put(bb);    // unload directly
-          }
-
-          incoming_[to].records[from] = QueueRecord(size, external);
-
-          ++received_;
-          continue;
-      }
-
-      inflight_.push_back(InFlight());
-      inflight_.back().from = from;
-      inflight_.back().to   = to;
-      inflight_.back().message.swap(cur->second);
-      diy::save(inflight_.back().message, std::make_pair(from, to));
-      inflight_.back().request = comm_.isend(proc, tags::queue, inflight_.back().message.buffer);
+        ++received_;
+        continue;
     }
+
+    inflight_.push_back(InFlight()); ++inflight_size_;
+    inflight_.back().from = from;
+    inflight_.back().to   = to;
+    BinaryBuffer& bb = inflight_.back().message;
+
+    QueueRecord& qr = outgoing_[from].records[to_proc];
+    if (qr.external != -1)
+    {
+      if (qr.size == 0)
+        fprintf(stderr, "Warning: unexpected external empty queue\n");
+      fprintf(stderr, "Loading queue: %d -> %d\n", to, from);
+      storage_->get(qr.external, bb, 2*sizeof(int));      // extra padding for (from,to) footer
+      bb.position = bb.size();
+      qr.external = -1;
+    } else
+      bb.swap(outgoing_[from].queues[to_proc]);
+
+    diy::save(bb, std::make_pair(from, to));
+    inflight_.back().request = comm_.isend(proc, tags::queue, bb.buffer);
   }
-  outgoing_.clear();
 
   // kick requests
   while(nudge());
@@ -546,10 +626,12 @@ comm_exchange()
     if (block(lid(to)) != 0)
     {
         incoming_[to].queues[from].swap(bb);
-        incoming_[to].queues[from].reset();       // buffer position = 0
+        incoming_[to].queues[from].reset();     // buffer position = 0
     } else if (size > 0)
-        external = storage_->put(bb);    // unload directly
-
+    {
+        fprintf(stderr, "Directly unloading queue %d <- %d\n", to, from);
+        external = storage_->put(bb);           // unload directly
+    }
     incoming_[to].records[from] = QueueRecord(size, external);
 
     ++received_;
@@ -567,21 +649,48 @@ flush()
   unsigned wait = 1;
 #endif
 
-  comm_exchange();
-  while (!inflight_.empty() || received_ < expected_)
+  // make a list of outgoing queues to send (the ones in memory come first)
+  ToSendList    to_send;
+  for (OutgoingQueuesMap::iterator it = outgoing_.begin(); it != outgoing_.end(); ++it)
   {
-    comm_exchange();
+    OutgoingQueuesRecords& out = it->second;
+    for (OutQueueRecords::iterator cur = out.records.begin(); cur != out.records.end(); ++cur)
+    {
+      if (cur->second.external == -1)
+        to_send.push_front(std::make_pair(it->first, cur->first));
+      else
+        to_send.push_back(std::make_pair(it->first, cur->first));
+    }
+  }
+  //fprintf(stderr, "to_send.size(): %lu\n", to_send.size());
+
+  // XXX: we probably want a cleverer limit than block limit times average number of queues per block
+  // XXX: with queues we could easily maintain a specific space limit
+  int out_queues_limit;
+  if (limit_ == -1)
+    out_queues_limit = to_send.size();
+  else
+    out_queues_limit = std::max((size_t) 1, to_send.size()/size()*limit_);      // average number of queues per block * in-memory block limit
+
+  do
+  {
+    comm_exchange(to_send, out_queues_limit);
 
 #ifdef DEBUG
     time_type cur = get_time();
     if (cur - start > wait*1000)
     {
-        std::cerr << "Waiting in flush [" << comm_.rank() << "]: "
-                  << inflight_.size() << " - " << received_ << " out of " << expected_ << std::endl;
+        fprintf(stderr, "Waiting in flush [%d]: %lu - %d out of %d\n",
+                        comm_.rank(), inflight_size_, received_, expected_);
         wait *= 2;
     }
 #endif
-  }
+  } while (!inflight_.empty() || received_ < expected_ || !to_send.empty());
+
+  outgoing_.clear();
+
+  //fprintf(stderr, "Done in flush\n");
+  //show_incoming_records();
 
   process_collectives();
   comm_.barrier();
@@ -638,11 +747,34 @@ nudge()
       success = true;
       InFlightList::iterator rm = it;
       --it;
-      inflight_.erase(rm);
+      inflight_.erase(rm); --inflight_size_;
     }
   }
   return success;
 }
 
+void
+diy::Master::
+show_incoming_records() const
+{
+  for (IncomingQueuesMap::const_iterator it = incoming_.begin(); it != incoming_.end(); ++it)
+  {
+    const IncomingQueuesRecords& in_qrs = it->second;
+    for (InQueueRecords::const_iterator cur = in_qrs.records.begin(); cur != in_qrs.records.end(); ++cur)
+    {
+      const QueueRecord& qr = cur->second;
+      fprintf(stderr, "%d <- %d: (size,external) = (%lu,%d)\n",
+                      it->first, cur->first,
+                      qr.size,
+                      qr.external);
+    }
+    for (IncomingQueues::const_iterator cur = in_qrs.queues.begin(); cur != in_qrs.queues.end(); ++cur)
+    {
+      fprintf(stderr, "%d <- %d: queue.size() = %lu\n",
+                      it->first, cur->first,
+                      const_cast<IncomingQueuesRecords&>(in_qrs).queues[cur->first].size());
+      }
+  }
+}
 
 #endif

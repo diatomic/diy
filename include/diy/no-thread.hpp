@@ -31,7 +31,7 @@ namespace diy
 
   namespace this_thread
   {
-      unsigned long int     get_id()    { return 0; }
+      inline unsigned long int  get_id()    { return 0; }
   }
 }
 
