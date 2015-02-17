@@ -593,7 +593,7 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
     {
       if (qr.size == 0)
         fprintf(stderr, "Warning: unexpected external empty queue\n");
-      fprintf(stderr, "Loading queue: %d -> %d\n", to, from);
+      //fprintf(stderr, "Loading queue: %d -> %d\n", to, from);
       storage_->get(qr.external, bb, 2*sizeof(int));      // extra padding for (from,to) footer
       bb.position = bb.size();
       qr.external = -1;
@@ -629,7 +629,7 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
         incoming_[to].queues[from].reset();     // buffer position = 0
     } else if (size > 0)
     {
-        fprintf(stderr, "Directly unloading queue %d <- %d\n", to, from);
+        //fprintf(stderr, "Directly unloading queue %d <- %d\n", to, from);
         external = storage_->put(bb);           // unload directly
     }
     incoming_[to].records[from] = QueueRecord(size, external);
