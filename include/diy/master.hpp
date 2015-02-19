@@ -131,7 +131,9 @@ namespace diy
       void          unload_all()                        { for(unsigned i = 0; i < size(); ++i) if (block(i) != 0) unload(i); }
       inline bool   has_incoming(int i) const;
 
+      //! return the MPI communicator
       const mpi::communicator&  communicator() const    { return comm_; }
+      //! return the MPI communicator
       mpi::communicator&        communicator()          { return comm_; }
 
       //! return the `i`-th block, loading it if necessary
