@@ -39,7 +39,7 @@ namespace diy
         int fh = mkostemp(const_cast<char*>(filename.c_str()), O_WRONLY | O_SYNC);
 #endif
 
-        //std::cout << "FileStorage::put(): " << filename << std::endl;
+        //fprintf(stdout, "FileStorage::put(): %s; buffer size: %lu\n", filename.c_str(), bb.size());
 
         int sz = bb.buffer.size();
         write(fh, &bb.buffer[0], sz);
@@ -72,7 +72,7 @@ namespace diy
           accessor->erase(i);
         }
 
-        //std::cout << "FileStorage::get(): " << fr.name << std::endl;
+        //fprintf(stdout, "FileStorage::get(): %s\n", fr.name.c_str());
 
         bb.buffer.reserve(fr.size + extra);
         bb.buffer.resize(fr.size);
