@@ -6,6 +6,8 @@
 #include <algorithm>
 
 #include "types.hpp"
+#include "serialization.hpp"
+#include "assigner.hpp"
 
 namespace diy
 {
@@ -24,9 +26,41 @@ namespace diy
 
       void      add_neighbor(const BlockID& block)  { neighbors_.push_back(block); }
 
+      void      fix(const Assigner& assigner)       { for (unsigned i = 0; i < neighbors_.size(); ++i) { neighbors_[i].proc = assigner.rank(neighbors_[i].gid); } }
+
+      virtual void  save(BinaryBuffer& bb) const    { diy::save(bb, neighbors_); }
+      virtual void  load(BinaryBuffer& bb)          { diy::load(bb, neighbors_); }
+
+      virtual size_t id() const                     { return 0; }
+
     private:
       std::vector<BlockID>  neighbors_;
   };
+
+  template<class Bounds_>
+  class RegularLink;
+
+  typedef       RegularLink<DiscreteBounds>         RegularGridLink;
+  typedef       RegularLink<ContinuousBounds>       RegularContinuousLink;
+
+  // Selector between regular discrete and contious links given bounds type
+  template<class Bounds_>
+  struct RegularLinkSelector;
+
+  template<>
+  struct RegularLinkSelector<DiscreteBounds>
+  {
+    typedef     RegularGridLink         type;
+    static const size_t id = 1;
+  };
+
+  template<>
+  struct RegularLinkSelector<ContinuousBounds>
+  {
+    typedef     RegularContinuousLink   type;
+    static const size_t id = 2;
+  };
+
 
   // for a regular decomposition, it makes sense to address the neighbors by direction
   // and store local and neighbor bounds
@@ -60,6 +94,33 @@ namespace diy
       const Bounds& bounds(int i) const                 { return nbr_bounds_[i]; }
       void          add_bounds(const Bounds& bounds)    { nbr_bounds_.push_back(bounds); }
 
+
+      void      save(BinaryBuffer& bb) const
+      {
+          Link::save(bb);
+          diy::save(bb, dim_);
+          diy::save(bb, dir_map_);
+          diy::save(bb, dir_vec_);
+          diy::save(bb, wrap_);
+          diy::save(bb, core_);
+          diy::save(bb, bounds_);
+          diy::save(bb, nbr_bounds_);
+      }
+
+      void      load(BinaryBuffer& bb)
+      {
+          Link::load(bb);
+          diy::load(bb, dim_);
+          diy::load(bb, dir_map_);
+          diy::load(bb, dir_vec_);
+          diy::load(bb, wrap_);
+          diy::load(bb, core_);
+          diy::load(bb, bounds_);
+          diy::load(bb, nbr_bounds_);
+      }
+
+      virtual size_t id() const                         { return RegularLinkSelector<Bounds>::id; }
+
     private:
       int       dim_;
 
@@ -72,27 +133,47 @@ namespace diy
       std::vector<Bounds>   nbr_bounds_;
   };
 
-  typedef       RegularLink<DiscreteBounds>         RegularGridLink;
-  typedef       RegularLink<ContinuousBounds>       RegularContinuousLink;
-
-
   // Other cover candidates: KDTreeLink, AMRGridLink
 
-  // Selector between regular discrete and contious links given bounds type
-  template<class Bounds_>
-  struct RegularLinkSelector;
-
-  template<>
-  struct RegularLinkSelector<DiscreteBounds>
+  struct LinkFactory
   {
-    typedef     RegularGridLink         type;
-  };
+    public:
+      static Link*          create(size_t id)
+      {
+          // not pretty, but will do for now
+          if (id == 0)
+            return new Link;
+          else if (id == 1)
+            return new RegularGridLink(0, DiscreteBounds(), DiscreteBounds());
+          else if (id == 2)
+            return new RegularContinuousLink(0, ContinuousBounds(), ContinuousBounds());
+          else
+            return 0;
+      }
 
-  template<>
-  struct RegularLinkSelector<ContinuousBounds>
-  {
-    typedef     RegularContinuousLink   type;
+      inline static void    save(BinaryBuffer& bb, const Link* l);
+      inline static Link*   load(BinaryBuffer& bb);
   };
+}
+
+
+void
+diy::LinkFactory::
+save(BinaryBuffer& bb, const Link* l)
+{
+    diy::save(bb, l->id());
+    l->save(bb);
+}
+
+diy::Link*
+diy::LinkFactory::
+load(BinaryBuffer& bb)
+{
+    size_t id;
+    diy::load(bb, id);
+    Link* l = create(id);
+    l->load(bb);
+    return l;
 }
 
 int

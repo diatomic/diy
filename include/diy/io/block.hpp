@@ -4,12 +4,13 @@
 #include <string>
 #include <algorithm>
 
+#include <unistd.h>
+
 #include "../mpi.hpp"
 #include "../assigner.hpp"
 #include "../master.hpp"
 
 // Read and write collections of blocks using MPI-IO
-// TODO: save and restore the links
 namespace diy
 {
 namespace io
@@ -30,7 +31,10 @@ namespace io
     mpi::all_reduce(comm, size, max_size, mpi::maximum<unsigned>());
     mpi::all_reduce(comm, size, min_size, mpi::minimum<unsigned>());
 
-    // TODO: this will not truncate an existing file
+    // truncate the file
+    if (comm.rank() == 0)
+        truncate(outfilename.c_str(), 0);
+
     mpi::io::file f(comm, outfilename, mpi::io::file::wronly | mpi::io::file::create);
 
     offset_t  start = 0, shift;
@@ -45,6 +49,7 @@ namespace io
         // get the block from master and serialize it
         const void* block = master.get(i);
         BinaryBuffer bb;
+        LinkFactory::save(bb, master.link(i));
         save(block, bb);
         count = bb.buffer.size();
         mpi::scan(comm, count, offset, std::plus<offset_t>());
@@ -127,9 +132,11 @@ namespace io
         BinaryBuffer bb;
         bb.buffer.resize(count);
         f.read_at(offset, bb.buffer);
+        Link* l = LinkFactory::load(bb);
+        l->fix(assigner);
         void* b = master.create();
         load(b, bb);
-        master.add(gids[i], b, new Link);
+        master.add(gids[i], b, l);
     }
   }
 }
