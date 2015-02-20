@@ -26,7 +26,8 @@ int main(int argc, char* argv[])
                                    0,
                                    &save_block,
                                    &load_block);
-  diy::RoundRobinAssigner   assigner(world.size(), 0);      // nblocks will be filled by read_blocks()
+  diy::ContiguousAssigner   assigner(world.size(), 0);
+  //diy::RoundRobinAssigner   assigner(world.size(), 0);      // nblocks will be filled by read_blocks()
 
   diy::io::read_blocks("blocks.out", world, assigner, master);
 

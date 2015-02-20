@@ -15,6 +15,26 @@ namespace diy
 {
 namespace io
 {
+  namespace detail
+  {
+    typedef mpi::io::offset                 offset_t;
+
+    struct GidOffsetCount
+    {
+                    GidOffsetCount():                                   // need to initialize a vector of given size
+                        gid(-1), offset(0), count(0)                    {}
+
+                    GidOffsetCount(int gid_, offset_t offset_, offset_t count_):
+                        gid(gid_), offset(offset_), count(count_)       {}
+
+        bool        operator<(const GidOffsetCount& other) const        { return gid < other.gid; }
+
+        int         gid;
+        offset_t    offset;
+        offset_t    count;
+    };
+  }
+
   template<class Master>
   void
   write_blocks(const std::string&           outfilename,
@@ -24,7 +44,8 @@ namespace io
   {
     if (!save) save = master.saver();       // save is likely to be different from master.save()
 
-    typedef mpi::io::offset     offset_t;
+    typedef detail::offset_t                offset_t;
+    typedef detail::GidOffsetCount          GidOffsetCount;
 
     unsigned size = master.size(),
              max_size, min_size;
@@ -38,7 +59,7 @@ namespace io
     mpi::io::file f(comm, outfilename, mpi::io::file::wronly | mpi::io::file::create);
 
     offset_t  start = 0, shift;
-    std::vector<offset_t>   offsets, counts;
+    std::vector<GidOffsetCount>     offset_counts;
     unsigned i;
     for (i = 0; i < max_size; ++i)
     {
@@ -61,35 +82,52 @@ namespace io
           f.write_at_all(offset, bb.buffer);
         else
           f.write_at(offset, bb.buffer);
+
+        offset_counts.push_back(GidOffsetCount(master.gid(i), offset, count));
+      } else
+      {
+        // -1 indicates that there is no block written here from this rank
+        offset_counts.push_back(GidOffsetCount(-1, offset, count));
       }
-      offsets.push_back(offset);
-      counts.push_back(count);
     }
 
     if (comm.rank() == 0)
     {
-      std::vector< std::vector<offset_t> > all_offsets, all_counts;
-      mpi::gather(comm, offsets, all_offsets, 0);
-      mpi::gather(comm, counts,  all_counts,  0);
+      // round-about way of gather vector of vectors of GidOffsetCount to avoid registering a new mpi datatype
+      std::vector< std::vector<char> > gathered_offset_count_buffers;
+      BinaryBuffer oc_buffer; diy::save(oc_buffer, offset_counts);
+      mpi::gather(comm, oc_buffer.buffer, gathered_offset_count_buffers, 0);
 
-      std::vector< std::pair<offset_t, offset_t> >  all_offset_counts;
-      for (unsigned i = 0; i < all_offsets.size(); ++i)
-        for (unsigned j = 0; j < all_offsets[i].size(); ++j)
-          if (all_counts[i][j] != 0)
-            all_offset_counts.push_back(std::make_pair(all_offsets[i][j], all_counts[i][j]));
-      std::sort(all_offset_counts.begin(), all_offset_counts.end());
+      std::vector<GidOffsetCount>  all_offset_counts;
+      for (unsigned i = 0; i < gathered_offset_count_buffers.size(); ++i)
+      {
+        BinaryBuffer oc_buffer; oc_buffer.buffer.swap(gathered_offset_count_buffers[i]);
+        std::vector<GidOffsetCount> offset_counts;
+        diy::load(oc_buffer, offset_counts);
+        for (unsigned j = 0; j < offset_counts.size(); ++j)
+          if (offset_counts[j].gid != -1)
+            all_offset_counts.push_back(offset_counts[j]);
+      }
+      std::sort(all_offset_counts.begin(), all_offset_counts.end());        // sorts by gid
 
       unsigned footer_size = all_offset_counts.size();        // should be the same as master.size();
       BinaryBuffer bb;
       diy::save(bb, all_offset_counts);
       diy::save(bb, footer_size);
 
-      offset_t footer_offset = all_offset_counts.back().first + all_offset_counts.back().second;
+      // find footer_offset as the max of (offset + count)
+      offset_t footer_offset = 0;
+      for (unsigned i = 0; i < all_offset_counts.size(); ++i)
+      {
+        offset_t end = all_offset_counts[i].offset + all_offset_counts[i].count;
+        if (end > footer_offset)
+            footer_offset = end;
+      }
       f.write_at(footer_offset, bb.buffer);
     } else
     {
-      mpi::gather(comm, offsets, 0);
-      mpi::gather(comm, counts,  0);
+      BinaryBuffer oc_buffer; diy::save(oc_buffer, offset_counts);
+      mpi::gather(comm, oc_buffer.buffer, 0);
     }
   }
 
@@ -103,7 +141,8 @@ namespace io
   {
     if (!load) load = master.loader();      // load is likely to be different from master.load()
 
-    typedef mpi::io::offset     offset_t;
+    typedef detail::offset_t                offset_t;
+    typedef detail::GidOffsetCount          GidOffsetCount;
 
     mpi::io::file f(comm, outfilename, mpi::io::file::rdonly);
 
@@ -114,8 +153,8 @@ namespace io
     f.read_at_all(footer_offset, (char*) &size, sizeof(size));
 
     // Read all_offset_counts
-    footer_offset -= size*sizeof(std::pair<offset_t, offset_t>);
-    std::vector< std::pair<offset_t, offset_t> >    all_offset_counts(size);
+    footer_offset -= size*sizeof(GidOffsetCount);
+    std::vector<GidOffsetCount>  all_offset_counts(size);
     f.read_at_all(footer_offset, all_offset_counts);
 
     // Get local gids from assigner
@@ -127,8 +166,11 @@ namespace io
     // TODO: use collective IO, when possible
     for (unsigned i = 0; i < gids.size(); ++i)
     {
-        offset_t offset = all_offset_counts[gids[i]].first,
-                 count  = all_offset_counts[gids[i]].second;
+        if (gids[i] != all_offset_counts[gids[i]].gid)
+            fprintf(stderr, "Warning: gids don't match in diy::io::read_blocks(), %d vs %d\n", gids[i], all_offset_counts[gids[i]].gid);
+
+        offset_t offset = all_offset_counts[gids[i]].offset,
+                 count  = all_offset_counts[gids[i]].count;
         BinaryBuffer bb;
         bb.buffer.resize(count);
         f.read_at(offset, bb.buffer);
