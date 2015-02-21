@@ -14,11 +14,13 @@ namespace diy
                     Assigner(int size, int nblocks):
                       size_(size), nblocks_(nblocks)    {}
 
+      //! returns the total number of process ranks
       int           size() const                        { return size_; }
+      //! returns the total number of global blocks
       int           nblocks() const                     { return nblocks_; }
-
+      //! sets the total number of global blocks
       void          set_nblocks(int nblocks)            { nblocks_ = nblocks; }
-
+      //! gets the local gids for a given process rank
       virtual void  local_gids(int rank, std::vector<int>& gids) const   =0;
       //! returns the process rank of the block with global id gid (need not be local)
       virtual int   rank(int gid) const     =0;
