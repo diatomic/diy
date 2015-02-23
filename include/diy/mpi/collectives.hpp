@@ -26,7 +26,7 @@ namespace mpi
       size_t s  = comm.size();
              s *= Datatype::count(in);
       out.resize(s);
-      MPI_Gather(Datatype::address(in),
+      MPI_Gather(Datatype::address(const_cast<T&>(in)),
                  Datatype::count(in),
                  Datatype::datatype(),
                  Datatype::address(out[0]),
@@ -45,7 +45,7 @@ namespace mpi
         offsets[i] = offsets[i-1] + counts[i-1];
 
       std::vector<T> buffer(offsets.back() + counts.back());
-      MPI_Gatherv(Datatype::address(in[0]),
+      MPI_Gatherv(Datatype::address(const_cast<T&>(in[0])),
                   in.size(),
                   Datatype::datatype(),
                   Datatype::address(buffer[0]),
@@ -66,7 +66,7 @@ namespace mpi
 
     static void gather(const communicator& comm, const T& in, int root)
     {
-      MPI_Gather(Datatype::address(in),
+      MPI_Gather(Datatype::address(const_cast<T&>(in)),
                  Datatype::count(in),
                  Datatype::datatype(),
                  Datatype::address(const_cast<T&>(in)),
@@ -79,7 +79,7 @@ namespace mpi
     {
       Collectives<int,void*>::gather(comm, (int) in.size(), root);
 
-      MPI_Gatherv(Datatype::address(in[0]),
+      MPI_Gatherv(Datatype::address(const_cast<T&>(in[0])),
                   in.size(),
                   Datatype::datatype(),
                   0, 0, 0,
@@ -92,7 +92,7 @@ namespace mpi
       size_t s  = comm.size();
              s *= Datatype::count(in);
       out.resize(s);
-      MPI_Allgather(Datatype::address(in),
+      MPI_Allgather(Datatype::address(const_cast<T&>(in)),
                     Datatype::count(in),
                     Datatype::datatype(),
                     Datatype::address(out[0]),
@@ -111,7 +111,7 @@ namespace mpi
         offsets[i] = offsets[i-1] + counts[i-1];
 
       std::vector<T> buffer(offsets.back() + counts.back());
-      MPI_Allgatherv(Datatype::address(in[0]),
+      MPI_Allgatherv(Datatype::address(const_cast<T&>(in[0])),
                      in.size(),
                      Datatype::datatype(),
                      Datatype::address(buffer[0]),
@@ -132,7 +132,7 @@ namespace mpi
 
     static void reduce(const communicator& comm, const T& in, T& out, int root, const Op&)
     {
-      MPI_Reduce(Datatype::address(in),
+      MPI_Reduce(Datatype::address(const_cast<T&>(in)),
                  Datatype::address(out),
                  Datatype::count(in),
                  Datatype::datatype(),
@@ -142,7 +142,7 @@ namespace mpi
 
     static void reduce(const communicator& comm, const T& in, int root, const Op& op)
     {
-      MPI_Reduce(Datatype::address(in),
+      MPI_Reduce(Datatype::address(const_cast<T&>(in)),
                  Datatype::address(const_cast<T&>(in)),
                  Datatype::count(in),
                  Datatype::datatype(),
@@ -152,7 +152,7 @@ namespace mpi
 
     static void all_reduce(const communicator& comm, const T& in, T& out, const Op&)
     {
-      MPI_Allreduce(Datatype::address(in),
+      MPI_Allreduce(Datatype::address(const_cast<T&>(in)),
                     Datatype::address(out),
                     Datatype::count(in),
                     Datatype::datatype(),
@@ -162,7 +162,7 @@ namespace mpi
 
     static void scan(const communicator& comm, const T& in, T& out, const Op&)
     {
-      MPI_Scan(Datatype::address(in),
+      MPI_Scan(Datatype::address(const_cast<T&>(in)),
                Datatype::address(out),
                Datatype::count(in),
                Datatype::datatype(),
@@ -173,7 +173,7 @@ namespace mpi
     static void all_to_all(const communicator& comm, const std::vector<T>& in, std::vector<T>& out, int n = 1)
     {
       // NB: this will fail if T is a vector
-      MPI_Alltoall(Datatype::address(in[0]), n,
+      MPI_Alltoall(Datatype::address(const_cast<T&>(in[0])), n,
                    Datatype::datatype(),
                    Datatype::address(out[0]), n,
                    Datatype::datatype(),
