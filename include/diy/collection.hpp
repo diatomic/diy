@@ -54,6 +54,8 @@ namespace diy
       void*         create() const                  { return create_(); }
       void          destroy(int i)                  { if (find(i)) { destroy_(find(i)); elements_[i] = 0; } else if (external_[i] != -1) storage_->destroy(external_[i]); }
 
+      bool          own() const                     { return destroy_ != 0; }
+
       ExternalStorage*      storage() const         { return storage_; }
 
     private:

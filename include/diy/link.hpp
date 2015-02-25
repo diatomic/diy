@@ -21,6 +21,7 @@ namespace diy
       inline
       int       size_unique() const;
       BlockID   target(int i) const                 { return neighbors_[i]; }
+      BlockID&  target(int i)                       { return neighbors_[i]; }
       inline
       int       find(int gid) const;
 

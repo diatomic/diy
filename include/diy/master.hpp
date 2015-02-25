@@ -94,9 +94,9 @@ namespace diy
       //   * destroy a block (a function that's expected to upcast and delete),
       //   * serialize a block
                     Master(mpi::communicator    comm,
-                           CreateBlock          create,
-                           DestroyBlock         destroy,
-                           int                  limit    = -1,       // blocks to store in memory
+                           CreateBlock          create   = 0,
+                           DestroyBlock         destroy  = 0,       // master takes ownership of blocks only if destroy != 0
+                           int                  limit    = -1,      // blocks to store in memory
                            int                  threads  = -1,
                            ExternalStorage*     storage  = 0,
                            SaveBlock            save     = 0,
@@ -113,7 +113,7 @@ namespace diy
                                                         {}
                     ~Master()                           { destroy_block_records(); }
       inline void   destroy_block_records();
-      inline void   destroy(int i)                      { blocks_.destroy(i); }
+      inline void   destroy(int i)                      { if (blocks_.own()) blocks_.destroy(i); }
 
       inline int    add(int gid, void* b, Link* l);     //!< add a block
       inline void*  release(int i);                     //!< release ownership of the block
