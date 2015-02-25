@@ -572,7 +572,9 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
           bb.reset();
           in_qr = out_qr;
           if (bb.position != 0 || bb.size() != in_qr.size || in_qr.external != -1)
-              fprintf(stderr, "Warning: inconsistency after in-memory swap: %d <- %d\n", to, from);
+              fprintf(stderr,
+                      "Warning: inconsistency after in-memory swap: %d <- %d : %lu,%lu,%lu,%d\n",
+                      to, from, bb.position, bb.size(), in_qr.size, in_qr.external);
         } else // !out_external && in_external
         {
           //fprintf(stderr, "Unloading outgoing directly as incoming: %d <- %d\n", to, from);
