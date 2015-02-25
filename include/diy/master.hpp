@@ -263,11 +263,6 @@ namespace diy
             }
 
             f(master.block(i), master.proxy(i), aux);
-
-            // update outgoing queue records
-            OutgoingQueuesRecords& out = master.outgoing_[master.gid(i)];
-            for (OutgoingQueues::iterator it = out.queues.begin(); it != out.queues.end(); ++it)
-              out.records[it->first] = QueueRecord(it->second.size());
         }
       } while(true);
 
@@ -540,6 +535,11 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
     int     proc    = to_proc.proc;
     to_send.pop_front();
 
+    //fprintf(stderr, "Processing queue: %d <- %d\n", to, from);
+    //fprintf(stderr, "   size:    %lu\n",     outgoing_[from].queues[to_proc].size());
+    //fprintf(stderr, "   record: (%lu,%d)\n", outgoing_[from].records[to_proc].size,
+    //                                         outgoing_[from].records[to_proc].external);
+
     if (proc == comm_.rank())     // sending to ourselves: simply swap buffers
     {
         //fprintf(stderr, "Moving queue in-place: %d <- %d\n", to, from);
@@ -573,8 +573,10 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
           in_qr = out_qr;
           if (bb.position != 0 || bb.size() != in_qr.size || in_qr.external != -1)
               fprintf(stderr,
-                      "Warning: inconsistency after in-memory swap: %d <- %d : %lu,%lu,%lu,%d\n",
-                      to, from, bb.position, bb.size(), in_qr.size, in_qr.external);
+                      "Warning: inconsistency after in-memory swap: %d <- %d : (%lu,%lu),(%lu,%d),(%lu,%d)\n",
+                      to, from, bb.position, bb.size(),
+                      in_qr.size, in_qr.external,
+                      out_qr.size, out_qr.external);
         } else // !out_external && in_external
         {
           //fprintf(stderr, "Unloading outgoing directly as incoming: %d <- %d\n", to, from);
