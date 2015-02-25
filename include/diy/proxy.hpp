@@ -16,7 +16,7 @@ namespace diy
                           outgoing_(&master->outgoing(gid)),
                           collectives_(&master->collectives(gid))       {}
 
-                        ~Proxy();
+    inline              ~Proxy();
 
     int                 gid() const                                     { return gid_; }
 
