@@ -34,7 +34,8 @@ namespace io
                          const std::string&     filename,
                          int                    mode):
                         comm_(comm)                         { MPI_File_open(comm, const_cast<char*>(filename.c_str()), mode, MPI_INFO_NULL, &fh); }
-                    ~file()                                 { MPI_File_close(&fh); }
+                    ~file()                                 { close(); }
+      void          close()                                 { MPI_File_close(&fh); }
 
       offset        size() const                            { offset sz; MPI_File_get_size(fh, &sz); return sz; }
 
