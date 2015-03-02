@@ -35,7 +35,7 @@ namespace io
                          int                    mode):
                         comm_(comm)                         { MPI_File_open(comm, const_cast<char*>(filename.c_str()), mode, MPI_INFO_NULL, &fh); }
                     ~file()                                 { close(); }
-      void          close()                                 { MPI_File_close(&fh); }
+      void          close()                                 { if (fh != MPI_FILE_NULL) MPI_File_close(&fh); }
 
       offset        size() const                            { offset sz; MPI_File_get_size(fh, &sz); return sz; }
 
