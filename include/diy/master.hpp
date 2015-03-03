@@ -676,7 +676,7 @@ flush()
   // XXX: we probably want a cleverer limit than block limit times average number of queues per block
   // XXX: with queues we could easily maintain a specific space limit
   int out_queues_limit;
-  if (limit_ == -1)
+  if (limit_ == -1 || size() == 0)
     out_queues_limit = to_send.size();
   else
     out_queues_limit = std::max((size_t) 1, to_send.size()/size()*limit_);      // average number of queues per block * in-memory block limit
