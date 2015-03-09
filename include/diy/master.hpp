@@ -473,25 +473,32 @@ foreach(const Functor& f, const Skip& skip, void* aux)
   // idx is shared
   critical_resource<int> idx(0);
 
-  // launch the threads
-  typedef               ProcessBlock<Functor,Skip>                      BlockFunctor;
-  typedef               std::pair<thread*, BlockFunctor*>               ThreadFunctorPair;
-  typedef               std::list<ThreadFunctorPair>                    ThreadFunctorList;
-  ThreadFunctorList     threads;
-  for (unsigned i = 0; i < num_threads; ++i)
+  typedef                 ProcessBlock<Functor,Skip>                      BlockFunctor;
+  if (num_threads > 1)
   {
-      BlockFunctor* bf = new BlockFunctor(f, skip, aux, *this, blocks, blocks_per_thread, idx);
-      threads.push_back(ThreadFunctorPair(new thread(&BlockFunctor::run, bf), bf));
-  }
+    // launch the threads
+    typedef               std::pair<thread*, BlockFunctor*>               ThreadFunctorPair;
+    typedef               std::list<ThreadFunctorPair>                    ThreadFunctorList;
+    ThreadFunctorList     threads;
+    for (unsigned i = 0; i < num_threads; ++i)
+    {
+        BlockFunctor* bf = new BlockFunctor(f, skip, aux, *this, blocks, blocks_per_thread, idx);
+        threads.push_back(ThreadFunctorPair(new thread(&BlockFunctor::run, bf), bf));
+    }
 
-  // join the threads
-  for(typename ThreadFunctorList::iterator it = threads.begin(); it != threads.end(); ++it)
+    // join the threads
+    for(typename ThreadFunctorList::iterator it = threads.begin(); it != threads.end(); ++it)
+    {
+        thread*           t  = it->first;
+        BlockFunctor*     bf = it->second;
+        t->join();
+        delete t;
+        delete bf;
+    }
+  } else
   {
-      thread*           t  = it->first;
-      BlockFunctor*     bf = it->second;
-      t->join();
-      delete t;
-      delete bf;
+      BlockFunctor bf(f, skip, aux, *this, blocks, blocks_per_thread, idx);
+      BlockFunctor::run(&bf);
   }
 
   // clear incoming queues
