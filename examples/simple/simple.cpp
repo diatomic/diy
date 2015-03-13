@@ -87,10 +87,10 @@ int main(int argc, char* argv[])
 
   diy::FileStorage          storage(prefix);
   diy::Master               master(world,
+                                   threads,
+                                   in_memory,
                                    &create_block,
                                    &destroy_block,
-                                   in_memory,
-                                   threads,
                                    &storage,
                                    &save_block,
                                    &load_block);

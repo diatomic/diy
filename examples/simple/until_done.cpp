@@ -41,10 +41,10 @@ int main(int argc, char* argv[])
   diy::FileStorage          storage("./DIY.XXXXXX");
 
   diy::Master               master(world,
+                                   -1,
+                                   2,
                                    &create_block,
                                    &destroy_block,
-                                   2,
-                                   -1,
                                    &storage,
                                    &save_block,
                                    &load_block);

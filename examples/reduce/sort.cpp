@@ -363,10 +363,10 @@ int main(int argc, char* argv[])
 
   diy::FileStorage          storage(prefix);
   diy::Master               master(world,
+                                   threads,
+                                   mem_blocks,
                                    &Block<Value>::create,
                                    &Block<Value>::destroy,
-                                   mem_blocks,
-                                   threads,
                                    &storage,
                                    &Block<Value>::save,
                                    &Block<Value>::load);

@@ -94,10 +94,10 @@ namespace diy
       //   * destroy a block (a function that's expected to upcast and delete),
       //   * serialize a block
                     Master(mpi::communicator    comm,
+                           int                  threads  = 1,
+                           int                  limit    = -1,      // blocks to store in memory
                            CreateBlock          create   = 0,
                            DestroyBlock         destroy  = 0,       // master takes ownership of blocks only if destroy != 0
-                           int                  limit    = -1,      // blocks to store in memory
-                           int                  threads  = -1,
                            ExternalStorage*     storage  = 0,
                            SaveBlock            save     = 0,
                            LoadBlock            load     = 0):
@@ -153,13 +153,16 @@ namespace diy
 
       //! return the number of local blocks
       unsigned      size() const                        { return blocks_.size(); }
-      LoadBlock     loader() const                      { return blocks_.loader(); }
-      SaveBlock     saver() const                       { return blocks_.saver(); }
       void*         create() const                      { return blocks_.create(); }
 
       // accessors
       int           limit() const                       { return limit_; }
       int           threads() const                     { return threads_; }
+
+      CreateBlock   creator() const                     { return blocks_.creator(); }
+      DestroyBlock  destroyer() const                   { return blocks_.destroyer(); }
+      LoadBlock     loader() const                      { return blocks_.loader(); }
+      SaveBlock     saver() const                       { return blocks_.saver(); }
 
       //! call `f` with every block
       template<class Functor>

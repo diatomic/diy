@@ -18,18 +18,13 @@ int main(int argc, char* argv[])
   diy::mpi::environment     env(argc, argv);
   diy::mpi::communicator    world;
 
-  diy::Master               master(world,
-                                   &create_block,
-                                   &destroy_block,
-                                   -1,
-                                   1,
-                                   0,
-                                   &save_block,
-                                   &load_block);
+  diy::Master               master(world, 1, -1,
+                                   &create_block,           // master will take ownership after read_blocks(),
+                                   &destroy_block);         // so it needs create and destroy functions
   diy::ContiguousAssigner   assigner(world.size(), 0);
   //diy::RoundRobinAssigner   assigner(world.size(), 0);      // nblocks will be filled by read_blocks()
 
-  diy::io::read_blocks("blocks.out", world, assigner, master);
+  diy::io::read_blocks("blocks.out", world, assigner, master, &load_block);
 
   master.foreach(&output);
 }
