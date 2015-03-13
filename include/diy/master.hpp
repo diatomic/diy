@@ -131,6 +131,9 @@ namespace diy
       void          unload_all()                        { for(unsigned i = 0; i < size(); ++i) if (block(i) != 0) unload(i); }
       inline bool   has_incoming(int i) const;
 
+      inline void   unload_queues(int i);
+      inline void   load_queues(int i);
+
       //! return the MPI communicator
       const mpi::communicator&  communicator() const    { return comm_; }
       //! return the MPI communicator
@@ -253,7 +256,19 @@ namespace diy
         int i = blocks[cur];
 
         if (skip(i, master))
+        {
+            if (master.block(i) == 0)
+                master.load_queues(i);      // even though we are skipping the block, the queues might be necessary
+
             f(0, master.proxy(i), aux);     // 0 signals that we are skipping the block (even if it's loaded)
+
+            // no longer need them, so get rid of them, rather than risk reloading
+            master.incoming_[master.gid(i)].queues.clear();
+            master.incoming_[master.gid(i)].records.clear();
+
+            if (master.block(i) == 0)
+                master.unload_queues(i);    // even though we are skipping the block, the queues might be necessary
+        }
         else
         {
             if (master.block(i) == 0)                               // block unloaded
@@ -332,7 +347,13 @@ unload(int i)
   //fprintf(stdout, "Unloading block: %d\n", gid(i));
 
   blocks_.unload(i);
+  unload_queues(i);
+}
 
+void
+diy::Master::
+unload_queues(int i)
+{
   IncomingQueuesRecords& in_qrs = incoming_[gid(i)];
   for (InQueueRecords::iterator it = in_qrs.records.begin(); it != in_qrs.records.end(); ++it)
   {
@@ -363,7 +384,13 @@ load(int i)
   //fprintf(stdout, "Loading block: %d\n", gid(i));
 
   blocks_.load(i);
+  load_queues(i);
+}
 
+void
+diy::Master::
+load_queues(int i)
+{
   IncomingQueuesRecords& in_qrs = incoming_[gid(i)];
   for (InQueueRecords::iterator it = in_qrs.records.begin(); it != in_qrs.records.end(); ++it)
   {

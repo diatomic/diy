@@ -94,6 +94,8 @@ namespace diy
         remove(fr.name.c_str());
       }
 
+      int           count() const               { return (*count_.const_access()); }
+
                     ~FileStorage()
       {
         for (FileRecordMap::const_iterator it =  filenames_.const_access()->begin();

@@ -13,6 +13,7 @@
 //typedef     int                         Value;
 typedef     float                       Value;
 typedef     diy::Link                   Link;
+typedef     std::vector<size_t>         Histogram;
 
 
 template<class T>
@@ -32,9 +33,8 @@ struct Block
 
   static void*    create()                                      { return new Block; }
   static void     destroy(void* b)                              { delete static_cast<Block*>(b); }
-  static void     save(const void* b, diy::BinaryBuffer& bb)    { diy::save(bb, *static_cast<const Block*>(b)); }
-  static void     load(void* b, diy::BinaryBuffer& bb)          { diy::load(bb, *static_cast<Block*>(b)); }
-
+  static void     save(const void* b, diy::BinaryBuffer& bb);
+  static void     load(void* b, diy::BinaryBuffer& bb);
 
   void            generate_values(size_t n)
   {
@@ -47,11 +47,36 @@ struct Block
   std::vector<T>        values;
 
   int                   bins;
-  std::vector<size_t>   histogram;
 
   private:
                   Block()                                     {}
 };
+
+template<class T>
+void
+Block<T>::
+save(const void* b_, diy::BinaryBuffer& bb)
+{
+  const Block<T>& b = *static_cast<const Block<T>*>(b_);
+
+  diy::save(bb, b.min);
+  diy::save(bb, b.max);
+  diy::save(bb, b.values);
+  diy::save(bb, b.bins);
+}
+
+template<class T>
+void
+Block<T>::
+load(void* b_, diy::BinaryBuffer& bb)
+{
+  Block<T>& b = *static_cast<Block<T>*>(b_);
+
+  diy::load(bb, b.min);
+  diy::load(bb, b.max);
+  diy::load(bb, b.values);
+  diy::load(bb, b.bins);
+}
 
 // 1D sort partners:
 //   these allow for k-ary reductions (as opposed to kd-trees,
@@ -128,13 +153,25 @@ struct SortPartners
   std::vector<RoundType>            rounds_;
 };
 
+// Functor that tells reduce to skip histogram rounds
+struct SkipHistogram
+{
+        SkipHistogram(const SortPartners& partners_):
+            partners(partners_)                                             {}
+
+  bool  operator()(int round, int lid, const diy::Master& master) const     { return round < partners.rounds()  &&
+                                                                                    !partners.swap_round(round) &&
+                                                                                     partners.sub_round(round) != 0; }
+
+  const SortPartners&   partners;
+};
+
 void compute_local_histogram(void* b_, const diy::ReduceProxy& srp)
 {
     Block<Value>* b = static_cast<Block<Value>*>(b_);
 
     // compute and enqueue local histogram
-    b->histogram.clear();
-    b->histogram.resize(b->bins);
+    Histogram histogram(b->bins);
     float width = ((float)b->max - (float)b->min) / b->bins;
     for (size_t i = 0; i < b->values.size(); ++i)
     {
@@ -142,15 +179,16 @@ void compute_local_histogram(void* b_, const diy::ReduceProxy& srp)
         int loc = ((float)x - b->min) / width;
         if (loc >= b->bins)
             loc = b->bins - 1;
-        ++(b->histogram[loc]);
+        ++(histogram[loc]);
     }
-    if (srp.out_link().target(0).gid != srp.gid())
-        srp.enqueue(srp.out_link().target(0), b->histogram);
+    srp.enqueue(srp.out_link().target(0), histogram);
 }
 
 void add_histogram(void* b_, const diy::ReduceProxy& srp)
 {
     Block<Value>* b = static_cast<Block<Value>*>(b_);
+
+    Histogram histogram;
 
     // dequeue and add up the histograms
     for (unsigned i = 0; i < srp.in_link().size(); ++i)
@@ -158,34 +196,34 @@ void add_histogram(void* b_, const diy::ReduceProxy& srp)
         int nbr_gid = srp.in_link().target(i).gid;
         if (nbr_gid != srp.gid())
         {
-            std::vector<size_t> hist;
+            Histogram hist;
             srp.dequeue(nbr_gid, hist);
+            if (histogram.size() < hist.size())
+                histogram.resize(hist.size());
             for (size_t i = 0; i < hist.size(); ++i)
-                b->histogram[i] += hist[i];
+                histogram[i] += hist[i];
         }
     }
-    if (srp.out_link().target(0).gid != srp.gid())
-        srp.enqueue(srp.out_link().target(0), b->histogram);
+
+    srp.enqueue(srp.out_link().target(0), histogram);
 }
 
-void receive_histogram(void* b_, const diy::ReduceProxy& srp)
+void receive_histogram(void* b_, const diy::ReduceProxy& srp, Histogram& histogram)
 {
     Block<Value>* b = static_cast<Block<Value>*>(b_);
 
-    if (srp.in_link().target(0).gid != srp.gid())
-        srp.dequeue(srp.in_link().target(0).gid, b->histogram);
+    srp.dequeue(srp.in_link().target(0).gid, histogram);
 }
 
-void forward_histogram(void* b_, const diy::ReduceProxy& srp)
+void forward_histogram(void* b_, const diy::ReduceProxy& srp, const Histogram& histogram)
 {
     Block<Value>* b = static_cast<Block<Value>*>(b_);
 
     for (unsigned i = 0; i < srp.out_link().size(); ++i)
-        if (srp.out_link().target(i).gid != srp.gid())
-            srp.enqueue(srp.out_link().target(i), b->histogram);
+        srp.enqueue(srp.out_link().target(i), histogram);
 }
 
-void enqueue_exchange(void* b_, const diy::ReduceProxy& srp)
+void enqueue_exchange(void* b_, const diy::ReduceProxy& srp, const Histogram& histogram)
 {
     Block<Value>*   b        = static_cast<Block<Value>*>(b_);
 
@@ -193,19 +231,19 @@ void enqueue_exchange(void* b_, const diy::ReduceProxy& srp)
 
     // pick split points
     size_t total = 0;
-    for (size_t i = 0; i < b->histogram.size(); ++i)
-        total += b->histogram[i];
+    for (size_t i = 0; i < histogram.size(); ++i)
+        total += histogram[i];
 
     std::vector<Value>  splits;
     splits.push_back(b->min);
     size_t cur = 0;
     float width = ((float)b->max - (float)b->min) / b->bins;
-    for (size_t i = 0; i < b->histogram.size(); ++i)
+    for (size_t i = 0; i < histogram.size(); ++i)
     {
-        if (cur + b->histogram[i] > total/k*splits.size())
+        if (cur + histogram[i] > total/k*splits.size())
             splits.push_back(b->min + width*i + width/2);   // mid-point of the bin
 
-        cur += b->histogram[i];
+        cur += histogram[i];
 
         if (splits.size() == k)
             break;
@@ -278,8 +316,9 @@ void sort(void* b_, const diy::ReduceProxy& srp, const SortPartners& partners)
     }
     else if (partners.swap_round(srp.round()))
     {
-        receive_histogram(b_, srp);
-        enqueue_exchange(b_, srp);
+        Histogram histogram;
+        receive_histogram(b_, srp, histogram);
+        enqueue_exchange(b_, srp, histogram);
     } else if (partners.sub_round(srp.round()) == 0)
     {
         if (srp.round() > 0)
@@ -290,8 +329,9 @@ void sort(void* b_, const diy::ReduceProxy& srp, const SortPartners& partners)
         add_histogram(b_, srp);
     else
     {
-        receive_histogram(b_, srp);
-        forward_histogram(b_, srp);
+        Histogram histogram;
+        receive_histogram(b_, srp, histogram);
+        forward_histogram(b_, srp, histogram);
     }
 }
 
@@ -343,6 +383,7 @@ int main(int argc, char* argv[])
       >> Option(     "hist",    hist,           "histogram multiplier")
       >> Option('b', "blocks",  nblocks,        "number of blocks")
       >> Option('t', "thread",  threads,        "number of threads")
+      >> Option('m', "memory",  mem_blocks,     "number of blocks to keep in memory")
       >> Option(     "prefix",  prefix,         "prefix for external storage")
   ;
 
@@ -393,10 +434,12 @@ int main(int argc, char* argv[])
   std::cout << "Blocks generated" << std::endl;
 
   SortPartners partners(nblocks, k);
-  diy::reduce(master, assigner, partners, sort);
+  diy::reduce(master, assigner, partners, sort, SkipHistogram(partners));
 
   master.foreach(print_block, &verbose);
   master.foreach(verify_block);
   if (world.rank() == 0)
     std::cout << "Blocks verified" << std::endl;
+
+  std::cout << "[" << world.rank() << "] Storage count: " << storage.count() << std::endl;
 }

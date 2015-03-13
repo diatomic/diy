@@ -70,6 +70,11 @@ namespace detail
 
   template<class Partners, class Skip>
   struct SkipInactiveOr;
+
+  struct ReduceNeverSkip
+  {
+    bool operator()(int round, int lid, const Master& master) const  { return false; }
+  };
 }
 
 /**
@@ -123,7 +128,7 @@ void reduce(Master&                    master,
             const Partners&            partners,
             const Reduce&              reducer)
 {
-  reduce(master, assigner, partners, reducer, Master::NeverSkip());
+  reduce(master, assigner, partners, reducer, detail::ReduceNeverSkip());
 }
 
 namespace detail
@@ -165,7 +170,7 @@ namespace detail
   {
                     SkipInactiveOr(int round_, const Partners& partners_, const Skip& skip_):
                         round(round_), partners(partners_), skip(skip_)         {}
-    bool            operator()(int i, const Master& master) const               { return !partners.active(round, master.gid(i)) || skip(i, master); }
+    bool            operator()(int i, const Master& master) const               { return !partners.active(round, master.gid(i)) || skip(round, i, master); }
     int             round;
     const Partners& partners;
     const Skip&     skip;
