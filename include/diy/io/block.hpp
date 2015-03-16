@@ -86,6 +86,10 @@ namespace io
         offset_counts.push_back(GidOffsetCount(master.gid(i), offset, count));
       } else
       {
+        // matching global operations
+        mpi::scan(comm, count, offset, std::plus<offset_t>());
+        mpi::all_reduce(comm, count, shift, std::plus<offset_t>());
+
         // -1 indicates that there is no block written here from this rank
         offset_counts.push_back(GidOffsetCount(-1, offset, count));
       }

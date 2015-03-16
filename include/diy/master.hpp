@@ -94,10 +94,10 @@ namespace diy
       //   * destroy a block (a function that's expected to upcast and delete),
       //   * serialize a block
                     Master(mpi::communicator    comm,
-                           CreateBlock          create,
-                           DestroyBlock         destroy,
-                           int                  limit    = -1,       // blocks to store in memory
-                           int                  threads  = -1,
+                           int                  threads  = 1,
+                           int                  limit    = -1,      // blocks to store in memory
+                           CreateBlock          create   = 0,
+                           DestroyBlock         destroy  = 0,       // master takes ownership of blocks only if destroy != 0
                            ExternalStorage*     storage  = 0,
                            SaveBlock            save     = 0,
                            LoadBlock            load     = 0):
@@ -113,7 +113,7 @@ namespace diy
                                                         {}
                     ~Master()                           { destroy_block_records(); }
       inline void   destroy_block_records();
-      inline void   destroy(int i)                      { blocks_.destroy(i); }
+      inline void   destroy(int i)                      { if (blocks_.own()) blocks_.destroy(i); }
 
       inline int    add(int gid, void* b, Link* l);     //!< add a block
       inline void*  release(int i);                     //!< release ownership of the block
@@ -153,13 +153,16 @@ namespace diy
 
       //! return the number of local blocks
       unsigned      size() const                        { return blocks_.size(); }
-      LoadBlock     loader() const                      { return blocks_.loader(); }
-      SaveBlock     saver() const                       { return blocks_.saver(); }
       void*         create() const                      { return blocks_.create(); }
 
       // accessors
       int           limit() const                       { return limit_; }
       int           threads() const                     { return threads_; }
+
+      CreateBlock   creator() const                     { return blocks_.creator(); }
+      DestroyBlock  destroyer() const                   { return blocks_.destroyer(); }
+      LoadBlock     loader() const                      { return blocks_.loader(); }
+      SaveBlock     saver() const                       { return blocks_.saver(); }
 
       //! call `f` with every block
       template<class Functor>
@@ -263,11 +266,6 @@ namespace diy
             }
 
             f(master.block(i), master.proxy(i), aux);
-
-            // update outgoing queue records
-            OutgoingQueuesRecords& out = master.outgoing_[master.gid(i)];
-            for (OutgoingQueues::iterator it = out.queues.begin(); it != out.queues.end(); ++it)
-              out.records[it->first] = QueueRecord(it->second.size());
         }
       } while(true);
 
@@ -478,25 +476,32 @@ foreach(const Functor& f, const Skip& skip, void* aux)
   // idx is shared
   critical_resource<int> idx(0);
 
-  // launch the threads
-  typedef               ProcessBlock<Functor,Skip>                      BlockFunctor;
-  typedef               std::pair<thread*, BlockFunctor*>               ThreadFunctorPair;
-  typedef               std::list<ThreadFunctorPair>                    ThreadFunctorList;
-  ThreadFunctorList     threads;
-  for (unsigned i = 0; i < num_threads; ++i)
+  typedef                 ProcessBlock<Functor,Skip>                      BlockFunctor;
+  if (num_threads > 1)
   {
-      BlockFunctor* bf = new BlockFunctor(f, skip, aux, *this, blocks, blocks_per_thread, idx);
-      threads.push_back(ThreadFunctorPair(new thread(&BlockFunctor::run, bf), bf));
-  }
+    // launch the threads
+    typedef               std::pair<thread*, BlockFunctor*>               ThreadFunctorPair;
+    typedef               std::list<ThreadFunctorPair>                    ThreadFunctorList;
+    ThreadFunctorList     threads;
+    for (unsigned i = 0; i < num_threads; ++i)
+    {
+        BlockFunctor* bf = new BlockFunctor(f, skip, aux, *this, blocks, blocks_per_thread, idx);
+        threads.push_back(ThreadFunctorPair(new thread(&BlockFunctor::run, bf), bf));
+    }
 
-  // join the threads
-  for(typename ThreadFunctorList::iterator it = threads.begin(); it != threads.end(); ++it)
+    // join the threads
+    for(typename ThreadFunctorList::iterator it = threads.begin(); it != threads.end(); ++it)
+    {
+        thread*           t  = it->first;
+        BlockFunctor*     bf = it->second;
+        t->join();
+        delete t;
+        delete bf;
+    }
+  } else
   {
-      thread*           t  = it->first;
-      BlockFunctor*     bf = it->second;
-      t->join();
-      delete t;
-      delete bf;
+      BlockFunctor bf(f, skip, aux, *this, blocks, blocks_per_thread, idx);
+      BlockFunctor::run(&bf);
   }
 
   // clear incoming queues
@@ -540,6 +545,11 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
     int     proc    = to_proc.proc;
     to_send.pop_front();
 
+    //fprintf(stderr, "Processing queue: %d <- %d\n", to, from);
+    //fprintf(stderr, "   size:    %lu\n",     outgoing_[from].queues[to_proc].size());
+    //fprintf(stderr, "   record: (%lu,%d)\n", outgoing_[from].records[to_proc].size,
+    //                                         outgoing_[from].records[to_proc].external);
+
     if (proc == comm_.rank())     // sending to ourselves: simply swap buffers
     {
         //fprintf(stderr, "Moving queue in-place: %d <- %d\n", to, from);
@@ -572,7 +582,11 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
           bb.reset();
           in_qr = out_qr;
           if (bb.position != 0 || bb.size() != in_qr.size || in_qr.external != -1)
-              fprintf(stderr, "Warning: inconsistency after in-memory swap: %d <- %d\n", to, from);
+              fprintf(stderr,
+                      "Warning: inconsistency after in-memory swap: %d <- %d : (%lu,%lu),(%lu,%d),(%lu,%d)\n",
+                      to, from, bb.position, bb.size(),
+                      in_qr.size, in_qr.external,
+                      out_qr.size, out_qr.external);
         } else // !out_external && in_external
         {
           //fprintf(stderr, "Unloading outgoing directly as incoming: %d <- %d\n", to, from);
@@ -672,7 +686,7 @@ flush()
   // XXX: we probably want a cleverer limit than block limit times average number of queues per block
   // XXX: with queues we could easily maintain a specific space limit
   int out_queues_limit;
-  if (limit_ == -1)
+  if (limit_ == -1 || size() == 0)
     out_queues_limit = to_send.size();
   else
     out_queues_limit = std::max((size_t) 1, to_send.size()/size()*limit_);      // average number of queues per block * in-memory block limit

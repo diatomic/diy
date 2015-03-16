@@ -17,7 +17,7 @@ namespace diy
   //! A serialization buffer. \ingroup Serialization
   struct BinaryBuffer
   {
-                        BinaryBuffer(int position_ = 0):
+                        BinaryBuffer(size_t position_ = 0):
                           position(position_)                       {}
 
     inline void         save_binary(const char* x, int count);      //!< copy `count` bytes from `x` into the buffer
@@ -47,7 +47,7 @@ namespace diy
         position = 0;
     }
 
-    int                 position;
+    size_t              position;
     std::vector<char>   buffer;
   };
 

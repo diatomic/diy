@@ -49,10 +49,15 @@ namespace diy
       inline void   load(int i);
       inline void   unload(int i);
 
+      Create        creator() const                 { return create_; }
+      Destroy       destroyer() const               { return destroy_; }
       Load          loader() const                  { return load_; }
       Save          saver() const                   { return save_; }
+
       void*         create() const                  { return create_(); }
       void          destroy(int i)                  { if (find(i)) { destroy_(find(i)); elements_[i] = 0; } else if (external_[i] != -1) storage_->destroy(external_[i]); }
+
+      bool          own() const                     { return destroy_ != 0; }
 
       ExternalStorage*      storage() const         { return storage_; }
 

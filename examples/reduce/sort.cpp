@@ -135,11 +135,11 @@ void compute_local_histogram(void* b_, const diy::ReduceProxy& srp)
     // compute and enqueue local histogram
     b->histogram.clear();
     b->histogram.resize(b->bins);
-    Value   width = (b->max - b->min)/b->bins;
+    float width = ((float)b->max - (float)b->min) / b->bins;
     for (size_t i = 0; i < b->values.size(); ++i)
     {
         Value x = b->values[i];
-        int loc = (x - b->min) / width;
+        int loc = ((float)x - b->min) / width;
         if (loc >= b->bins)
             loc = b->bins - 1;
         ++(b->histogram[loc]);
@@ -199,7 +199,7 @@ void enqueue_exchange(void* b_, const diy::ReduceProxy& srp)
     std::vector<Value>  splits;
     splits.push_back(b->min);
     size_t cur = 0;
-    Value width = (b->max - b->min)/b->bins;
+    float width = ((float)b->max - (float)b->min) / b->bins;
     for (size_t i = 0; i < b->histogram.size(); ++i)
     {
         if (cur + b->histogram[i] > total/k*splits.size())
@@ -363,10 +363,10 @@ int main(int argc, char* argv[])
 
   diy::FileStorage          storage(prefix);
   diy::Master               master(world,
+                                   threads,
+                                   mem_blocks,
                                    &Block<Value>::create,
                                    &Block<Value>::destroy,
-                                   mem_blocks,
-                                   threads,
                                    &storage,
                                    &Block<Value>::save,
                                    &Block<Value>::load);

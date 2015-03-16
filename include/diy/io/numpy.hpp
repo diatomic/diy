@@ -83,7 +83,7 @@ parse_npy_header(BOV::Shape& shape, bool& fortran_order)
 
     //fortran order
     loc1 = header.find("fortran_order")+16;
-    fortran_order = (header.substr(loc1,5) == "True" ? true : false);
+    fortran_order = (header.substr(loc1,4) == "True" ? true : false);
 
     //shape
     unsigned ndims;
