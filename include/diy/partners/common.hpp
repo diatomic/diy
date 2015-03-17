@@ -12,11 +12,10 @@ struct RegularPartners
   // The record of group size per round in a dimension
   struct DimK
   {
-            DimK(int dim_, int round_, int k_):
-                dim(dim_), round(round_), size(k_)               {}
+            DimK(int dim_, int k_):
+                dim(dim_), size(k_)               {}
 
     int dim;
-    int round;          // round in this dimension  (actually, unused)
     int size;           // group size
   };
 
@@ -155,7 +154,7 @@ factor(int k, const DivisionVector& divisions, KVSVector& kvs)
     {
       if (round_per_dim[i] == tmp_kvs[i].size())
         continue;
-      kvs.push_back(DimK(i, round++, tmp_kvs[i][round_per_dim[i]++]));
+      kvs.push_back(DimK(i, tmp_kvs[i][round_per_dim[i]++]));
       changed = true;
     }
     if (!changed)
