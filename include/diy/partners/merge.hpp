@@ -34,17 +34,11 @@ bool
 diy::RegularMergePartners::
 active(int round, int gid) const
 {
-  if (round == rounds())
-      return gid == 0;          // 0 is always the root
-
   CoordVector   coords;
   Decomposer::gid_to_coords(gid, coords, divisions());
 
-  std::vector<int> steps;
-  Parent::fill_steps(steps, round);
-
   for (int r = 0; r < round; ++r)
-      if (Parent::group_position(r, coords[kvs()[r].dim], steps[r]) != 0)
+      if (Parent::group_position(r, coords[kvs()[r].dim], step(r)) != 0)
           return false;
 
   return true;

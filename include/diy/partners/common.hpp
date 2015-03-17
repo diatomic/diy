@@ -16,7 +16,7 @@ struct RegularPartners
                 dim(dim_), round(round_), size(k_)               {}
 
     int dim;
-    int round;          // round in this dimension
+    int round;          // round in this dimension  (actually, unused)
     int size;           // group size
   };
 
@@ -30,16 +30,18 @@ struct RegularPartners
 
                 RegularPartners(int dim, int nblocks, int k, bool contiguous = true):
                   divisions_(dim, 0),
-                  contiguous_(contiguous)                       { Decomposer::fill_divisions(dim, nblocks, divisions_); factor(k, divisions_, kvs_); }
+                  contiguous_(contiguous)                       { Decomposer::fill_divisions(dim, nblocks, divisions_); factor(k, divisions_, kvs_); fill_steps(); }
                 RegularPartners(const DivisionVector&   divs,
                                 const KVSVector&        kvs,
                                 bool  contiguous = true):
                   divisions_(divs), kvs_(kvs),
-                  contiguous_(contiguous)                       {}
+                  contiguous_(contiguous)                       { fill_steps(); }
 
   size_t        rounds() const                                  { return kvs_.size(); }
   int           size(int round) const                           { return kvs_[round].size; }
   int           dim(int round) const                            { return kvs_[round].dim; }
+
+  int           step(int round) const                           { return steps_[round]; }
 
   const DivisionVector&     divisions() const                   { return divisions_; }
   const KVSVector&          kvs() const                         { return kvs_; }
@@ -48,42 +50,41 @@ struct RegularPartners
   static
   inline void   factor(int k, const DivisionVector& divisions, KVSVector& kvs);
 
-  inline void   fill_steps(std::vector<int>& steps, int round) const;
-
   inline void   fill(int round, int gid, std::vector<int>& partners) const;
   inline int    group_position(int round, int c, int step) const;
 
   private:
+    inline void fill_steps();
     static void factor(int k, int tot_b, std::vector<int>& kvs);
 
     DivisionVector      divisions_;
     KVSVector           kvs_;
     bool                contiguous_;
+    std::vector<int>    steps_;
 };
 
 }
 
 void
 diy::RegularPartners::
-fill_steps(std::vector<int>& steps, int round) const
+fill_steps()
 {
   if (contiguous_)
   {
     std::vector<int>    cur_steps(divisions().size(), 1);
 
-    for (int r = 0; r < round; ++r)
+    for (int r = 0; r < rounds(); ++r)
     {
-      steps.push_back(cur_steps[kvs_[r].dim]);
+      steps_.push_back(cur_steps[kvs_[r].dim]);
       cur_steps[kvs_[r].dim] *= kvs_[r].size;
     }
-    steps.push_back(cur_steps[kvs_[round].dim]);
   } else
   {
     std::vector<int>    cur_steps(divisions().begin(), divisions().end());
-    for (int r = 0; r < round + 1; ++r)
+    for (int r = 0; r < rounds(); ++r)
     {
       cur_steps[kvs_[r].dim] /= kvs_[r].size;
-      steps.push_back(cur_steps[kvs_[r].dim]);
+      steps_.push_back(cur_steps[kvs_[r].dim]);
     }
   }
 }
@@ -95,9 +96,7 @@ fill(int round, int gid, std::vector<int>& partners) const
   const DimK&   kv  = kvs_[round];
   partners.reserve(kv.size - 1);
 
-  std::vector<int> steps;
-  fill_steps(steps, round);
-  int step = steps[round];       // gids jump by this much in the current round
+  int step = this->step(round);       // gids jump by this much in the current round
 
   CoordVector   coords;
   Decomposer::gid_to_coords(gid, coords, divisions_);
