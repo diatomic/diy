@@ -406,7 +406,9 @@ int main(int argc, char* argv[])
   SortPartners partners(nblocks, k);
   diy::reduce(master, assigner, partners, sort, SkipHistogram(partners));
 
+  printf("Printing blocks\n");
   master.foreach(print_block, &verbose);
+  printf("Verifying blocks\n");
   master.foreach(verify_block);
   if (world.rank() == 0)
     std::cout << "Blocks verified" << std::endl;

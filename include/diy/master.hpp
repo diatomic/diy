@@ -161,6 +161,7 @@ namespace diy
       // accessors
       int           limit() const                       { return limit_; }
       int           threads() const                     { return threads_; }
+      int           in_memory() const                   { return *blocks_.in_memory().const_access(); }
 
       CreateBlock   creator() const                     { return blocks_.creator(); }
       DestroyBlock  destroyer() const                   { return blocks_.destroyer(); }
@@ -254,6 +255,12 @@ namespace diy
             return;
 
         int i = blocks[cur];
+        if (master.block(i))
+        {
+          if (local.size() == local_limit)
+            master.unload(local);
+          local.push_back(i);
+        }
 
         if (skip(i, master))
         {
@@ -271,7 +278,7 @@ namespace diy
         }
         else
         {
-            if (master.block(i) == 0)                               // block unloaded
+            if (master.block(i) == 0)                             // block unloaded
             {
               if (local.size() == local_limit)                    // reached the local limit
                 master.unload(local);
@@ -533,6 +540,12 @@ foreach(const Functor& f, const Skip& skip, void* aux)
 
   // clear incoming queues
   incoming_.clear();
+
+  if (limit() != -1 && in_memory() > limit())
+  {
+    fprintf(stderr, "Fatal: %d blocks in memory, with limit %d\n", in_memory(), limit());
+    std::abort();
+  }
 }
 
 void
