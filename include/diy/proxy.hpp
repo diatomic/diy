@@ -16,8 +16,6 @@ namespace diy
                           outgoing_(&master->outgoing(gid)),
                           collectives_(&master->collectives(gid))       {}
 
-    inline              ~Proxy();
-
     int                 gid() const                                     { return gid_; }
 
     //! Enqueue data whose size can be determined automatically
@@ -126,21 +124,6 @@ namespace diy
   };
 }
 
-
-diy::Master::Proxy::
-~Proxy()
-{
-  // update outgoing queue records
-  OutgoingQueuesRecords& out = master_->outgoing_[gid_];
-  for (OutgoingQueues::iterator it = out.queues.begin(); it != out.queues.end(); ++it)
-  {
-    out.records[it->first] = QueueRecord(it->second.size());
-    //fprintf(stderr, "Outgoing record: %d -> (%d,%d): %lu, %d\n",
-    //                gid_, it->first.gid, it->first.proc,
-    //                out.records[it->first].size,
-    //                out.records[it->first].external);
-  }
-}
 
 void
 diy::Master::Proxy::
