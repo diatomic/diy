@@ -27,7 +27,8 @@ namespace diy
   {
     public:
                     FileStorage(const std::string& filename_template = "/tmp/DIY.XXXXXX"):
-                      filename_template_(filename_template), count_(0)      {}
+                      filename_template_(filename_template),
+                      count_(0), current_size_(0), max_size_(0)         {}
 
       virtual int   put(BinaryBuffer& bb)
       {
@@ -60,6 +61,13 @@ namespace diy
         FileRecord  fr = { sz, filename };
         (*filenames_.access())[res] = fr;
 
+        // keep track of sizes
+        critical_resource<size_t>::accessor     cur = current_size_.access();
+        *cur += sz;
+        critical_resource<size_t>::accessor     max = max_size_.access();
+        if (*cur > *max)
+            *max = *cur;
+
         return res;
       }
 
@@ -81,6 +89,8 @@ namespace diy
         close(fh);
 
         remove(fr.name.c_str());
+
+        (*current_size_.access()) -= fr.size;
       }
 
       virtual void  destroy(int i)
@@ -92,9 +102,12 @@ namespace diy
           accessor->erase(i);
         }
         remove(fr.name.c_str());
+        (*current_size_.access()) -= fr.size;
       }
 
       int           count() const               { return (*count_.const_access()); }
+      size_t        current_size() const        { return (*current_size_.const_access()); }
+      size_t        max_size() const            { return (*max_size_.const_access()); }
 
                     ~FileStorage()
       {
@@ -119,8 +132,9 @@ namespace diy
 
     private:
       std::string                   filename_template_;
-      critical_resource<int>        count_;
       CriticalMap                   filenames_;
+      critical_resource<int>        count_;
+      critical_resource<size_t>     current_size_, max_size_;
   };
 }
 

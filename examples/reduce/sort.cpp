@@ -413,5 +413,6 @@ int main(int argc, char* argv[])
   if (world.rank() == 0)
     std::cout << "Blocks verified" << std::endl;
 
-  std::cout << "[" << world.rank() << "] Storage count: " << storage.count() << std::endl;
+  std::cout << "[" << world.rank() << "] Storage count:    " << storage.count() << std::endl;
+  std::cout << "[" << world.rank() << "] Storage max size: " << storage.max_size() << std::endl;
 }
