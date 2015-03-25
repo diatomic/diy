@@ -220,9 +220,9 @@ namespace diy
       diy::load(bb, s);
       for (size_t i = 0; i < s; ++i)
       {
-        std::pair<K,V> p;
-        diy::load(bb, p);
-        m.insert(p);
+        K k;
+        diy::load(bb, k);
+        diy::load(bb, m[k]);
       }
     }
   };

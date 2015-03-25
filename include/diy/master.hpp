@@ -634,7 +634,7 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
   while(inflight_size_ < out_queues_limit && !to_send.empty())
   {
     int from = to_send.front();
-    if (outgoing_[from].external == -1)
+    if (outgoing_[from].external != -1)
       load_outgoing(from);
     to_send.pop_front();
 
@@ -647,8 +647,6 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
 
       //fprintf(stderr, "Processing queue: %d <- %d\n", to, from);
       //fprintf(stderr, "   size:    %lu\n",     outgoing_[from].queues[to_proc].size());
-      //fprintf(stderr, "   record: (%lu,%d)\n", outgoing_[from].records[to_proc].size,
-      //                                         outgoing_[from].records[to_proc].external);
 
       if (proc == comm_.rank())     // sending to ourselves: simply swap buffers
       {
