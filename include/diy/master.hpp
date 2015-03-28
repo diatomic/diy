@@ -90,6 +90,7 @@ namespace diy
       typedef           std::map<int,     QueueRecord>      InQueueRecords;     //  gid         -> (size, external)
       typedef           std::map<int,     BinaryBuffer>     IncomingQueues;     //  gid         -> queue
       typedef           std::map<BlockID, BinaryBuffer>     OutgoingQueues;     // (gid, proc)  -> queue
+      typedef           std::map<BlockID, QueueRecord>      OutQueueRecords;    // (gid, proc)  -> (size, external)
       struct IncomingQueuesRecords
       {
         InQueueRecords  records;
@@ -99,6 +100,7 @@ namespace diy
       {
                         OutgoingQueuesRecord(int e = -1): external(e)       {}
         int             external;
+        OutQueueRecords external_local;
         OutgoingQueues  queues;
       };
       typedef           std::map<int,     IncomingQueuesRecords>    IncomingQueuesMap;  //  gid         -> {  gid       -> queue }
@@ -413,21 +415,50 @@ diy::Master::
 unload_outgoing(int gid)
 {
   OutgoingQueuesRecord& out_qr = outgoing_[gid];
-  // XXX: this is coupled too tightly to serialization, but saves unnecessary queue saving
+
   size_t out_queues_size = sizeof(size_t);   // map size
+  size_t count = 0;
   for (OutgoingQueues::iterator it = out_qr.queues.begin(); it != out_qr.queues.end(); ++it)
   {
+    if (it->first.proc == comm_.rank()) continue;
+
     out_queues_size += sizeof(BlockID);     // target
     out_queues_size += sizeof(size_t);      // buffer.position
     out_queues_size += sizeof(size_t);      // buffer.size
-    out_queues_size += it->second.size();          // buffer contents
+    out_queues_size += it->second.size();   // buffer contents
+    ++count;
   }
   if (queue_policy_->unload_outgoing(*this, gid, out_queues_size - sizeof(size_t)))
   {
       //fprintf(stderr, "Unloading outgoing queues: %d -> ...; size = %lu\n", gid, out_queues_size);
       BinaryBuffer  bb;     bb.reserve(out_queues_size);
-      diy::save(bb, out_qr.queues);
-      out_qr.queues.clear();
+      diy::save(bb, count);
+
+      for (OutgoingQueues::iterator it = out_qr.queues.begin(); it != out_qr.queues.end();)
+      {
+        if (it->first.proc == comm_.rank())
+        {
+          // treat as incoming
+          if (queue_policy_->unload_incoming(*this, gid, it->first.gid, it->second.size()))
+          {
+            QueueRecord& qr = out_qr.external_local[it->first];
+            qr.size = it->second.size();
+            qr.external = storage_->put(it->second);
+
+            out_qr.queues.erase(it++);
+            continue;
+          } // else keep in memory
+        } else
+        {
+          diy::save(bb, it->first);
+          diy::save(bb, it->second);
+
+          out_qr.queues.erase(it++);
+          continue;
+        }
+        ++it;
+      }
+
       out_qr.external = storage_->put(bb);
   }
 }
@@ -477,7 +508,15 @@ load_outgoing(int gid)
     BinaryBuffer bb;
     storage_->get(out_qr.external, bb);
     out_qr.external = -1;
-    diy::load(bb, out_qr.queues);
+
+    size_t count;
+    diy::load(bb, count);
+    for (size_t i = 0; i < count; ++i)
+    {
+      BlockID to;
+      diy::load(bb, to);
+      diy::load(bb, out_qr.queues[to]);
+    }
   }
 }
 
@@ -616,9 +655,13 @@ exchange()
   for (int i = 0; i < size(); ++i)
   {
     OutgoingQueues&  outgoing_queues  = outgoing_[gid(i)].queues;
+    OutQueueRecords& external_local   = outgoing_[gid(i)].external_local;
     if (outgoing_queues.size() < link(i)->size())
       for (unsigned j = 0; j < link(i)->size(); ++j)
-        outgoing_queues[link(i)->target(j)];        // touch the outgoing queue, creating it if necessary
+      {
+        if (external_local.find(link(i)->target(j)) == external_local.end())
+          outgoing_queues[link(i)->target(j)];        // touch the outgoing queue, creating it if necessary
+      }
   }
 
   flush();
@@ -634,6 +677,35 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
   while(inflight_size_ < out_queues_limit && !to_send.empty())
   {
     int from = to_send.front();
+
+    // deal with external_local queues
+    for (OutQueueRecords::iterator it = outgoing_[from].external_local.begin(); it != outgoing_[from].external_local.end(); ++it)
+    {
+      int to = it->first.gid;
+
+      //fprintf(stderr, "Processing local queue: %d <- %d\n", to, from);
+      //fprintf(stderr, "   size:    %lu\n",     it->second.size);
+
+      QueueRecord& in_qr  = incoming_[to].records[from];
+      bool in_external  = block(lid(to)) == 0;
+
+      if (in_external)
+          in_qr = it->second;
+      else
+      {
+          // load the queue
+          in_qr.size     = it->second.size;
+          in_qr.external = -1;
+
+          BinaryBuffer bb;
+          storage_->get(it->second.external, bb);
+
+          incoming_[to].queues[from].swap(bb);
+      }
+      ++received_;
+    }
+    outgoing_[from].external_local.clear();
+
     if (outgoing_[from].external != -1)
       load_outgoing(from);
     to_send.pop_front();
@@ -648,6 +720,7 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
       //fprintf(stderr, "Processing queue: %d <- %d\n", to, from);
       //fprintf(stderr, "   size:    %lu\n",     outgoing_[from].queues[to_proc].size());
 
+      // There may be local outgoing queues that remained in memory
       if (proc == comm_.rank())     // sending to ourselves: simply swap buffers
       {
         //fprintf(stderr, "Moving queue in-place: %d <- %d\n", to, from);
