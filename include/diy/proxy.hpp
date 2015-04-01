@@ -76,6 +76,8 @@ namespace diy
 
     CollectivesList*    collectives() const                             { return collectives_; }
 
+    Master*             master() const                                  { return master_; }
+
     private:
       int               gid_;
       Master*           master_;
