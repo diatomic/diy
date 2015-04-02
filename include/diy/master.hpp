@@ -121,13 +121,13 @@ namespace diy
                            SaveBlock            save     = 0,
                            LoadBlock            load     = 0,
                            QueuePolicy*         q_policy = new QueueSizePolicy(4096)):
-                      comm_(comm),
                       blocks_(create, destroy, storage, save, load),
                       queue_policy_(q_policy),
                       limit_(limit),
                       threads_(threads == -1 ? thread::hardware_concurrency() : threads),
                       storage_(storage),
                       // Communicator functionality
+                      comm_(comm),
                       inflight_size_(0),
                       expected_(0),
                       received_(0)

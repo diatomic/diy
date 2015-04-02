@@ -144,7 +144,6 @@ factor(int k, const DivisionVector& divisions, KVSVector& kvs)
     factor(k, divisions[i], tmp_kvs[i]);
 
   // interleave the dimensions
-  int round = 0;
   std::vector<int>  round_per_dim(divisions.size(), 0);
   while(true)
   {
