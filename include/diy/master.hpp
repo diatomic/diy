@@ -252,6 +252,9 @@ namespace diy
       CollectivesMap        collectives_;
       int                   expected_;
       int                   received_;
+
+    private:
+      fast_mutex            add_mutex_;
   };
 
   template<class Functor, class Skip>
@@ -532,6 +535,8 @@ add(int gid, void* b, Link* l)
 {
   if (*blocks_.in_memory().const_access() == limit_)
     unload_all();
+
+  lock_guard<fast_mutex>    lock(add_mutex_);       // allow to add blocks from multiple threads
 
   blocks_.add(b);
   links_.push_back(l);
