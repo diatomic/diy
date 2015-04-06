@@ -46,13 +46,13 @@ namespace io
       const Shape&  shape() const                                       { return shape_; }
 
       template<class T>
-      void          read(const DiscreteBounds& bounds, T* buffer, bool collective = false) const;
+      void          read(const DiscreteBounds& bounds, T* buffer, bool collective = false, int chunk = 1) const;
 
       template<class T>
-      void          write(const DiscreteBounds& bounds, const T* buffer, bool collective = false);
+      void          write(const DiscreteBounds& bounds, const T* buffer, bool collective = false, int chunk = 1);
 
       template<class T>
-      void          write(const DiscreteBounds& bounds, const T* buffer, const DiscreteBounds& core, bool collective = false);
+      void          write(const DiscreteBounds& bounds, const T* buffer, const DiscreteBounds& core, bool collective = false, int chunk = 1);
 
     protected:
       mpi::io::file&        file()                                        { return f_; }
@@ -69,7 +69,7 @@ namespace io
 template<class T>
 void
 diy::io::BOV::
-read(const DiscreteBounds& bounds, T* buffer, bool collective) const
+read(const DiscreteBounds& bounds, T* buffer, bool collective, int chunk) const
 {
   int dim   = shape_.size();
   int total = 1;
@@ -80,7 +80,20 @@ read(const DiscreteBounds& bounds, T* buffer, bool collective) const
     total *= subsizes.back();
   }
 
-  MPI_Datatype T_type = mpi::detail::get_mpi_datatype<T>();
+  MPI_Datatype T_type;
+  if (chunk == 1)
+    T_type = mpi::detail::get_mpi_datatype<T>();
+  else
+  {
+    // create an MPI struct of size chunk to read the data in those chunks
+    // (this allows to work around MPI-IO weirdness where crucial quantities
+    // are ints, which are too narrow of a type)
+    const int             array_of_blocklengths[]  = { chunk };
+    const MPI_Aint        array_of_displacements[] = { 0 };
+    const MPI_Datatype    array_of_types[]         = { mpi::detail::get_mpi_datatype<T>() };
+    MPI_Type_create_struct(1, array_of_blocklengths, array_of_displacements, array_of_types, &T_type);
+    MPI_Type_commit(&T_type);
+  }
 
   MPI_Datatype fileblk;
   MPI_Type_create_subarray(dim, &shape_[0], &subsizes[0], &bounds.min[0], MPI_ORDER_C, T_type, &fileblk);
@@ -94,21 +107,23 @@ read(const DiscreteBounds& bounds, T* buffer, bool collective) const
   else
       MPI_File_read_all(f_.handle(), buffer, total, T_type, &s.s);
 
+  if (chunk != 1)
+    MPI_Type_free(&T_type);
   MPI_Type_free(&fileblk);
 }
 
 template<class T>
 void
 diy::io::BOV::
-write(const DiscreteBounds& bounds, const T* buffer, bool collective)
+write(const DiscreteBounds& bounds, const T* buffer, bool collective, int chunk)
 {
-    write(bounds, buffer, bounds, collective);
+    write(bounds, buffer, bounds, collective, chunk);
 }
 
 template<class T>
 void
 diy::io::BOV::
-write(const DiscreteBounds& bounds, const T* buffer, const DiscreteBounds& core, bool collective)
+write(const DiscreteBounds& bounds, const T* buffer, const DiscreteBounds& core, bool collective, int chunk)
 {
   int dim   = shape_.size();
   std::vector<int> subsizes;
@@ -120,7 +135,18 @@ write(const DiscreteBounds& bounds, const T* buffer, const DiscreteBounds& core,
     subsizes.push_back(core.max[i] - core.min[i] + 1);
   }
 
-  MPI_Datatype T_type = mpi::detail::get_mpi_datatype<T>();
+  MPI_Datatype T_type;
+  if (chunk == 1)
+    T_type = mpi::detail::get_mpi_datatype<T>();
+  else
+  {
+    // assume T is a binary block and create an MPI struct of appropriate size
+    const int             array_of_blocklengths[]  = { chunk };
+    const MPI_Aint        array_of_displacements[] = { 0 };
+    const MPI_Datatype    array_of_types[]         = { mpi::detail::get_mpi_datatype<T>() };
+    MPI_Type_create_struct(1, array_of_blocklengths, array_of_displacements, array_of_types, &T_type);
+    MPI_Type_commit(&T_type);
+  }
 
   MPI_Datatype fileblk, subbuffer;
   MPI_Type_create_subarray(dim, &shape_[0],       &subsizes[0], &bounds.min[0],   MPI_ORDER_C, T_type, &fileblk);
@@ -136,6 +162,8 @@ write(const DiscreteBounds& bounds, const T* buffer, const DiscreteBounds& core,
   else
       MPI_File_write_all(f_.handle(), buffer, 1, subbuffer, &s.s);
 
+  if (chunk != 1)
+    MPI_Type_free(&T_type);
   MPI_Type_free(&fileblk);
   MPI_Type_free(&subbuffer);
 }

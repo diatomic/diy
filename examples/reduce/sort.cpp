@@ -7,6 +7,8 @@
 #include <diy/partners/all-reduce.hpp>
 #include <diy/partners/swap.hpp>
 #include <diy/assigner.hpp>
+#include <diy/mpi/io.hpp>
+#include <diy/io/bov.hpp>
 
 #include "../opts.h"
 
@@ -28,16 +30,19 @@ float random(float min, float max)      { return min + float(rand() % 1024) / 10
 template<class T>
 struct Block
 {
-                  Block(T min_, T max_, int bins_):
-                      min(min_), max(max_), bins(bins_)         {}
+                  Block(int bins_):
+                      bins(bins_)         {}
 
   static void*    create()                                      { return new Block; }
   static void     destroy(void* b)                              { delete static_cast<Block*>(b); }
   static void     save(const void* b, diy::BinaryBuffer& bb);
   static void     load(void* b, diy::BinaryBuffer& bb);
 
-  void            generate_values(size_t n)
+  void            generate_values(size_t n, T min_, T max_)
   {
+    min = min_;
+    max = max_;
+
     values.resize(n);
     for (size_t i = 0; i < n; ++i)
       values[i] = random<Value>(min, max);
@@ -153,6 +158,12 @@ struct SkipHistogram
 void compute_local_histogram(void* b_, const diy::ReduceProxy& srp)
 {
     Block<Value>* b = static_cast<Block<Value>*>(b_);
+
+    if (srp.round() == 0)
+    {
+        b->min = srp.get<Value>();
+        b->max = srp.get<Value>();
+    }
 
     // compute and enqueue local histogram
     Histogram histogram(b->bins);
@@ -310,7 +321,7 @@ void print_block(void* b_, const diy::Master::ProxyWithLink& cp, void* verbose_)
   Block<Value>*   b         = static_cast<Block<Value>*>(b_);
   bool            verbose   = *static_cast<bool*>(verbose_);
 
-  std::cout << cp.gid() << ": " << b->min << " - " << b->max << std::endl;
+  std::cout << cp.gid() << ": " << b->min << " - " << b->max << ": " << b->values.size() << std::endl;
 
   if (verbose)
     for (size_t i = 0; i < b->values.size(); ++i)
@@ -341,8 +352,11 @@ int main(int argc, char* argv[])
   int               hist        = 32;
   int               mem_blocks  = -1;
   int               threads     = 1;
+  int               chunk_size  = 1;
   std::string       prefix      = "./DIY.XXXXXX";
+  bool              print       = ops >> Present(     "print",   "print the result");
   bool              verbose     = ops >> Present('v', "verbose", "verbose output");
+  bool              verify      = ops >> Present(     "verify",  "verify the result");
 
   Value             min = 0,
                     max = 1 << 20;
@@ -354,6 +368,7 @@ int main(int argc, char* argv[])
       >> Option('b', "blocks",  nblocks,        "number of blocks")
       >> Option('t', "thread",  threads,        "number of threads")
       >> Option('m', "memory",  mem_blocks,     "number of blocks to keep in memory")
+      >> Option('c', "chunk",   chunk_size,     "size of a chunk in which to read the data")
       >> Option(     "prefix",  prefix,         "prefix for external storage")
   ;
 
@@ -366,11 +381,15 @@ int main(int argc, char* argv[])
   {
       if (world.rank() == 0)
       {
-          std::cout << "Usage: " << argv[0] << " [OPTIONS]\n";
+          std::cout << "Usage: " << argv[0] << " [OPTIONS] [INPUT.bov]\n";
+          std::cout << "Generates random particles in range [min,max] if not INPUT.bov is given.\n";
           std::cout << ops;
       }
       return 1;
   }
+
+  std::string infile;
+  ops >> PosOption(infile);
 
   diy::FileStorage          storage(prefix);
   diy::Master               master(world,
@@ -382,34 +401,104 @@ int main(int argc, char* argv[])
                                    &Block<Value>::save,
                                    &Block<Value>::load);
 
-  srand(time(0));
-
   diy::ContiguousAssigner   assigner(world.size(), nblocks);
   //diy::RoundRobinAssigner   assigner(world.size(), nblocks);
 
-  // initially fill the blocks with random points anywhere in the domain
   std::vector<int> gids;
   assigner.local_gids(world.rank(), gids);
-  for (unsigned i = 0; i < gids.size(); ++i)
+
+  if (infile.empty())
   {
-    int             gid = gids[i];
-    Block<Value>*   b   = new Block<Value>(min, max, k*hist);
-    Link*           l   = new Link;
+    srand(time(0));
 
-    // this could be replaced by reading values from a file
-    b->generate_values(num_values);
+    for (unsigned i = 0; i < gids.size(); ++i)
+    {
+      int             gid = gids[i];
+      Block<Value>*   b   = new Block<Value>(k*hist);
+      Link*           l   = new Link;
 
-    master.add(gid, b, l);
+      // this could be replaced by reading values from a file
+      b->generate_values(num_values, min, max);
+
+      master.add(gid, b, l);
+
+      // post collectives to match the external data setting
+      master.proxy(i).all_reduce(min, diy::mpi::minimum<Value>());
+      master.proxy(i).all_reduce(max, diy::mpi::maximum<Value>());
+    }
+    std::cout << "Blocks generated" << std::endl;
+  } else
+  {
+    if (nblocks % world.size() != 0)
+    {
+      if (world.rank() == 0)
+        std::cerr << "Number of blocks must be divisible by the number of processes (for collective MPI-IO)\n";
+      return 1;
+    }
+
+    // determine the size of the file, divide by sizeof(Value)
+    diy::mpi::io::file in(world, infile, diy::mpi::io::file::rdonly);
+    size_t sz = in.size() / sizeof(Value);
+
+    // We have to work around a weirdness in MPI-IO. MPI expresses various
+    // sizes as integers, which is too small to reference large data. So
+    // instead we create a FileBlock of larger size and read in terms of those
+    // blocks.
+    if (sz % (chunk_size * nblocks) != 0)
+    {
+      if (world.rank() == 0)
+        std::cerr << "Expected data size to align with the number of blocks and chunk size\n";
+      return 1;
+    }
+
+    std::vector<int> shape;
+    shape.push_back(sz / chunk_size);
+    diy::io::BOV reader(in, shape);
+
+    size_t block_size = sz / nblocks;
+
+    for (unsigned i = 0; i < gids.size(); ++i)
+    {
+      int             gid = gids[i];
+      Block<Value>*   b   = new Block<Value>(k*hist);
+      Link*           l   = new Link;
+
+      // read values from a file
+      b->values.resize(block_size);
+      diy::DiscreteBounds block_bounds;
+      block_bounds.min[0] =  gid      * (block_size / chunk_size);
+      block_bounds.max[0] = (gid + 1) * (block_size / chunk_size) - 1;
+
+      reader.read(block_bounds, &b->values[0], true, chunk_size);
+      Value min = *std::min_element(b->values.begin(), b->values.end());
+      Value max = *std::max_element(b->values.begin(), b->values.end());
+
+      master.add(gid, b, l);
+
+      // post collectives to match the external data setting
+      master.proxy(i).all_reduce(min, diy::mpi::minimum<Value>());
+      master.proxy(i).all_reduce(max, diy::mpi::maximum<Value>());
+    }
+    if (world.rank() == 0)
+      std::cout << "Array loaded" << std::endl;
   }
-  std::cout << "Blocks generated" << std::endl;
+
+  // need to determine global min/max
+  master.process_collectives();
 
   SortPartners partners(nblocks, k);
   diy::reduce(master, assigner, partners, sort, SkipHistogram(partners));
 
-  printf("Printing blocks\n");
-  master.foreach(print_block, &verbose);
-  printf("Verifying blocks\n");
-  master.foreach(verify_block);
+  if (print)
+  {
+    printf("Printing blocks\n");
+    master.foreach(print_block, &verbose);
+  }
+  if (verify)
+  {
+    printf("Verifying blocks\n");
+    master.foreach(verify_block);
+  }
   if (world.rank() == 0)
     std::cout << "Blocks verified" << std::endl;
 

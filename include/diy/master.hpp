@@ -175,6 +175,7 @@ namespace diy
 
       //! exchange the queues between all the blocks (collective operation)
       inline void   exchange();
+      inline void   process_collectives();
 
       inline
       ProxyWithLink proxy(int i) const;
@@ -223,7 +224,6 @@ namespace diy
       // Communicator functionality
       inline void       comm_exchange(ToSendList& to_send, int out_queues_limit);     // possibly called in between block computations
       inline bool       nudge();
-      inline void       process_collectives();
 
       void              cancel_requests();              // TODO
 
