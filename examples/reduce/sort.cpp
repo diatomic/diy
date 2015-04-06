@@ -498,9 +498,10 @@ int main(int argc, char* argv[])
   {
     printf("Verifying blocks\n");
     master.foreach(verify_block);
+
+    if (world.rank() == 0)
+      std::cout << "Blocks verified" << std::endl;
   }
-  if (world.rank() == 0)
-    std::cout << "Blocks verified" << std::endl;
 
   std::cout << "[" << world.rank() << "] Storage count:    " << storage.count() << std::endl;
   std::cout << "[" << world.rank() << "] Storage max size: " << storage.max_size() << std::endl;
