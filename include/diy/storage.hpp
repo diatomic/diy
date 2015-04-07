@@ -42,7 +42,7 @@ namespace diy
         else
         {
             // pick a template at random (very basic load balancing mechanism)
-            filename  = filename_templates_[std::rand() % filename_templates_.size()];
+            filename  = filename_templates_[std::rand() % filename_templates_.size()].c_str();
         }
 #ifdef __MACH__
         // TODO: figure out how to open with O_SYNC
