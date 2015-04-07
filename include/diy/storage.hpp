@@ -27,12 +27,23 @@ namespace diy
   {
     public:
                     FileStorage(const std::string& filename_template = "/tmp/DIY.XXXXXX"):
-                      filename_template_(filename_template),
+                      filename_templates_(1, filename_template),
+                      count_(0), current_size_(0), max_size_(0)         {}
+
+                    FileStorage(const std::vector<std::string>& filename_templates):
+                      filename_templates_(filename_templates),
                       count_(0), current_size_(0), max_size_(0)         {}
 
       virtual int   put(BinaryBuffer& bb)
       {
-        std::string     filename = filename_template_.c_str();
+        std::string     filename;
+        if (filename_templates_.size() == 1)
+            filename = filename_templates_[0].c_str();
+        else
+        {
+            // pick a template at random (very basic load balancing mechanism)
+            filename  = filename_templates_[std::rand() % filename_templates_.size()];
+        }
 #ifdef __MACH__
         // TODO: figure out how to open with O_SYNC
         int fh = mkstemp(const_cast<char*>(filename.c_str()));
@@ -131,7 +142,7 @@ namespace diy
       typedef           CriticalMap::accessor                       CriticalMapAccessor;
 
     private:
-      std::string                   filename_template_;
+      std::vector<std::string>      filename_templates_;
       CriticalMap                   filenames_;
       critical_resource<int>        count_;
       critical_resource<size_t>     current_size_, max_size_;
