@@ -132,8 +132,8 @@ namespace diy
                       expected_(0),
                       received_(0)
                                                         {}
-                    ~Master()                           { destroy_block_records(); delete queue_policy_; }
-      inline void   destroy_block_records();
+                    ~Master()                           { clear(); delete queue_policy_; }
+      inline void   clear();
       inline void   destroy(int i)                      { if (blocks_.own()) blocks_.destroy(i); }
 
       inline int    add(int gid, void* b, Link* l);     //!< add a block
@@ -370,13 +370,15 @@ namespace diy
 
 void
 diy::Master::
-destroy_block_records()
+clear()
 {
   for (unsigned i = 0; i < size(); ++i)
-  {
-    destroy(i);
     delete links_[i];
-  }
+  blocks_.clear();
+  links_.clear();
+  gids_.clear();
+  lids_.clear();
+  expected_ = 0;
 }
 
 void

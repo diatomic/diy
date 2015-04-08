@@ -37,6 +37,7 @@ namespace diy
 
       size_t        size() const                    { return elements_.size(); }
       const CInt&   in_memory() const               { return in_memory_; }
+      inline void   clear();
 
       int           add(Element e)                  { elements_.push_back(e); external_.push_back(-1); ++(*in_memory_.access()); return elements_.size() - 1; }
       void*         release(int i)                  { void* e = get(i); elements_[i] = 0; return e; }
@@ -72,6 +73,17 @@ namespace diy
       std::vector<int>      external_;
       CInt                  in_memory_;
   };
+}
+
+void
+diy::Collection::
+clear()
+{
+  for (size_t i = 0; i < size(); ++i)
+    destroy(i);
+  elements_.clear();
+  external_.clear();
+  *in_memory_.access() = 0;
 }
 
 void
