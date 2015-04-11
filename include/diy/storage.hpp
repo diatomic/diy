@@ -53,8 +53,10 @@ namespace diy
 
         //fprintf(stdout, "FileStorage::put(): %s; buffer size: %lu\n", filename.c_str(), bb.size());
 
-        int sz = bb.buffer.size();
-        write(fh, &bb.buffer[0], sz);
+        size_t sz = bb.buffer.size();
+        size_t written = write(fh, &bb.buffer[0], sz);
+        if (written < sz || written == -1)
+          fprintf(stderr, "Warning: could not write the full buffer to %s: written = %lu; size = %lu\n", filename.c_str(), written, sz);
         fsync(fh);
         close(fh);
         bb.wipe();
