@@ -90,13 +90,11 @@ void
 diy::Collection::
 unload(int i)
 {
-  // TODO: could avoid the extra copy by asking storage_ for an instance derived
-  //       from BinaryBuffer, which could save the data directly
-
-  BinaryBuffer bb;
+  //BinaryBuffer bb;
   void* e = find(i);
-  save_(e, bb);
-  external_[i] = storage_->put(bb);
+  //save_(e, bb);
+  //external_[i] = storage_->put(bb);
+  external_[i] = storage_->put(e, save_);
 
   destroy_(e);
   elements_[i] = 0;
@@ -108,10 +106,11 @@ void
 diy::Collection::
 load(int i)
 {
-  BinaryBuffer bb;
-  storage_->get(external_[i], bb);
+  //BinaryBuffer bb;
+  //storage_->get(external_[i], bb);
   void* e = create_();
-  load_(e, bb);
+  //load_(e, bb);
+  storage_->get(external_[i], e, load_);
   elements_[i] = e;
   external_[i] = -1;
 

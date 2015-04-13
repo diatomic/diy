@@ -464,6 +464,8 @@ unload_outgoing(int gid)
         ++it;
       }
 
+      // TODO: this mechanism could be adjusted for direct saving to disk
+      //       (without intermediate binary buffer serialization)
       out_qr.external = storage_->put(bb);
   }
 }

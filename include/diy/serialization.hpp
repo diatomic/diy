@@ -14,15 +14,18 @@
 
 namespace diy
 {
+  //TODO: need to add some classes to the hierarchy; BinaryBuffer should be an
+  //abstract base, and then there should be a "solid" instance of BinaryBufferVector, or something like that
+
   //! A serialization buffer. \ingroup Serialization
   struct BinaryBuffer
   {
                         BinaryBuffer(size_t position_ = 0):
                           position(position_)                       {}
 
-    inline void         save_binary(const char* x, int count);      //!< copy `count` bytes from `x` into the buffer
-    inline void         load_binary(char* x, int count);            //!< copy `count` bytes into `x` from the buffer
-    inline void         load_binary_back(char* x, int count);       //!< copy `count` bytes into `x` from the back of the buffer
+    virtual inline void save_binary(const char* x, size_t count);   //!< copy `count` bytes from `x` into the buffer
+    virtual inline void load_binary(char* x, size_t count);         //!< copy `count` bytes into `x` from the buffer
+    virtual inline void load_binary_back(char* x, size_t count);    //!< copy `count` bytes into `x` from the back of the buffer
 
     void                clear()                                     { buffer.clear(); reset(); }
     void                wipe()                                      { std::vector<char>().swap(buffer); reset(); }
@@ -320,7 +323,7 @@ namespace diy
 
 void
 diy::BinaryBuffer::
-save_binary(const char* x, int count)
+save_binary(const char* x, size_t count)
 {
   if (position + count > buffer.capacity())
     buffer.reserve((position + count) * growth_multiplier());           // if we have to grow, grow geometrically
@@ -334,7 +337,7 @@ save_binary(const char* x, int count)
 
 void
 diy::BinaryBuffer::
-load_binary(char* x, int count)
+load_binary(char* x, size_t count)
 {
   std::copy(&buffer[position], &buffer[position + count], x);
   position += count;
@@ -342,7 +345,7 @@ load_binary(char* x, int count)
 
 void
 diy::BinaryBuffer::
-load_binary_back(char* x, int count)
+load_binary_back(char* x, size_t count)
 {
   std::copy(&buffer[buffer.size() - count], &buffer[buffer.size()], x);
   buffer.resize(buffer.size() - count);
