@@ -14,15 +14,12 @@
 
 namespace diy
 {
-  //TODO: need to add some classes to the hierarchy; BinaryBuffer should be an
-  //abstract base, and then there should be a "solid" instance of BinaryBufferVector, or something like that
-
   //! A serialization buffer. \ingroup Serialization
   struct BinaryBuffer
   {
-    virtual inline void save_binary(const char* x, size_t count)    =0;   //!< copy `count` bytes from `x` into the buffer
-    virtual inline void load_binary(char* x, size_t count)          =0;   //!< copy `count` bytes into `x` from the buffer
-    virtual inline void load_binary_back(char* x, size_t count)     =0;   //!< copy `count` bytes into `x` from the back of the buffer
+    virtual void        save_binary(const char* x, size_t count)    =0;   //!< copy `count` bytes from `x` into the buffer
+    virtual void        load_binary(char* x, size_t count)          =0;   //!< copy `count` bytes into `x` from the buffer
+    virtual void        load_binary_back(char* x, size_t count)     =0;   //!< copy `count` bytes into `x` from the back of the buffer
   };
 
   struct BinaryBufferVector: public BinaryBuffer
