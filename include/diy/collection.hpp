@@ -19,8 +19,8 @@ namespace diy
 
       typedef       void* (*Create)();
       typedef       void  (*Destroy)(void*);
-      typedef       void  (*Save)(const void*, BinaryBuffer& buf);
-      typedef       void  (*Load)(void*,       BinaryBuffer& buf);
+      typedef       detail::Save                                Save;
+      typedef       detail::Load                                Load;
 
     public:
                     Collection(Create               create,

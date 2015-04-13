@@ -69,7 +69,7 @@ namespace io
       {
         // get the block from master and serialize it
         const void* block = master.get(i);
-        BinaryBuffer bb;
+        BinaryBufferVector bb;
         LinkFactory::save(bb, master.link(i));
         save(block, bb);
         count = bb.buffer.size();
@@ -99,13 +99,13 @@ namespace io
     {
       // round-about way of gather vector of vectors of GidOffsetCount to avoid registering a new mpi datatype
       std::vector< std::vector<char> > gathered_offset_count_buffers;
-      BinaryBuffer oc_buffer; diy::save(oc_buffer, offset_counts);
+      BinaryBufferVector oc_buffer; diy::save(oc_buffer, offset_counts);
       mpi::gather(comm, oc_buffer.buffer, gathered_offset_count_buffers, 0);
 
       std::vector<GidOffsetCount>  all_offset_counts;
       for (unsigned i = 0; i < gathered_offset_count_buffers.size(); ++i)
       {
-        BinaryBuffer oc_buffer; oc_buffer.buffer.swap(gathered_offset_count_buffers[i]);
+        BinaryBufferVector oc_buffer; oc_buffer.buffer.swap(gathered_offset_count_buffers[i]);
         std::vector<GidOffsetCount> offset_counts;
         diy::load(oc_buffer, offset_counts);
         for (unsigned j = 0; j < offset_counts.size(); ++j)
@@ -115,7 +115,7 @@ namespace io
       std::sort(all_offset_counts.begin(), all_offset_counts.end());        // sorts by gid
 
       unsigned footer_size = all_offset_counts.size();        // should be the same as master.size();
-      BinaryBuffer bb;
+      BinaryBufferVector bb;
       diy::save(bb, all_offset_counts);
       diy::save(bb, footer_size);
 
@@ -130,7 +130,7 @@ namespace io
       f.write_at(footer_offset, bb.buffer);
     } else
     {
-      BinaryBuffer oc_buffer; diy::save(oc_buffer, offset_counts);
+      BinaryBufferVector oc_buffer; diy::save(oc_buffer, offset_counts);
       mpi::gather(comm, oc_buffer.buffer, 0);
     }
   }
@@ -175,7 +175,7 @@ namespace io
 
         offset_t offset = all_offset_counts[gids[i]].offset,
                  count  = all_offset_counts[gids[i]].count;
-        BinaryBuffer bb;
+        BinaryBufferVector bb;
         bb.buffer.resize(count);
         f.read_at(offset, bb.buffer);
         Link* l = LinkFactory::load(bb);

@@ -22,25 +22,27 @@ namespace diy
 
     struct FileBuffer: public BinaryBuffer
     {
-                          FileBuffer(FILE* file_): file(file_), sz(0) {}
+                          FileBuffer(FILE* file_): file(file_), head(0), tail(0)    {}
 
       // TODO: add error checking
-      virtual inline void save_binary(const char* x, size_t count)    { fwrite(x, 1, count, file); sz += count; }
+      virtual inline void save_binary(const char* x, size_t count)    { fwrite(x, 1, count, file); head += count; }
       virtual inline void load_binary(char* x, size_t count)          { fread(x, 1, count, file); }
+      virtual inline void load_binary_back(char* x, size_t count)     { fseek(file, tail, SEEK_END); fread(x, 1, count, file); tail += count; fseek(file, head, SEEK_SET); }
 
-      size_t              size() const                                { return sz; }
+      size_t              size() const                                { return head; }
 
       FILE*  file;
-      size_t sz;
+      size_t head, tail;  // tail is used to support reading from the back;
+                          // the mechanism is a little awkward and unused, but should work if needed
     };
   }
 
   class ExternalStorage
   {
     public:
-      virtual int   put(BinaryBuffer& bb)                               =0;
+      virtual int   put(BinaryBufferVector& bb)                         =0;
       virtual int   put(const void* x, detail::Save save)               =0;
-      virtual void  get(int i, BinaryBuffer& bb, size_t extra = 0)      =0;
+      virtual void  get(int i, BinaryBufferVector& bb, size_t extra = 0)=0;
       virtual void  get(int i, void* x, detail::Load load)              =0;
       virtual void  destroy(int i)                                      =0;
   };
@@ -56,7 +58,7 @@ namespace diy
                       filename_templates_(filename_templates),
                       count_(0), current_size_(0), max_size_(0)         {}
 
-      virtual int   put(BinaryBuffer& bb)
+      virtual int   put(BinaryBufferVector& bb)
       {
         std::string     filename;
         if (filename_templates_.size() == 1)
@@ -144,7 +146,7 @@ namespace diy
         return res;
       }
 
-      virtual void   get(int i, BinaryBuffer& bb, size_t extra)
+      virtual void   get(int i, BinaryBufferVector& bb, size_t extra)
       {
         FileRecord      fr;
         {
