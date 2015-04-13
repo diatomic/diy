@@ -22,15 +22,15 @@ namespace diy
 
     struct FileBuffer: public BinaryBuffer
     {
-                          FileBuffer(int fh_): fh(fh_), sz(0)         {}
+                          FileBuffer(FILE* file_): file(file_), sz(0) {}
 
       // TODO: add error checking
-      virtual inline void save_binary(const char* x, size_t count)    { ::write(fh, x, count); sz += count; }
-      virtual inline void load_binary(char* x, size_t count)          { ::read(fh, x, count); }
+      virtual inline void save_binary(const char* x, size_t count)    { fwrite(x, 1, count, file); sz += count; }
+      virtual inline void load_binary(char* x, size_t count)          { fread(x, 1, count, file); }
 
       size_t              size() const                                { return sz; }
 
-      int    fh;
+      FILE*  file;
       size_t sz;
     };
   }
@@ -124,11 +124,11 @@ namespace diy
         int fh = mkostemp(const_cast<char*>(filename.c_str()), O_WRONLY);
 #endif
 
-        detail::FileBuffer fb(fh);
+        detail::FileBuffer fb(fdopen(fh, "w"));
         save(x, fb);
         size_t sz = fb.size();
+        fclose(fb.file);
         fsync(fh);
-        close(fh);
 
         int res = (*count_.access())++;
         FileRecord  fr = { sz, filename };
@@ -177,9 +177,9 @@ namespace diy
 
         //int fh = open(fr.name.c_str(), O_RDONLY | O_SYNC, 0600);
         int fh = open(fr.name.c_str(), O_RDONLY, 0600);
-        detail::FileBuffer fb(fh);
+        detail::FileBuffer fb(fdopen(fh, "r"));
         load(x, fb);
-        close(fh);
+        fclose(fb.file);
 
         remove(fr.name.c_str());
 
