@@ -52,7 +52,7 @@ namespace diy
     private:
       struct FileRecord
       {
-        int             size;
+        size_t          size;
         std::string     name;
       };
 
