@@ -49,6 +49,13 @@ namespace diy
 
   class FileStorage: public ExternalStorage
   {
+    private:
+      struct FileRecord
+      {
+        int             size;
+        std::string     name;
+      };
+
     public:
                     FileStorage(const std::string& filename_template = "/tmp/DIY.XXXXXX"):
                       filename_templates_(1, filename_template),
@@ -61,19 +68,7 @@ namespace diy
       virtual int   put(BinaryBufferVector& bb)
       {
         std::string     filename;
-        if (filename_templates_.size() == 1)
-            filename = filename_templates_[0].c_str();
-        else
-        {
-            // pick a template at random (very basic load balancing mechanism)
-            filename  = filename_templates_[std::rand() % filename_templates_.size()].c_str();
-        }
-#ifdef __MACH__
-        // TODO: figure out how to open with O_SYNC
-        int fh = mkstemp(const_cast<char*>(filename.c_str()));
-#else
-        int fh = mkostemp(const_cast<char*>(filename.c_str()), O_WRONLY | O_SYNC);
-#endif
+        int fh = open_random(filename);
 
         //fprintf(stdout, "FileStorage::put(): %s; buffer size: %lu\n", filename.c_str(), bb.size());
 
@@ -94,37 +89,13 @@ namespace diy
         fclose(fp);
 #endif
 
-        int res = (*count_.access())++;
-        FileRecord  fr = { sz, filename };
-        (*filenames_.access())[res] = fr;
-
-        // keep track of sizes
-        critical_resource<size_t>::accessor     cur = current_size_.access();
-        *cur += sz;
-        critical_resource<size_t>::accessor     max = max_size_.access();
-        if (*cur > *max)
-            *max = *cur;
-
-        return res;
+        return make_file_record(filename, sz);
       }
 
       virtual int    put(const void* x, detail::Save save)
       {
         std::string     filename;
-        if (filename_templates_.size() == 1)
-            filename = filename_templates_[0].c_str();
-        else
-        {
-            // pick a template at random (very basic load balancing mechanism)
-            filename  = filename_templates_[std::rand() % filename_templates_.size()].c_str();
-        }
-#ifdef __MACH__
-        // TODO: figure out how to open with O_SYNC
-        int fh = mkstemp(const_cast<char*>(filename.c_str()));
-#else
-        //int fh = mkostemp(const_cast<char*>(filename.c_str()), O_WRONLY | O_SYNC);
-        int fh = mkostemp(const_cast<char*>(filename.c_str()), O_WRONLY);
-#endif
+        int fh = open_random(filename);
 
         detail::FileBuffer fb(fdopen(fh, "w"));
         save(x, fb);
@@ -132,28 +103,12 @@ namespace diy
         fclose(fb.file);
         fsync(fh);
 
-        int res = (*count_.access())++;
-        FileRecord  fr = { sz, filename };
-        (*filenames_.access())[res] = fr;
-
-        // keep track of sizes
-        critical_resource<size_t>::accessor     cur = current_size_.access();
-        *cur += sz;
-        critical_resource<size_t>::accessor     max = max_size_.access();
-        if (*cur > *max)
-            *max = *cur;
-
-        return res;
+        return make_file_record(filename, sz);
       }
 
       virtual void   get(int i, BinaryBufferVector& bb, size_t extra)
       {
-        FileRecord      fr;
-        {
-          CriticalMapAccessor accessor = filenames_.access();
-          fr = (*accessor)[i];
-          accessor->erase(i);
-        }
+        FileRecord fr = extract_file_record(i);
 
         //fprintf(stdout, "FileStorage::get(): %s\n", fr.name.c_str());
 
@@ -163,19 +118,12 @@ namespace diy
         read(fh, &bb.buffer[0], fr.size);
         close(fh);
 
-        remove(fr.name.c_str());
-
-        (*current_size_.access()) -= fr.size;
+        remove_file(fr);
       }
 
       virtual void   get(int i, void* x, detail::Load load)
       {
-        FileRecord      fr;
-        {
-          CriticalMapAccessor accessor = filenames_.access();
-          fr = (*accessor)[i];
-          accessor->erase(i);
-        }
+        FileRecord fr = extract_file_record(i);
 
         //int fh = open(fr.name.c_str(), O_RDONLY | O_SYNC, 0600);
         int fh = open(fr.name.c_str(), O_RDONLY, 0600);
@@ -183,9 +131,7 @@ namespace diy
         load(x, fb);
         fclose(fb.file);
 
-        remove(fr.name.c_str());
-
-        (*current_size_.access()) -= fr.size;
+        remove_file(fr);
       }
 
       virtual void  destroy(int i)
@@ -215,12 +161,56 @@ namespace diy
       }
 
     private:
-      struct FileRecord
+      int           open_random(std::string& filename) const
       {
-        int             size;
-        std::string     name;
-      };
+        if (filename_templates_.size() == 1)
+            filename = filename_templates_[0].c_str();
+        else
+        {
+            // pick a template at random (very basic load balancing mechanism)
+            filename  = filename_templates_[std::rand() % filename_templates_.size()].c_str();
+        }
+#ifdef __MACH__
+        // TODO: figure out how to open with O_SYNC
+        int fh = mkstemp(const_cast<char*>(filename.c_str()));
+#else
+        int fh = mkostemp(const_cast<char*>(filename.c_str()), O_WRONLY | O_SYNC);
+#endif
 
+        return fh;
+      }
+
+      int           make_file_record(const std::string& filename, size_t sz)
+      {
+        int res = (*count_.access())++;
+        FileRecord  fr = { sz, filename };
+        (*filenames_.access())[res] = fr;
+
+        // keep track of sizes
+        critical_resource<size_t>::accessor     cur = current_size_.access();
+        *cur += sz;
+        critical_resource<size_t>::accessor     max = max_size_.access();
+        if (*cur > *max)
+            *max = *cur;
+
+        return res;
+      }
+
+      FileRecord    extract_file_record(int i)
+      {
+        CriticalMapAccessor accessor = filenames_.access();
+        FileRecord fr = (*accessor)[i];
+        accessor->erase(i);
+        return fr;
+      }
+
+      void          remove_file(const FileRecord& fr)
+      {
+        remove(fr.name.c_str());
+        (*current_size_.access()) -= fr.size;
+      }
+
+    private:
       typedef           std::map<int, FileRecord>                   FileRecordMap;
       typedef           critical_resource<FileRecordMap>            CriticalMap;
       typedef           CriticalMap::accessor                       CriticalMapAccessor;
