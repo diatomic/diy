@@ -22,9 +22,9 @@ namespace diy
     virtual void        load_binary_back(char* x, size_t count)     =0;   //!< copy `count` bytes into `x` from the back of the buffer
   };
 
-  struct BinaryBufferVector: public BinaryBuffer
+  struct MemoryBuffer: public BinaryBuffer
   {
-                        BinaryBufferVector(size_t position_ = 0):
+                        MemoryBuffer(size_t position_ = 0):
                           position(position_)                       {}
 
     virtual inline void save_binary(const char* x, size_t count);   //!< copy `count` bytes from `x` into the buffer
@@ -34,7 +34,7 @@ namespace diy
     void                clear()                                     { buffer.clear(); reset(); }
     void                wipe()                                      { std::vector<char>().swap(buffer); reset(); }
     void                reset()                                     { position = 0; }
-    void                swap(BinaryBufferVector& o)                 { std::swap(position, o.position); buffer.swap(o.buffer); }
+    void                swap(MemoryBuffer& o)                       { std::swap(position, o.position); buffer.swap(o.buffer); }
     bool                empty() const                               { return buffer.empty(); }
     size_t              size() const                                { return buffer.size(); }
     void                reserve(size_t s)                           { buffer.reserve(s); }
@@ -149,17 +149,17 @@ namespace diy
   }
 
 
-  // save/load for BinaryBufferVector
+  // save/load for MemoryBuffer
   template<>
-  struct Serialization< BinaryBufferVector >
+  struct Serialization< MemoryBuffer >
   {
-    static void         save(BinaryBuffer& bb, const BinaryBufferVector& x)
+    static void         save(BinaryBuffer& bb, const MemoryBuffer& x)
     {
       diy::save(bb, x.position);
       diy::save(bb, x.buffer);
     }
 
-    static void         load(BinaryBuffer& bb, BinaryBufferVector& x)
+    static void         load(BinaryBuffer& bb, MemoryBuffer& x)
     {
       diy::load(bb, x.position);
       diy::load(bb, x.buffer);
@@ -326,7 +326,7 @@ namespace diy
 }
 
 void
-diy::BinaryBufferVector::
+diy::MemoryBuffer::
 save_binary(const char* x, size_t count)
 {
   if (position + count > buffer.capacity())
@@ -340,7 +340,7 @@ save_binary(const char* x, size_t count)
 }
 
 void
-diy::BinaryBufferVector::
+diy::MemoryBuffer::
 load_binary(char* x, size_t count)
 {
   std::copy(&buffer[position], &buffer[position + count], x);
@@ -348,7 +348,7 @@ load_binary(char* x, size_t count)
 }
 
 void
-diy::BinaryBufferVector::
+diy::MemoryBuffer::
 load_binary_back(char* x, size_t count)
 {
   std::copy(&buffer[buffer.size() - count], &buffer[buffer.size()], x);

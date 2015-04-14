@@ -40,8 +40,6 @@ namespace diy
       typedef Collection::Save              SaveBlock;
       typedef Collection::Load              LoadBlock;
 
-      typedef BinaryBufferVector            BBVector;
-
     public:
       // Communicator types
 
@@ -67,7 +65,7 @@ namespace diy
 
       struct InFlight
       {
-        BBVector            message;
+        MemoryBuffer        message;
         mpi::request        request;
 
         // for debug purposes:
@@ -90,8 +88,8 @@ namespace diy
       };
 
       typedef           std::map<int,     QueueRecord>      InQueueRecords;     //  gid         -> (size, external)
-      typedef           std::map<int,     BBVector>         IncomingQueues;     //  gid         -> queue
-      typedef           std::map<BlockID, BBVector>         OutgoingQueues;     // (gid, proc)  -> queue
+      typedef           std::map<int,     MemoryBuffer>     IncomingQueues;     //  gid         -> queue
+      typedef           std::map<BlockID, MemoryBuffer>     OutgoingQueues;     // (gid, proc)  -> queue
       typedef           std::map<BlockID, QueueRecord>      OutQueueRecords;    // (gid, proc)  -> (size, external)
       struct IncomingQueuesRecords
       {
@@ -438,7 +436,7 @@ unload_outgoing(int gid)
   if (queue_policy_->unload_outgoing(*this, gid, out_queues_size - sizeof(size_t)))
   {
       //fprintf(stderr, "Unloading outgoing queues: %d -> ...; size = %lu\n", gid, out_queues_size);
-      BBVector  bb;     bb.reserve(out_queues_size);
+      MemoryBuffer  bb;     bb.reserve(out_queues_size);
       diy::save(bb, count);
 
       for (OutgoingQueues::iterator it = out_qr.queues.begin(); it != out_qr.queues.end();)
@@ -512,11 +510,11 @@ diy::Master::
 load_outgoing(int gid)
 {
   // TODO: we could adjust this mechanism to read directly from storage,
-  //       bypassing an intermediate BBVector
+  //       bypassing an intermediate MemoryBuffer
   OutgoingQueuesRecord& out_qr = outgoing_[gid];
   if (out_qr.external != -1)
   {
-    BBVector bb;
+    MemoryBuffer bb;
     storage_->get(out_qr.external, bb);
     out_qr.external = -1;
 
@@ -710,7 +708,7 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
           in_qr.size     = it->second.size;
           in_qr.external = -1;
 
-          BBVector bb;
+          MemoryBuffer bb;
           storage_->get(it->second.external, bb);
 
           incoming_[to].queues[from].swap(bb);
@@ -743,13 +741,13 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
         if (in_external)
         {
           //fprintf(stderr, "Unloading outgoing directly as incoming: %d <- %d\n", to, from);
-          BBVector& bb = it->second;
+          MemoryBuffer& bb = it->second;
           in_qr.size = bb.size();
           if (queue_policy_->unload_incoming(*this, from, to, in_qr.size))
             in_qr.external = storage_->put(bb);
           else
           {
-            BBVector& in_bb = incoming_[to].queues[from];
+            MemoryBuffer& in_bb = incoming_[to].queues[from];
             in_bb.swap(bb);
             in_bb.reset();
             in_qr.external = -1;
@@ -757,7 +755,7 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
         } else        // !in_external
         {
           //fprintf(stderr, "Swapping in memory: %d <- %d\n", to, from);
-          BBVector& bb = incoming_[to].queues[from];
+          MemoryBuffer& bb = incoming_[to].queues[from];
           bb.swap(it->second);
           bb.reset();
           in_qr.size = bb.size();
@@ -771,7 +769,7 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
       inflight_.push_back(InFlight()); ++inflight_size_;
       inflight_.back().from = from;
       inflight_.back().to   = to;
-      BBVector& bb = inflight_.back().message;
+      MemoryBuffer& bb = inflight_.back().message;
       bb.swap(it->second);
       diy::save(bb, std::make_pair(from, to));
       inflight_.back().request = comm_.isend(proc, tags::queue, bb.buffer);
@@ -785,7 +783,7 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
   mpi::optional<mpi::status>        ostatus = comm_.iprobe(mpi::any_source, tags::queue);
   while(ostatus)
   {
-    BBVector bb;
+    MemoryBuffer bb;
     comm_.recv(ostatus->source(), tags::queue, bb.buffer);
 
     std::pair<int,int> from_to;
@@ -796,7 +794,7 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
     int size     = bb.size();
     int external = -1;
 
-    incoming_[to].queues[from] = BBVector();
+    incoming_[to].queues[from] = MemoryBuffer();
     if (block(lid(to)) != 0 || !queue_policy_->unload_incoming(*this, from, to, size))
     {
         incoming_[to].queues[from].swap(bb);

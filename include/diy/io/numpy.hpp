@@ -136,7 +136,7 @@ write_header(const S& shape)
 {
     BOV::set_shape(shape);
 
-    diy::BinaryBufferVector dict;
+    diy::MemoryBuffer dict;
     save(dict, "{'descr': '");
     diy::save(dict, detail::big_endian());
     diy::save(dict, detail::map_numpy_type<T>());
@@ -156,7 +156,7 @@ write_header(const S& shape)
         diy::save(dict, ' ');
     diy::save(dict, '\n');
 
-    diy::BinaryBufferVector header;
+    diy::MemoryBuffer header;
     diy::save(header, (char) 0x93);
     save(header, "NUMPY");
     diy::save(header, (char) 0x01);  // major version of numpy format

@@ -40,9 +40,9 @@ namespace diy
   class ExternalStorage
   {
     public:
-      virtual int   put(BinaryBufferVector& bb)                         =0;
+      virtual int   put(MemoryBuffer& bb)                               =0;
       virtual int   put(const void* x, detail::Save save)               =0;
-      virtual void  get(int i, BinaryBufferVector& bb, size_t extra = 0)=0;
+      virtual void  get(int i, MemoryBuffer& bb, size_t extra = 0)      =0;
       virtual void  get(int i, void* x, detail::Load load)              =0;
       virtual void  destroy(int i)                                      =0;
   };
@@ -65,7 +65,7 @@ namespace diy
                       filename_templates_(filename_templates),
                       count_(0), current_size_(0), max_size_(0)         {}
 
-      virtual int   put(BinaryBufferVector& bb)
+      virtual int   put(MemoryBuffer& bb)
       {
         std::string     filename;
         int fh = open_random(filename);
@@ -106,7 +106,7 @@ namespace diy
         return make_file_record(filename, sz);
       }
 
-      virtual void   get(int i, BinaryBufferVector& bb, size_t extra)
+      virtual void   get(int i, MemoryBuffer& bb, size_t extra)
       {
         FileRecord fr = extract_file_record(i);
 

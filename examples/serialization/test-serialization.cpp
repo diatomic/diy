@@ -30,7 +30,7 @@ namespace diy
 
 int main()
 {
-  diy::BinaryBufferVector bb;
+  diy::MemoryBuffer bb;
   std::cout << "Position: " << bb.position << std::endl;
 
   {
