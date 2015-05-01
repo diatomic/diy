@@ -54,7 +54,8 @@ struct RegularPartners
 
   private:
     inline void fill_steps();
-    static void factor(int k, int tot_b, std::vector<int>& kvs);
+    static
+    inline void factor(int k, int tot_b, std::vector<int>& kvs);
 
     DivisionVector      divisions_;
     KVSVector           kvs_;
