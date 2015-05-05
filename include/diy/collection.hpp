@@ -79,8 +79,9 @@ void
 diy::Collection::
 clear()
 {
-  for (size_t i = 0; i < size(); ++i)
-    destroy(i);
+  if (own())
+    for (size_t i = 0; i < size(); ++i)
+      destroy(i);
   elements_.clear();
   external_.clear();
   *in_memory_.access() = 0;
