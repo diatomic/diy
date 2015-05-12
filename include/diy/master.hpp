@@ -29,7 +29,7 @@ namespace diy
   class Master
   {
     public:
-      template<class Functor, class Skip>
+      template<class Block, class Functor, class Skip>
       struct ProcessBlock;
 
       struct SkipNoIncoming;
@@ -196,12 +196,21 @@ namespace diy
 
       //! call `f` with every block
       template<class Functor>
-      void          foreach(const Functor& f)           { foreach(f, NeverSkip(), 0); }
+      void          foreach(const Functor& f)           { foreach<void>(f); }
+
+      template<class Block, class Functor>
+      void          foreach(const Functor& f)           { foreach<Block>(f, (void*) 0); }
 
       template<class Functor, class T>
-      void          foreach(const Functor& f, T* aux)   { foreach(f, NeverSkip(), aux); }
+      void          foreach(const Functor& f, T* aux)   { foreach<void>(f, aux); }
+
+      template<class Block, class Functor, class T>
+      void          foreach(const Functor& f, T* aux)   { foreach<Block>(f, NeverSkip(), aux); }
 
       template<class Functor, class Skip>
+      void          foreach(const Functor& f, const Skip& skip, void* aux = 0)  { foreach<void>(f,skip,aux); }
+
+      template<class Block, class Functor, class Skip>
       void          foreach(const Functor& f, const Skip& skip, void* aux = 0);
 
     public:
@@ -257,7 +266,7 @@ namespace diy
       fast_mutex            add_mutex_;
   };
 
-  template<class Functor, class Skip>
+  template<class Block, class Functor, class Skip>
   struct Master::ProcessBlock
   {
             ProcessBlock(const Functor&             f_,
@@ -319,7 +328,7 @@ namespace diy
               local.push_back(i);
             }
 
-            f(master.block(i), master.proxy(i), aux);
+            f(master.block<Block>(i), master.proxy(i), aux);
         }
       } while(true);
 
@@ -579,7 +588,7 @@ has_incoming(int i) const
   return false;
 }
 
-template<class Functor, class Skip>
+template<class Block, class Functor, class Skip>
 void
 diy::Master::
 foreach(const Functor& f, const Skip& skip, void* aux)
@@ -618,7 +627,7 @@ foreach(const Functor& f, const Skip& skip, void* aux)
   // idx is shared
   critical_resource<int> idx(0);
 
-  typedef                 ProcessBlock<Functor,Skip>                      BlockFunctor;
+  typedef                 ProcessBlock<Block,Functor,Skip>                BlockFunctor;
   if (num_threads > 1)
   {
     // launch the threads
