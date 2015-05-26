@@ -6,71 +6,16 @@
 #include <diy/decomposition.hpp>
 #include <diy/assigner.hpp>
 
+#include "../opts.h"
+
+#include "point.h"
+
 typedef     diy::ContinuousBounds       Bounds;
 typedef     diy::RegularContinuousLink  RCLink;
 
 static const unsigned DIM = 3;
-
-template<unsigned D>
-struct SimplePoint
-{
-    float   coords[D];
-
-    float&  operator[](unsigned i)                          { return coords[i]; }
-    float   operator[](unsigned i) const                    { return coords[i]; }
-};
-
-struct Block
-{
-  typedef         SimplePoint<DIM>                            Point;
-
-                  Block(const Bounds& bounds_):
-                      bounds(bounds_)                         {}
-
-  static void*    create()                                    { return new Block; }
-  static void     destroy(void* b)                            { delete static_cast<Block*>(b); }
-  static void     save(const void* b, diy::BinaryBuffer& bb)  { diy::save(bb, *static_cast<const Block*>(b)); }
-  static void     load(void* b, diy::BinaryBuffer& bb)        { diy::load(bb, *static_cast<Block*>(b)); }
-
-
-  void            generate_points(const Bounds& domain, size_t n)
-  {
-    box = domain;
-    points.resize(n);
-    for (size_t i = 0; i < n; ++i)
-      for (unsigned j = 0; j < DIM; ++j)
-        points[i][j] = domain.min[j] + float(rand() % 100)/100 * (domain.max[j] - domain.min[j]);
-  }
-
-  Bounds                bounds;
-  Bounds                box;
-  std::vector<Point>    points;
-
-  private:
-                  Block()                                     {}
-};
-
-struct AddBlock
-{
-        AddBlock(diy::Master& master_, size_t num_points_):
-            master(master_),
-            num_points(num_points_)
-        {}
-
-  void  operator()(int gid, const Bounds& core, const Bounds& bounds, const Bounds& domain, const RCLink& link) const
-  {
-    Block*          b   = new Block(core);
-    RCLink*         l   = new RCLink(link);
-    diy::Master&    m   = const_cast<diy::Master&>(master);
-
-    int             lid = m.add(gid, b, l);
-
-    b->generate_points(domain, num_points);
-  }
-
-  diy::Master&  master;
-  size_t        num_points;
-};
+typedef     PointBlock<DIM>             Block;
+typedef     AddPointBlock<DIM>          AddBlock;
 
 void redistribute(void* b_, const diy::ReduceProxy& srp, const diy::RegularSwapPartners& partners)
 {
@@ -129,55 +74,52 @@ void redistribute(void* b_, const diy::ReduceProxy& srp, const diy::RegularSwapP
     b->box.max[cur_dim] = new_max;
 }
 
-void verify_block(void* b_, const diy::Master::ProxyWithLink& cp, void*)
-{
-    Block*   b     = static_cast<Block*>(b_);
-
-    for (size_t i = 0; i < b->points.size(); ++i)
-      for (unsigned j = 0; j < DIM; ++j)
-        if (b->points[i][j] < b->box.min[j] || b->points[i][j] > b->box.max[j])
-          fprintf(stderr, "!!! Point outside the box !!!\n");
-}
-
-void print_block(void* b_, const diy::Master::ProxyWithLink& cp, void* verbose_)
-{
-    Block*   b       = static_cast<Block*>(b_);
-    bool     verbose = *static_cast<bool*>(verbose_);
-
-    fprintf(stdout, "[%d] Box:    %f %f %f -- %f %f %f\n",
-            cp.gid(),
-            b->box.min[0], b->box.min[1], b->box.min[2],
-            b->box.max[0], b->box.max[1], b->box.max[2]);
-    fprintf(stdout, "[%d] Bounds: %f %f %f -- %f %f %f\n",
-            cp.gid(),
-            b->bounds.min[0], b->bounds.min[1], b->bounds.min[2],
-            b->bounds.max[0], b->bounds.max[1], b->bounds.max[2]);
-
-    if (verbose)
-    {
-      for (size_t i = 0; i < b->points.size(); ++i)
-      {
-        fprintf(stdout, "  ");
-        for (unsigned j = 0; j < DIM; ++j)
-          fprintf(stdout, "%f ", b->points[i][j]);
-        fprintf(stdout, "\n");
-      }
-    } else
-        fprintf(stdout, "[%d] Points: %d\n", cp.gid(), (int) b->points.size());
-}
-
 int main(int argc, char* argv[])
 {
-  // TODO: read from the command line
-  int                       nblocks     = 64;
+  diy::mpi::environment     env(argc, argv);
+  diy::mpi::communicator    world;
+
+  int                       nblocks     = world.size();
   size_t                    num_points  = 100;      // points per block
   int                       mem_blocks  = -1;
   int                       threads     = -1;
+  int                       k           = 2;
+  std::string               prefix      = "./DIY.XXXXXX";
 
-  diy::mpi::environment     env(argc, argv);
+  Bounds domain;
+  domain.min[0] = domain.min[1] = domain.min[2] = 0;
+  domain.max[0] = domain.max[1] = domain.max[2] = 100.;
 
-  diy::mpi::communicator    world;
-  diy::FileStorage          storage("./DIY.XXXXXX");
+  using namespace opts;
+  Options ops(argc, argv);
+
+  ops
+      >> Option('n', "number",  num_points,     "number of points per block")
+      >> Option('k', "k",       k,              "use k-ary swap")
+      >> Option('b', "blocks",  nblocks,        "number of blocks")
+      >> Option('t', "thread",  threads,        "number of threads")
+      >> Option('m', "memory",  mem_blocks,     "number of blocks to keep in memory")
+      >> Option(     "prefix",  prefix,         "prefix for external storage")
+  ;
+
+  ops
+      >> Option('x',  "max-x",  domain.max[0],  "domain max x")
+      >> Option('y',  "max-y",  domain.max[1],  "domain max y")
+      >> Option('z',  "max-z",  domain.max[2],  "domain max z")
+  ;
+
+  if (ops >> Present('h', "help", "show help"))
+  {
+      if (world.rank() == 0)
+      {
+          std::cout << "Usage: " << argv[0] << " [OPTIONS]\n";
+          std::cout << "Generates random particles in the domain and redistributes them into correct blocks.\n";
+          std::cout << ops;
+      }
+      return 1;
+  }
+
+  diy::FileStorage          storage(prefix);
   diy::Master               master(world,
                                    threads,
                                    mem_blocks,
@@ -188,22 +130,18 @@ int main(int argc, char* argv[])
                                    &Block::load);
 
   int   dim = DIM;
-  Bounds domain;
-  domain.min[0] = domain.min[1] = domain.min[2] = 0;
-  domain.max[0] = domain.max[1] = domain.max[2] = 100.;
 
   diy::ContiguousAssigner   assigner(world.size(), nblocks);
   //diy::RoundRobinAssigner   assigner(world.size(), nblocks);
   AddBlock  create(master, num_points);
   diy::decompose(dim, world.rank(), domain, assigner, create);
 
-  int   k = 2;
   diy::RegularSwapPartners  partners(dim, nblocks, k, false);
   //fprintf(stderr, "%d %d %d\n", dim, nblocks, k);
   //fprintf(stderr, "partners.rounds(): %d\n", (int) partners.rounds());
   diy::reduce(master, assigner, partners, redistribute);
 
   bool  verbose = false;
-  master.foreach(print_block, &verbose);
-  master.foreach(verify_block);
+  master.foreach<Block>(Block::print_block, &verbose);
+  master.foreach<Block>(Block::verify_block);
 }
