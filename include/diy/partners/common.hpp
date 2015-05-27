@@ -94,7 +94,7 @@ diy::RegularPartners::
 fill(int round, int gid, std::vector<int>& partners) const
 {
   const DimK&   kv  = kvs_[round];
-  partners.reserve(kv.size - 1);
+  partners.reserve(kv.size);
 
   int step = this->step(round);       // gids jump by this much in the current round
 
