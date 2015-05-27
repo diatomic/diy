@@ -42,7 +42,13 @@ struct PointBlock
       for (size_t i = 0; i < b->points.size(); ++i)
         for (unsigned j = 0; j < DIM; ++j)
           if (b->points[i][j] < b->box.min[j] || b->points[i][j] > b->box.max[j])
+          {
             fprintf(stderr, "!!! Point outside the box !!!\n");
+            fprintf(stderr, "    %f %f %f\n", b->points[i][0], b->points[i][1], b->points[i][2]);
+            fprintf(stderr, "    %f %f %f - %f %f %f\n",
+                            b->box.min[0], b->box.min[1], b->box.min[2],
+                            b->box.max[0], b->box.max[1], b->box.max[2]);
+          }
   }
 
   static void print_block(PointBlock* b, const diy::Master::ProxyWithLink& cp, void* verbose_)

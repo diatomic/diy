@@ -53,8 +53,8 @@ namespace detail
     static float    from(int i, int n, float min, float max, bool)      { return min + (max - min)/n * i; }
     static float    to(int i, int n, float min, float max, bool)        { return min + (max - min)/n * (i+1); }
 
-    static int      lower(float x, int n, float min, float max)         { float width = (max - min)/n; float res = std::floor((x - min)/width); if (res == x) return (res - 1); else return res; }
-    static int      upper(float x, int n, float min, float max)         { float width = (max - min)/n; float res = std::ceil ((x - min)/width); if (res == x) return (res + 1); else return res; }
+    static int      lower(float x, int n, float min, float max, bool)   { float width = (max - min)/n; float res = std::floor((x - min)/width); if (min + res*width == x) return (res - 1); else return res; }
+    static int      upper(float x, int n, float min, float max, bool)   { float width = (max - min)/n; float res = std::ceil ((x - min)/width); if (min + res*width == x) return (res + 1); else return res; }
   };
 }
 
@@ -110,7 +110,7 @@ namespace detail
     int             coords_to_gid(const DivisionsVector& coords) const          { return coords_to_gid(coords, divisions); }
     void            fill_divisions(int nblocks)                                 { fill_divisions(dim, nblocks, divisions); }
 
-    void            fill_bounds(Bounds& bounds, const DivisionsVector& coords, bool add_ghosts = false);
+    void            fill_bounds(Bounds& bounds, const DivisionsVector& coords, bool add_ghosts = false) const;
 
     static bool     all(const std::vector<int>& v, int x);
     static void     gid_to_coords(int gid, DivisionsVector& coords, const DivisionsVector& divisions);
@@ -121,6 +121,10 @@ namespace detail
     // Point to GIDs functions
     template<class Point>
     void            point_to_gids(std::vector<int>& gids, const Point& p) const;
+
+    //! returns gid of a block that contains the point; ignores ghosts
+    template<class Point>
+    int             point_to_gid(const Point& p) const;
 
     template<class Point>
     int             num_gids(const Point& p) const;
@@ -302,7 +306,7 @@ coords_to_gid(const DivisionsVector& coords, const DivisionsVector& divisions)
 template<class Bounds>
 void
 diy::RegularDecomposer<Bounds>::
-fill_bounds(Bounds& bounds, const DivisionsVector& coords, bool add_ghosts)
+fill_bounds(Bounds& bounds, const DivisionsVector& coords, bool add_ghosts) const
 {
   for (int i = 0; i < dim; ++i)
   {
@@ -410,6 +414,26 @@ point_to_gids(std::vector<int>& gids, const Point& p) const
             location[i]++;
         }
     }
+}
+
+template<class Bounds>
+template<class Point>
+int
+diy::RegularDecomposer<Bounds>::
+point_to_gid(const Point& p) const
+{
+    int gid = 0;
+    for (int axis = dim; axis >= 0; --axis)
+    {
+      int bottom  = detail::BoundsHelper<Bounds>::lower(p[axis], divisions[axis], domain.min[axis], domain.max[axis], share_face[axis]);
+          bottom  = std::max(0, bottom);
+
+      // coupled with coords_to_gid
+      gid *= divisions[axis];
+      gid += bottom;
+    }
+
+    return gid;
 }
 
 template<class Bounds>

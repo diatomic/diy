@@ -34,11 +34,15 @@ namespace diy
     void                clear()                                     { buffer.clear(); reset(); }
     void                wipe()                                      { std::vector<char>().swap(buffer); reset(); }
     void                reset()                                     { position = 0; }
+    void                skip(size_t s)                              { position += s; }
     void                swap(MemoryBuffer& o)                       { std::swap(position, o.position); buffer.swap(o.buffer); }
     bool                empty() const                               { return buffer.empty(); }
     size_t              size() const                                { return buffer.size(); }
     void                reserve(size_t s)                           { buffer.reserve(s); }
                         operator bool() const                       { return position < buffer.size(); }
+
+    //! copy a memory buffer from one buffer to another, bypassing making a temporary copy first
+    inline static void  copy(MemoryBuffer& from, MemoryBuffer& to);
 
     //! multiplier used for the geometric growth of the container
     static const float  growth_multiplier()                         { return 1.5; }
@@ -156,13 +160,14 @@ namespace diy
     static void         save(BinaryBuffer& bb, const MemoryBuffer& x)
     {
       diy::save(bb, x.position);
-      diy::save(bb, x.buffer);
+      diy::save(bb, &x.buffer[0], x.position);
     }
 
     static void         load(BinaryBuffer& bb, MemoryBuffer& x)
     {
       diy::load(bb, x.position);
-      diy::load(bb, x.buffer);
+      x.buffer.resize(x.position);
+      diy::load(bb, &x.buffer[0], x.position);
     }
   };
 
@@ -353,6 +358,21 @@ load_binary_back(char* x, size_t count)
 {
   std::copy(&buffer[buffer.size() - count], &buffer[buffer.size()], x);
   buffer.resize(buffer.size() - count);
+}
+
+void
+diy::MemoryBuffer::
+copy(MemoryBuffer& from, MemoryBuffer& to)
+{
+  size_t sz;
+  diy::load(from, sz);
+  from.position -= sizeof(size_t);
+
+  size_t total = sizeof(size_t) + sz;
+  to.buffer.resize(to.position + total);
+  std::copy(&from.buffer[from.position], &from.buffer[from.position + total], &to.buffer[to.position]);
+  to.position += total;
+  from.position += total;
 }
 
 #endif

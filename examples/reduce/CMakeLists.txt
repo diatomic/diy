@@ -9,3 +9,6 @@ target_link_libraries       (kd-tree ${libraries})
 
 add_executable              (sort sort.cpp)
 target_link_libraries       (sort ${libraries})
+
+add_executable              (all-to-all all-to-all.cpp)
+target_link_libraries       (all-to-all ${libraries})

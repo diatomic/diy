@@ -1,0 +1,161 @@
+#include <cmath>
+#include <cassert>
+
+#include <diy/master.hpp>
+#include <diy/reduce-operations.hpp>
+#include <diy/decomposition.hpp>
+#include <diy/assigner.hpp>
+
+#include "../opts.h"
+
+#include "point.h"
+
+typedef     diy::ContinuousBounds               Bounds;
+typedef     diy::RegularContinuousLink          RCLink;
+typedef     diy::RegularDecomposer<Bounds>      Decomposer;
+
+static const unsigned DIM = 3;
+typedef     PointBlock<DIM>                     Block;
+typedef     AddPointBlock<DIM>                  AddBlock;
+
+struct Redistribute
+{
+       Redistribute(const Decomposer& decomposer_):
+           decomposer(decomposer_)              {}
+
+  void operator()(void* b_, const diy::ReduceProxy& rp) const
+  {
+      Block* b = static_cast<Block*>(b_);
+
+      if (rp.in_link().size() == 0)
+      {
+          // queue points to the correct blocks
+          for (size_t i = 0; i < b->points.size(); ++i)
+          {
+            int dest_gid = decomposer.point_to_gid(b->points[i]);
+            diy::BlockID dest = rp.out_link().target(dest_gid);        // out_link targets are ordered as gids
+            assert(dest.gid == dest_gid);
+            rp.enqueue(dest, b->points[i]);
+
+            // DEBUG
+            Decomposer::DivisionsVector coords;
+            decomposer.gid_to_coords(dest_gid, coords);
+            Bounds bounds;
+            decomposer.fill_bounds(bounds, coords);
+
+            for (int j = 0; j < DIM; ++j)
+              if (b->points[i][j] < bounds.min[j] || b->points[i][j] > bounds.max[j])
+              {
+                fprintf(stderr, "!!! Point sent outside the target box !!!\n");
+                fprintf(stderr, "    %f %f %f\n", b->points[i][0], b->points[i][1], b->points[i][2]);
+                fprintf(stderr, "    %f %f %f - %f %f %f\n",
+                                bounds.min[0], bounds.min[1], bounds.min[2],
+                                bounds.max[0], bounds.max[1], bounds.max[2]);
+              }
+          }
+          b->points.clear();
+      } else
+      {
+          // in this example, box is not updated during the reduction, so just set it to bounds
+          b->box = b->bounds;
+
+          // add up the total number of points
+          size_t total = 0;
+          for (int i = 0; i < rp.in_link().size(); ++i)
+          {
+            int gid = rp.in_link().target(i).gid;
+            assert(gid == i);
+
+            diy::MemoryBuffer& incoming = rp.incoming(gid);
+            size_t incoming_sz  = incoming.size() / sizeof(Block::Point);
+            total += incoming_sz;
+          }
+
+          // resize and copy out the points
+          b->points.resize(total);
+          size_t sz = 0;
+          for (int i = 0; i < rp.in_link().size(); ++i)
+          {
+            int gid = rp.in_link().target(i).gid;
+            diy::MemoryBuffer& incoming = rp.incoming(gid);
+            size_t incoming_sz  = incoming.size() / sizeof(Block::Point);
+            std::copy((Block::Point*) &incoming.buffer[0],
+                      (Block::Point*) &incoming.buffer[0] + incoming_sz,
+                      &b->points[sz]);
+            sz += incoming_sz;
+          }
+      }
+  }
+
+  const Decomposer& decomposer;
+};
+
+int main(int argc, char* argv[])
+{
+  diy::mpi::environment     env(argc, argv);
+  diy::mpi::communicator    world;
+
+  int                       nblocks     = world.size();
+  size_t                    num_points  = 100;      // points per block
+  int                       mem_blocks  = -1;
+  int                       threads     = -1;
+  int                       k           = 2;
+  std::string               prefix      = "./DIY.XXXXXX";
+
+  Bounds domain;
+  domain.min[0] = domain.min[1] = domain.min[2] = 0;
+  domain.max[0] = domain.max[1] = domain.max[2] = 100.;
+
+  using namespace opts;
+  Options ops(argc, argv);
+
+  ops
+      >> Option('n', "number",  num_points,     "number of points per block")
+      >> Option('k', "k",       k,              "use k-ary swap")
+      >> Option('b', "blocks",  nblocks,        "number of blocks")
+      >> Option('t', "thread",  threads,        "number of threads")
+      >> Option('m', "memory",  mem_blocks,     "number of blocks to keep in memory")
+      >> Option(     "prefix",  prefix,         "prefix for external storage")
+  ;
+
+  ops
+      >> Option('x',  "max-x",  domain.max[0],  "domain max x")
+      >> Option('y',  "max-y",  domain.max[1],  "domain max y")
+      >> Option('z',  "max-z",  domain.max[2],  "domain max z")
+  ;
+
+  if (ops >> Present('h', "help", "show help"))
+  {
+      if (world.rank() == 0)
+      {
+          std::cout << "Usage: " << argv[0] << " [OPTIONS]\n";
+          std::cout << "Generates random particles in the domain and redistributes them into correct blocks.\n";
+          std::cout << ops;
+      }
+      return 1;
+  }
+
+  diy::FileStorage          storage(prefix);
+  diy::Master               master(world,
+                                   threads,
+                                   mem_blocks,
+                                   &Block::create,
+                                   &Block::destroy,
+                                   &storage,
+                                   &Block::save,
+                                   &Block::load);
+
+  int   dim = DIM;
+
+  diy::ContiguousAssigner   assigner(world.size(), nblocks);
+  //diy::RoundRobinAssigner   assigner(world.size(), nblocks);
+  AddBlock      create(master, num_points);
+
+  Decomposer    decomposer(dim, domain, assigner);
+  decomposer.decompose(world.rank(), create);
+  diy::all_to_all(master, assigner, Redistribute(decomposer), k);
+
+  bool  verbose = false;
+  master.foreach<Block>(Block::print_block, &verbose);
+  master.foreach<Block>(Block::verify_block);
+}

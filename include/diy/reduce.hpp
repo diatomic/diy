@@ -43,6 +43,19 @@ struct ReduceProxy: public Master::Proxy
       }
     }
 
+    ReduceProxy(const Master::Proxy&    proxy, //!< parent proxy
+                void*                   block, //!< diy block
+                unsigned                round, //!< current round
+                const Link&             in_link,
+                const Link&             out_link):
+      Master::Proxy(proxy),
+      block_(block),
+      round_(round),
+      in_link_(in_link),
+      out_link_(out_link)
+    {}
+
+
       //! returns pointer to block
       void*         block() const                           { return block_; }
       //! returns current round number
