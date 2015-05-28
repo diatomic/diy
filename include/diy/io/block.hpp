@@ -35,12 +35,12 @@ namespace io
     };
   }
 
-  template<class Master>
+  inline
   void
   write_blocks(const std::string&           outfilename,
                const mpi::communicator&     comm,
                Master&                      master,
-               typename Master::SaveBlock   save = 0)
+               Master::SaveBlock            save = 0)
   {
     if (!save) save = master.saver();       // save is likely to be different from master.save()
 
@@ -135,13 +135,13 @@ namespace io
     }
   }
 
-  template<class Master>
+  inline
   void
   read_blocks(const std::string&           outfilename,
               const mpi::communicator&     comm,
               Assigner&                    assigner,
               Master&                      master,
-              typename Master::LoadBlock   load = 0)
+              Master::LoadBlock            load = 0)
   {
     if (!load) load = master.loader();      // load is likely to be different from master.load()
 
