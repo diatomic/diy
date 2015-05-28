@@ -10,6 +10,24 @@ namespace diy
 namespace detail
 {
   template<class Op>
+  struct AllToAllReduce;
+}
+
+template<class Op>
+void
+all_to_all(Master&              master,     //!< block owner
+           const Assigner&      assigner,   //!< global block locator (maps gid to proc)
+           const Op&            op,         //!< user-defined operation called to enqueue and dequeue items
+           int                  k = 2       //!< reduction fanout
+          )
+{
+  RegularSwapPartners  partners(1, assigner.nblocks(), k, false);
+  reduce(master, assigner, partners, detail::AllToAllReduce<Op>(op, assigner));
+}
+
+namespace detail
+{
+  template<class Op>
   struct AllToAllReduce
   {
          AllToAllReduce(const Op& op_, const Assigner& assigner):
@@ -24,9 +42,25 @@ namespace detail
 
     void operator()(void* b, const ReduceProxy& srp, const RegularSwapPartners& partners) const
     {
-      if (srp.in_link().size() == 0)                // initial round
-      {
+      int k_in  = srp.in_link().size();
+      int k_out = srp.out_link().size();
 
+      if (k_in == 0 && k_out == 0)  // special case of a single block
+      {
+          ReduceProxy all_srp_out(srp, srp.block(), 0, empty_link,         all_neighbors_link);
+          ReduceProxy all_srp_in (srp, srp.block(), 1, all_neighbors_link, empty_link);
+
+          op(b, all_srp_out);
+          MemoryBuffer& in_queue = all_srp_in.incoming(all_srp_in.in_link().target(0).gid);
+          in_queue.swap(all_srp_out.outgoing(all_srp_out.out_link().target(0)));
+          in_queue.reset();
+
+          op(b, all_srp_in);
+          return;
+      }
+
+      if (k_in == 0)                // initial round
+      {
         ReduceProxy all_srp(srp, srp.block(), 0, empty_link, all_neighbors_link);
         op(b, all_srp);
 
@@ -34,7 +68,6 @@ namespace detail
         all_queues.swap(*all_srp.outgoing());       // clears out the queues and stores them locally
 
         // enqueue outgoing
-        int k_out = srp.out_link().size();
         int group = all_srp.out_link().size() / k_out;
         for (int i = 0; i < k_out; ++i)
         {
@@ -48,15 +81,13 @@ namespace detail
             srp.enqueue(srp.out_link().target(i), all_queues[all_srp.out_link().target(j)]);
           }
         }
-      } else if (srp.out_link().size() == 0)        // final round
+      } else if (k_out == 0)        // final round
       {
         // dequeue incoming + reorder into the correct order
         ReduceProxy all_srp(srp, srp.block(), 1, all_neighbors_link, empty_link);
 
         Master::IncomingQueues all_incoming;
         all_incoming.swap(*srp.incoming());
-
-        int k_in  = srp.in_link().size();
 
         std::pair<int, int> range;      // all the ranges should be the same
         for (int i = 0; i < k_in; ++i)
@@ -69,15 +100,13 @@ namespace detail
             std::pair<int, int> from_to;
             load(in, from_to);
             load(in, all_srp.incoming(from_to.first));
+            all_srp.incoming(from_to.first).reset();
           }
         }
 
         op(b, all_srp);
       } else                                        // intermediate round: reshuffle queues
       {
-        int k_in  = srp.in_link().size();
-        int k_out = srp.out_link().size();
-
         // add up buffer sizes
         std::vector<size_t> sizes_out(k_out, sizeof(std::pair<int,int>));
         std::pair<int, int> range;      // all the ranges should be the same
@@ -140,18 +169,6 @@ namespace detail
     const Op&           op;
     Link                all_neighbors_link, empty_link;
   };
-}
-
-template<class Op>
-void
-all_to_all(Master&              master,     //!< block owner
-           const Assigner&      assigner,   //!< global block locator (maps gid to proc)
-           const Op&            op,         //!< user-defined operation called to enqueue and dequeue items
-           int                  k = 2       //!< reduction fanout
-          )
-{
-  RegularSwapPartners  partners(1, assigner.nblocks(), k, false);
-  reduce(master, assigner, partners, detail::AllToAllReduce<Op>(op, assigner));
 }
 
 }
