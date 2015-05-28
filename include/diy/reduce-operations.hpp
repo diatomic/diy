@@ -64,8 +64,6 @@ namespace detail
           int gid_in = srp.in_link().target(i).gid;
           MemoryBuffer& in = all_incoming[gid_in];
           load(in, range);
-          assert(range.first == range.second - 1);
-          assert(range.first == srp.gid());
           while(in)
           {
             std::pair<int, int> from_to;
