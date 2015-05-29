@@ -47,8 +47,8 @@ namespace detail
 
       if (k_in == 0 && k_out == 0)  // special case of a single block
       {
-          ReduceProxy all_srp_out(srp, srp.block(), 0, empty_link,         all_neighbors_link);
-          ReduceProxy all_srp_in (srp, srp.block(), 1, all_neighbors_link, empty_link);
+          ReduceProxy all_srp_out(srp, srp.block(), 0, srp.nblocks(), empty_link,         all_neighbors_link);
+          ReduceProxy all_srp_in (srp, srp.block(), 1, srp.nblocks(), all_neighbors_link, empty_link);
 
           op(b, all_srp_out);
           MemoryBuffer& in_queue = all_srp_in.incoming(all_srp_in.in_link().target(0).gid);
@@ -61,7 +61,7 @@ namespace detail
 
       if (k_in == 0)                // initial round
       {
-        ReduceProxy all_srp(srp, srp.block(), 0, empty_link, all_neighbors_link);
+        ReduceProxy all_srp(srp, srp.block(), 0, srp.nblocks(), empty_link, all_neighbors_link);
         op(b, all_srp);
 
         Master::OutgoingQueues all_queues;
@@ -84,7 +84,7 @@ namespace detail
       } else if (k_out == 0)        // final round
       {
         // dequeue incoming + reorder into the correct order
-        ReduceProxy all_srp(srp, srp.block(), 1, all_neighbors_link, empty_link);
+        ReduceProxy all_srp(srp, srp.block(), 1, srp.nblocks(), all_neighbors_link, empty_link);
 
         Master::IncomingQueues all_incoming;
         all_incoming.swap(*srp.incoming());

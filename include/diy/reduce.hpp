@@ -22,7 +22,8 @@ struct ReduceProxy: public Master::Proxy
                 const GIDVector&        outgoing_gids): //!< outgoing gids in this group
       Master::Proxy(proxy),
       block_(block),
-      round_(round)
+      round_(round),
+      nblocks_(assigner.nblocks())
     {
       // setup in_link
       for (unsigned i = 0; i < incoming_gids.size(); ++i)
@@ -46,34 +47,39 @@ struct ReduceProxy: public Master::Proxy
     ReduceProxy(const Master::Proxy&    proxy, //!< parent proxy
                 void*                   block, //!< diy block
                 unsigned                round, //!< current round
+                int                     nblocks,
                 const Link&             in_link,
                 const Link&             out_link):
       Master::Proxy(proxy),
       block_(block),
       round_(round),
+      nblocks_(nblocks),
       in_link_(in_link),
       out_link_(out_link)
     {}
 
 
-      //! returns pointer to block
-      void*         block() const                           { return block_; }
-      //! returns current round number
-      unsigned      round() const                           { return round_; }
-      //! returns incoming link
-      const Link&   in_link() const                         { return in_link_; }
-      //! returns outgoing link
-      const Link&   out_link() const                        { return out_link_; }
+    //! returns pointer to block
+    void*         block() const                           { return block_; }
+    //! returns current round number
+    unsigned      round() const                           { return round_; }
+    //! returns incoming link
+    const Link&   in_link() const                         { return in_link_; }
+    //! returns outgoing link
+    const Link&   out_link() const                        { return out_link_; }
+    //! returns total number of blocks
+    int           nblocks() const                         { return nblocks_; }
 
-      //! advanced: change current round number
-      void          set_round(unsigned r)                   { round_ = r; }
+    //! advanced: change current round number
+    void          set_round(unsigned r)                   { round_ = r; }
 
-    private:
-      void*         block_;
-      unsigned      round_;
+  private:
+    void*         block_;
+    unsigned      round_;
+    int           nblocks_;
 
-      Link          in_link_;
-      Link          out_link_;
+    Link          in_link_;
+    Link          out_link_;
 };
 
 namespace detail
