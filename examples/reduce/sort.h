@@ -51,10 +51,13 @@ struct Block
     for (size_t i = 0; i < values.size(); ++i)
       if (values[i] < min || values[i] > max)
         std::cout << "Warning: " << values[i] << " outside of [" << min << "," << max << "]" << std::endl;
+
+    cp.all_reduce(values.size(), std::plus<size_t>());
   }
 
   T                     min, max;
   std::vector<T>        values;
+  std::vector<T>        samples;            // used only in sample sort
 
   int                   bins;
 

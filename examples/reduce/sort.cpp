@@ -414,6 +414,13 @@ int main(int argc, char* argv[])
     printf("Verifying blocks\n");
     master.foreach(&ValueBlock::verify_block);
 
+    master.exchange();      // to process collectives
+    typedef diy::Master::ProxyWithLink      Proxy;
+    int     idx   = master.loaded_block();
+    Proxy   proxy = master.proxy(idx);
+    size_t  total = proxy.get<size_t>();
+    std::cout << "Total values: " << total << " vs " << nblocks * num_values << std::endl;
+
     if (world.rank() == 0)
       std::cout << "Blocks verified" << std::endl;
   }
