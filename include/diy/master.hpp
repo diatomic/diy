@@ -31,6 +31,8 @@ namespace diy
     public:
       template<class Block, class Functor, class Skip>
       struct ProcessBlock;
+      template<class Block>
+      struct Binder;
 
       struct SkipNoIncoming;
       struct NeverSkip { bool    operator()(int i, const Master& master) const   { return false; } };
@@ -213,6 +215,16 @@ namespace diy
       template<class Block, class Functor, class Skip>
       void          foreach(const Functor& f, const Skip& skip, void* aux = 0);
 
+      // calls to member functions
+      template<class Block>
+      void          foreach(void (Block::*f)(const ProxyWithLink&, void*))                   { foreach<Block>(f, (void*) 0); }
+
+      template<class Block, class T>
+      void          foreach(void (Block::*f)(const ProxyWithLink&, void*), T* aux)           { foreach<Block>(f, NeverSkip(), aux); }
+
+      template<class Block, class Skip>
+      void          foreach(void (Block::*f)(const ProxyWithLink&, void*), const Skip& skip, void* aux = 0) { foreach<Block>(Binder<Block>(f), skip, aux); }
+
     public:
       // Communicator functionality
       IncomingQueues&   incoming(int gid)               { return incoming_[gid].queues; }
@@ -345,6 +357,15 @@ namespace diy
     const std::deque<int>&  blocks;
     int                     local_limit;
     critical_resource<int>& idx;
+  };
+
+  template<class Block>
+  struct Master::Binder
+  {
+    typedef     void (Block::*MemberFn)(const ProxyWithLink&, void*);
+                Binder(MemberFn f): f_(f)                                           {}
+    void        operator()(Block* b, const ProxyWithLink& cp, void* aux) const      { (b->*f_)(cp, aux); }
+    MemberFn    f_;
   };
 
   struct Master::SkipNoIncoming

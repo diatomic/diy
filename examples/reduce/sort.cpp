@@ -12,76 +12,12 @@
 
 #include "../opts.h"
 
-//typedef     int                         Value;
-typedef     float                       Value;
+#include "sort.h"
+
 typedef     diy::Link                   Link;
 typedef     std::vector<size_t>         Histogram;
 
-
-template<class T>
-T random(T min, T max);
-
-template<>
-int random(int min, int max)            { return min + rand() % (max - min); }
-
-template<>
-float random(float min, float max)      { return min + float(rand() % 1024) / 1024 * (max - min); }
-
-template<class T>
-struct Block
-{
-                  Block(int bins_):
-                      bins(bins_)         {}
-
-  static void*    create()                                      { return new Block; }
-  static void     destroy(void* b)                              { delete static_cast<Block*>(b); }
-  static void     save(const void* b, diy::BinaryBuffer& bb);
-  static void     load(void* b, diy::BinaryBuffer& bb);
-
-  void            generate_values(size_t n, T min_, T max_)
-  {
-    min = min_;
-    max = max_;
-
-    values.resize(n);
-    for (size_t i = 0; i < n; ++i)
-      values[i] = random<Value>(min, max);
-  }
-
-  T                     min, max;
-  std::vector<T>        values;
-
-  int                   bins;
-
-  private:
-                  Block()                                     {}
-};
-
-template<class T>
-void
-Block<T>::
-save(const void* b_, diy::BinaryBuffer& bb)
-{
-  const Block<T>& b = *static_cast<const Block<T>*>(b_);
-
-  diy::save(bb, b.min);
-  diy::save(bb, b.max);
-  diy::save(bb, b.values);
-  diy::save(bb, b.bins);
-}
-
-template<class T>
-void
-Block<T>::
-load(void* b_, diy::BinaryBuffer& bb)
-{
-  Block<T>& b = *static_cast<Block<T>*>(b_);
-
-  diy::load(bb, b.min);
-  diy::load(bb, b.max);
-  diy::load(bb, b.values);
-  diy::load(bb, b.bins);
-}
+typedef     Block<Value>                ValueBlock;
 
 // 1D sort partners:
 //   these allow for k-ary reductions (as opposed to kd-trees,
@@ -157,7 +93,7 @@ struct SkipHistogram
 
 void compute_local_histogram(void* b_, const diy::ReduceProxy& srp)
 {
-    Block<Value>* b = static_cast<Block<Value>*>(b_);
+    ValueBlock* b = static_cast<ValueBlock*>(b_);
 
     if (srp.round() == 0)
     {
@@ -182,7 +118,7 @@ void compute_local_histogram(void* b_, const diy::ReduceProxy& srp)
 
 void receive_histogram(void* b_, const diy::ReduceProxy& srp, Histogram& histogram)
 {
-    Block<Value>* b = static_cast<Block<Value>*>(b_);
+    ValueBlock* b = static_cast<ValueBlock*>(b_);
 
     // dequeue and add up the histograms
     for (unsigned i = 0; i < srp.in_link().size(); ++i)
@@ -200,7 +136,7 @@ void receive_histogram(void* b_, const diy::ReduceProxy& srp, Histogram& histogr
 
 void add_histogram(void* b_, const diy::ReduceProxy& srp)
 {
-    Block<Value>* b = static_cast<Block<Value>*>(b_);
+    ValueBlock* b = static_cast<ValueBlock*>(b_);
 
     Histogram histogram;
     receive_histogram(b_, srp, histogram);
@@ -212,7 +148,7 @@ void add_histogram(void* b_, const diy::ReduceProxy& srp)
 
 void enqueue_exchange(void* b_, const diy::ReduceProxy& srp, const Histogram& histogram)
 {
-    Block<Value>*   b        = static_cast<Block<Value>*>(b_);
+    ValueBlock* b = static_cast<ValueBlock*>(b_);
 
     int k = srp.out_link().size();
 
@@ -266,7 +202,7 @@ void enqueue_exchange(void* b_, const diy::ReduceProxy& srp, const Histogram& hi
 
 void dequeue_exchange(void* b_, const diy::ReduceProxy& srp)
 {
-    Block<Value>*   b        = static_cast<Block<Value>*>(b_);
+    ValueBlock* b = static_cast<ValueBlock*>(b_);
 
     for (unsigned i = 0; i < srp.in_link().size(); ++i)
     {
@@ -290,7 +226,7 @@ void dequeue_exchange(void* b_, const diy::ReduceProxy& srp)
 
 void sort_local(void* b_, const diy::ReduceProxy&)
 {
-    Block<Value>*   b        = static_cast<Block<Value>*>(b_);
+    ValueBlock* b = static_cast<ValueBlock*>(b_);
     std::sort(b->values.begin(), b->values.end());
 }
 
@@ -314,27 +250,6 @@ void sort(void* b_, const diy::ReduceProxy& srp, const SortPartners& partners)
         compute_local_histogram(b_, srp);
     } else
         add_histogram(b_, srp);
-}
-
-void print_block(void* b_, const diy::Master::ProxyWithLink& cp, void* verbose_)
-{
-  Block<Value>*   b         = static_cast<Block<Value>*>(b_);
-  bool            verbose   = *static_cast<bool*>(verbose_);
-
-  std::cout << cp.gid() << ": " << b->min << " - " << b->max << ": " << b->values.size() << std::endl;
-
-  if (verbose)
-    for (size_t i = 0; i < b->values.size(); ++i)
-      std::cout << "  " << b->values[i] << std::endl;
-}
-
-void verify_block(void* b_, const diy::Master::ProxyWithLink& cp, void*)
-{
-  Block<Value>*   b   = static_cast<Block<Value>*>(b_);
-
-  for (size_t i = 0; i < b->values.size(); ++i)
-    if (b->values[i] < b->min || b->values[i] > b->max)
-      std::cout << "Warning: " << b->values[i] << " outside of [" << b->min << "," << b->max << "]" << std::endl;
 }
 
 
@@ -382,7 +297,7 @@ int main(int argc, char* argv[])
       if (world.rank() == 0)
       {
           std::cout << "Usage: " << argv[0] << " [OPTIONS] [INPUT.bov]\n";
-          std::cout << "Generates random particles in range [min,max] if not INPUT.bov is given.\n";
+          std::cout << "Generates random values in range [min,max] if not INPUT.bov is given.\n";
           std::cout << ops;
       }
       return 1;
@@ -395,11 +310,11 @@ int main(int argc, char* argv[])
   diy::Master               master(world,
                                    threads,
                                    mem_blocks,
-                                   &Block<Value>::create,
-                                   &Block<Value>::destroy,
+                                   &ValueBlock::create,
+                                   &ValueBlock::destroy,
                                    &storage,
-                                   &Block<Value>::save,
-                                   &Block<Value>::load);
+                                   &ValueBlock::save,
+                                   &ValueBlock::load);
 
   diy::ContiguousAssigner   assigner(world.size(), nblocks);
   //diy::RoundRobinAssigner   assigner(world.size(), nblocks);
@@ -414,7 +329,7 @@ int main(int argc, char* argv[])
     for (unsigned i = 0; i < gids.size(); ++i)
     {
       int             gid = gids[i];
-      Block<Value>*   b   = new Block<Value>(k*hist);
+      ValueBlock*     b   = new ValueBlock(k*hist);
       Link*           l   = new Link;
 
       // this could be replaced by reading values from a file
@@ -460,7 +375,7 @@ int main(int argc, char* argv[])
     for (unsigned i = 0; i < gids.size(); ++i)
     {
       int             gid = gids[i];
-      Block<Value>*   b   = new Block<Value>(k*hist);
+      ValueBlock*     b   = new ValueBlock(k*hist);
       Link*           l   = new Link;
 
       // read values from a file
@@ -492,12 +407,12 @@ int main(int argc, char* argv[])
   if (print)
   {
     printf("Printing blocks\n");
-    master.foreach(print_block, &verbose);
+    master.foreach(&ValueBlock::print_block, &verbose);
   }
   if (verify)
   {
     printf("Verifying blocks\n");
-    master.foreach(verify_block);
+    master.foreach(&ValueBlock::verify_block);
 
     if (world.rank() == 0)
       std::cout << "Blocks verified" << std::endl;
