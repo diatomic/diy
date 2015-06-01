@@ -107,6 +107,7 @@ int main(int argc, char* argv[])
       >> Option('y',  "max-y",  domain.max[1],  "domain max y")
       >> Option('z',  "max-z",  domain.max[2],  "domain max z")
   ;
+  bool  verbose = ops >> Present('v', "verbose", "print the block contents");
 
   if (ops >> Present('h', "help", "show help"))
   {
@@ -141,7 +142,6 @@ int main(int argc, char* argv[])
   //fprintf(stderr, "partners.rounds(): %d\n", (int) partners.rounds());
   diy::reduce(master, assigner, partners, redistribute);
 
-  bool  verbose = false;
-  master.foreach<Block>(Block::print_block, &verbose);
-  master.foreach<Block>(Block::verify_block);
+  master.foreach(&Block::print_block, &verbose);
+  master.foreach(&Block::verify_block);
 }

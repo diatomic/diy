@@ -34,47 +34,47 @@ struct PointBlock
     points.resize(n);
     for (size_t i = 0; i < n; ++i)
       for (unsigned j = 0; j < DIM; ++j)
-        points[i][j] = domain.min[j] + float(rand() % 100)/100 * (domain.max[j] - domain.min[j]);
+        points[i][j] = domain.min[j] + float(rand() % 1024)/1024 * (domain.max[j] - domain.min[j]);
   }
 
-  static void verify_block(PointBlock* b, const diy::Master::ProxyWithLink& cp, void*)
+  void          verify_block(const diy::Master::ProxyWithLink& cp, void*)
   {
-      for (size_t i = 0; i < b->points.size(); ++i)
+      for (size_t i = 0; i < points.size(); ++i)
         for (unsigned j = 0; j < DIM; ++j)
-          if (b->points[i][j] < b->box.min[j] || b->points[i][j] > b->box.max[j])
+          if (points[i][j] < box.min[j] || points[i][j] > box.max[j])
           {
             fprintf(stderr, "!!! Point outside the box !!!\n");
-            fprintf(stderr, "    %f %f %f\n", b->points[i][0], b->points[i][1], b->points[i][2]);
+            fprintf(stderr, "    %f %f %f\n", points[i][0], points[i][1], points[i][2]);
             fprintf(stderr, "    %f %f %f - %f %f %f\n",
-                            b->box.min[0], b->box.min[1], b->box.min[2],
-                            b->box.max[0], b->box.max[1], b->box.max[2]);
+                            box.min[0], box.min[1], box.min[2],
+                            box.max[0], box.max[1], box.max[2]);
           }
   }
 
-  static void print_block(PointBlock* b, const diy::Master::ProxyWithLink& cp, void* verbose_)
+  void          print_block(const diy::Master::ProxyWithLink& cp, void* verbose_)
   {
       bool     verbose = *static_cast<bool*>(verbose_);
 
       fprintf(stdout, "[%d] Box:    %f %f %f -- %f %f %f\n",
               cp.gid(),
-              b->box.min[0], b->box.min[1], b->box.min[2],
-              b->box.max[0], b->box.max[1], b->box.max[2]);
+              box.min[0], box.min[1], box.min[2],
+              box.max[0], box.max[1], box.max[2]);
       fprintf(stdout, "[%d] Bounds: %f %f %f -- %f %f %f\n",
               cp.gid(),
-              b->bounds.min[0], b->bounds.min[1], b->bounds.min[2],
-              b->bounds.max[0], b->bounds.max[1], b->bounds.max[2]);
+              bounds.min[0], bounds.min[1], bounds.min[2],
+              bounds.max[0], bounds.max[1], bounds.max[2]);
 
       if (verbose)
       {
-        for (size_t i = 0; i < b->points.size(); ++i)
+        for (size_t i = 0; i < points.size(); ++i)
         {
           fprintf(stdout, "  ");
           for (unsigned j = 0; j < DIM; ++j)
-            fprintf(stdout, "%f ", b->points[i][j]);
+            fprintf(stdout, "%f ", points[i][j]);
           fprintf(stdout, "\n");
         }
       } else
-          fprintf(stdout, "[%d] Points: %d\n", cp.gid(), (int) b->points.size());
+          fprintf(stdout, "[%d] Points: %d\n", cp.gid(), (int) points.size());
   }
 
   Bounds                bounds;
