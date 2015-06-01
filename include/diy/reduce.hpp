@@ -122,10 +122,10 @@ void reduce(Master&                    master,
     int expected = 0;
     for (int i = 0; i < master.size(); ++i)
     {
-      if (partners.active(round + 1, master.gid(i)))
+      if (partners.active(round + 1, master.gid(i), master))
       {
         std::vector<int> incoming_gids;
-        partners.incoming(round + 1, master.gid(i), incoming_gids);
+        partners.incoming(round + 1, master.gid(i), incoming_gids, master);
         expected += incoming_gids.size();
         master.incoming(master.gid(i)).clear();
       }
@@ -160,13 +160,13 @@ namespace detail
 
     void        operator()(void* b, const Master::ProxyWithLink& cp, void*) const
     {
-      if (!partners.active(round, cp.gid())) return;
+      if (!partners.active(round, cp.gid(), *cp.master())) return;
 
       std::vector<int> incoming_gids, outgoing_gids;
       if (round > 0)
-          partners.incoming(round, cp.gid(), incoming_gids);        // receive from the previous round
+          partners.incoming(round, cp.gid(), incoming_gids, *cp.master());        // receive from the previous round
       if (round < partners.rounds())
-          partners.outgoing(round, cp.gid(), outgoing_gids);        // send to the next round
+          partners.outgoing(round, cp.gid(), outgoing_gids, *cp.master());        // send to the next round
 
       ReduceProxy   rp(cp, b, round, assigner, incoming_gids, outgoing_gids);
       reduce(b, rp, partners);
@@ -189,7 +189,7 @@ namespace detail
   {
                     SkipInactiveOr(int round_, const Partners& partners_, const Skip& skip_):
                         round(round_), partners(partners_), skip(skip_)         {}
-    bool            operator()(int i, const Master& master) const               { return !partners.active(round, master.gid(i)) || skip(round, i, master); }
+    bool            operator()(int i, const Master& master) const               { return !partners.active(round, master.gid(i), master) || skip(round, i, master); }
     int             round;
     const Partners& partners;
     const Skip&     skip;

@@ -91,41 +91,41 @@ struct KDTreePartners
   bool          swap_round(int round) const                 { return rounds_[round].first; }
   int           sub_round(int round) const                  { return rounds_[round].second; }
 
-  inline bool   active(int round, int gid) const
+  inline bool   active(int round, int gid, const diy::Master& m) const
   {
     if (round == rounds())
         return true;
     else if (swap_round(round))
-        return swap.active(sub_round(round), gid);
+        return swap.active(sub_round(round), gid, m);
     else
-        return histogram.active(sub_round(round), gid);
+        return histogram.active(sub_round(round), gid, m);
   }
 
-  inline void   incoming(int round, int gid, std::vector<int>& partners) const
+  inline void   incoming(int round, int gid, std::vector<int>& partners, const diy::Master& m) const
   {
     if (round == rounds())
-        swap.incoming(sub_round(round-1) + 1, gid, partners);
+        swap.incoming(sub_round(round-1) + 1, gid, partners, m);
     else if (swap_round(round))
-        histogram.incoming(histogram.rounds(), gid, partners);
+        histogram.incoming(histogram.rounds(), gid, partners, m);
     else
     {
         if (round > 0 && sub_round(round) == 0)
-            swap.incoming(sub_round(round - 1) + 1, gid, partners);
+            swap.incoming(sub_round(round - 1) + 1, gid, partners, m);
         else if (round > 0 && sub_round(round - 1) != sub_round(round) - 1)        // jump through the histogram rounds
-            histogram.incoming(sub_round(round - 1) + 1, gid, partners);
+            histogram.incoming(sub_round(round - 1) + 1, gid, partners, m);
         else
-            histogram.incoming(sub_round(round), gid, partners);
+            histogram.incoming(sub_round(round), gid, partners, m);
     }
   }
 
-  inline void   outgoing(int round, int gid, std::vector<int>& partners) const
+  inline void   outgoing(int round, int gid, std::vector<int>& partners, const diy::Master& m) const
   {
     if (round == rounds())
-        swap.outgoing(sub_round(round-1) + 1, gid, partners);
+        swap.outgoing(sub_round(round-1) + 1, gid, partners, m);
     else if (swap_round(round))
-        swap.outgoing(sub_round(round), gid, partners);
+        swap.outgoing(sub_round(round), gid, partners, m);
     else
-        histogram.outgoing(sub_round(round), gid, partners);
+        histogram.outgoing(sub_round(round), gid, partners, m);
   }
 
   diy::RegularAllReducePartners     histogram;

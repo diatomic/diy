@@ -6,6 +6,8 @@
 namespace diy
 {
 
+class Master;
+
 struct RegularSwapPartners: public RegularPartners
 {
   typedef       RegularPartners                                 Parent;
@@ -20,10 +22,10 @@ struct RegularSwapPartners: public RegularPartners
                                     bool  contiguous = true):
                     Parent(divs, kvs, contiguous)               {}
 
-  bool          active(int round, int gid) const                { return true; }    // in swap-reduce every block is always active
+  bool          active(int round, int gid, const Master&) const                                 { return true; }    // in swap-reduce every block is always active
 
-  void          incoming(int round, int gid, std::vector<int>& partners) const    { Parent::fill(round - 1, gid, partners); }
-  void          outgoing(int round, int gid, std::vector<int>& partners) const    { Parent::fill(round, gid, partners); }
+  void          incoming(int round, int gid, std::vector<int>& partners, const Master&) const   { Parent::fill(round - 1, gid, partners); }
+  void          outgoing(int round, int gid, std::vector<int>& partners, const Master&) const   { Parent::fill(round, gid, partners); }
 };
 
 } // diy

@@ -6,6 +6,8 @@
 namespace diy
 {
 
+class Master;
+
 struct RegularMergePartners: public RegularPartners
 {
   typedef       RegularPartners                                 Parent;
@@ -20,19 +22,19 @@ struct RegularMergePartners: public RegularPartners
                                      bool  contiguous = true):
                     Parent(divs, kvs, contiguous)               {}
 
-  inline bool   active(int round, int gid) const;
+  inline bool   active(int round, int gid, const Master&) const;
 
   // incoming is only valid for an active gid; it will only be called with an active gid
-  inline void   incoming(int round, int gid, std::vector<int>& partners) const    { Parent::fill(round - 1, gid, partners); }
+  inline void   incoming(int round, int gid, std::vector<int>& partners, const Master&) const    { Parent::fill(round - 1, gid, partners); }
   // this is a lazy implementation of outgoing, but it reuses the existing code
-  inline void   outgoing(int round, int gid, std::vector<int>& partners) const    { std::vector<int> tmp; Parent::fill(round, gid, tmp); partners.push_back(tmp[0]); }
+  inline void   outgoing(int round, int gid, std::vector<int>& partners, const Master&) const    { std::vector<int> tmp; Parent::fill(round, gid, tmp); partners.push_back(tmp[0]); }
 };
 
 } // diy
 
 bool
 diy::RegularMergePartners::
-active(int round, int gid) const
+active(int round, int gid, const Master&) const
 {
   CoordVector   coords;
   Decomposer::gid_to_coords(gid, coords, divisions());

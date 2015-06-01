@@ -47,29 +47,29 @@ struct SortPartners
   bool          exchange_round(int round) const             { return rounds_[round].first; }
   int           sub_round(int round) const                  { return rounds_[round].second; }
 
-  inline bool   active(int round, int gid) const            { return true; }
+  inline bool   active(int round, int gid, const diy::Master&) const            { return true; }
 
-  inline void   incoming(int round, int gid, std::vector<int>& partners) const
+  inline void   incoming(int round, int gid, std::vector<int>& partners, const diy::Master& m) const
   {
     if (round == rounds())
-        exchange.incoming(sub_round(round-1) + 1, gid, partners);
+        exchange.incoming(sub_round(round-1) + 1, gid, partners, m);
     else if (exchange_round(round))     // round != 0
-        histogram.incoming(sub_round(round-1) + 1, gid, partners);
+        histogram.incoming(sub_round(round-1) + 1, gid, partners, m);
     else        // histogram round
     {
         if (round > 0 && sub_round(round) == 0)
-            exchange.incoming(sub_round(round - 1) + 1, gid, partners);
+            exchange.incoming(sub_round(round - 1) + 1, gid, partners, m);
         else
-            histogram.incoming(sub_round(round), gid, partners);
+            histogram.incoming(sub_round(round), gid, partners, m);
     }
   }
 
-  inline void   outgoing(int round, int gid, std::vector<int>& partners) const
+  inline void   outgoing(int round, int gid, std::vector<int>& partners, const diy::Master& m) const
   {
     if (exchange_round(round))
-        exchange.outgoing(sub_round(round), gid, partners);
+        exchange.outgoing(sub_round(round), gid, partners, m);
     else
-        histogram.outgoing(sub_round(round), gid, partners);
+        histogram.outgoing(sub_round(round), gid, partners, m);
   }
 
   diy::RegularSwapPartners          histogram;

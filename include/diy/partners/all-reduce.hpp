@@ -6,6 +6,8 @@
 namespace diy
 {
 
+class Master;
+
 //! Allreduce (reduction with results broadcasted to all blocks) is
 //! implemented as two merge reductions, with incoming and outgoing items swapped in second one.
 //! Ie, follows merge reduction up and down the merge tree
@@ -33,25 +35,25 @@ struct RegularAllReducePartners: public RegularMergePartners
   //! returns dimension (direction of partners in a regular grid) in a given round
   int           dim(int round) const                            { return Parent::dim(parent_round(round)); }
   //! returns whether a given block in a given round has dropped out of the merge yet or not
-  inline bool   active(int round, int gid) const                { return Parent::active(parent_round(round), gid); }
+  inline bool   active(int round, int gid, const Master& m) const { return Parent::active(parent_round(round), gid, m); }
   //! returns what the current round would be in the first or second parent merge reduction
   int           parent_round(int round) const                   { return round < Parent::rounds() ? round : rounds() - round; }
 
   // incoming is only valid for an active gid; it will only be called with an active gid
-  inline void   incoming(int round, int gid, std::vector<int>& partners) const
+  inline void   incoming(int round, int gid, std::vector<int>& partners, const Master& m) const
   {
       if (round <= Parent::rounds())
-          Parent::incoming(round, gid, partners);
+          Parent::incoming(round, gid, partners, m);
       else
-          Parent::outgoing(parent_round(round), gid, partners);
+          Parent::outgoing(parent_round(round), gid, partners, m);
   }
 
-  inline void   outgoing(int round, int gid, std::vector<int>& partners) const
+  inline void   outgoing(int round, int gid, std::vector<int>& partners, const Master& m) const
   {
       if (round < Parent::rounds())
-          Parent::outgoing(round, gid, partners);
+          Parent::outgoing(round, gid, partners, m);
       else
-          Parent::incoming(parent_round(round), gid, partners);
+          Parent::incoming(parent_round(round), gid, partners, m);
   }
 };
 
