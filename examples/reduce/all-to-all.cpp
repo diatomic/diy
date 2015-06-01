@@ -37,6 +37,7 @@ struct Redistribute
             assert(dest.gid == dest_gid);
             rp.enqueue(dest, b->points[i]);
 
+#if 0
             // DEBUG
             Decomposer::DivisionsVector coords;
             decomposer.gid_to_coords(dest_gid, coords);
@@ -52,6 +53,7 @@ struct Redistribute
                                 bounds.min[0], bounds.min[1], bounds.min[2],
                                 bounds.max[0], bounds.max[1], bounds.max[2]);
               }
+#endif
           }
           b->points.clear();
       } else
