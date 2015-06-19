@@ -1,5 +1,9 @@
 \defgroup Initialization
 
+Master initialization snippet:
+\snippet examples/simple/simple.cpp Master initialization
+
+
 The following is an example of the steps needed to initialize diy:
 
 ~~~~{.cpp}

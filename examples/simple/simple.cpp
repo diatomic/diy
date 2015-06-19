@@ -85,6 +85,7 @@ int main(int argc, char* argv[])
     return 1;
   }
 
+  //! [Master initialization]
   diy::FileStorage          storage(prefix);
   diy::Master               master(world,
                                    threads,
@@ -94,6 +95,7 @@ int main(int argc, char* argv[])
                                    &storage,
                                    &save_block,
                                    &load_block);
+  //! [Master initialization]
 
   //diy::ContiguousAssigner   assigner(world.size(), nblocks);
   diy::RoundRobinAssigner   assigner(world.size(), nblocks);
