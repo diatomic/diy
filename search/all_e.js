@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['rank',['rank',['../classdiy_1_1_assigner.html#a272d33bcc94394f39880603084b55f38',1,'diy::Assigner::rank()'],['../classdiy_1_1_contiguous_assigner.html#af4c8d5184b03faf02e63b674c2481968',1,'diy::ContiguousAssigner::rank()'],['../classdiy_1_1_round_robin_assigner.html#a68351bf83c2957ab73fa24bb3b580ca7',1,'diy::RoundRobinAssigner::rank()']]],
+  ['recursive_5fmutex',['recursive_mutex',['../structdiy_1_1recursive__mutex.html',1,'diy']]],
+  ['recv',['recv',['../classdiy_1_1mpi_1_1communicator.html#a49d6b9d40158decf77b6b2f9b866779d',1,'diy::mpi::communicator']]],
+  ['reduce',['reduce',['../group___m_p_i.html#ga13ff29a892870f09695ff7fd3832e764',1,'diy::mpi::reduce(const communicator &amp;comm, const T &amp;in, T &amp;out, int root, const Op &amp;op)'],['../group___m_p_i.html#ga8d25825b156fc8b5ded921b1094f7520',1,'diy::mpi::reduce(const communicator &amp;comm, const T &amp;in, int root, const Op &amp;op)'],['../group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f',1,'diy::reduce()']]],
+  ['reduceproxy',['ReduceProxy',['../structdiy_1_1_reduce_proxy.html',1,'diy']]],
+  ['reduceproxy',['ReduceProxy',['../structdiy_1_1_reduce_proxy.html#a00fc565b7b88b6bdc3f3163a41e1e0a9',1,'diy::ReduceProxy::ReduceProxy(const Master::Proxy &amp;proxy, void *block, unsigned round, const Assigner &amp;assigner, const GIDVector &amp;incoming_gids, const GIDVector &amp;outgoing_gids)'],['../structdiy_1_1_reduce_proxy.html#a7d292436f664e68e8b39dd6661bcfc37',1,'diy::ReduceProxy::ReduceProxy(const Master::Proxy &amp;proxy, void *block, unsigned round, int nblocks, const Link &amp;in_link, const Link &amp;out_link)']]],
+  ['regularallreducepartners',['RegularAllReducePartners',['../structdiy_1_1_regular_all_reduce_partners.html#a50ce9e40dfda64e0df6053cb362eab23',1,'diy::RegularAllReducePartners::RegularAllReducePartners(int dim, int nblocks, int k, bool contiguous=true)'],['../structdiy_1_1_regular_all_reduce_partners.html#a98822d82069ec237a13100323db887bc',1,'diy::RegularAllReducePartners::RegularAllReducePartners(const DivisionVector &amp;divs, const KVSVector &amp;kvs, bool contiguous=true)']]],
+  ['regularallreducepartners',['RegularAllReducePartners',['../structdiy_1_1_regular_all_reduce_partners.html',1,'diy']]],
+  ['regulardecomposer',['RegularDecomposer',['../structdiy_1_1_regular_decomposer.html',1,'diy']]],
+  ['regulardecomposer',['RegularDecomposer',['../structdiy_1_1_regular_decomposer.html#a60eda2b1f0fe469df8708366de8c2c0c',1,'diy::RegularDecomposer']]],
+  ['regularlink',['RegularLink',['../classdiy_1_1_regular_link.html',1,'diy']]],
+  ['regularlinkselector',['RegularLinkSelector',['../structdiy_1_1_regular_link_selector.html',1,'diy']]],
+  ['regularlinkselector_3c_20continuousbounds_20_3e',['RegularLinkSelector&lt; ContinuousBounds &gt;',['../structdiy_1_1_regular_link_selector_3_01_continuous_bounds_01_4.html',1,'diy']]],
+  ['regularlinkselector_3c_20discretebounds_20_3e',['RegularLinkSelector&lt; DiscreteBounds &gt;',['../structdiy_1_1_regular_link_selector_3_01_discrete_bounds_01_4.html',1,'diy']]],
+  ['regularmergepartners',['RegularMergePartners',['../structdiy_1_1_regular_merge_partners.html',1,'diy']]],
+  ['regularpartners',['RegularPartners',['../structdiy_1_1_regular_partners.html',1,'diy']]],
+  ['regularswappartners',['RegularSwapPartners',['../structdiy_1_1_regular_swap_partners.html',1,'diy']]],
+  ['release',['release',['../classdiy_1_1_master.html#a4e8f7b4f8af7041559385b54e82d0f1c',1,'diy::Master']]],
+  ['request',['request',['../structdiy_1_1mpi_1_1request.html',1,'diy::mpi']]],
+  ['resource_5faccessor',['resource_accessor',['../classdiy_1_1resource__accessor.html',1,'diy']]],
+  ['round',['round',['../structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375',1,'diy::ReduceProxy']]],
+  ['roundrobinassigner',['RoundRobinAssigner',['../classdiy_1_1_round_robin_assigner.html',1,'diy']]],
+  ['rounds',['rounds',['../structdiy_1_1_regular_all_reduce_partners.html#a2e293d418aa252920321004e2461097e',1,'diy::RegularAllReducePartners']]]
+];
