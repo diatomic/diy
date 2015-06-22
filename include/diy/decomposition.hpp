@@ -111,6 +111,7 @@ namespace detail
     void            fill_divisions(int nblocks)                                 { fill_divisions(dim, nblocks, divisions); }
 
     void            fill_bounds(Bounds& bounds, const DivisionsVector& coords, bool add_ghosts = false) const;
+    void            fill_bounds(Bounds& bounds, int gid, bool add_ghosts = false) const;
 
     static bool     all(const std::vector<int>& v, int x);
     static void     gid_to_coords(int gid, DivisionsVector& coords, const DivisionsVector& divisions);
@@ -303,10 +304,15 @@ coords_to_gid(const DivisionsVector& coords, const DivisionsVector& divisions)
   return gid;
 }
 
+//! \ingroup Decomposition
+//! Gets the bounds, with or without ghosts, for a block specified by its block coordinates
 template<class Bounds>
 void
 diy::RegularDecomposer<Bounds>::
-fill_bounds(Bounds& bounds, const DivisionsVector& coords, bool add_ghosts) const
+fill_bounds(Bounds& bounds,                  //!< (output) bounds
+            const DivisionsVector& coords,   //!< coordinates of the block in the decomposition
+            bool add_ghosts)                 //!< whether to include ghosts in the output bounds
+    const
 {
   for (int i = 0; i < dim; ++i)
   {
@@ -329,6 +335,24 @@ fill_bounds(Bounds& bounds, const DivisionsVector& coords, bool add_ghosts) cons
       bounds.max[i] = std::min(domain.max[i], bounds.max[i] + ghosts[i]);
     }
   }
+}
+
+//! \ingroup Decomposition
+//! Gets the bounds, with or without ghosts, for a block specified by its gid
+template<class Bounds>
+void
+diy::RegularDecomposer<Bounds>::
+fill_bounds(Bounds& bounds,                  //!< (output) bounds
+            int gid,                         //!< global id of the block
+            bool add_ghosts)                 //!< whether to include ghosts in the output bounds
+    const
+{
+    DivisionsVector coords;
+    gid_to_coords(gid, coords);
+    if (add_ghosts)
+        fill_bounds(bounds, coords, true);
+    else
+        fill_bounds(bounds, coords);
 }
 
 template<class Bounds>
