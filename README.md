@@ -1,4 +1,4 @@
-# DIY is a data-parallel out-of core library
+# DIY is a data-parallel out-of-core library
 
 DIY2 is a data-parallel library for implementing scalable algorithms that can execute both
 in-core and out-of-core. The same program can be executed with one or more threads per MPI
