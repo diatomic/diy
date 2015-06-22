@@ -26,7 +26,7 @@ DIY2 is available as header files that do not need to be built, only included in
 
 # Documentation
 
-Available in [Doxygen](https://diatomic.github/io/diy2).
+Available in [Doxygen](https://diatomic.github.io/diy2).
 
 # Example
 
