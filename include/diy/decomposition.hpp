@@ -447,7 +447,7 @@ diy::RegularDecomposer<Bounds>::
 point_to_gid(const Point& p) const
 {
     int gid = 0;
-    for (int axis = dim; axis >= 0; --axis)
+    for (int axis = dim - 1; axis >= 0; --axis)
     {
       int bottom  = detail::BoundsHelper<Bounds>::lower(p[axis], divisions[axis], domain.min[axis], domain.max[axis], share_face[axis]);
           bottom  = std::max(0, bottom);
