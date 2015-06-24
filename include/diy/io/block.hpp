@@ -137,7 +137,7 @@ namespace io
 
   inline
   void
-  read_blocks(const std::string&           outfilename,
+  read_blocks(const std::string&           infilename,
               const mpi::communicator&     comm,
               Assigner&                    assigner,
               Master&                      master,
@@ -148,7 +148,7 @@ namespace io
     typedef detail::offset_t                offset_t;
     typedef detail::GidOffsetCount          GidOffsetCount;
 
-    mpi::io::file f(comm, outfilename, mpi::io::file::rdonly);
+    mpi::io::file f(comm, infilename, mpi::io::file::rdonly);
 
     offset_t    footer_offset = f.size() - sizeof(unsigned);
     unsigned size;
