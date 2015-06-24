@@ -1,6 +1,7 @@
 #include <cmath>
 #include <vector>
 #include <cstdlib>
+#include <limits>
 
 #include <diy/master.hpp>
 #include <diy/link.hpp>
