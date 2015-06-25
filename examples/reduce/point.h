@@ -2,6 +2,7 @@
 #define DIY_EXAMPLES_POINT_H
 
 #include <vector>
+#include <cassert>
 #include <diy/types.hpp>
 
 template<unsigned D>
@@ -9,8 +10,8 @@ struct SimplePoint
 {
     float   coords[D];
 
-    float&  operator[](unsigned i)                          { return coords[i]; }
-    float   operator[](unsigned i) const                    { return coords[i]; }
+    float&  operator[](unsigned i)                          { assert(i < D); return coords[i]; }
+    float   operator[](unsigned i) const                    { assert(i < D); return coords[i]; }
 };
 
 template<unsigned DIM>
