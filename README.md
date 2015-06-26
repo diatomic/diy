@@ -1,4 +1,4 @@
-## DIY is a data-parallel out-of-core library
+## DIY2 is a data-parallel out-of-core library
 
 DIY2 is a data-parallel library for implementing scalable algorithms that can execute both
 in-core and out-of-core. The same program can be executed with one or more threads per MPI
@@ -11,53 +11,37 @@ possible in- and out-of-core in DIY2.
 
 ## Licensing
 
-DIY is released as open source software under a BSD style [license](./LICENSE.txt).
+DIY2 is released as open source software under a BSD style [license](./LICENSE.txt).
 
 ## Dependencies
 
-DIY requires an MPI installation. We recommend MPICH:
+DIY2 requires an MPI installation. We recommend [MPICH](http://www.mpich.org/).
 
-```
-wget http://www.mpich.org/static/downloads/3.1.4/mpich-3.1.4.tar.gz
-tar -xvf mpich-3.1.4.tar.gz
-cd mpich-3.1.4
+## Download, build, install
 
-./configure \
---prefix=/path/to/mpich-3.1.4/install \
---disable-fortran \
---enable-shared \
---enable-g=all \
+- You can clone this repository, or
 
-make
-make install
-```
+- You can download the [latest tarball](https://github.com/diatomic/diy2/archive/master.tar.gz).
 
-## Installation
 
-a. You can clone this repository, or
+DIY2 is a header-only library. It does not need to be built; you can simply
+include it in your project. The examples can be built using `cmake` from the
+top level directory.
 
-b. You can download the [latest tarball](https://github.com/diatomic/diy2/archive/master.tar.gz).
-
-## Building
-
-DIY2 is available as header files that do not need to be built, only included in your project. The examples can be build using cmake from the top level directory.
-
-## Documentation
-
-Available in [Doxygen](https://diatomic.github.io/diy2).
+## [Documentation](https://diatomic.github.io/diy2)
 
 ## Example
 
-A simple DIY program, shown below, consists of the following components:
+A simple DIY2 program, shown below, consists of the following components:
 
-- structs called blocks,
-- a diy object called the master,
-- a set of callback functions performed on each block by master.foreach(),
-- optionally one or more message exchanges between the blocks by master.exchange(), and
+- `struct`s called blocks,
+- a diy object called the `master`,
+- a set of callback functions performed on each block by `master.foreach()`,
+- optionally one or more message exchanges between the blocks by `master.exchange()`, and
 - there may be other collectives and global reductions not shown below.
 
-The callback functions (enqueue_block() and average() in the example below) are given the block
-data and a communication proxy for the message exchange between blocks. It is usual for the
+The callback functions (`enqueue_block()` and `average()` in the example below) are given the block
+pointer and a communication proxy for the message exchange between blocks. It is usual for the
 callback functions to enqueue or dequeue messages from the proxy, so that information can be
 received and sent during rounds of message exchange.
 
