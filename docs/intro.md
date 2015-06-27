@@ -1,14 +1,14 @@
 DIY
 ===
 
-DIY is a data-parallel out-of-core library.
+DIY is a data-parallel out-of-core library. 
 
-`diy::Master` owns the blocks, put into it using the
-[add()](@ref diy::Master::add)
-method.  Its main two methods are [foreach()](@ref diy::Master::foreach) and
+One partitions there data into blocks. The `diy::Master` owns these blocks. One may use the
+[add()](@ref diy::Master::add) method to give a block to Master.  
+Its main two methods are [foreach()](@ref diy::Master::foreach) and
 [exchange()](@ref diy::Master::exchange),
-which together support a bulk-synchronous processing (BSP) model of algorithm design.
-[foreach(f)](@ref diy::Master::foreach) calls back a function `f()` with every block.
+which together support a [bulk-synchronous processing (BSP)](https://en.wikipedia.org/wiki/Bulk_synchronous_parallel) model of algorithm design.
+[foreach(f)](@ref diy::Master::foreach) calls a function `f()` on every block.
 The function is responsible for performing computation and scheduling communication using
 [enqueue()](@ref diy::Master::Proxy::enqueue)/[dequeue()](@ref diy::Master::Proxy::dequeue)
 operations. The actual communication is performed by
