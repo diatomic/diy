@@ -28,25 +28,45 @@ struct SampleSort
     {
         int k_in  = rp.in_link().size();
 
-        // add up sizes
-        size_t sz = 0;
-        size_t end = v.size();
-        for (int i = 0; i < k_in; ++i)
+        if (detail::is_default< Serialization<T> >::value)
         {
-            if (skip_self && rp.in_link().target(i).gid == rp.gid()) continue;
-            MemoryBuffer& in = rp.incoming(rp.in_link().target(i).gid);
-            sz += in.size() / sizeof(T);
-        }
-        v.resize(end + sz);
+            // add up sizes
+            size_t sz = 0;
+            size_t end = v.size();
+            for (int i = 0; i < k_in; ++i)
+            {
+                if (skip_self && rp.in_link().target(i).gid == rp.gid()) continue;
+                MemoryBuffer& in = rp.incoming(rp.in_link().target(i).gid);
+                sz += in.size() / sizeof(T);
+            }
+            v.resize(end + sz);
 
-        for (int i = 0; i < k_in; ++i)
+            for (int i = 0; i < k_in; ++i)
+            {
+                if (skip_self && rp.in_link().target(i).gid == rp.gid()) continue;
+                MemoryBuffer& in = rp.incoming(rp.in_link().target(i).gid);
+                size_t sz = in.size() / sizeof(T);
+                T* bg = (T*) &in.buffer[0];
+                std::copy(bg, bg + sz, &v[end]);
+                end += sz;
+            }
+        } else
         {
-            if (skip_self && rp.in_link().target(i).gid == rp.gid()) continue;
-            MemoryBuffer& in = rp.incoming(rp.in_link().target(i).gid);
-            size_t sz = in.size() / sizeof(T);
-            T* bg = (T*) &in.buffer[0];
-            std::copy(bg, bg + sz, &v[end]);
-            end += sz;
+            for (int i = 0; i < k_in; ++i)
+            {
+                if (skip_self && rp.in_link().target(i).gid == rp.gid()) continue;
+                MemoryBuffer& in = rp.incoming(rp.in_link().target(i).gid);
+                while(in)
+                {
+                    T x;
+                    diy::load(in, x);
+#if __cplusplus > 199711L           // C++11
+                    v.emplace_back(std::move(x));
+#else
+                    v.push_back(x);
+#endif
+                }
+            }
         }
     }
 
