@@ -45,7 +45,7 @@ namespace diy
     inline static void  copy(MemoryBuffer& from, MemoryBuffer& to);
 
     //! multiplier used for the geometric growth of the container
-    static const float  growth_multiplier()                         { return 1.5; }
+    static float        growth_multiplier()                         { return 1.5; }
 
     // simple file IO
     void                write(const std::string& fn) const          { std::ofstream out(fn.c_str()); out.write(&buffer[0], size()); }

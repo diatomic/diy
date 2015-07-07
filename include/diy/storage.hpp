@@ -74,7 +74,7 @@ namespace diy
 
         size_t sz = bb.buffer.size();
         size_t written = write(fh, &bb.buffer[0], sz);
-        if (written < sz || written == -1)
+        if (written < sz || written == (size_t)-1)
           fprintf(stderr, "Warning: could not write the full buffer to %s: written = %lu; size = %lu\n", filename.c_str(), written, sz);
         fsync(fh);
         close(fh);

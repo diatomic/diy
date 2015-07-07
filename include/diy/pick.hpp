@@ -33,7 +33,6 @@ near(const RegularLink<Bounds>& link,  //!< neighbors
      const Bounds& domain)             //!< global domain bounds
 {
   int d; // current dimension
-  float dir[DIY_MAX_DIM]; // offset direction
   float new_pt[DIY_MAX_DIM]; // offset point
   Bounds neigh_bounds; // neighbor block bounds
 
@@ -76,8 +75,6 @@ in(const RegularLink<Bounds>& link,  //!< neighbors
    const Bounds& domain)             //!< global domain bounds
 {
   int d; // current dimension
-  float dir[DIY_MAX_DIM]; // offset direction
-  float new_pt[DIY_MAX_DIM]; // offset point
   Bounds neigh_bounds; // neighbor block bounds
 
   // for all neighbors of this block

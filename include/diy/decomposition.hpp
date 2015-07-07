@@ -185,7 +185,7 @@ decompose(int rank, const Creator& create)
 {
   std::vector<int> gids;
   assigner.local_gids(rank, gids);
-  for (int i = 0; i < gids.size(); ++i)
+  for (int i = 0; i < (int)gids.size(); ++i)
   {
     int gid = gids[i];
 
