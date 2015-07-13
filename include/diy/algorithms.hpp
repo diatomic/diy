@@ -28,7 +28,7 @@ void sort(Master&                   master,
 
   // swap-reduce to all-gather samples
   RegularSwapPartners   partners(1, assigner.nblocks(), k);
-  reduce(master, assigner, partners, sorter.sample());
+  reduce(master, assigner, partners, sorter.sample(), detail::SkipIntermediate(partners.rounds()));
 
   // all_to_all to exchange the values
   all_to_all(master, assigner, sorter.exchange(), k);

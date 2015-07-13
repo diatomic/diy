@@ -79,8 +79,8 @@ struct SampleSort
 template<class Block, class T, class Cmp>
 struct SampleSort<Block,T,Cmp>::Sampler
 {
-                    Sampler(ValuesVector values_, ValuesVector samples_, const Cmp& cmp_, size_t num_samples_):
-                        values(values_), samples(samples_), cmp(cmp_), num_samples(num_samples_)    {}
+                    Sampler(ValuesVector values_, ValuesVector dividers_, const Cmp& cmp_, size_t num_samples_):
+                        values(values_), dividers(dividers_), cmp(cmp_), num_samples(num_samples_)    {}
 
     void            operator()(void* b_, const ReduceProxy& srp, const RegularSwapPartners& partners) const
     {
@@ -89,38 +89,38 @@ struct SampleSort<Block,T,Cmp>::Sampler
         int k_in  = srp.in_link().size();
         int k_out = srp.out_link().size();
 
+        std::vector<T> samples;
+
         if (k_in == 0)
         {
             // draw random samples
-            (b->*samples).clear();
             for (int i = 0; i < num_samples; ++i)
-                (b->*samples).push_back((b->*values)[std::rand() % (b->*values).size()]);
+                samples.push_back((b->*values)[std::rand() % (b->*values).size()]);
         } else
-            dequeue_values(b->*samples, srp);
+            dequeue_values(samples, srp, false);
 
         if (k_out == 0)
         {
             // pick subsamples that separate quantiles
-            std::sort((b->*samples).begin(), (b->*samples).end(), cmp);
+            std::sort(samples.begin(), samples.end(), cmp);
             std::vector<T>  subsamples(srp.nblocks() - 1);
-            int step = (b->*samples).size() / srp.nblocks();       // NB: subsamples.size() + 1
+            int step = samples.size() / srp.nblocks();       // NB: subsamples.size() + 1
             for (int i = 0; i < subsamples.size(); ++i)
-                subsamples[i] = (b->*samples)[(i+1)*step];
-            (b->*samples).swap(subsamples);
+                subsamples[i] = samples[(i+1)*step];
+            (b->*dividers).swap(subsamples);
         }
         else
         {
             for (int i = 0; i < k_out; ++i)
             {
-                if (srp.out_link().target(i).gid == srp.gid()) continue;
                 MemoryBuffer& out = srp.outgoing(srp.out_link().target(i));
-                save(out, &(b->*samples)[0], (b->*samples).size());
+                save(out, &samples[0], samples.size());
             }
         }
     }
 
     ValuesVector    values;
-    ValuesVector    samples;
+    ValuesVector    dividers;
     const Cmp&      cmp;
     size_t          num_samples;
 };
