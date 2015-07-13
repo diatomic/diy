@@ -655,7 +655,7 @@ foreach(const Functor& f, const Skip& skip, void* aux)
     typedef               std::pair<thread*, BlockFunctor*>               ThreadFunctorPair;
     typedef               std::list<ThreadFunctorPair>                    ThreadFunctorList;
     ThreadFunctorList     threads;
-    for (unsigned i = 0; i < num_threads; ++i)
+    for (unsigned i = 0; i < (unsigned)num_threads; ++i)
     {
         BlockFunctor* bf = new BlockFunctor(f, skip, aux, *this, blocks, blocks_per_thread, idx);
         threads.push_back(ThreadFunctorPair(new thread(&BlockFunctor::run, bf), bf));
@@ -693,12 +693,12 @@ exchange()
   //fprintf(stdout, "Starting exchange\n");
 
   // make sure there is a queue for each neighbor
-  for (int i = 0; i < size(); ++i)
+  for (int i = 0; i < (int)size(); ++i)
   {
     OutgoingQueues&  outgoing_queues  = outgoing_[gid(i)].queues;
     OutQueueRecords& external_local   = outgoing_[gid(i)].external_local;
-    if (outgoing_queues.size() < link(i)->size())
-      for (unsigned j = 0; j < link(i)->size(); ++j)
+    if (outgoing_queues.size() < (size_t)link(i)->size())
+        for (unsigned j = 0; j < (unsigned)link(i)->size(); ++j)
       {
         if (external_local.find(link(i)->target(j)) == external_local.end())
           outgoing_queues[link(i)->target(j)];        // touch the outgoing queue, creating it if necessary
@@ -715,7 +715,7 @@ diy::Master::
 comm_exchange(ToSendList& to_send, int out_queues_limit)
 {
   // isend outgoing queues, up to the out_queues_limit
-  while(inflight_size_ < out_queues_limit && !to_send.empty())
+  while(inflight_size_ < (size_t)out_queues_limit && !to_send.empty())
   {
     int from = to_send.front();
 
