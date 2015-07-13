@@ -75,6 +75,7 @@ save(const void* b_, diy::BinaryBuffer& bb)
   diy::save(bb, b.min);
   diy::save(bb, b.max);
   diy::save(bb, b.values);
+  diy::save(bb, b.samples);
   diy::save(bb, b.bins);
 }
 
@@ -88,6 +89,7 @@ load(void* b_, diy::BinaryBuffer& bb)
   diy::load(bb, b.min);
   diy::load(bb, b.max);
   diy::load(bb, b.values);
+  diy::load(bb, b.samples);
   diy::load(bb, b.bins);
 }
 
