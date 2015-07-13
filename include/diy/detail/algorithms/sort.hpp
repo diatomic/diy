@@ -1,5 +1,5 @@
-#ifndef DIY_DETAIL_ALGORITHMS_HPP
-#define DIY_DETAIL_ALGORITHMS_HPP
+#ifndef DIY_DETAIL_ALGORITHMS_SORT_HPP
+#define DIY_DETAIL_ALGORITHMS_SORT_HPP
 
 #include <functional>
 #include <algorithm>
