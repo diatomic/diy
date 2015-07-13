@@ -25,9 +25,8 @@ struct PointBlock
 
   static void*    create()                                    { return new PointBlock; }
   static void     destroy(void* b)                            { delete static_cast<PointBlock*>(b); }
-  static void     save(const void* b, diy::BinaryBuffer& bb)  { diy::save(bb, *static_cast<const PointBlock*>(b)); }
-  static void     load(void* b, diy::BinaryBuffer& bb)        { diy::load(bb, *static_cast<PointBlock*>(b)); }
-
+  static void     save(const void* b_, diy::BinaryBuffer& bb) { const PointBlock* b = static_cast<const PointBlock*>(b_); diy::save(bb, b->bounds); diy::save(bb, b->box); diy::save(bb, b->points); }
+  static void     load(void* b_, diy::BinaryBuffer& bb)       { PointBlock* b = static_cast<PointBlock*>(b_); diy::load(bb, b->bounds); diy::load(bb, b->box); diy::load(bb, b->points); }
 
   void            generate_points(const Bounds& domain, size_t n)
   {
