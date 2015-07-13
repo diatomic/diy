@@ -172,7 +172,6 @@ int main(int argc, char* argv[])
             &ValueBlock::values,
             &ValueBlock::samples,
             num_samples,
-            std::less<Value>(),
             k);
 
   if (print || verify)
