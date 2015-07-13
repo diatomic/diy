@@ -364,7 +364,7 @@ namespace diy
   {
     typedef     void (Block::*MemberFn)(const ProxyWithLink&, void*);
                 Binder(MemberFn f): f_(f)                                           {}
-    void        operator()(Block* b, const ProxyWithLink& cp, void* aux) const      { (b->*f_)(cp, aux); }
+    void        operator()(Block* b, const ProxyWithLink& cp, void* aux) const      { if (b) (b->*f_)(cp, aux); }
     MemberFn    f_;
   };
 
