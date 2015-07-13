@@ -148,6 +148,16 @@ namespace detail
     const Op&           op;
     Link                all_neighbors_link, empty_link;
   };
+
+  struct SkipIntermediate
+  {
+         SkipIntermediate(size_t rounds_):
+            rounds(rounds_)                                     {}
+
+    bool operator()(int round, int, const Master&) const        { if (round == 0 || round == rounds) return false; return true; }
+
+    size_t  rounds;
+  };
 }
 
 }
