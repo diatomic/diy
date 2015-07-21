@@ -140,7 +140,7 @@ int main(int argc, char* argv[])
   diy::RegularSwapPartners  partners(dim, nblocks, k, false);
   //fprintf(stderr, "%d %d %d\n", dim, nblocks, k);
   //fprintf(stderr, "partners.rounds(): %d\n", (int) partners.rounds());
-  diy::reduce(master, assigner, partners, redistribute);
+  diy::reduce(master, assigner, partners, &redistribute);
 
   master.foreach(&Block::print_block, &verbose);
   master.foreach(&Block::verify_block);

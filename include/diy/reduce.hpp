@@ -118,6 +118,7 @@ void reduce(Master&                    master,
     //fprintf(stderr, "== Round %d\n", round);
     master.foreach(detail::ReductionFunctor<Reduce,Partners>(round, reduce, partners, assigner),
                    detail::SkipInactiveOr<Partners,Skip>(round, partners, skip));
+    master.execute();
 
     int expected = 0;
     for (int i = 0; i < master.size(); ++i)
@@ -179,8 +180,8 @@ namespace detail
     }
 
     unsigned        round;
-    const Reduce&   reduce;
-    const Partners& partners;
+    Reduce          reduce;
+    Partners        partners;
     const Assigner& assigner;
   };
 

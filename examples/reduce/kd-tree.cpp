@@ -400,10 +400,10 @@ int main(int argc, char* argv[])
   std::cout << "Blocks generated" << std::endl;
 
   KDTreePartners partners(DIM, nblocks);
-  diy::reduce(master, assigner, partners, partition);
+  diy::reduce(master, assigner, partners, &partition);
 
-  master.foreach(print_block, &verbose);
-  master.foreach(verify_block);
+  master.foreach(&print_block, &verbose);
+  master.foreach(&verify_block);
   if (world.rank() == 0)
     std::cout << "Blocks verified" << std::endl;
 }

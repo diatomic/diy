@@ -171,8 +171,8 @@ int main(int argc, char* argv[])
   diy::RegularMergePartners  partners(dim, nblocks, k, contiguous);
 //   fprintf(stderr, "%d %d %d\n", dim, nblocks, k);
 //   fprintf(stderr, "partners.rounds(): %d\n", (int) partners.rounds());
-  diy::reduce(master, assigner, partners, sum);
+  diy::reduce(master, assigner, partners, &sum);
 
-  master.foreach(print_block, &verbose);
+  master.foreach(&print_block, &verbose);
 }
 

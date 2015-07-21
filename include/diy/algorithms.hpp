@@ -24,6 +24,11 @@ void sort(Master&                   master,
           const Cmp&                cmp,
           int                       k   = 2)
 {
+  bool immediate = master.immediate();
+  master.set_immediate(false);
+
+  // NB: although sorter will go out of scope, its member functions sample()
+  //     and exchange() will return functors whose copies get saved inside reduce
   detail::SampleSort<Block,T,Cmp> sorter(values, samples, cmp, num_samples);
 
   // swap-reduce to all-gather samples
@@ -32,6 +37,8 @@ void sort(Master&                   master,
 
   // all_to_all to exchange the values
   all_to_all(master, assigner, sorter.exchange(), k);
+
+  master.set_immediate(immediate);
 }
 
 template<class Block, class T>
