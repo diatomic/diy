@@ -1,48 +1,76 @@
 DIY
 ===
 
-DIY is a data-parallel out-of-core library.
+DIY is a data-parallel library for writing scalable distributed- and shared-memory parallel
+algorithms that can run both in- and out-of-core. The same program can be executed with one
+or more threads per MPI process and with one or more data blocks resident in main memory.  The
+abstraction enabling these capabilities is block-based parallelism; blocks and their message
+queues are mapped onto processing elements (MPI processes or threads) and are migrated between
+memory and storage by the DIY runtime. Complex communication patterns, including neighbor
+exchange, merge reduction, swap reduction, and all-to-all exchange, are implemented in DIY.
 
-`diy::Master` owns the blocks, put into it using the
-[add()](@ref diy::Master::add)
-method.  Its main two methods are [foreach()](@ref diy::Master::foreach) and
-[exchange()](@ref diy::Master::exchange),
-which together support a bulk-synchronous processing (BSP) model of algorithm design.
-[foreach(f)](@ref diy::Master::foreach) calls back a function `f()` with every block.
-The function is responsible for performing computation and scheduling communication using
-[enqueue()](@ref diy::Master::Proxy::enqueue)/[dequeue()](@ref diy::Master::Proxy::dequeue)
-operations. The actual communication is performed by
-[exchange()](@ref diy::Master::exchange).
 
-DIY is [available on Github](http://github.com/diatomic/diy2),
-subject to a [variation of a 3-clause BSD license](https://github.com/diatomic/diy2/blob/master/LICENSE.txt).
-You can download the [latest tarball](https://github.com/diatomic/diy2/archive/master.tar.gz).
+DIY follows a bulk-synchronous processing (BSP) programming model. A simple program, shown
+below, consists of the following components:
 
+- `struct`s called blocks,
+- the diy object called `master`,
+- callback functions performed on each block by `master.foreach()`,
+- message exchanges between the blocks by `master.exchange()`
+
+`diy::Master` owns the blocks, put into it using the [add()](@ref diy::Master::add) method.
+Its main two methods are [foreach()](@ref diy::Master::foreach) and [exchange()](@ref diy::Master::exchange).
+[foreach(f)](@ref diy::Master::foreach) calls back a function `f()`
+with every block.  The function is responsible for performing computation and scheduling
+communication using [enqueue()](@ref diy::Master::Proxy::enqueue)/[dequeue()](@ref diy::Master::Proxy::dequeue) operations.
+The actual communication is performed by [exchange()](@ref diy::Master::exchange).
 
 Example
 -------
 
+The callback functions `enqueue_block()` and `average()` in the example below are given the
+block pointer and a communication proxy for the message exchange between blocks. The callback
+functions typically enqueue or dequeue messages from the proxy. In this way, information can be
+received and sent during rounds of message exchange.
+
 ~~~~{.cpp}
-    struct Block { float local, average; };
+    // --- main program --- //
 
-    Master master(world);   // world = MPI_Comm
-    ...                     // populate master with blocks
-    master.foreach<Block>(&enqueue_local);
-    master.exchange();
-    master.foreach<Block>(&average);
+    struct Block { float local, average; };             // define your block structure
 
-    void enqueue_local(Block* b, const Proxy& cp, void* aux)
+    Master master(world);                               // world = MPI_Comm
+    ...                                                 // populate master with blocks
+    master.foreach<Block>(&enqueue_local);              // call enqueue_local() for each block
+    master.exchange();                                  // exchange enqueued data between blocks
+    master.foreach<Block>(&average);                    // call average() for each block
+
+    // --- callback functions --- //
+
+    // enqueue block data prior to exchanging it
+    void enqueue_local(Block* b,                        // one block
+                       const Proxy& cp,                 // communication proxy
+                                                        // i.e., the neighbor blocks with which
+                                                        // this block communicates
+                       void* aux)                       // user-defined additional arguments
     {
-        for (size_t i = 0; i < cp.link()->size(); i++)
-            cp.enqueue(cp.link()->target(i), b->local);
+        for (size_t i = 0; i < cp.link()->size(); i++)  // for all neighbor blocks
+            cp.enqueue(cp.link()->target(i), b->local); // enqueue the data to be sent
+                                                        // to this neighbor block in the next
+                                                        // exchange
     }
 
-    void average(Block* b, const Proxy& cp, void* aux)
+    // use the received data after exchanging it, in this case compute its average
+    void average(Block* b,                              // one block
+                 const Proxy& cp,                       // communication proxy
+                                                        // i.e., the neighbor blocks with which
+                                                        // this block communicates
+                 void* aux)                             // user-defined additional arguments
     {
         float x, average = 0;
-        for (size_t i = 0; i < cp.link()->size(); i++)
+        for (size_t i = 0; i < cp.link()->size(); i++)  // for all neighbor blocks
         {
-            cp.dequeue(cp.link()->target(i).gid, x);
+            cp.dequeue(cp.link()->target(i).gid, x);    // dequeue the data received from this
+                                                        // neighbor block in the last exchange
             average += x;
         }
         b->average = average / cp.link()->size();
@@ -65,6 +93,13 @@ Components
  - diy::FileStorage
  - [MPI wrapper](\ref MPI) for convenience.
  - IO
+
+Download
+--------
+
+DIY is [available on Github](http://github.com/diatomic/diy2), subject to a [variation of a
+3-clause BSD license](https://github.com/diatomic/diy2/blob/master/LICENSE.txt).  You can
+download the [latest tarball](https://github.com/diatomic/diy2/archive/master.tar.gz).
 
 \authors [Dmitriy Morozov](http://mrzv.org)
 \authors [Tom Peterka](http://www.mcs.anl.gov/~tpeterka/)

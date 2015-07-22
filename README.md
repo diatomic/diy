@@ -46,34 +46,43 @@ callback functions to enqueue or dequeue messages from the proxy, so that inform
 received and sent during rounds of message exchange.
 
 ```cpp
-    struct Block { float local, average; };          // define your block structure
+    // --- main program --- //
 
-    Master master(world);                            // world = MPI_Comm
-    ...                                              // populate master with blocks
-    master.foreach<Block>(&enqueue_local);           // call enqueue_local() for each block
-    master.exchange();                               // exchange enqueued data between blocks
-    master.foreach<Block>(&average);                 // call average() for each block
+    struct Block { float local, average; };             // define your block structure
+
+    Master master(world);                               // world = MPI_Comm
+    ...                                                 // populate master with blocks
+    master.foreach<Block>(&enqueue_local);              // call enqueue_local() for each block
+    master.exchange();                                  // exchange enqueued data between blocks
+    master.foreach<Block>(&average);                    // call average() for each block
+
+    // --- callback functions --- //
 
     // enqueue block data prior to exchanging it
-    void enqueue_local(Block* b,                     // one block
-                       const Proxy& cp,              // communication proxy, i.e., the other blocks
-                                                     // with which this block communicates
-                       void* aux)                    // user-defined additional arguments
+    void enqueue_local(Block* b,                        // one block
+                       const Proxy& cp,                 // communication proxy
+                                                        // i.e., the neighbor blocks with which
+                                                        // this block communicates
+                       void* aux)                       // user-defined additional arguments
     {
-        for (size_t i = 0; i < cp.link()->size(); i++)
-            cp.enqueue(cp.link()->target(i), b->local);
+        for (size_t i = 0; i < cp.link()->size(); i++)  // for all neighbor blocks
+            cp.enqueue(cp.link()->target(i), b->local); // enqueue the data to be sent
+                                                        // to this neighbor block in the next
+                                                        // exchange
     }
 
-    // process received data after exchanging it, in this case compute its average
-    void average(Block* b,                           // one block
-                 const Proxy& cp,                    // communication proxy, i.e., the other blocks
-                                                     // with which this block communicates
-                 void* aux)                          // user-defined additional arguments
+    // use the received data after exchanging it, in this case compute its average
+    void average(Block* b,                              // one block
+                 const Proxy& cp,                       // communication proxy
+                                                        // i.e., the neighbor blocks with which
+                                                        // this block communicates
+                 void* aux)                             // user-defined additional arguments
     {
         float x, average = 0;
-        for (size_t i = 0; i < cp.link()->size(); i++)
+        for (size_t i = 0; i < cp.link()->size(); i++)  // for all neighbor blocks
         {
-            cp.dequeue(cp.link()->target(i).gid, x);
+            cp.dequeue(cp.link()->target(i).gid, x);    // dequeue the data received from this
+                                                        // neighbor block in the last exchange
             average += x;
         }
         b->average = average / cp.link()->size();

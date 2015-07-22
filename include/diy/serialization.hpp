@@ -7,10 +7,10 @@
 #include <string>
 #include <fstream>
 
-#if __cplusplus > 199711L           // C++11
-#include <tuple>
-#include <unordered_map>
-#endif
+// #if __cplusplus > 199711L           // C++11
+// #include <tuple>
+// #include <unordered_map>
+// #endif
 
 namespace diy
 {
@@ -266,68 +266,68 @@ namespace diy
     }
   };
 
-#if __cplusplus > 199711L           // C++11
-  // save/load for std::unordered_map<K,V>
-  template<class K, class V>
-  struct Serialization< std::unordered_map<K,V> >
-  {
-    typedef             std::unordered_map<K,V>         Map;
+// #if __cplusplus > 199711L           // C++11
+//   // save/load for std::unordered_map<K,V>
+//   template<class K, class V>
+//   struct Serialization< std::unordered_map<K,V> >
+//   {
+//     typedef             std::unordered_map<K,V>         Map;
 
-    static void         save(BinaryBuffer& bb, const Map& m)
-    {
-      size_t s = m.size();
-      diy::save(bb, s);
-      for (auto& x : m)
-        diy::save(bb, x);
-    }
+//     static void         save(BinaryBuffer& bb, const Map& m)
+//     {
+//       size_t s = m.size();
+//       diy::save(bb, s);
+//       for (auto& x : m)
+//         diy::save(bb, x);
+//     }
 
-    static void         load(BinaryBuffer& bb, Map& m)
-    {
-      size_t s;
-      diy::load(bb, s);
-      for (size_t i = 0; i < s; ++i)
-      {
-        std::pair<K,V> p;
-        diy::load(bb, p);
-        m.emplace(std::move(p));
-      }
-    }
-  };
+//     static void         load(BinaryBuffer& bb, Map& m)
+//     {
+//       size_t s;
+//       diy::load(bb, s);
+//       for (size_t i = 0; i < s; ++i)
+//       {
+//         std::pair<K,V> p;
+//         diy::load(bb, p);
+//         m.emplace(std::move(p));
+//       }
+//     }
+//   };
 
-  // save/load for std::tuple<...>
-  // TODO: this ought to be default (copying) serialization
-  //       if all arguments are default
-  template<class... Args>
-  struct Serialization< std::tuple<Args...> >
-  {
-    typedef             std::tuple<Args...>     Tuple;
+//   // save/load for std::tuple<...>
+//   // TODO: this ought to be default (copying) serialization
+//   //       if all arguments are default
+//   template<class... Args>
+//   struct Serialization< std::tuple<Args...> >
+//   {
+//     typedef             std::tuple<Args...>     Tuple;
 
-    static void         save(BinaryBuffer& bb, const Tuple& t)          { save<0>(bb, t); }
+//     static void         save(BinaryBuffer& bb, const Tuple& t)          { save<0>(bb, t); }
 
-    template<std::size_t I = 0>
-    static
-    typename std::enable_if<I == sizeof...(Args), void>::type
-                        save(BinaryBuffer&, const Tuple&)               {}
+//     template<std::size_t I = 0>
+//     static
+//     typename std::enable_if<I == sizeof...(Args), void>::type
+//                         save(BinaryBuffer&, const Tuple&)               {}
 
-    template<std::size_t I = 0>
-    static
-    typename std::enable_if<I < sizeof...(Args), void>::type
-                        save(BinaryBuffer& bb, const Tuple& t)          { diy::save(bb, std::get<I>(t)); save<I+1>(bb, t); }
+//     template<std::size_t I = 0>
+//     static
+//     typename std::enable_if<I < sizeof...(Args), void>::type
+//                         save(BinaryBuffer& bb, const Tuple& t)          { diy::save(bb, std::get<I>(t)); save<I+1>(bb, t); }
 
-    static void         load(BinaryBuffer& bb, Tuple& t)                { load<0>(bb, t); }
+//     static void         load(BinaryBuffer& bb, Tuple& t)                { load<0>(bb, t); }
 
-    template<std::size_t I = 0>
-    static
-    typename std::enable_if<I == sizeof...(Args), void>::type
-                        load(BinaryBuffer&, Tuple&)                     {}
+//     template<std::size_t I = 0>
+//     static
+//     typename std::enable_if<I == sizeof...(Args), void>::type
+//                         load(BinaryBuffer&, Tuple&)                     {}
 
-    template<std::size_t I = 0>
-    static
-    typename std::enable_if<I < sizeof...(Args), void>::type
-                        load(BinaryBuffer& bb, Tuple& t)                { diy::load(bb, std::get<I>(t)); load<I+1>(bb, t); }
+//     template<std::size_t I = 0>
+//     static
+//     typename std::enable_if<I < sizeof...(Args), void>::type
+//                         load(BinaryBuffer& bb, Tuple& t)                { diy::load(bb, std::get<I>(t)); load<I+1>(bb, t); }
 
-  };
-#endif
+//   };
+// #endif
 }
 
 void
