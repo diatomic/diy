@@ -12,8 +12,8 @@ var indexSectionsWithContent =
   2: "d",
   3: "abcdefgilnoprs",
   4: "p",
-  5: "cdims",
-  6: "cdims"
+  5: "cdeims",
+  6: "cdeims"
 };
 
 var indexSectionNames =

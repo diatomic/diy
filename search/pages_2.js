@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['initialization',['initialization',['../md_docs_detail_initialization.html',1,'']]]
+  ['examples',['examples',['../md_docs_detail_examples.html',1,'']]]
 ];

@@ -108,13 +108,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="structdiy_1_1_reduce_proxy.html#a00fc565b7b88b6bdc3f3163a41e1e0a9">   17</a></span>&#160;    <a class="code" href="structdiy_1_1_reduce_proxy.html#a00fc565b7b88b6bdc3f3163a41e1e0a9">ReduceProxy</a>(<span class="keyword">const</span> <a class="code" href="structdiy_1_1_master_1_1_proxy.html">Master::Proxy</a>&amp;    proxy, </div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;                <span class="keywordtype">void</span>*                   <a class="code" href="structdiy_1_1_reduce_proxy.html#a6ae6c22da66bea79cbf2702a5d51fe2b">block</a>, </div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;                <span class="keywordtype">unsigned</span>                <a class="code" href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">round</a>, </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;                <span class="keyword">const</span> <a class="code" href="classdiy_1_1_assigner.html">Assigner</a>&amp;         assigner, </div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;                <span class="keyword">const</span> <a class="code" href="classdiy_1_1_assigner.html">Assigner</a>&amp;         <a class="code" href="structdiy_1_1_reduce_proxy.html#ab3cba8511e114ecfd3e84a25f30f6bd9">assigner</a>, </div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;                <span class="keyword">const</span> GIDVector&amp;        incoming_gids, </div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;                <span class="keyword">const</span> GIDVector&amp;        outgoing_gids): </div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;      <a class="code" href="classdiy_1_1_master.html">Master</a>::Proxy(proxy),</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;      block_(block),</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;      round_(round),</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;      nblocks_(assigner.<a class="code" href="structdiy_1_1_reduce_proxy.html#ab340a062e8e96bfb7428186e6f3046a8">nblocks</a>())</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;      assigner_(assigner)</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    {</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;      <span class="comment">// setup in_link</span></div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; incoming_gids.size(); ++i)</div>
@@ -135,171 +135,174 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;      }</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    }</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
-<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="structdiy_1_1_reduce_proxy.html#a7d292436f664e68e8b39dd6661bcfc37">   47</a></span>&#160;    <a class="code" href="structdiy_1_1_reduce_proxy.html#a7d292436f664e68e8b39dd6661bcfc37">ReduceProxy</a>(<span class="keyword">const</span> <a class="code" href="structdiy_1_1_master_1_1_proxy.html">Master::Proxy</a>&amp;    proxy, </div>
+<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="structdiy_1_1_reduce_proxy.html#a5ed1995ee2e11b6704c733ed289f52d4">   47</a></span>&#160;    <a class="code" href="structdiy_1_1_reduce_proxy.html#a5ed1995ee2e11b6704c733ed289f52d4">ReduceProxy</a>(<span class="keyword">const</span> <a class="code" href="structdiy_1_1_master_1_1_proxy.html">Master::Proxy</a>&amp;    proxy, </div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;                <span class="keywordtype">void</span>*                   <a class="code" href="structdiy_1_1_reduce_proxy.html#a6ae6c22da66bea79cbf2702a5d51fe2b">block</a>, </div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;                <span class="keywordtype">unsigned</span>                <a class="code" href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">round</a>, </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;                <span class="keywordtype">int</span>                     <a class="code" href="structdiy_1_1_reduce_proxy.html#ab340a062e8e96bfb7428186e6f3046a8">nblocks</a>,</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;                <span class="keyword">const</span> <a class="code" href="classdiy_1_1_assigner.html">Assigner</a>&amp;         <a class="code" href="structdiy_1_1_reduce_proxy.html#ab3cba8511e114ecfd3e84a25f30f6bd9">assigner</a>,</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;                <span class="keyword">const</span> <a class="code" href="classdiy_1_1_link.html">Link</a>&amp;             <a class="code" href="structdiy_1_1_reduce_proxy.html#a4468710ba18007a4be74aa46b9e98386">in_link</a>,</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;                <span class="keyword">const</span> <a class="code" href="classdiy_1_1_link.html">Link</a>&amp;             <a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>):</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;      <a class="code" href="classdiy_1_1_master.html">Master</a>::Proxy(proxy),</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;      block_(block),</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;      round_(round),</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      nblocks_(nblocks),</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      assigner_(assigner),</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      in_link_(in_link),</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;      out_link_(out_link)</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    {}</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;</div>
-<div class="line"><a name="l00063"></a><span class="lineno"><a class="line" href="structdiy_1_1_reduce_proxy.html#a6ae6c22da66bea79cbf2702a5d51fe2b">   63</a></span>&#160;    <span class="keywordtype">void</span>*         <a class="code" href="structdiy_1_1_reduce_proxy.html#a6ae6c22da66bea79cbf2702a5d51fe2b">block</a>()<span class="keyword"> const                           </span>{ <span class="keywordflow">return</span> block_; }</div>
-<div class="line"><a name="l00065"></a><span class="lineno"><a class="line" href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">   65</a></span>&#160;    <span class="keywordtype">unsigned</span>      <a class="code" href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">round</a>()<span class="keyword"> const                           </span>{ <span class="keywordflow">return</span> round_; }</div>
-<div class="line"><a name="l00067"></a><span class="lineno"><a class="line" href="structdiy_1_1_reduce_proxy.html#a4468710ba18007a4be74aa46b9e98386">   67</a></span>&#160;    <span class="keyword">const</span> <a class="code" href="classdiy_1_1_link.html">Link</a>&amp;   <a class="code" href="structdiy_1_1_reduce_proxy.html#a4468710ba18007a4be74aa46b9e98386">in_link</a>()<span class="keyword"> const                         </span>{ <span class="keywordflow">return</span> in_link_; }</div>
-<div class="line"><a name="l00069"></a><span class="lineno"><a class="line" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">   69</a></span>&#160;    <span class="keyword">const</span> <a class="code" href="classdiy_1_1_link.html">Link</a>&amp;   <a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>()<span class="keyword"> const                        </span>{ <span class="keywordflow">return</span> out_link_; }</div>
-<div class="line"><a name="l00071"></a><span class="lineno"><a class="line" href="structdiy_1_1_reduce_proxy.html#ab340a062e8e96bfb7428186e6f3046a8">   71</a></span>&#160;    <span class="keywordtype">int</span>           <a class="code" href="structdiy_1_1_reduce_proxy.html#ab340a062e8e96bfb7428186e6f3046a8">nblocks</a>()<span class="keyword"> const                         </span>{ <span class="keywordflow">return</span> nblocks_; }</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;</div>
-<div class="line"><a name="l00074"></a><span class="lineno"><a class="line" href="structdiy_1_1_reduce_proxy.html#a670b1f74a12b1dc0f43645cd4fa9f2ed">   74</a></span>&#160;    <span class="keywordtype">void</span>          <a class="code" href="structdiy_1_1_reduce_proxy.html#a670b1f74a12b1dc0f43645cd4fa9f2ed">set_round</a>(<span class="keywordtype">unsigned</span> r)                   { round_ = r; }</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keywordtype">void</span>*         block_;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="keywordtype">unsigned</span>      round_;</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="keywordtype">int</span>           nblocks_;</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <a class="code" href="classdiy_1_1_link.html">Link</a>          in_link_;</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <a class="code" href="classdiy_1_1_link.html">Link</a>          out_link_;</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;};</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="keyword">namespace </span>detail</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;{</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">class</span> Reduce, <span class="keyword">class</span> Partners&gt;</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;  <span class="keyword">struct </span>ReductionFunctor;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">class</span> Partners, <span class="keyword">class</span> Skip&gt;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  <span class="keyword">struct </span>SkipInactiveOr;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  <span class="keyword">struct </span>ReduceNeverSkip</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  {</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <span class="keywordtype">bool</span> operator()(<span class="keywordtype">int</span> round, <span class="keywordtype">int</span> lid, <span class="keyword">const</span> Master&amp; master)<span class="keyword"> const  </span>{ <span class="keywordflow">return</span> <span class="keyword">false</span>; }</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  };</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;}</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> Reduce, <span class="keyword">class</span> Partners, <span class="keyword">class</span> Skip&gt;</div>
-<div class="line"><a name="l00107"></a><span class="lineno"><a class="line" href="group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f">  107</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f">reduce</a>(<a class="code" href="classdiy_1_1_master.html">Master</a>&amp;                    master,</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;            <span class="keyword">const</span> <a class="code" href="classdiy_1_1_assigner.html">Assigner</a>&amp;            assigner,</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;            <span class="keyword">const</span> Partners&amp;            partners,</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;            <span class="keyword">const</span> Reduce&amp;              <a class="code" href="group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f">reduce</a>,</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;            <span class="keyword">const</span> Skip&amp;                skip)</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;{</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  <span class="keywordtype">int</span> original_expected = master.expected();</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  <span class="keywordtype">unsigned</span> round;</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  <span class="keywordflow">for</span> (round = 0; round &lt; partners.rounds(); ++round)</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  {</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="comment">//fprintf(stderr, &quot;== Round %d\n&quot;, round);</span></div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    master.<a class="code" href="classdiy_1_1_master.html#a99badfe62db24446c4b23a7830fce05c">foreach</a>(detail::ReductionFunctor&lt;Reduce,Partners&gt;(round, reduce, partners, assigner),</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;                   detail::SkipInactiveOr&lt;Partners,Skip&gt;(round, partners, skip));</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="keywordtype">int</span> expected = 0;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; master.<a class="code" href="classdiy_1_1_master.html#afd41d766a657a7b5e3aa6eb2ed141ecd">size</a>(); ++i)</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    {</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;      <span class="keywordflow">if</span> (partners.active(round + 1, master.<a class="code" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>(i), master))</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;      {</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;        std::vector&lt;int&gt; incoming_gids;</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        partners.incoming(round + 1, master.<a class="code" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>(i), incoming_gids, master);</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;        expected += incoming_gids.size();</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        master.incoming(master.<a class="code" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>(i)).clear();</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;      }</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    }</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    master.set_expected(expected);</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    master.flush();</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;  }</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;  <span class="comment">// final round</span></div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;  <span class="comment">//fprintf(stderr, &quot;== Round %d\n&quot;, round);</span></div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  master.<a class="code" href="classdiy_1_1_master.html#a99badfe62db24446c4b23a7830fce05c">foreach</a>(detail::ReductionFunctor&lt;Reduce,Partners&gt;(round, reduce, partners, assigner),</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;                 detail::SkipInactiveOr&lt;Partners,Skip&gt;(round, partners, skip));</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;  master.set_expected(original_expected);</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;}</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> Reduce, <span class="keyword">class</span> Partners&gt;</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;<span class="keywordtype">void</span> <a class="code" href="group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f">reduce</a>(Master&amp;                    master,</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;            <span class="keyword">const</span> Assigner&amp;            assigner,</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;            <span class="keyword">const</span> Partners&amp;            partners,</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;            <span class="keyword">const</span> Reduce&amp;              reducer)</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;{</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  <a class="code" href="group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f">reduce</a>(master, assigner, partners, reducer, detail::ReduceNeverSkip());</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;}</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;<span class="keyword">namespace </span>detail</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;{</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">class</span> Reduce, <span class="keyword">class</span> Partners&gt;</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;  <span class="keyword">struct </span>ReductionFunctor</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;  {</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;                ReductionFunctor(<span class="keywordtype">unsigned</span> round_, <span class="keyword">const</span> Reduce&amp; reduce_, <span class="keyword">const</span> Partners&amp; partners_, <span class="keyword">const</span> Assigner&amp; assigner_):</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;                    round(round_), <a class="code" href="group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f">reduce</a>(reduce_), partners(partners_), assigner(assigner_)        {}</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <span class="keywordtype">void</span>        operator()(<span class="keywordtype">void</span>* b, <span class="keyword">const</span> Master::ProxyWithLink&amp; cp, <span class="keywordtype">void</span>*)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;      <span class="keywordflow">if</span> (!partners.active(round, cp.gid(), *cp.master())) <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;      std::vector&lt;int&gt; incoming_gids, outgoing_gids;</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;      <span class="keywordflow">if</span> (round &gt; 0)</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;          partners.incoming(round, cp.gid(), incoming_gids, *cp.master());        <span class="comment">// receive from the previous round</span></div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;      <span class="keywordflow">if</span> (round &lt; partners.rounds())</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;          partners.outgoing(round, cp.gid(), outgoing_gids, *cp.master());        <span class="comment">// send to the next round</span></div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;      ReduceProxy   rp(cp, b, round, assigner, incoming_gids, outgoing_gids);</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;      <a class="code" href="group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f">reduce</a>(b, rp, partners);</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;      <span class="comment">// touch the outgoing queues to make sure they exist</span></div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;      Master::OutgoingQueues&amp; outgoing = *cp.outgoing();</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;      <span class="keywordflow">if</span> (outgoing.size() &lt; rp.out_link().size())</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> j = 0; j &lt; rp.out_link().size(); ++j)</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;          outgoing[rp.out_link().target(j)];       <span class="comment">// touch the outgoing queue, creating it if necessary</span></div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    }</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    <span class="keywordtype">unsigned</span>        round;</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    <span class="keyword">const</span> Reduce&amp;   <a class="code" href="group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f">reduce</a>;</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    <span class="keyword">const</span> Partners&amp; partners;</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="keyword">const</span> Assigner&amp; assigner;</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;  };</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">class</span> Partners, <span class="keyword">class</span> Skip&gt;</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;  <span class="keyword">struct </span>SkipInactiveOr</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;  {</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;                    SkipInactiveOr(<span class="keywordtype">int</span> round_, <span class="keyword">const</span> Partners&amp; partners_, <span class="keyword">const</span> Skip&amp; skip_):</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;                        round(round_), partners(partners_), skip(skip_)         {}</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    <span class="keywordtype">bool</span>            operator()(<span class="keywordtype">int</span> i, <span class="keyword">const</span> Master&amp; master)<span class="keyword"> const               </span>{ <span class="keywordflow">return</span> !partners.active(round, master.gid(i), master) || skip(round, i, master); }</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    <span class="keywordtype">int</span>             round;</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    <span class="keyword">const</span> Partners&amp; partners;</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="keyword">const</span> Skip&amp;     skip;</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;  };</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;}</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;} <span class="comment">// diy</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno"><a class="line" href="structdiy_1_1_reduce_proxy.html#a6ae6c22da66bea79cbf2702a5d51fe2b">   62</a></span>&#160;    <span class="keywordtype">void</span>*         <a class="code" href="structdiy_1_1_reduce_proxy.html#a6ae6c22da66bea79cbf2702a5d51fe2b">block</a>()<span class="keyword"> const                           </span>{ <span class="keywordflow">return</span> block_; }</div>
+<div class="line"><a name="l00064"></a><span class="lineno"><a class="line" href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">   64</a></span>&#160;    <span class="keywordtype">unsigned</span>      <a class="code" href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">round</a>()<span class="keyword"> const                           </span>{ <span class="keywordflow">return</span> round_; }</div>
+<div class="line"><a name="l00066"></a><span class="lineno"><a class="line" href="structdiy_1_1_reduce_proxy.html#a4468710ba18007a4be74aa46b9e98386">   66</a></span>&#160;    <span class="keyword">const</span> <a class="code" href="classdiy_1_1_link.html">Link</a>&amp;   <a class="code" href="structdiy_1_1_reduce_proxy.html#a4468710ba18007a4be74aa46b9e98386">in_link</a>()<span class="keyword"> const                         </span>{ <span class="keywordflow">return</span> in_link_; }</div>
+<div class="line"><a name="l00068"></a><span class="lineno"><a class="line" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">   68</a></span>&#160;    <span class="keyword">const</span> <a class="code" href="classdiy_1_1_link.html">Link</a>&amp;   <a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>()<span class="keyword"> const                        </span>{ <span class="keywordflow">return</span> out_link_; }</div>
+<div class="line"><a name="l00070"></a><span class="lineno"><a class="line" href="structdiy_1_1_reduce_proxy.html#ab340a062e8e96bfb7428186e6f3046a8">   70</a></span>&#160;    <span class="keywordtype">int</span>           <a class="code" href="structdiy_1_1_reduce_proxy.html#ab340a062e8e96bfb7428186e6f3046a8">nblocks</a>()<span class="keyword"> const                         </span>{ <span class="keywordflow">return</span> assigner_.<a class="code" href="classdiy_1_1_assigner.html#a61ea8499c8c28934f94e18e635e06436">nblocks</a>(); }</div>
+<div class="line"><a name="l00072"></a><span class="lineno"><a class="line" href="structdiy_1_1_reduce_proxy.html#ab3cba8511e114ecfd3e84a25f30f6bd9">   72</a></span>&#160;    <span class="keyword">const</span> <a class="code" href="classdiy_1_1_assigner.html">Assigner</a>&amp; <a class="code" href="structdiy_1_1_reduce_proxy.html#ab3cba8511e114ecfd3e84a25f30f6bd9">assigner</a>()<span class="keyword"> const                      </span>{ <span class="keywordflow">return</span> assigner_; }</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>
+<div class="line"><a name="l00075"></a><span class="lineno"><a class="line" href="structdiy_1_1_reduce_proxy.html#a670b1f74a12b1dc0f43645cd4fa9f2ed">   75</a></span>&#160;    <span class="keywordtype">void</span>          <a class="code" href="structdiy_1_1_reduce_proxy.html#a670b1f74a12b1dc0f43645cd4fa9f2ed">set_round</a>(<span class="keywordtype">unsigned</span> r)                   { round_ = r; }</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="keywordtype">void</span>*         block_;</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="keywordtype">unsigned</span>      round_;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdiy_1_1_assigner.html">Assigner</a>&amp; assigner_;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <a class="code" href="classdiy_1_1_link.html">Link</a>          in_link_;</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <a class="code" href="classdiy_1_1_link.html">Link</a>          out_link_;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;};</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="keyword">namespace </span>detail</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;{</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">class</span> Reduce, <span class="keyword">class</span> Partners&gt;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  <span class="keyword">struct </span>ReductionFunctor;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">class</span> Partners, <span class="keyword">class</span> Skip&gt;</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  <span class="keyword">struct </span>SkipInactiveOr;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  <span class="keyword">struct </span>ReduceNeverSkip</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;  {</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <span class="keywordtype">bool</span> operator()(<span class="keywordtype">int</span> round, <span class="keywordtype">int</span> lid, <span class="keyword">const</span> Master&amp; master)<span class="keyword"> const  </span>{ <span class="keywordflow">return</span> <span class="keyword">false</span>; }</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  };</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;}</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> Reduce, <span class="keyword">class</span> Partners, <span class="keyword">class</span> Skip&gt;</div>
+<div class="line"><a name="l00108"></a><span class="lineno"><a class="line" href="group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f">  108</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f">reduce</a>(<a class="code" href="classdiy_1_1_master.html">Master</a>&amp;                    master,</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;            <span class="keyword">const</span> <a class="code" href="classdiy_1_1_assigner.html">Assigner</a>&amp;            assigner,</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;            <span class="keyword">const</span> Partners&amp;            partners,</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;            <span class="keyword">const</span> Reduce&amp;              <a class="code" href="group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f">reduce</a>,</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;            <span class="keyword">const</span> Skip&amp;                skip)</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;{</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  <span class="keywordtype">int</span> original_expected = master.expected();</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  <span class="keywordtype">unsigned</span> round;</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  <span class="keywordflow">for</span> (round = 0; round &lt; partners.rounds(); ++round)</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  {</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="comment">//fprintf(stderr, &quot;== Round %d\n&quot;, round);</span></div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    master.<a class="code" href="classdiy_1_1_master.html#a99badfe62db24446c4b23a7830fce05c">foreach</a>(detail::ReductionFunctor&lt;Reduce,Partners&gt;(round, reduce, partners, assigner),</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;                   detail::SkipInactiveOr&lt;Partners,Skip&gt;(round, partners, skip));</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    master.execute();</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <span class="keywordtype">int</span> expected = 0;</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; master.<a class="code" href="classdiy_1_1_master.html#afd41d766a657a7b5e3aa6eb2ed141ecd">size</a>(); ++i)</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    {</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;      <span class="keywordflow">if</span> (partners.active(round + 1, master.<a class="code" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>(i), master))</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;      {</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;        std::vector&lt;int&gt; incoming_gids;</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        partners.incoming(round + 1, master.<a class="code" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>(i), incoming_gids, master);</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        expected += incoming_gids.size();</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        master.incoming(master.<a class="code" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>(i)).clear();</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;      }</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    }</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    master.set_expected(expected);</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    master.flush();</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;  }</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  <span class="comment">// final round</span></div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;  <span class="comment">//fprintf(stderr, &quot;== Round %d\n&quot;, round);</span></div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;  master.<a class="code" href="classdiy_1_1_master.html#a99badfe62db24446c4b23a7830fce05c">foreach</a>(detail::ReductionFunctor&lt;Reduce,Partners&gt;(round, reduce, partners, assigner),</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;                 detail::SkipInactiveOr&lt;Partners,Skip&gt;(round, partners, skip));</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;  master.set_expected(original_expected);</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;}</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> Reduce, <span class="keyword">class</span> Partners&gt;</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;<span class="keywordtype">void</span> <a class="code" href="group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f">reduce</a>(Master&amp;                    master,</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;            <span class="keyword">const</span> Assigner&amp;            assigner,</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;            <span class="keyword">const</span> Partners&amp;            partners,</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;            <span class="keyword">const</span> Reduce&amp;              reducer)</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;{</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  <a class="code" href="group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f">reduce</a>(master, assigner, partners, reducer, detail::ReduceNeverSkip());</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;}</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;<span class="keyword">namespace </span>detail</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;{</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">class</span> Reduce, <span class="keyword">class</span> Partners&gt;</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;  <span class="keyword">struct </span>ReductionFunctor</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  {</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;                ReductionFunctor(<span class="keywordtype">unsigned</span> round_, <span class="keyword">const</span> Reduce&amp; reduce_, <span class="keyword">const</span> Partners&amp; partners_, <span class="keyword">const</span> Assigner&amp; assigner_):</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;                    round(round_), <a class="code" href="group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f">reduce</a>(reduce_), partners(partners_), assigner(assigner_)        {}</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keywordtype">void</span>        operator()(<span class="keywordtype">void</span>* b, <span class="keyword">const</span> Master::ProxyWithLink&amp; cp, <span class="keywordtype">void</span>*)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;      <span class="keywordflow">if</span> (!partners.active(round, cp.gid(), *cp.master())) <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;      std::vector&lt;int&gt; incoming_gids, outgoing_gids;</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;      <span class="keywordflow">if</span> (round &gt; 0)</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;          partners.incoming(round, cp.gid(), incoming_gids, *cp.master());        <span class="comment">// receive from the previous round</span></div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;      <span class="keywordflow">if</span> (round &lt; partners.rounds())</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;          partners.outgoing(round, cp.gid(), outgoing_gids, *cp.master());        <span class="comment">// send to the next round</span></div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;      ReduceProxy   rp(cp, b, round, assigner, incoming_gids, outgoing_gids);</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;      <a class="code" href="group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f">reduce</a>(b, rp, partners);</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;      <span class="comment">// touch the outgoing queues to make sure they exist</span></div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;      Master::OutgoingQueues&amp; outgoing = *cp.outgoing();</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;      <span class="keywordflow">if</span> (outgoing.size() &lt; rp.out_link().size())</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> j = 0; j &lt; rp.out_link().size(); ++j)</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;          outgoing[rp.out_link().target(j)];       <span class="comment">// touch the outgoing queue, creating it if necessary</span></div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    }</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    <span class="keywordtype">unsigned</span>        round;</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    Reduce          <a class="code" href="group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f">reduce</a>;</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    Partners        partners;</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    <span class="keyword">const</span> Assigner&amp; assigner;</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;  };</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">class</span> Partners, <span class="keyword">class</span> Skip&gt;</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;  <span class="keyword">struct </span>SkipInactiveOr</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;  {</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;                    SkipInactiveOr(<span class="keywordtype">int</span> round_, <span class="keyword">const</span> Partners&amp; partners_, <span class="keyword">const</span> Skip&amp; skip_):</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;                        round(round_), partners(partners_), skip(skip_)         {}</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    <span class="keywordtype">bool</span>            operator()(<span class="keywordtype">int</span> i, <span class="keyword">const</span> Master&amp; master)<span class="keyword"> const               </span>{ <span class="keywordflow">return</span> !partners.active(round, master.gid(i), master) || skip(round, i, master); }</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="keywordtype">int</span>             round;</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="keyword">const</span> Partners&amp; partners;</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <span class="keyword">const</span> Skip&amp;     skip;</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;  };</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;}</div>
 <div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;<span class="preprocessor">#endif // DIY_REDUCE_HPP</span></div>
-<div class="ttc" id="structdiy_1_1_reduce_proxy_html_a930bd9ac87512bc08e20501d406946c9"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">diy::ReduceProxy::out_link</a></div><div class="ttdeci">const Link &amp; out_link() const </div><div class="ttdoc">returns outgoing link </div><div class="ttdef"><b>Definition:</b> reduce.hpp:69</div></div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;} <span class="comment">// diy</span></div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;<span class="preprocessor">#endif // DIY_REDUCE_HPP</span></div>
+<div class="ttc" id="structdiy_1_1_reduce_proxy_html_a930bd9ac87512bc08e20501d406946c9"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">diy::ReduceProxy::out_link</a></div><div class="ttdeci">const Link &amp; out_link() const </div><div class="ttdoc">returns outgoing link </div><div class="ttdef"><b>Definition:</b> reduce.hpp:68</div></div>
 <div class="ttc" id="structdiy_1_1_reduce_proxy_html"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html">diy::ReduceProxy</a></div><div class="ttdoc">Enables communication within a group during a reduction. DIY creates the ReduceProxy for you in diy::...</div><div class="ttdef"><b>Definition:</b> reduce.hpp:13</div></div>
-<div class="ttc" id="classdiy_1_1_master_html_a99badfe62db24446c4b23a7830fce05c"><div class="ttname"><a href="classdiy_1_1_master.html#a99badfe62db24446c4b23a7830fce05c">diy::Master::foreach</a></div><div class="ttdeci">void foreach(const Functor &amp;f)</div><div class="ttdoc">call f with every block </div><div class="ttdef"><b>Definition:</b> master.hpp:201</div></div>
+<div class="ttc" id="classdiy_1_1_master_html_a99badfe62db24446c4b23a7830fce05c"><div class="ttname"><a href="classdiy_1_1_master.html#a99badfe62db24446c4b23a7830fce05c">diy::Master::foreach</a></div><div class="ttdeci">void foreach(const Functor &amp;f)</div><div class="ttdoc">call f with every block </div><div class="ttdef"><b>Definition:</b> master.hpp:225</div></div>
 <div class="ttc" id="structgb__t_html"><div class="ttname"><a href="structgb__t.html">gb_t</a></div><div class="ttdef"><b>Definition:</b> types.h:9</div></div>
-<div class="ttc" id="structdiy_1_1_reduce_proxy_html_aa38bbd6145d035a99562a1a5a3d92375"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">diy::ReduceProxy::round</a></div><div class="ttdeci">unsigned round() const </div><div class="ttdoc">returns current round number </div><div class="ttdef"><b>Definition:</b> reduce.hpp:65</div></div>
-<div class="ttc" id="classdiy_1_1_master_html_a20e686efa0c9389b4ed943277ccfffbc"><div class="ttname"><a href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">diy::Master::gid</a></div><div class="ttdeci">int gid(int i) const </div><div class="ttdoc">return gid of the i-th block </div><div class="ttdef"><b>Definition:</b> master.hpp:172</div></div>
-<div class="ttc" id="group___communication_html_ga4254d5b9c3e97e5d5d73dd019023257f"><div class="ttname"><a href="group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f">diy::reduce</a></div><div class="ttdeci">void reduce(Master &amp;master, const Assigner &amp;assigner, const Partners &amp;partners, const Reduce &amp;reduce, const Skip &amp;skip)</div><div class="ttdoc">Implementation of the reduce communication pattern (includes swap-reduce, merge-reduce, and any other global communication). </div><div class="ttdef"><b>Definition:</b> reduce.hpp:107</div></div>
+<div class="ttc" id="structdiy_1_1_reduce_proxy_html_aa38bbd6145d035a99562a1a5a3d92375"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">diy::ReduceProxy::round</a></div><div class="ttdeci">unsigned round() const </div><div class="ttdoc">returns current round number </div><div class="ttdef"><b>Definition:</b> reduce.hpp:64</div></div>
+<div class="ttc" id="classdiy_1_1_assigner_html_a61ea8499c8c28934f94e18e635e06436"><div class="ttname"><a href="classdiy_1_1_assigner.html#a61ea8499c8c28934f94e18e635e06436">diy::Assigner::nblocks</a></div><div class="ttdeci">int nblocks() const </div><div class="ttdoc">returns the total number of global blocks </div><div class="ttdef"><b>Definition:</b> assigner.hpp:20</div></div>
+<div class="ttc" id="classdiy_1_1_master_html_a20e686efa0c9389b4ed943277ccfffbc"><div class="ttname"><a href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">diy::Master::gid</a></div><div class="ttdeci">int gid(int i) const </div><div class="ttdoc">return gid of the i-th block </div><div class="ttdef"><b>Definition:</b> master.hpp:196</div></div>
+<div class="ttc" id="group___communication_html_ga4254d5b9c3e97e5d5d73dd019023257f"><div class="ttname"><a href="group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f">diy::reduce</a></div><div class="ttdeci">void reduce(Master &amp;master, const Assigner &amp;assigner, const Partners &amp;partners, const Reduce &amp;reduce, const Skip &amp;skip)</div><div class="ttdoc">Implementation of the reduce communication pattern (includes swap-reduce, merge-reduce, and any other global communication). </div><div class="ttdef"><b>Definition:</b> reduce.hpp:108</div></div>
 <div class="ttc" id="classdiy_1_1_assigner_html_a272d33bcc94394f39880603084b55f38"><div class="ttname"><a href="classdiy_1_1_assigner.html#a272d33bcc94394f39880603084b55f38">diy::Assigner::rank</a></div><div class="ttdeci">virtual int rank(int gid) const =0</div><div class="ttdoc">returns the process rank of the block with global id gid (need not be local) </div></div>
-<div class="ttc" id="structdiy_1_1_reduce_proxy_html_a670b1f74a12b1dc0f43645cd4fa9f2ed"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html#a670b1f74a12b1dc0f43645cd4fa9f2ed">diy::ReduceProxy::set_round</a></div><div class="ttdeci">void set_round(unsigned r)</div><div class="ttdoc">advanced: change current round number </div><div class="ttdef"><b>Definition:</b> reduce.hpp:74</div></div>
+<div class="ttc" id="structdiy_1_1_reduce_proxy_html_a670b1f74a12b1dc0f43645cd4fa9f2ed"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html#a670b1f74a12b1dc0f43645cd4fa9f2ed">diy::ReduceProxy::set_round</a></div><div class="ttdeci">void set_round(unsigned r)</div><div class="ttdoc">advanced: change current round number </div><div class="ttdef"><b>Definition:</b> reduce.hpp:75</div></div>
 <div class="ttc" id="classdiy_1_1_assigner_html"><div class="ttname"><a href="classdiy_1_1_assigner.html">diy::Assigner</a></div><div class="ttdef"><b>Definition:</b> assigner.hpp:11</div></div>
-<div class="ttc" id="structdiy_1_1_reduce_proxy_html_a4468710ba18007a4be74aa46b9e98386"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html#a4468710ba18007a4be74aa46b9e98386">diy::ReduceProxy::in_link</a></div><div class="ttdeci">const Link &amp; in_link() const </div><div class="ttdoc">returns incoming link </div><div class="ttdef"><b>Definition:</b> reduce.hpp:67</div></div>
-<div class="ttc" id="classdiy_1_1_master_html"><div class="ttname"><a href="classdiy_1_1_master.html">diy::Master</a></div><div class="ttdef"><b>Definition:</b> master.hpp:29</div></div>
+<div class="ttc" id="structdiy_1_1_reduce_proxy_html_a5ed1995ee2e11b6704c733ed289f52d4"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html#a5ed1995ee2e11b6704c733ed289f52d4">diy::ReduceProxy::ReduceProxy</a></div><div class="ttdeci">ReduceProxy(const Master::Proxy &amp;proxy, void *block, unsigned round, const Assigner &amp;assigner, const Link &amp;in_link, const Link &amp;out_link)</div><div class="ttdef"><b>Definition:</b> reduce.hpp:47</div></div>
+<div class="ttc" id="structdiy_1_1_reduce_proxy_html_a4468710ba18007a4be74aa46b9e98386"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html#a4468710ba18007a4be74aa46b9e98386">diy::ReduceProxy::in_link</a></div><div class="ttdeci">const Link &amp; in_link() const </div><div class="ttdoc">returns incoming link </div><div class="ttdef"><b>Definition:</b> reduce.hpp:66</div></div>
+<div class="ttc" id="classdiy_1_1_master_html"><div class="ttname"><a href="classdiy_1_1_master.html">diy::Master</a></div><div class="ttdef"><b>Definition:</b> master.hpp:43</div></div>
 <div class="ttc" id="classdiy_1_1_link_html"><div class="ttname"><a href="classdiy_1_1_link.html">diy::Link</a></div><div class="ttdef"><b>Definition:</b> link.hpp:15</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_proxy_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_proxy.html">diy::Master::Proxy</a></div><div class="ttdef"><b>Definition:</b> proxy.hpp:7</div></div>
-<div class="ttc" id="structdiy_1_1_reduce_proxy_html_a7d292436f664e68e8b39dd6661bcfc37"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html#a7d292436f664e68e8b39dd6661bcfc37">diy::ReduceProxy::ReduceProxy</a></div><div class="ttdeci">ReduceProxy(const Master::Proxy &amp;proxy, void *block, unsigned round, int nblocks, const Link &amp;in_link, const Link &amp;out_link)</div><div class="ttdef"><b>Definition:</b> reduce.hpp:47</div></div>
 <div class="ttc" id="structdiy_1_1_reduce_proxy_html_a00fc565b7b88b6bdc3f3163a41e1e0a9"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html#a00fc565b7b88b6bdc3f3163a41e1e0a9">diy::ReduceProxy::ReduceProxy</a></div><div class="ttdeci">ReduceProxy(const Master::Proxy &amp;proxy, void *block, unsigned round, const Assigner &amp;assigner, const GIDVector &amp;incoming_gids, const GIDVector &amp;outgoing_gids)</div><div class="ttdef"><b>Definition:</b> reduce.hpp:17</div></div>
-<div class="ttc" id="structdiy_1_1_reduce_proxy_html_a6ae6c22da66bea79cbf2702a5d51fe2b"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html#a6ae6c22da66bea79cbf2702a5d51fe2b">diy::ReduceProxy::block</a></div><div class="ttdeci">void * block() const </div><div class="ttdoc">returns pointer to block </div><div class="ttdef"><b>Definition:</b> reduce.hpp:63</div></div>
-<div class="ttc" id="structdiy_1_1_reduce_proxy_html_ab340a062e8e96bfb7428186e6f3046a8"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html#ab340a062e8e96bfb7428186e6f3046a8">diy::ReduceProxy::nblocks</a></div><div class="ttdeci">int nblocks() const </div><div class="ttdoc">returns total number of blocks </div><div class="ttdef"><b>Definition:</b> reduce.hpp:71</div></div>
-<div class="ttc" id="classdiy_1_1_master_html_afd41d766a657a7b5e3aa6eb2ed141ecd"><div class="ttname"><a href="classdiy_1_1_master.html#afd41d766a657a7b5e3aa6eb2ed141ecd">diy::Master::size</a></div><div class="ttdeci">unsigned size() const </div><div class="ttdoc">return the number of local blocks </div><div class="ttdef"><b>Definition:</b> master.hpp:186</div></div>
+<div class="ttc" id="structdiy_1_1_reduce_proxy_html_a6ae6c22da66bea79cbf2702a5d51fe2b"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html#a6ae6c22da66bea79cbf2702a5d51fe2b">diy::ReduceProxy::block</a></div><div class="ttdeci">void * block() const </div><div class="ttdoc">returns pointer to block </div><div class="ttdef"><b>Definition:</b> reduce.hpp:62</div></div>
+<div class="ttc" id="structdiy_1_1_reduce_proxy_html_ab340a062e8e96bfb7428186e6f3046a8"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html#ab340a062e8e96bfb7428186e6f3046a8">diy::ReduceProxy::nblocks</a></div><div class="ttdeci">int nblocks() const </div><div class="ttdoc">returns total number of blocks </div><div class="ttdef"><b>Definition:</b> reduce.hpp:70</div></div>
+<div class="ttc" id="structdiy_1_1_reduce_proxy_html_ab3cba8511e114ecfd3e84a25f30f6bd9"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html#ab3cba8511e114ecfd3e84a25f30f6bd9">diy::ReduceProxy::assigner</a></div><div class="ttdeci">const Assigner &amp; assigner() const </div><div class="ttdoc">returns the assigner </div><div class="ttdef"><b>Definition:</b> reduce.hpp:72</div></div>
+<div class="ttc" id="classdiy_1_1_master_html_afd41d766a657a7b5e3aa6eb2ed141ecd"><div class="ttname"><a href="classdiy_1_1_master.html#afd41d766a657a7b5e3aa6eb2ed141ecd">diy::Master::size</a></div><div class="ttdeci">unsigned size() const </div><div class="ttdoc">return the number of local blocks </div><div class="ttdef"><b>Definition:</b> master.hpp:210</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 25 2015 12:54:40 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jul 23 2015 14:55:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.7
 </small></address>

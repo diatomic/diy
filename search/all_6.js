@@ -5,5 +5,5 @@ var searchData=
   ['get',['get',['../classdiy_1_1_master.html#a97a88f274e2b86738171a2c852027729',1,'diy::Master']]],
   ['gid',['gid',['../classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc',1,'diy::Master']]],
   ['gidoffsetcount',['GidOffsetCount',['../structdiy_1_1io_1_1detail_1_1_gid_offset_count.html',1,'diy::io::detail']]],
-  ['growth_5fmultiplier',['growth_multiplier',['../structdiy_1_1_memory_buffer.html#a5d1a0e2a8467efb97d445fcfe339b664',1,'diy::MemoryBuffer']]]
+  ['growth_5fmultiplier',['growth_multiplier',['../structdiy_1_1_memory_buffer.html#a5e2f70569226e09b8a0ca3c8319d93bc',1,'diy::MemoryBuffer']]]
 ];

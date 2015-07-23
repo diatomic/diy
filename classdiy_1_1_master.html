@@ -103,9 +103,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_master_1_1_base_command.html">BaseCommand</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_master_1_1_binder.html">Binder</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_master_1_1_collective.html">Collective</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_master_1_1_command.html">Command</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_master_1_1_incoming_queues_records.html">IncomingQueuesRecords</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -135,6 +139,10 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
+<tr class="memitem:aa87caf0d63a31019131f003d74fb16b3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa87caf0d63a31019131f003d74fb16b3"></a>
+typedef std::vector<br class="typebreak" />
+&lt; <a class="el" href="structdiy_1_1_master_1_1_base_command.html">BaseCommand</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>Commands</b></td></tr>
+<tr class="separator:aa87caf0d63a31019131f003d74fb16b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc47fc17c1518f35f036401d4a32a039"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abc47fc17c1518f35f036401d4a32a039"></a>
 typedef Collection::Create&#160;</td><td class="memItemRight" valign="bottom"><b>CreateBlock</b></td></tr>
 <tr class="separator:abc47fc17c1518f35f036401d4a32a039"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -348,6 +356,15 @@ template&lt;class Block , class T &gt; </td></tr>
 template&lt;class Block , class Skip &gt; </td></tr>
 <tr class="memitem:a4d11ff119b46067371c6a64f3c6abd78"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>foreach</b> (void(Block::*f)(const <a class="el" href="structdiy_1_1_master_1_1_proxy_with_link.html">ProxyWithLink</a> &amp;, void *), const Skip &amp;skip, void *aux=0)</td></tr>
 <tr class="separator:a4d11ff119b46067371c6a64f3c6abd78"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac72ba1c953eb819e093c7145322178f4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac72ba1c953eb819e093c7145322178f4"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>execute</b> ()</td></tr>
+<tr class="separator:ac72ba1c953eb819e093c7145322178f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb483afd930fe3e7fde8908e069297bc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abb483afd930fe3e7fde8908e069297bc"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>immediate</b> () const </td></tr>
+<tr class="separator:abb483afd930fe3e7fde8908e069297bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afef14a8401b2d7057c5f551008061519"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afef14a8401b2d7057c5f551008061519"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>set_immediate</b> (bool i)</td></tr>
+<tr class="separator:afef14a8401b2d7057c5f551008061519"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac4173b996aa1013b03a5a7a6dfee2024"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac4173b996aa1013b03a5a7a6dfee2024"></a>
 IncomingQueues &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>incoming</b> (int <a class="el" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>)</td></tr>
 <tr class="separator:ac4173b996aa1013b03a5a7a6dfee2024"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -376,7 +393,9 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>expected</b> () const 
 void&#160;</td><td class="memItemRight" valign="bottom"><b>flush</b> ()</td></tr>
 <tr class="separator:aeef9b42d31921179c35f43588807fe7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Function Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><dl><dt><b>Examples: </b></dt><dd><a class="el" href="reduce_2all-to-all_8cpp-example.html#_a21">reduce/all-to-all.cpp</a>, <a class="el" href="reduce_2kd-tree_8cpp-example.html#_a5">reduce/kd-tree.cpp</a>, <a class="el" href="reduce_2merge-reduce_8cpp-example.html#_a5">reduce/merge-reduce.cpp</a>, <a class="el" href="reduce_2sample-sort_8cpp-example.html#_a8">reduce/sample-sort.cpp</a>, <a class="el" href="reduce_2sort_8cpp-example.html#_a1">reduce/sort.cpp</a>, <a class="el" href="reduce_2swap-reduce_8cpp-example.html#_a20">reduce/swap-reduce.cpp</a>, <a class="el" href="simple_2read-blocks_8cpp-example.html#_a9">simple/read-blocks.cpp</a>, <a class="el" href="simple_2simple_8cpp-example.html#_a15">simple/simple.cpp</a>, and <a class="el" href="simple_2until-done_8cpp-example.html#_a10">simple/until-done.cpp</a>.</dd>
+</dl></div><h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a4e8f7b4f8af7041559385b54e82d0f1c"></a>
 <div class="memitem">
 <div class="memproto">
@@ -410,7 +429,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>flush</b> ()</td></tr
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 25 2015 12:54:41 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jul 23 2015 14:55:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.7
 </small></address>

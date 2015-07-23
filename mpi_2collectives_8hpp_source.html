@@ -148,10 +148,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      out.resize(comm.size());</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;      <span class="keywordtype">size_t</span> cur = 0;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; comm.size(); ++i)</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; (unsigned)comm.size(); ++i)</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;      {</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;          out[i].reserve(counts[i]);</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;          <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> j = 0; j &lt; counts[i]; ++j)</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;          <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> j = 0; j &lt; (unsigned)counts[i]; ++j)</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;              out[i].push_back(buffer[cur++]);</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;      }</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    }</div>
@@ -350,7 +350,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="group___m_p_i_html_ga173b8718e3db0f8e804acb303b9db33b"><div class="ttname"><a href="group___m_p_i.html#ga173b8718e3db0f8e804acb303b9db33b">diy::mpi::all_to_all</a></div><div class="ttdeci">void all_to_all(const communicator &amp;comm, const std::vector&lt; T &gt; &amp;in, std::vector&lt; T &gt; &amp;out, int n=1)</div><div class="ttdoc">all_to_all </div><div class="ttdef"><b>Definition:</b> collectives.hpp:267</div></div>
 <div class="ttc" id="group___m_p_i_html_ga13ff29a892870f09695ff7fd3832e764"><div class="ttname"><a href="group___m_p_i.html#ga13ff29a892870f09695ff7fd3832e764">diy::mpi::reduce</a></div><div class="ttdeci">void reduce(const communicator &amp;comm, const T &amp;in, T &amp;out, int root, const Op &amp;op)</div><div class="ttdoc">reduce </div><div class="ttdef"><b>Definition:</b> collectives.hpp:239</div></div>
 <div class="ttc" id="group___m_p_i_html_ga76daf228be0f1f03f4bab95e9bd34f45"><div class="ttname"><a href="group___m_p_i.html#ga76daf228be0f1f03f4bab95e9bd34f45">diy::mpi::scan</a></div><div class="ttdeci">void scan(const communicator &amp;comm, const T &amp;in, T &amp;out, const Op &amp;op)</div><div class="ttdoc">scan </div><div class="ttdef"><b>Definition:</b> collectives.hpp:260</div></div>
-<div class="ttc" id="namespacediy_html_a861d8601719a75414c57d6aa6a99e0fc"><div class="ttname"><a href="namespacediy.html#a861d8601719a75414c57d6aa6a99e0fc">diy::in</a></div><div class="ttdeci">void in(const RegularLink&lt; Bounds &gt; &amp;link, const Point &amp;p, OutIter out, const Bounds &amp;domain)</div><div class="ttdoc">Finds the neighbor(s) containing the target point. Assumptions: </div><div class="ttdef"><b>Definition:</b> pick.hpp:73</div></div>
+<div class="ttc" id="namespacediy_html_a861d8601719a75414c57d6aa6a99e0fc"><div class="ttname"><a href="namespacediy.html#a861d8601719a75414c57d6aa6a99e0fc">diy::in</a></div><div class="ttdeci">void in(const RegularLink&lt; Bounds &gt; &amp;link, const Point &amp;p, OutIter out, const Bounds &amp;domain)</div><div class="ttdoc">Finds the neighbor(s) containing the target point. Assumptions: </div><div class="ttdef"><b>Definition:</b> pick.hpp:72</div></div>
 <div class="ttc" id="classdiy_1_1mpi_1_1communicator_html"><div class="ttname"><a href="classdiy_1_1mpi_1_1communicator.html">diy::mpi::communicator</a></div><div class="ttdoc">Simple wrapper around MPI_Comm. </div><div class="ttdef"><b>Definition:</b> communicator.hpp:8</div></div>
 <div class="ttc" id="group___m_p_i_html_ga9346ef64e83013dc4a92b7b91e5ba79f"><div class="ttname"><a href="group___m_p_i.html#ga9346ef64e83013dc4a92b7b91e5ba79f">diy::mpi::all_gather</a></div><div class="ttdeci">void all_gather(const communicator &amp;comm, const T &amp;in, std::vector&lt; T &gt; &amp;out)</div><div class="ttdoc">all_gather from all processes in comm. out is resized to comm.size() and filled with elements from th...</div><div class="ttdef"><b>Definition:</b> collectives.hpp:225</div></div>
 <div class="ttc" id="group___m_p_i_html_ga8d25825b156fc8b5ded921b1094f7520"><div class="ttname"><a href="group___m_p_i.html#ga8d25825b156fc8b5ded921b1094f7520">diy::mpi::reduce</a></div><div class="ttdeci">void reduce(const communicator &amp;comm, const T &amp;in, int root, const Op &amp;op)</div><div class="ttdoc">Simplified version (without out) for use on non-root processes. </div><div class="ttdef"><b>Definition:</b> collectives.hpp:246</div></div>
@@ -362,7 +362,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 25 2015 12:54:40 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jul 23 2015 14:55:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.7
 </small></address>

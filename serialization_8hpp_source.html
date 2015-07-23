@@ -101,10 +101,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;fstream&gt;</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#if __cplusplus &gt; 199711L           // C++11</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &lt;tuple&gt;</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &lt;unordered_map&gt;</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment">// #if __cplusplus &gt; 199711L           // C++11</span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment">// #include &lt;tuple&gt;</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment">// #include &lt;unordered_map&gt;</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment">// #endif</span></div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">namespace </span>diy</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;{</div>
@@ -136,7 +136,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">inline</span> <span class="keyword">static</span> <span class="keywordtype">void</span>  <a class="code" href="structdiy_1_1_memory_buffer.html#acf7080d0f3b5f15e3bb8b7e1a8ebdf61">copy</a>(<a class="code" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a>&amp; from, <a class="code" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a>&amp; to);</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
-<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="structdiy_1_1_memory_buffer.html#a5d1a0e2a8467efb97d445fcfe339b664">   48</a></span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">float</span>  <a class="code" href="structdiy_1_1_memory_buffer.html#a5d1a0e2a8467efb97d445fcfe339b664">growth_multiplier</a>()                         { <span class="keywordflow">return</span> 1.5; }</div>
+<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="structdiy_1_1_memory_buffer.html#a5e2f70569226e09b8a0ca3c8319d93bc">   48</a></span>&#160;    <span class="keyword">static</span> <span class="keywordtype">float</span>        <a class="code" href="structdiy_1_1_memory_buffer.html#a5e2f70569226e09b8a0ca3c8319d93bc">growth_multiplier</a>()                         { <span class="keywordflow">return</span> 1.5; }</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="comment">// simple file IO</span></div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordtype">void</span>                write(<span class="keyword">const</span> std::string&amp; fn)<span class="keyword"> const          </span>{ std::ofstream out(fn.c_str()); out.write(&amp;buffer[0], size()); }</div>
@@ -332,68 +332,68 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    }</div>
 <div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;  };</div>
 <div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;<span class="preprocessor">#if __cplusplus &gt; 199711L           // C++11</span></div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;  <span class="comment">// save/load for std::unordered_map&lt;K,V&gt;</span></div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">class</span> K, <span class="keyword">class</span> V&gt;</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;  <span class="keyword">struct </span><a class="code" href="structdiy_1_1_serialization.html">Serialization</a>&lt; std::unordered_map&lt;K,V&gt; &gt;</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;  {</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    <span class="keyword">typedef</span>             std::unordered_map&lt;K,V&gt;         Map;</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;<span class="comment">// #if __cplusplus &gt; 199711L           // C++11</span></div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;<span class="comment">//   // save/load for std::unordered_map&lt;K,V&gt;</span></div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;<span class="comment">//   template&lt;class K, class V&gt;</span></div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;<span class="comment">//   struct Serialization&lt; std::unordered_map&lt;K,V&gt; &gt;</span></div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;<span class="comment">//   {</span></div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;<span class="comment">//     typedef             std::unordered_map&lt;K,V&gt;         Map;</span></div>
 <div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span>         <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>(<a class="code" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a>&amp; bb, <span class="keyword">const</span> Map&amp; m)</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    {</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;      <span class="keywordtype">size_t</span> s = m.size();</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;      <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">diy::save</a>(bb, s);</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;      <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; x : m)</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;        <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">diy::save</a>(bb, x);</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    }</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;<span class="comment">//     static void         save(BinaryBuffer&amp; bb, const Map&amp; m)</span></div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;<span class="comment">//     {</span></div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;<span class="comment">//       size_t s = m.size();</span></div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;<span class="comment">//       diy::save(bb, s);</span></div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;<span class="comment">//       for (auto&amp; x : m)</span></div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;<span class="comment">//         diy::save(bb, x);</span></div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;<span class="comment">//     }</span></div>
 <div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span>         <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a>(BinaryBuffer&amp; bb, Map&amp; m)</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    {</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;      <span class="keywordtype">size_t</span> s;</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;      <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a>(bb, s);</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; s; ++i)</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;      {</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;        std::pair&lt;K,V&gt; p;</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;        <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a>(bb, p);</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;        m.emplace(std::move(p));</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;      }</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    }</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;  };</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;<span class="comment">//     static void         load(BinaryBuffer&amp; bb, Map&amp; m)</span></div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;<span class="comment">//     {</span></div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;<span class="comment">//       size_t s;</span></div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;<span class="comment">//       diy::load(bb, s);</span></div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;<span class="comment">//       for (size_t i = 0; i &lt; s; ++i)</span></div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;<span class="comment">//       {</span></div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;<span class="comment">//         std::pair&lt;K,V&gt; p;</span></div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;<span class="comment">//         diy::load(bb, p);</span></div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;<span class="comment">//         m.emplace(std::move(p));</span></div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;<span class="comment">//       }</span></div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;<span class="comment">//     }</span></div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;<span class="comment">//   };</span></div>
 <div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;  <span class="comment">// save/load for std::tuple&lt;...&gt;</span></div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;  <span class="comment">// TODO: this ought to be default (copying) serialization</span></div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;  <span class="comment">//       if all arguments are default</span></div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">class</span>... Args&gt;</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;  <span class="keyword">struct </span>Serialization&lt; std::tuple&lt;Args...&gt; &gt;</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;  {</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;    <span class="keyword">typedef</span>             std::tuple&lt;Args...&gt;     Tuple;</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;<span class="comment">//   // save/load for std::tuple&lt;...&gt;</span></div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;<span class="comment">//   // TODO: this ought to be default (copying) serialization</span></div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;<span class="comment">//   //       if all arguments are default</span></div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;<span class="comment">//   template&lt;class... Args&gt;</span></div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;<span class="comment">//   struct Serialization&lt; std::tuple&lt;Args...&gt; &gt;</span></div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;<span class="comment">//   {</span></div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;<span class="comment">//     typedef             std::tuple&lt;Args...&gt;     Tuple;</span></div>
 <div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span>         <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>(BinaryBuffer&amp; bb, <span class="keyword">const</span> Tuple&amp; t)          { save&lt;0&gt;(bb, t); }</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;<span class="comment">//     static void         save(BinaryBuffer&amp; bb, const Tuple&amp; t)          { save&lt;0&gt;(bb, t); }</span></div>
 <div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    <span class="keyword">template</span>&lt;std::<span class="keywordtype">size_t</span> I = 0&gt;</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;    <span class="keyword">static</span></div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    <span class="keyword">typename</span> std::enable_if&lt;I == <span class="keyword">sizeof</span>...(Args), <span class="keywordtype">void</span>&gt;::type</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;                        <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>(BinaryBuffer&amp;, <span class="keyword">const</span> Tuple&amp;)               {}</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;<span class="comment">//     template&lt;std::size_t I = 0&gt;</span></div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;<span class="comment">//     static</span></div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;<span class="comment">//     typename std::enable_if&lt;I == sizeof...(Args), void&gt;::type</span></div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;<span class="comment">//                         save(BinaryBuffer&amp;, const Tuple&amp;)               {}</span></div>
 <div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    <span class="keyword">template</span>&lt;std::<span class="keywordtype">size_t</span> I = 0&gt;</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;    <span class="keyword">static</span></div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    <span class="keyword">typename</span> std::enable_if&lt;I &lt; <span class="keyword">sizeof</span>...(Args), <span class="keywordtype">void</span>&gt;::type</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;                        <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>(BinaryBuffer&amp; bb, <span class="keyword">const</span> Tuple&amp; t)          { <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">diy::save</a>(bb, std::get&lt;I&gt;(t)); save&lt;I+1&gt;(bb, t); }</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;<span class="comment">//     template&lt;std::size_t I = 0&gt;</span></div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;<span class="comment">//     static</span></div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;<span class="comment">//     typename std::enable_if&lt;I &lt; sizeof...(Args), void&gt;::type</span></div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;<span class="comment">//                         save(BinaryBuffer&amp; bb, const Tuple&amp; t)          { diy::save(bb, std::get&lt;I&gt;(t)); save&lt;I+1&gt;(bb, t); }</span></div>
 <div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span>         <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a>(BinaryBuffer&amp; bb, Tuple&amp; t)                { load&lt;0&gt;(bb, t); }</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;<span class="comment">//     static void         load(BinaryBuffer&amp; bb, Tuple&amp; t)                { load&lt;0&gt;(bb, t); }</span></div>
 <div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;    <span class="keyword">template</span>&lt;std::<span class="keywordtype">size_t</span> I = 0&gt;</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;    <span class="keyword">static</span></div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;    <span class="keyword">typename</span> std::enable_if&lt;I == <span class="keyword">sizeof</span>...(Args), <span class="keywordtype">void</span>&gt;::type</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;                        <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a>(BinaryBuffer&amp;, Tuple&amp;)                     {}</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;<span class="comment">//     template&lt;std::size_t I = 0&gt;</span></div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;<span class="comment">//     static</span></div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;<span class="comment">//     typename std::enable_if&lt;I == sizeof...(Args), void&gt;::type</span></div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;<span class="comment">//                         load(BinaryBuffer&amp;, Tuple&amp;)                     {}</span></div>
 <div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;    <span class="keyword">template</span>&lt;std::<span class="keywordtype">size_t</span> I = 0&gt;</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    <span class="keyword">static</span></div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;    <span class="keyword">typename</span> std::enable_if&lt;I &lt; <span class="keyword">sizeof</span>...(Args), <span class="keywordtype">void</span>&gt;::type</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;                        <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a>(BinaryBuffer&amp; bb, Tuple&amp; t)                { <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a>(bb, std::get&lt;I&gt;(t)); load&lt;I+1&gt;(bb, t); }</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;<span class="comment">//     template&lt;std::size_t I = 0&gt;</span></div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;<span class="comment">//     static</span></div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;<span class="comment">//     typename std::enable_if&lt;I &lt; sizeof...(Args), void&gt;::type</span></div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;<span class="comment">//                         load(BinaryBuffer&amp; bb, Tuple&amp; t)                { diy::load(bb, std::get&lt;I&gt;(t)); load&lt;I+1&gt;(bb, t); }</span></div>
 <div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;  };</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;<span class="comment">//   };</span></div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;<span class="comment">// #endif</span></div>
 <div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;}</div>
 <div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;</div>
 <div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;<span class="keywordtype">void</span></div>
@@ -446,12 +446,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="group___serialization_html_ga33accb25f133567d216ebd3bee44595b"><div class="ttname"><a href="group___serialization.html#ga33accb25f133567d216ebd3bee44595b">diy::load_back</a></div><div class="ttdeci">void load_back(BinaryBuffer &amp;bb, T &amp;x)</div><div class="ttdoc">Supports only binary data copying (meant for simple footers). </div><div class="ttdef"><b>Definition:</b> serialization.hpp:115</div></div>
 <div class="ttc" id="structdiy_1_1_binary_buffer_html_a9d0ab30fe4978c730176a52ccd142cc3"><div class="ttname"><a href="structdiy_1_1_binary_buffer.html#a9d0ab30fe4978c730176a52ccd142cc3">diy::BinaryBuffer::save_binary</a></div><div class="ttdeci">virtual void save_binary(const char *x, size_t count)=0</div><div class="ttdoc">copy count bytes from x into the buffer </div></div>
 <div class="ttc" id="structdiy_1_1_memory_buffer_html_acf7080d0f3b5f15e3bb8b7e1a8ebdf61"><div class="ttname"><a href="structdiy_1_1_memory_buffer.html#acf7080d0f3b5f15e3bb8b7e1a8ebdf61">diy::MemoryBuffer::copy</a></div><div class="ttdeci">static void copy(MemoryBuffer &amp;from, MemoryBuffer &amp;to)</div><div class="ttdoc">copy a memory buffer from one buffer to another, bypassing making a temporary copy first ...</div><div class="ttdef"><b>Definition:</b> serialization.hpp:365</div></div>
+<div class="ttc" id="structdiy_1_1_memory_buffer_html_a5e2f70569226e09b8a0ca3c8319d93bc"><div class="ttname"><a href="structdiy_1_1_memory_buffer.html#a5e2f70569226e09b8a0ca3c8319d93bc">diy::MemoryBuffer::growth_multiplier</a></div><div class="ttdeci">static float growth_multiplier()</div><div class="ttdoc">multiplier used for the geometric growth of the container </div><div class="ttdef"><b>Definition:</b> serialization.hpp:48</div></div>
 <div class="ttc" id="group___serialization_html_gafaac9aa4ccdc04930f612ca20341fc9b"><div class="ttname"><a href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">diy::save</a></div><div class="ttdeci">void save(BinaryBuffer &amp;bb, const T &amp;x)</div><div class="ttdoc">Saves x to bb by calling diy::Serialization<T>::save(bb,x). </div><div class="ttdef"><b>Definition:</b> serialization.hpp:97</div></div>
-<div class="ttc" id="namespacediy_html_a861d8601719a75414c57d6aa6a99e0fc"><div class="ttname"><a href="namespacediy.html#a861d8601719a75414c57d6aa6a99e0fc">diy::in</a></div><div class="ttdeci">void in(const RegularLink&lt; Bounds &gt; &amp;link, const Point &amp;p, OutIter out, const Bounds &amp;domain)</div><div class="ttdoc">Finds the neighbor(s) containing the target point. Assumptions: </div><div class="ttdef"><b>Definition:</b> pick.hpp:73</div></div>
+<div class="ttc" id="namespacediy_html_a861d8601719a75414c57d6aa6a99e0fc"><div class="ttname"><a href="namespacediy.html#a861d8601719a75414c57d6aa6a99e0fc">diy::in</a></div><div class="ttdeci">void in(const RegularLink&lt; Bounds &gt; &amp;link, const Point &amp;p, OutIter out, const Bounds &amp;domain)</div><div class="ttdoc">Finds the neighbor(s) containing the target point. Assumptions: </div><div class="ttdef"><b>Definition:</b> pick.hpp:72</div></div>
 <div class="ttc" id="structdiy_1_1_memory_buffer_html_a23b65b27938651c30726fc9511008adf"><div class="ttname"><a href="structdiy_1_1_memory_buffer.html#a23b65b27938651c30726fc9511008adf">diy::MemoryBuffer::load_binary</a></div><div class="ttdeci">virtual void load_binary(char *x, size_t count)</div><div class="ttdoc">copy count bytes into x from the buffer </div><div class="ttdef"><b>Definition:</b> serialization.hpp:349</div></div>
 <div class="ttc" id="structdiy_1_1_memory_buffer_html_a257319ddbc7f3eec8c2a409941183ce6"><div class="ttname"><a href="structdiy_1_1_memory_buffer.html#a257319ddbc7f3eec8c2a409941183ce6">diy::MemoryBuffer::load_binary_back</a></div><div class="ttdeci">virtual void load_binary_back(char *x, size_t count)</div><div class="ttdoc">copy count bytes into x from the back of the buffer </div><div class="ttdef"><b>Definition:</b> serialization.hpp:357</div></div>
 <div class="ttc" id="structdiy_1_1_memory_buffer_html_a7f99738ad05bd02b289497dfc45b49be"><div class="ttname"><a href="structdiy_1_1_memory_buffer.html#a7f99738ad05bd02b289497dfc45b49be">diy::MemoryBuffer::save_binary</a></div><div class="ttdeci">virtual void save_binary(const char *x, size_t count)</div><div class="ttdoc">copy count bytes from x into the buffer </div><div class="ttdef"><b>Definition:</b> serialization.hpp:335</div></div>
-<div class="ttc" id="structdiy_1_1_memory_buffer_html_a5d1a0e2a8467efb97d445fcfe339b664"><div class="ttname"><a href="structdiy_1_1_memory_buffer.html#a5d1a0e2a8467efb97d445fcfe339b664">diy::MemoryBuffer::growth_multiplier</a></div><div class="ttdeci">static const float growth_multiplier()</div><div class="ttdoc">multiplier used for the geometric growth of the container </div><div class="ttdef"><b>Definition:</b> serialization.hpp:48</div></div>
 <div class="ttc" id="structdiy_1_1_memory_buffer_html"><div class="ttname"><a href="structdiy_1_1_memory_buffer.html">diy::MemoryBuffer</a></div><div class="ttdef"><b>Definition:</b> serialization.hpp:25</div></div>
 <div class="ttc" id="structdiy_1_1_binary_buffer_html_a53b5ba450ddf8b6e9b262c552b2ef673"><div class="ttname"><a href="structdiy_1_1_binary_buffer.html#a53b5ba450ddf8b6e9b262c552b2ef673">diy::BinaryBuffer::load_binary</a></div><div class="ttdeci">virtual void load_binary(char *x, size_t count)=0</div><div class="ttdoc">copy count bytes into x from the buffer </div></div>
 <div class="ttc" id="structdiy_1_1_serialization_html"><div class="ttname"><a href="structdiy_1_1_serialization.html">diy::Serialization</a></div><div class="ttdoc">Main interface to serialization, meant to be specialized for the types that require special handling...</div><div class="ttdef"><b>Definition:</b> serialization.hpp:89</div></div>
@@ -460,7 +460,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 25 2015 12:54:40 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jul 23 2015 14:55:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.7
 </small></address>

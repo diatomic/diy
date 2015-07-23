@@ -213,11 +213,15 @@ typedef dir_t&#160;</td><td class="memItemRight" valign="bottom"><b>Direction</b
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a3c25df952f1fbe4a99f5dd419aaf18a9"><td class="memTemplParams" colspan="2"><a class="anchor" id="a3c25df952f1fbe4a99f5dd419aaf18a9"></a>
+<tr class="memitem:afe36ac144afe27029fa35e48431ced28"><td class="memTemplParams" colspan="2"><a class="anchor" id="afe36ac144afe27029fa35e48431ced28"></a>
 template&lt;class Block , class T , class Cmp &gt; </td></tr>
-<tr class="memitem:a3c25df952f1fbe4a99f5dd419aaf18a9"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacediy.html#a3c25df952f1fbe4a99f5dd419aaf18a9">sort</a> (<a class="el" href="classdiy_1_1_master.html">Master</a> &amp;master, const <a class="el" href="classdiy_1_1_assigner.html">Assigner</a> &amp;assigner, std::vector&lt; T &gt; Block::*values, std::vector&lt; T &gt; Block::*samples, size_t num_samples, const Cmp &amp;cmp=std::less&lt; T &gt;(), int k=2)</td></tr>
-<tr class="memdesc:a3c25df952f1fbe4a99f5dd419aaf18a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">sample sort <code>values</code> of each block, store the boundaries between blocks in <code>samples</code> <br /></td></tr>
-<tr class="separator:a3c25df952f1fbe4a99f5dd419aaf18a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe36ac144afe27029fa35e48431ced28"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacediy.html#afe36ac144afe27029fa35e48431ced28">sort</a> (<a class="el" href="classdiy_1_1_master.html">Master</a> &amp;master, const <a class="el" href="classdiy_1_1_assigner.html">Assigner</a> &amp;assigner, std::vector&lt; T &gt; Block::*values, std::vector&lt; T &gt; Block::*samples, size_t num_samples, const Cmp &amp;cmp, int k=2)</td></tr>
+<tr class="memdesc:afe36ac144afe27029fa35e48431ced28"><td class="mdescLeft">&#160;</td><td class="mdescRight">sample sort <code>values</code> of each block, store the boundaries between blocks in <code>samples</code> <br /></td></tr>
+<tr class="separator:afe36ac144afe27029fa35e48431ced28"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3463dcd20b4e802bfad48a88b918d192"><td class="memTemplParams" colspan="2"><a class="anchor" id="a3463dcd20b4e802bfad48a88b918d192"></a>
+template&lt;class Block , class T &gt; </td></tr>
+<tr class="memitem:a3463dcd20b4e802bfad48a88b918d192"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sort</b> (<a class="el" href="classdiy_1_1_master.html">Master</a> &amp;master, const <a class="el" href="classdiy_1_1_assigner.html">Assigner</a> &amp;assigner, std::vector&lt; T &gt; Block::*values, std::vector&lt; T &gt; Block::*samples, size_t num_samples, int k=2)</td></tr>
+<tr class="separator:a3463dcd20b4e802bfad48a88b918d192"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaf2e85a34f7b5adcdd0bbad32df5ad02a"><td class="memTemplParams" colspan="2">template&lt;class Bounds , class Assigner , class Creator &gt; </td></tr>
 <tr class="memitem:gaf2e85a34f7b5adcdd0bbad32df5ad02a"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group___decomposition.html#gaf2e85a34f7b5adcdd0bbad32df5ad02a">decompose</a> (int dim, int rank, const Bounds &amp;domain, const <a class="el" href="classdiy_1_1_assigner.html">Assigner</a> &amp;assigner, const Creator &amp;create, typename <a class="el" href="structdiy_1_1_regular_decomposer.html">RegularDecomposer</a>&lt; Bounds &gt;::BoolVector share_face=typename <a class="el" href="structdiy_1_1_regular_decomposer.html">RegularDecomposer</a>&lt; Bounds &gt;::BoolVector(), typename <a class="el" href="structdiy_1_1_regular_decomposer.html">RegularDecomposer</a>&lt; Bounds &gt;::BoolVector wrap=typename <a class="el" href="structdiy_1_1_regular_decomposer.html">RegularDecomposer</a>&lt; Bounds &gt;::BoolVector(), typename <a class="el" href="structdiy_1_1_regular_decomposer.html">RegularDecomposer</a>&lt; Bounds &gt;::CoordinateVector ghosts=typename <a class="el" href="structdiy_1_1_regular_decomposer.html">RegularDecomposer</a>&lt; Bounds &gt;::CoordinateVector(), typename <a class="el" href="structdiy_1_1_regular_decomposer.html">RegularDecomposer</a>&lt; Bounds &gt;::DivisionsVector divs=typename <a class="el" href="structdiy_1_1_regular_decomposer.html">RegularDecomposer</a>&lt; Bounds &gt;::DivisionsVector())</td></tr>
 <tr class="memdesc:gaf2e85a34f7b5adcdd0bbad32df5ad02a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decomposes the domain into a prescribed pattern of blocks.  <a href="group___decomposition.html#gaf2e85a34f7b5adcdd0bbad32df5ad02a">More...</a><br /></td></tr>
@@ -319,7 +323,8 @@ template&lt;class Op &gt; </div>
   </table>
   </dd>
 </dl>
-
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="reduce_2all-to-all_8cpp-example.html#a25">reduce/all-to-all.cpp</a>, and <a class="el" href="reduce_2kd-tree_8cpp-example.html#a36">reduce/kd-tree.cpp</a>.</dd>
+</dl>
 </div>
 </div>
 <a class="anchor" id="a861d8601719a75414c57d6aa6a99e0fc"></a>
@@ -441,7 +446,7 @@ template&lt;class Bounds , class Point , class OutIter &gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 25 2015 12:54:41 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jul 23 2015 14:55:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.7
 </small></address>

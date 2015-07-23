@@ -139,7 +139,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      <span class="keywordtype">void</span>*         find(<span class="keywordtype">int</span> i)<span class="keyword"> const               </span>{ <span class="keywordflow">return</span> elements_[i]; }                        <span class="comment">// possibly returns 0, if the element is unloaded</span></div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;      <span class="keywordtype">void</span>*         <span class="keyword">get</span>(<span class="keywordtype">int</span> i)                      { <span class="keywordflow">if</span> (!find(i)) load(i); <span class="keywordflow">return</span> find(i); }      <span class="comment">// loads the element first, and then returns its address</span></div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;      <span class="keywordtype">int</span>           available()<span class="keyword"> const               </span>{ <span class="keywordtype">int</span> i = 0; <span class="keywordflow">for</span> (; i &lt; size(); ++i) <span class="keywordflow">if</span> (find(i) != 0) <span class="keywordflow">break</span>; <span class="keywordflow">return</span> i; }</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;      <span class="keywordtype">int</span>           available()<span class="keyword"> const               </span>{ <span class="keywordtype">int</span> i = 0; <span class="keywordflow">for</span> (; i &lt; (int)size(); ++i) <span class="keywordflow">if</span> (find(i) != 0) <span class="keywordflow">break</span>; <span class="keywordflow">return</span> i; }</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;      <span class="keyword">inline</span> <span class="keywordtype">void</span>   load(<span class="keywordtype">int</span> i);</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;      <span class="keyword">inline</span> <span class="keywordtype">void</span>   unload(<span class="keywordtype">int</span> i);</div>
@@ -220,7 +220,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 25 2015 12:54:40 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jul 23 2015 14:55:33 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.7
 </small></address>

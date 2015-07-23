@@ -120,8 +120,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;      <span class="keywordflow">if</span> (k_in == 0 &amp;&amp; k_out == 0)  <span class="comment">// special case of a single block</span></div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;      {</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;          ReduceProxy all_srp_out(srp, srp.block(), 0, srp.nblocks(), empty_link,         all_neighbors_link);</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;          ReduceProxy all_srp_in (srp, srp.block(), 1, srp.nblocks(), all_neighbors_link, empty_link);</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;          ReduceProxy all_srp_out(srp, srp.block(), 0, srp.assigner(), empty_link,         all_neighbors_link);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;          ReduceProxy all_srp_in (srp, srp.block(), 1, srp.assigner(), all_neighbors_link, empty_link);</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;          op(b, all_srp_out);</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;          MemoryBuffer&amp; in_queue = all_srp_in.incoming(all_srp_in.in_link().target(0).gid);</div>
@@ -134,7 +134,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;      <span class="keywordflow">if</span> (k_in == 0)                <span class="comment">// initial round</span></div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      {</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        ReduceProxy all_srp(srp, srp.block(), 0, srp.nblocks(), empty_link, all_neighbors_link);</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        ReduceProxy all_srp(srp, srp.block(), 0, srp.assigner(), empty_link, all_neighbors_link);</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        op(b, all_srp);</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        Master::OutgoingQueues all_queues;</div>
@@ -157,7 +157,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (k_out == 0)        <span class="comment">// final round</span></div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;      {</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        <span class="comment">// dequeue incoming + reorder into the correct order</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        ReduceProxy all_srp(srp, srp.block(), 1, srp.nblocks(), all_neighbors_link, empty_link);</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        ReduceProxy all_srp(srp, srp.block(), 1, srp.assigner(), all_neighbors_link, empty_link);</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        Master::IncomingQueues all_incoming;</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        all_incoming.swap(*srp.incoming());</div>
@@ -242,19 +242,29 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <span class="keyword">const</span> Op&amp;           op;</div>
 <div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    Link                all_neighbors_link, empty_link;</div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  };</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;}</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;}</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  <span class="keyword">struct </span>SkipIntermediate</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;  {</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;         SkipIntermediate(<span class="keywordtype">size_t</span> rounds_):</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;            rounds(rounds_)                                     {}</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <span class="keywordtype">bool</span> operator()(<span class="keywordtype">int</span> round, <span class="keywordtype">int</span>, <span class="keyword">const</span> Master&amp;)<span class="keyword"> const        </span>{ <span class="keywordflow">if</span> (round == 0 || round == rounds) <span class="keywordflow">return</span> <span class="keyword">false</span>; <span class="keywordflow">return</span> <span class="keyword">true</span>; }</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <span class="keywordtype">size_t</span>  rounds;</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  };</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;}</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;}</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="group___serialization_html_gae54f4c5c6740fcf7627009bdcfe02aa1"><div class="ttname"><a href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a></div><div class="ttdeci">void load(BinaryBuffer &amp;bb, T &amp;x)</div><div class="ttdoc">Loads x from bb by calling diy::Serialization<T>::load(bb,x). </div><div class="ttdef"><b>Definition:</b> serialization.hpp:101</div></div>
 <div class="ttc" id="structdiy_1_1_memory_buffer_html_acf7080d0f3b5f15e3bb8b7e1a8ebdf61"><div class="ttname"><a href="structdiy_1_1_memory_buffer.html#acf7080d0f3b5f15e3bb8b7e1a8ebdf61">diy::MemoryBuffer::copy</a></div><div class="ttdeci">static void copy(MemoryBuffer &amp;from, MemoryBuffer &amp;to)</div><div class="ttdoc">copy a memory buffer from one buffer to another, bypassing making a temporary copy first ...</div><div class="ttdef"><b>Definition:</b> serialization.hpp:365</div></div>
 <div class="ttc" id="group___serialization_html_gafaac9aa4ccdc04930f612ca20341fc9b"><div class="ttname"><a href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">diy::save</a></div><div class="ttdeci">void save(BinaryBuffer &amp;bb, const T &amp;x)</div><div class="ttdoc">Saves x to bb by calling diy::Serialization<T>::save(bb,x). </div><div class="ttdef"><b>Definition:</b> serialization.hpp:97</div></div>
-<div class="ttc" id="namespacediy_html_a861d8601719a75414c57d6aa6a99e0fc"><div class="ttname"><a href="namespacediy.html#a861d8601719a75414c57d6aa6a99e0fc">diy::in</a></div><div class="ttdeci">void in(const RegularLink&lt; Bounds &gt; &amp;link, const Point &amp;p, OutIter out, const Bounds &amp;domain)</div><div class="ttdoc">Finds the neighbor(s) containing the target point. Assumptions: </div><div class="ttdef"><b>Definition:</b> pick.hpp:73</div></div>
+<div class="ttc" id="namespacediy_html_a861d8601719a75414c57d6aa6a99e0fc"><div class="ttname"><a href="namespacediy.html#a861d8601719a75414c57d6aa6a99e0fc">diy::in</a></div><div class="ttdeci">void in(const RegularLink&lt; Bounds &gt; &amp;link, const Point &amp;p, OutIter out, const Bounds &amp;domain)</div><div class="ttdoc">Finds the neighbor(s) containing the target point. Assumptions: </div><div class="ttdef"><b>Definition:</b> pick.hpp:72</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 25 2015 12:54:40 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jul 23 2015 14:55:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.7
 </small></address>

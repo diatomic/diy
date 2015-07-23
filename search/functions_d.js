@@ -7,5 +7,5 @@ var searchData=
   ['set_5fnblocks',['set_nblocks',['../classdiy_1_1_assigner.html#a36ff8dfc23aac3e8faf76748cf3b3cfc',1,'diy::Assigner']]],
   ['set_5fround',['set_round',['../structdiy_1_1_reduce_proxy.html#a670b1f74a12b1dc0f43645cd4fa9f2ed',1,'diy::ReduceProxy']]],
   ['size',['size',['../classdiy_1_1_assigner.html#a57dfc4402f8e66d6fc8e0b25e7c5a4a6',1,'diy::Assigner::size()'],['../classdiy_1_1_master.html#afd41d766a657a7b5e3aa6eb2ed141ecd',1,'diy::Master::size()'],['../structdiy_1_1_regular_all_reduce_partners.html#a81fbf63103de167d0f217a34bddec4ad',1,'diy::RegularAllReducePartners::size()']]],
-  ['sort',['sort',['../namespacediy.html#a3c25df952f1fbe4a99f5dd419aaf18a9',1,'diy']]]
+  ['sort',['sort',['../namespacediy.html#afe36ac144afe27029fa35e48431ced28',1,'diy']]]
 ];

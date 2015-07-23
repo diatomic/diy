@@ -2,9 +2,10 @@ var searchData=
 [
   ['collection',['Collection',['../classdiy_1_1_collection.html',1,'diy']]],
   ['collective',['Collective',['../structdiy_1_1_master_1_1_collective.html',1,'diy::Master']]],
+  ['command',['Command',['../structdiy_1_1_master_1_1_command.html',1,'diy::Master']]],
   ['communication',['Communication',['../group___communication.html',1,'']]],
-  ['communicator',['communicator',['../classdiy_1_1_master.html#a78c622d124589e8e8be7fa7041a5f21c',1,'diy::Master::communicator() const '],['../classdiy_1_1_master.html#a6aee1cc87a2760bdc89d7e5fa62a2f6e',1,'diy::Master::communicator()']]],
   ['communicator',['communicator',['../classdiy_1_1mpi_1_1communicator.html',1,'diy::mpi']]],
+  ['communicator',['communicator',['../classdiy_1_1_master.html#a78c622d124589e8e8be7fa7041a5f21c',1,'diy::Master::communicator() const '],['../classdiy_1_1_master.html#a6aee1cc87a2760bdc89d7e5fa62a2f6e',1,'diy::Master::communicator()']]],
   ['contiguousassigner',['ContiguousAssigner',['../classdiy_1_1_contiguous_assigner.html',1,'diy']]],
   ['copy',['copy',['../structdiy_1_1_memory_buffer.html#acf7080d0f3b5f15e3bb8b7e1a8ebdf61',1,'diy::MemoryBuffer']]],
   ['critical_5fresource',['critical_resource',['../classdiy_1_1critical__resource.html',1,'diy']]],
