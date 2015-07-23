@@ -1,3 +1,6 @@
+//! \example simple/simple.cpp
+
+
 #include <vector>
 #include <iostream>
 
