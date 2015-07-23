@@ -175,7 +175,7 @@ int main(int argc, char* argv[])
             k);
 
   if (print || verify)
-    master.foreach<ValueBlock>(set_min_max, &nblocks);
+    master.foreach<ValueBlock>(&set_min_max, &nblocks);
 
   if (print)
   {

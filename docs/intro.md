@@ -86,6 +86,7 @@ Components
  - \ref Decomposition
  - \ref Communication
  - \ref Callbacks
+ - \ref Immediate
 
  - diy::Master
  - diy::Communicator

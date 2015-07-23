@@ -43,14 +43,24 @@ namespace diy
   class Master
   {
     public:
-      template<class Block, class Functor, class Skip>
       struct ProcessBlock;
+
       template<class Block>
       struct Binder;
 
+      // Commands
+      struct BaseCommand;
+
+      template<class Block, class Functor, class Skip>
+      struct Command;
+
+      typedef std::vector<BaseCommand*>     Commands;
+
+      // Skip
       struct SkipNoIncoming;
       struct NeverSkip { bool    operator()(int i, const Master& master) const   { return false; } };
 
+      // Collection
       typedef Collection::Create            CreateBlock;
       typedef Collection::Destroy           DestroyBlock;
       typedef Collection::Save              SaveBlock;
@@ -58,7 +68,6 @@ namespace diy
 
     public:
       // Communicator types
-
       struct Proxy;
       struct ProxyWithLink;
 
@@ -146,9 +155,10 @@ namespace diy
                       comm_(comm),
                       inflight_size_(0),
                       expected_(0),
-                      received_(0)
+                      received_(0),
+                      immediate_(true)
                                                         {}
-                    ~Master()                           { clear(); delete queue_policy_; }
+                    ~Master()                           { set_immediate(true); clear(); delete queue_policy_; }
       inline void   clear();
       inline void   destroy(int i)                      { if (blocks_.own()) blocks_.destroy(i); }
 
@@ -239,6 +249,11 @@ namespace diy
       template<class Block, class Skip>
       void          foreach(void (Block::*f)(const ProxyWithLink&, void*), const Skip& skip, void* aux = 0) { foreach<Block>(Binder<Block>(f), skip, aux); }
 
+      inline void   execute();
+
+      bool          immediate() const                   { return immediate_; }
+      void          set_immediate(bool i)               { if (i && !immediate_) execute(); immediate_ = i; }
+
     public:
       // Communicator functionality
       IncomingQueues&   incoming(int gid)               { return incoming_[gid].queues; }
@@ -287,90 +302,32 @@ namespace diy
       CollectivesMap        collectives_;
       int                   expected_;
       int                   received_;
+      bool                  immediate_;
+      Commands              commands_;
 
     private:
       fast_mutex            add_mutex_;
   };
 
-  template<class Block, class Functor, class Skip>
-  struct Master::ProcessBlock
+  struct Master::BaseCommand
   {
-            ProcessBlock(const Functor&             f_,
-                         const Skip&                skip_,
-                         void*                      aux_,
-                         Master&                    master_,
-                         const std::deque<int>&     blocks_,
-                         int                        local_limit_,
-                         critical_resource<int>&    idx_):
-                f(f_), skip(skip_), aux(aux_),
-                master(master_),
-                blocks(blocks_),
-                local_limit(local_limit_),
-                idx(idx_)
-            {}
+      virtual       ~BaseCommand()                                                  {}      // to delete derived classes
+      virtual void  execute(void* b, const ProxyWithLink& cp) const                 =0;
+      virtual bool  skip(int i, const Master& master) const                         =0;
+  };
 
-    void    process()
-    {
-      //fprintf(stdout, "Processing with thread: %d\n",  (int) this_thread::get_id());
+  template<class Block, class Functor, class Skip>
+  struct Master::Command: public BaseCommand
+  {
+            Command(const Functor& f_, const Skip& s_, void* aux_):
+                f(f_), s(s_), aux(aux_)                                             {}
 
-      std::vector<int>      local;
-      do
-      {
-        int cur = (*idx.access())++;
+      void  execute(void* b, const ProxyWithLink& cp) const                         { f(static_cast<Block*>(b), cp, aux); }
+      bool  skip(int i, const Master& m) const                                      { return s(i,m); }
 
-        if (cur >= blocks.size())
-            return;
-
-        int i = blocks[cur];
-        if (master.block(i))
-        {
-          if (local.size() == local_limit)
-            master.unload(local);
-          local.push_back(i);
-        }
-
-        if (skip(i, master))
-        {
-            if (master.block(i) == 0)
-                master.load_queues(i);      // even though we are skipping the block, the queues might be necessary
-
-            f(0, master.proxy(i), aux);     // 0 signals that we are skipping the block (even if it's loaded)
-
-            // no longer need them, so get rid of them, rather than risk reloading
-            master.incoming_[master.gid(i)].queues.clear();
-            master.incoming_[master.gid(i)].records.clear();
-
-            if (master.block(i) == 0)
-                master.unload_queues(i);    // even though we are skipping the block, the queues might be necessary
-        }
-        else
-        {
-            if (master.block(i) == 0)                             // block unloaded
-            {
-              if (local.size() == local_limit)                    // reached the local limit
-                master.unload(local);
-
-              master.load(i);
-              local.push_back(i);
-            }
-
-            f(master.block<Block>(i), master.proxy(i), aux);
-        }
-      } while(true);
-
-      // TODO: invoke opportunistic communication
-      //       don't forget to adjust Master::exchange()
-    }
-
-    static void run(void* bf)                   { static_cast<ProcessBlock*>(bf)->process(); }
-
-    const Functor&          f;
-    const Skip&             skip;
-    void*                   aux;
-    Master&                 master;
-    const std::deque<int>&  blocks;
-    int                     local_limit;
-    critical_resource<int>& idx;
+      Functor f;
+      Skip    s;
+      void*   aux;
   };
 
   template<class Block>
@@ -411,6 +368,102 @@ namespace diy
 }
 
 #include "proxy.hpp"
+
+// --- ProcessBlock ---
+struct diy::Master::ProcessBlock
+{
+          ProcessBlock(Master&                    master_,
+                       const std::deque<int>&     blocks_,
+                       int                        local_limit_,
+                       critical_resource<int>&    idx_):
+              master(master_),
+              blocks(blocks_),
+              local_limit(local_limit_),
+              idx(idx_)
+          {}
+
+  void    process()
+  {
+    //fprintf(stderr, "Processing with thread: %d\n",  (int) this_thread::get_id());
+
+    std::vector<int>      local;
+    do
+    {
+      int cur = (*idx.access())++;
+
+      if (cur >= blocks.size())
+          return;
+
+      int i = blocks[cur];
+      if (master.block(i))
+      {
+        if (local.size() == local_limit)
+          master.unload(local);
+        local.push_back(i);
+      }
+
+      //fprintf(stderr, "Processing block: %d\n", master.gid(i));
+
+      bool skip_block = true;
+      for (size_t cmd = 0; cmd < master.commands_.size(); ++cmd)
+      {
+          if (!master.commands_[cmd]->skip(i, master))
+          {
+              skip_block = false;
+              break;
+          }
+      }
+      if (skip_block)
+      {
+          if (master.block(i) == 0)
+              master.load_queues(i);      // even though we are skipping the block, the queues might be necessary
+
+          for (size_t cmd = 0; cmd < master.commands_.size(); ++cmd)
+          {
+              master.commands_[cmd]->execute(0, master.proxy(i));  // 0 signals that we are skipping the block (even if it's loaded)
+
+              // no longer need them, so get rid of them, rather than risk reloading
+              master.incoming_[master.gid(i)].queues.clear();
+              master.incoming_[master.gid(i)].records.clear();
+          }
+
+          if (master.block(i) == 0)
+              master.unload_queues(i);    // even though we are skipping the block, the queues might be necessary
+      }
+      else
+      {
+          if (master.block(i) == 0)                             // block unloaded
+          {
+            if (local.size() == local_limit)                    // reached the local limit
+              master.unload(local);
+
+            master.load(i);
+            local.push_back(i);
+          }
+
+          for (size_t cmd = 0; cmd < master.commands_.size(); ++cmd)
+          {
+              master.commands_[cmd]->execute(master.block(i), master.proxy(i));
+
+              // no longer need them, so get rid of them
+              master.incoming_[master.gid(i)].queues.clear();
+              master.incoming_[master.gid(i)].records.clear();
+          }
+      }
+    } while(true);
+
+    // TODO: invoke opportunistic communication
+    //       don't forget to adjust Master::exchange()
+  }
+
+  static void run(void* bf)                   { static_cast<ProcessBlock*>(bf)->process(); }
+
+  Master&                 master;
+  const std::deque<int>&  blocks;
+  int                     local_limit;
+  critical_resource<int>& idx;
+};
+// --------------------
 
 void
 diy::Master::
@@ -628,6 +681,19 @@ void
 diy::Master::
 foreach(const Functor& f, const Skip& skip, void* aux)
 {
+    commands_.push_back(new Command<Block, Functor, Skip>(f, skip, aux));
+
+    if (immediate())
+        execute();
+}
+
+void
+diy::Master::
+execute()
+{
+  //fprintf(stderr, "Entered execute()\n");
+  //show_incoming_records();
+
   // touch the outgoing and incoming queues as well as collectives to make sure they exist
   for (unsigned i = 0; i < size(); ++i)
   {
@@ -636,6 +702,8 @@ foreach(const Functor& f, const Skip& skip, void* aux)
     collectives(gid(i));
   }
 
+  if (commands_.empty())
+      return;
 
   // Order the blocks, so the loaded ones come first
   std::deque<int>   blocks;
@@ -662,7 +730,7 @@ foreach(const Functor& f, const Skip& skip, void* aux)
   // idx is shared
   critical_resource<int> idx(0);
 
-  typedef                 ProcessBlock<Block,Functor,Skip>                BlockFunctor;
+  typedef                 ProcessBlock                                   BlockFunctor;
   if (num_threads > 1)
   {
     // launch the threads
@@ -671,12 +739,12 @@ foreach(const Functor& f, const Skip& skip, void* aux)
     ThreadFunctorList     threads;
     for (unsigned i = 0; i < (unsigned)num_threads; ++i)
     {
-        BlockFunctor* bf = new BlockFunctor(f, skip, aux, *this, blocks, blocks_per_thread, idx);
+        BlockFunctor* bf = new BlockFunctor(*this, blocks, blocks_per_thread, idx);
         threads.push_back(ThreadFunctorPair(new thread(&BlockFunctor::run, bf), bf));
     }
 
     // join the threads
-    for(typename ThreadFunctorList::iterator it = threads.begin(); it != threads.end(); ++it)
+    for(ThreadFunctorList::iterator it = threads.begin(); it != threads.end(); ++it)
     {
         thread*           t  = it->first;
         BlockFunctor*     bf = it->second;
@@ -686,7 +754,7 @@ foreach(const Functor& f, const Skip& skip, void* aux)
     }
   } else
   {
-      BlockFunctor bf(f, skip, aux, *this, blocks, blocks_per_thread, idx);
+      BlockFunctor bf(*this, blocks, blocks_per_thread, idx);
       BlockFunctor::run(&bf);
   }
 
@@ -698,12 +766,19 @@ foreach(const Functor& f, const Skip& skip, void* aux)
     fprintf(stderr, "Fatal: %d blocks in memory, with limit %d\n", in_memory(), limit());
     std::abort();
   }
+
+  // clear commands
+  for (size_t i = 0; i < commands_.size(); ++i)
+      delete commands_[i];
+  commands_.clear();
 }
 
 void
 diy::Master::
 exchange()
 {
+  execute();
+
   //fprintf(stdout, "Starting exchange\n");
 
   // make sure there is a queue for each neighbor
@@ -712,7 +787,7 @@ exchange()
     OutgoingQueues&  outgoing_queues  = outgoing_[gid(i)].queues;
     OutQueueRecords& external_local   = outgoing_[gid(i)].external_local;
     if (outgoing_queues.size() < (size_t)link(i)->size())
-        for (unsigned j = 0; j < (unsigned)link(i)->size(); ++j)
+      for (unsigned j = 0; j < (unsigned)link(i)->size(); ++j)
       {
         if (external_local.find(link(i)->target(j)) == external_local.end())
           outgoing_queues[link(i)->target(j)];        // touch the outgoing queue, creating it if necessary

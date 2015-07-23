@@ -402,7 +402,7 @@ int main(int argc, char* argv[])
   master.process_collectives();
 
   SortPartners partners(nblocks, k);
-  diy::reduce(master, assigner, partners, sort, SkipHistogram(partners));
+  diy::reduce(master, assigner, partners, &sort, SkipHistogram(partners));
 
   if (print)
   {

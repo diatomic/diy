@@ -29,6 +29,8 @@ namespace diy
 
       void      fix(const Assigner& assigner)       { for (unsigned i = 0; i < neighbors_.size(); ++i) { neighbors_[i].proc = assigner.rank(neighbors_[i].gid); } }
 
+      void      swap(Link& other)                   { neighbors_.swap(other.neighbors_); }
+
       virtual void  save(BinaryBuffer& bb) const    { diy::save(bb, neighbors_); }
       virtual void  load(BinaryBuffer& bb)          { diy::load(bb, neighbors_); }
 
@@ -95,6 +97,7 @@ namespace diy
       const Bounds& bounds(int i) const                 { return nbr_bounds_[i]; }
       void          add_bounds(const Bounds& bounds)    { nbr_bounds_.push_back(bounds); }
 
+      void      swap(RegularLink& other)                { Link::swap(other); dir_map_.swap(other.dir_map_); dir_vec_.swap(other.dir_vec_); nbr_bounds_.swap(other.nbr_bounds_); std::swap(dim_, other.dim_); std::swap(wrap_, other.wrap_); std::swap(core_, other.core_); std::swap(bounds_, other.bounds_); }
 
       void      save(BinaryBuffer& bb) const
       {

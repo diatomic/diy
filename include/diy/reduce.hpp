@@ -23,7 +23,7 @@ struct ReduceProxy: public Master::Proxy
       Master::Proxy(proxy),
       block_(block),
       round_(round),
-      nblocks_(assigner.nblocks())
+      assigner_(assigner)
     {
       // setup in_link
       for (unsigned i = 0; i < incoming_gids.size(); ++i)
@@ -47,17 +47,16 @@ struct ReduceProxy: public Master::Proxy
     ReduceProxy(const Master::Proxy&    proxy, //!< parent proxy
                 void*                   block, //!< diy block
                 unsigned                round, //!< current round
-                int                     nblocks,
+                const Assigner&         assigner,
                 const Link&             in_link,
                 const Link&             out_link):
       Master::Proxy(proxy),
       block_(block),
       round_(round),
-      nblocks_(nblocks),
+      assigner_(assigner),
       in_link_(in_link),
       out_link_(out_link)
     {}
-
 
     //! returns pointer to block
     void*         block() const                           { return block_; }
@@ -68,7 +67,9 @@ struct ReduceProxy: public Master::Proxy
     //! returns outgoing link
     const Link&   out_link() const                        { return out_link_; }
     //! returns total number of blocks
-    int           nblocks() const                         { return nblocks_; }
+    int           nblocks() const                         { return assigner_.nblocks(); }
+    //! returns the assigner
+    const Assigner& assigner() const                      { return assigner_; }
 
     //! advanced: change current round number
     void          set_round(unsigned r)                   { round_ = r; }
@@ -76,7 +77,7 @@ struct ReduceProxy: public Master::Proxy
   private:
     void*         block_;
     unsigned      round_;
-    int           nblocks_;
+    const Assigner& assigner_;
 
     Link          in_link_;
     Link          out_link_;
@@ -118,6 +119,7 @@ void reduce(Master&                    master,
     //fprintf(stderr, "== Round %d\n", round);
     master.foreach(detail::ReductionFunctor<Reduce,Partners>(round, reduce, partners, assigner),
                    detail::SkipInactiveOr<Partners,Skip>(round, partners, skip));
+    master.execute();
 
     int expected = 0;
     for (int i = 0; i < master.size(); ++i)
@@ -179,8 +181,8 @@ namespace detail
     }
 
     unsigned        round;
-    const Reduce&   reduce;
-    const Partners& partners;
+    Reduce          reduce;
+    Partners        partners;
     const Assigner& assigner;
   };
 

@@ -28,6 +28,8 @@ struct SampleSort
     {
         int k_in  = rp.in_link().size();
 
+        //printf("dequeue_values(): gid=%d, round=%d; v.size()=%lu\n", rp.gid(), rp.round(), v.size());
+
         if (detail::is_default< Serialization<T> >::value)
         {
             // add up sizes
@@ -35,10 +37,12 @@ struct SampleSort
             size_t end = v.size();
             for (int i = 0; i < k_in; ++i)
             {
+                //printf("    incoming size from %d: %lu\n", rp.in_link().target(i).gid, sz);
                 if (skip_self && rp.in_link().target(i).gid == rp.gid()) continue;
                 MemoryBuffer& in = rp.incoming(rp.in_link().target(i).gid);
                 sz += in.size() / sizeof(T);
             }
+            //printf("    incoming size: %lu\n", sz);
             v.resize(end + sz);
 
             for (int i = 0; i < k_in; ++i)
@@ -68,11 +72,12 @@ struct SampleSort
                 }
             }
         }
+        //printf("    v.size()=%lu\n", v.size());
     }
 
     ValuesVector    values;
     ValuesVector    samples;
-    const Cmp&      cmp;
+    Cmp             cmp;
     size_t          num_samples;
 };
 
@@ -121,7 +126,7 @@ struct SampleSort<Block,T,Cmp>::Sampler
 
     ValuesVector    values;
     ValuesVector    dividers;
-    const Cmp&      cmp;
+    Cmp             cmp;
     size_t          num_samples;
 };
 
@@ -153,7 +158,7 @@ struct SampleSort<Block,T,Cmp>::Exchanger
 
     ValuesVector    values;
     ValuesVector    samples;
-    const Cmp&      cmp;
+    Cmp             cmp;
 };
 
 }
