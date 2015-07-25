@@ -83,7 +83,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">simple/simple.cpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"></div>
+<div class="fragment"><div class="line"><span class="comment">//</span></div>
+<div class="line"><span class="comment">// Simple neighbor communication by creating a linear chain of blocks, each block connected</span></div>
+<div class="line"><span class="comment">// to two neighbors (predecessor and successor in the ring). Each block computes an average</span></div>
+<div class="line"><span class="comment">// of the values in its values and those of its neighbors. The average is stored in the block,</span></div>
+<div class="line"><span class="comment">// and the blocks are written to a file in storage.</span></div>
+<div class="line"><span class="comment">//</span></div>
 <div class="line"></div>
 <div class="line"><span class="preprocessor">#include &lt;vector&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;iostream&gt;</span></div>
@@ -99,134 +104,159 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"></div>
 <div class="line"><span class="preprocessor">#include &quot;block.h&quot;</span></div>
 <div class="line"></div>
-<div class="line"><span class="comment">// Compute average of local values</span></div>
-<div class="line"><span class="keywordtype">void</span> local_average(<span class="keywordtype">void</span>* b_, <span class="keyword">const</span> <a name="_a0"></a><a class="code" href="structdiy_1_1_master_1_1_proxy_with_link.html">diy::Master::ProxyWithLink</a>&amp; cp, <span class="keywordtype">void</span>*)</div>
+<div class="line"><span class="comment">// --- callback functions ---//</span></div>
+<div class="line"></div>
+<div class="line"><span class="comment">//</span></div>
+<div class="line"><span class="comment">// compute sum of local values and enqueue the sum</span></div>
+<div class="line"><span class="comment">//</span></div>
+<div class="line"><span class="keywordtype">void</span> local_sum(<span class="keywordtype">void</span>* b_,                             <span class="comment">// local block</span></div>
+<div class="line">               <span class="keyword">const</span> <a name="_a0"></a><a class="code" href="structdiy_1_1_master_1_1_proxy_with_link.html">diy::Master::ProxyWithLink</a>&amp; cp, <span class="comment">// communication proxy</span></div>
+<div class="line">               <span class="keywordtype">void</span>*)                                <span class="comment">// user-defined additional arguments</span></div>
 <div class="line">{</div>
-<div class="line">  Block*        b = <span class="keyword">static_cast&lt;</span>Block*<span class="keyword">&gt;</span>(b_);</div>
-<div class="line">  <a name="_a1"></a><a class="code" href="classdiy_1_1_link.html">diy::Link</a>*    l = cp.<a name="a2"></a>link();</div>
+<div class="line">    Block*        b = <span class="keyword">static_cast&lt;</span>Block*<span class="keyword">&gt;</span>(b_);</div>
+<div class="line">    <a name="_a1"></a><a class="code" href="classdiy_1_1_link.html">diy::Link</a>*    l = cp.<a name="a2"></a>link();</div>
 <div class="line"></div>
-<div class="line">  <span class="keywordtype">int</span> total = 0;</div>
-<div class="line">  <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; b-&gt;values.size(); ++i)</div>
-<div class="line">    total += b-&gt;values[i];</div>
+<div class="line">    <span class="comment">// compute local sum</span></div>
+<div class="line">    <span class="keywordtype">int</span> total = 0;</div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; b-&gt;values.size(); ++i)</div>
+<div class="line">        total += b-&gt;values[i];</div>
 <div class="line"></div>
-<div class="line">  std::cout &lt;&lt; <span class="stringliteral">&quot;Total     (&quot;</span> &lt;&lt; cp.<a name="a3"></a>gid() &lt;&lt; <span class="stringliteral">&quot;): &quot;</span> &lt;&lt; total        &lt;&lt; std::endl;</div>
+<div class="line">    std::cout &lt;&lt; <span class="stringliteral">&quot;Total     (&quot;</span> &lt;&lt; cp.<a name="a3"></a>gid() &lt;&lt; <span class="stringliteral">&quot;): &quot;</span> &lt;&lt; total        &lt;&lt; std::endl;</div>
 <div class="line"></div>
-<div class="line">  <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; l-&gt;<a name="a4"></a>size(); ++i)</div>
-<div class="line">  {</div>
-<div class="line">    <span class="comment">//std::cout &lt;&lt; &quot;Enqueueing: &quot; &lt;&lt; cp.gid()</span></div>
-<div class="line">    <span class="comment">//          &lt;&lt; &quot; -&gt; (&quot; &lt;&lt; l-&gt;target(i).gid &lt;&lt; &quot;,&quot; &lt;&lt; l-&gt;target(i).proc &lt;&lt; &quot;)&quot; &lt;&lt; std::endl;</span></div>
-<div class="line">    cp.<a name="a5"></a><a class="code" href="structdiy_1_1_master_1_1_proxy.html#a05bcb6fd6968e054c0b2f818c6cd24de">enqueue</a>(l-&gt;<a name="a6"></a>target(i), total);</div>
-<div class="line">  }</div>
+<div class="line">    <span class="comment">// for all neighbor blocks</span></div>
+<div class="line">    <span class="comment">// enqueue data to be sent to this neighbor block in the next exchange</span></div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; l-&gt;<a name="a4"></a>size(); ++i)</div>
+<div class="line">        cp.<a name="a5"></a><a class="code" href="structdiy_1_1_master_1_1_proxy.html#a05bcb6fd6968e054c0b2f818c6cd24de">enqueue</a>(l-&gt;<a name="a6"></a>target(i), total);</div>
 <div class="line"></div>
-<div class="line">  cp.<a name="a7"></a>all_reduce(total, std::plus&lt;int&gt;());</div>
+<div class="line">    <span class="comment">// diy collectives (optional) are piggybacking on the enqueue/exchange/dequeue mechanism.</span></div>
+<div class="line">    <span class="comment">// They are invoked by posting the collective at the time of the enqueue and getting the</span></div>
+<div class="line">    <span class="comment">// result at the time of the dequeue.</span></div>
+<div class="line">    <span class="comment">// all_reduce() is the posting of the collective.</span></div>
+<div class="line">    cp.<a name="a7"></a>all_reduce(total, std::plus&lt;int&gt;());</div>
 <div class="line">}</div>
 <div class="line"></div>
-<div class="line"><span class="comment">// Average the values received from the neighbors</span></div>
-<div class="line"><span class="keywordtype">void</span> average_neighbors(<span class="keywordtype">void</span>* b_, <span class="keyword">const</span> <a class="code" href="structdiy_1_1_master_1_1_proxy_with_link.html">diy::Master::ProxyWithLink</a>&amp; cp, <span class="keywordtype">void</span>*)</div>
+<div class="line"><span class="comment">//</span></div>
+<div class="line"><span class="comment">// average the values received from the neighbors</span></div>
+<div class="line"><span class="comment">//</span></div>
+<div class="line"><span class="keywordtype">void</span> average_neighbors(<span class="keywordtype">void</span>* b_,                             <span class="comment">// local block</span></div>
+<div class="line">                       <span class="keyword">const</span> <a class="code" href="structdiy_1_1_master_1_1_proxy_with_link.html">diy::Master::ProxyWithLink</a>&amp; cp, <span class="comment">// communication proxy</span></div>
+<div class="line">                       <span class="keywordtype">void</span>*)                                <span class="comment">// user-defined additional arguments</span></div>
 <div class="line">{</div>
-<div class="line">  Block*        b = <span class="keyword">static_cast&lt;</span>Block*<span class="keyword">&gt;</span>(b_);</div>
-<div class="line">  <a class="code" href="classdiy_1_1_link.html">diy::Link</a>*    l = cp.link();</div>
+<div class="line">    Block*        b = <span class="keyword">static_cast&lt;</span>Block*<span class="keyword">&gt;</span>(b_);</div>
+<div class="line">    <a class="code" href="classdiy_1_1_link.html">diy::Link</a>*    l = cp.link();</div>
 <div class="line"></div>
-<div class="line">  <span class="keywordtype">int</span> all_total = cp.<a name="a8"></a>get&lt;<span class="keywordtype">int</span>&gt;();</div>
-<div class="line">  std::cout &lt;&lt; <span class="stringliteral">&quot;All total (&quot;</span> &lt;&lt; cp.gid() &lt;&lt; <span class="stringliteral">&quot;): &quot;</span> &lt;&lt; all_total &lt;&lt; std::endl;</div>
+<div class="line">    <span class="comment">// diy collectives (optional) are piggybacking on the enqueue/exchange/dequeue mechanism.</span></div>
+<div class="line">    <span class="comment">// They are invoked by posting the collective at the time of the enqueue and getting the</span></div>
+<div class="line">    <span class="comment">// result at the time of the dequeue.</span></div>
+<div class="line">    <span class="comment">// cp.get() is the result retrieval.</span></div>
+<div class="line">    <span class="keywordtype">int</span> all_total = cp.<a name="a8"></a>get&lt;<span class="keywordtype">int</span>&gt;();</div>
 <div class="line"></div>
-<div class="line">  std::vector&lt;int&gt; <a class="code" href="namespacediy.html#a861d8601719a75414c57d6aa6a99e0fc">in</a>;</div>
-<div class="line">  cp.<a name="a9"></a>incoming(in);</div>
+<div class="line">    <span class="comment">// gids of incoming neighbors in the link</span></div>
+<div class="line">    std::vector&lt;int&gt; <a class="code" href="namespacediy.html#a861d8601719a75414c57d6aa6a99e0fc">in</a>;</div>
+<div class="line">    cp.<a name="a9"></a>incoming(in);</div>
 <div class="line"></div>
-<div class="line">  <span class="keywordtype">int</span> total = 0;</div>
-<div class="line">  <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; in.size(); ++i)</div>
-<div class="line">  {</div>
-<div class="line">    <span class="keywordtype">int</span> v;</div>
-<div class="line">    cp.<a name="a10"></a><a class="code" href="structdiy_1_1_master_1_1_proxy.html#ad7af65dcf357c32fe550b82a872d8692">dequeue</a>(in[i], v);</div>
-<div class="line">    total += v;</div>
-<div class="line">  }</div>
-<div class="line">  b-&gt;average = float(total) / in.size();</div>
-<div class="line">  std::cout &lt;&lt; <span class="stringliteral">&quot;Average   (&quot;</span> &lt;&lt; cp.gid() &lt;&lt; <span class="stringliteral">&quot;): &quot;</span> &lt;&lt; b-&gt;average   &lt;&lt; std::endl;</div>
+<div class="line">    <span class="comment">// for all neighbor blocks</span></div>
+<div class="line">    <span class="comment">// dequeue data received from this neighbor block in the last exchange</span></div>
+<div class="line">    <span class="keywordtype">int</span> total = 0;</div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; in.size(); ++i)</div>
+<div class="line">    {</div>
+<div class="line">        <span class="keywordtype">int</span> v;</div>
+<div class="line">        cp.<a name="a10"></a><a class="code" href="structdiy_1_1_master_1_1_proxy.html#ad7af65dcf357c32fe550b82a872d8692">dequeue</a>(in[i], v);</div>
+<div class="line">        total += v;</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="comment">// compute average and print it</span></div>
+<div class="line">    b-&gt;average = float(total) / in.size();</div>
+<div class="line">    std::cout &lt;&lt; <span class="stringliteral">&quot;Average   (&quot;</span> &lt;&lt; cp.gid() &lt;&lt; <span class="stringliteral">&quot;): &quot;</span> &lt;&lt; b-&gt;average   &lt;&lt; std::endl;</div>
 <div class="line">}</div>
+<div class="line"></div>
+<div class="line"><span class="comment">// --- main program ---//</span></div>
 <div class="line"></div>
 <div class="line"><span class="keywordtype">int</span> main(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>* argv[])</div>
 <div class="line">{</div>
-<div class="line">  <a name="_a11"></a><a class="code" href="structdiy_1_1mpi_1_1environment.html">diy::mpi::environment</a>     env(argc, argv);</div>
-<div class="line">  <a name="_a12"></a><a class="code" href="classdiy_1_1mpi_1_1communicator.html">diy::mpi::communicator</a>    world;</div>
+<div class="line">    <a name="_a11"></a><a class="code" href="structdiy_1_1mpi_1_1environment.html">diy::mpi::environment</a>     env(argc, argv); <span class="comment">// equivalent of MPI_Init(argc, argv)</span></div>
+<div class="line">    <a name="_a12"></a><a class="code" href="classdiy_1_1mpi_1_1communicator.html">diy::mpi::communicator</a>    world;           <span class="comment">// equivalent of MPI_COMM_WORLD</span></div>
 <div class="line"></div>
-<div class="line">  <span class="comment">//int                       nblocks = 4*world.size();</span></div>
-<div class="line">  <span class="keywordtype">int</span>                       nblocks   = 128;</div>
-<div class="line">  <span class="keywordtype">int</span>                       threads   = 4;</div>
-<div class="line">  <span class="keywordtype">int</span>                       in_memory = 8;</div>
-<div class="line">  std::string               prefix    = <span class="stringliteral">&quot;./DIY.XXXXXX&quot;</span>;</div>
+<div class="line">    <span class="keywordtype">int</span>                       nblocks   = 128; <span class="comment">// global number of blocks</span></div>
+<div class="line">    <span class="keywordtype">int</span>                       threads   = 4;   <span class="comment">// allow diy 4 threads for multithreading blocks</span></div>
+<div class="line">    <span class="keywordtype">int</span>                       in_memory = 8;   <span class="comment">// allow diy to keep 8 local blocks in memory</span></div>
+<div class="line">    std::string               prefix    = <span class="stringliteral">&quot;./DIY.XXXXXX&quot;</span>; <span class="comment">// prefix for temp files for blocks</span></div>
+<div class="line">                                                          <span class="comment">// moved out of core</span></div>
 <div class="line"></div>
-<div class="line">  <span class="keyword">using namespace </span>opts;</div>
-<div class="line">  Options ops(argc, argv);</div>
-<div class="line">  ops</div>
-<div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;b&#39;</span>, <span class="stringliteral">&quot;blocks&quot;</span>,  nblocks,        <span class="stringliteral">&quot;number of blocks&quot;</span>)</div>
-<div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;t&#39;</span>, <span class="stringliteral">&quot;thread&quot;</span>,  threads,        <span class="stringliteral">&quot;number of threads&quot;</span>)</div>
-<div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;m&#39;</span>, <span class="stringliteral">&quot;memory&quot;</span>,  in_memory,      <span class="stringliteral">&quot;maximum blocks to store in memory&quot;</span>)</div>
-<div class="line">      &gt;&gt; Option(     <span class="stringliteral">&quot;prefix&quot;</span>,  prefix,         <span class="stringliteral">&quot;prefix for external storage&quot;</span>)</div>
-<div class="line">  ;</div>
-<div class="line"></div>
-<div class="line">  <span class="keywordflow">if</span> (ops &gt;&gt; Present(<span class="charliteral">&#39;h&#39;</span>, <span class="stringliteral">&quot;help&quot;</span>, <span class="stringliteral">&quot;show help&quot;</span>))</div>
-<div class="line">  {</div>
-<div class="line">    <span class="keywordflow">if</span> (world.<a name="a13"></a>rank() == 0)</div>
-<div class="line">        std::cout &lt;&lt; ops;</div>
-<div class="line"></div>
-<div class="line">    <span class="keywordflow">return</span> 1;</div>
-<div class="line">  }</div>
-<div class="line"></div>
-<div class="line">  <a name="_a14"></a><a class="code" href="classdiy_1_1_file_storage.html">diy::FileStorage</a>          storage(prefix);</div>
-<div class="line">  <a name="_a15"></a><a class="code" href="classdiy_1_1_master.html">diy::Master</a>               master(world,</div>
-<div class="line">                                   threads,</div>
-<div class="line">                                   in_memory,</div>
-<div class="line">                                   &amp;create_block,</div>
-<div class="line">                                   &amp;destroy_block,</div>
-<div class="line">                                   &amp;storage,</div>
-<div class="line">                                   &amp;save_block,</div>
-<div class="line">                                   &amp;load_block);</div>
-<div class="line"></div>
-<div class="line">  <span class="comment">//diy::ContiguousAssigner   assigner(world.size(), nblocks);</span></div>
-<div class="line">  <a name="_a16"></a><a class="code" href="classdiy_1_1_round_robin_assigner.html">diy::RoundRobinAssigner</a>   assigner(world.<a name="a17"></a>size(), nblocks);</div>
-<div class="line"></div>
-<div class="line">  <span class="comment">// creates a linear chain of blocks</span></div>
-<div class="line">  std::vector&lt;int&gt; gids;</div>
-<div class="line">  assigner.<a name="a18"></a><a class="code" href="classdiy_1_1_round_robin_assigner.html#a82a47fd40bffad17ee280a439c8fd74c">local_gids</a>(world.rank(), gids);</div>
-<div class="line">  <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; gids.size(); ++i)</div>
-<div class="line">  {</div>
-<div class="line">    <span class="keywordtype">int</span> gid = gids[i];</div>
-<div class="line"></div>
-<div class="line">    <a class="code" href="classdiy_1_1_link.html">diy::Link</a>*    link = <span class="keyword">new</span> <a class="code" href="classdiy_1_1_link.html">diy::Link</a>;</div>
-<div class="line">    <a name="_a19"></a><a class="code" href="structgb__t.html">diy::BlockID</a>  neighbor;</div>
-<div class="line">    <span class="keywordflow">if</span> (gid &lt; nblocks - 1)</div>
+<div class="line">    <span class="comment">// get command line arguments</span></div>
+<div class="line">    <span class="keyword">using namespace </span>opts;</div>
+<div class="line">    Options ops(argc, argv);</div>
+<div class="line">    ops</div>
+<div class="line">        &gt;&gt; Option(<span class="charliteral">&#39;b&#39;</span>, <span class="stringliteral">&quot;blocks&quot;</span>,  nblocks,        <span class="stringliteral">&quot;number of blocks&quot;</span>)</div>
+<div class="line">        &gt;&gt; Option(<span class="charliteral">&#39;t&#39;</span>, <span class="stringliteral">&quot;thread&quot;</span>,  threads,        <span class="stringliteral">&quot;number of threads&quot;</span>)</div>
+<div class="line">        &gt;&gt; Option(<span class="charliteral">&#39;m&#39;</span>, <span class="stringliteral">&quot;memory&quot;</span>,  in_memory,      <span class="stringliteral">&quot;maximum blocks to store in memory&quot;</span>)</div>
+<div class="line">        &gt;&gt; Option(     <span class="stringliteral">&quot;prefix&quot;</span>,  prefix,         <span class="stringliteral">&quot;prefix for external storage&quot;</span>)</div>
+<div class="line">        ;</div>
+<div class="line">    <span class="keywordflow">if</span> (ops &gt;&gt; Present(<span class="charliteral">&#39;h&#39;</span>, <span class="stringliteral">&quot;help&quot;</span>, <span class="stringliteral">&quot;show help&quot;</span>))</div>
 <div class="line">    {</div>
-<div class="line">      neighbor.<a name="a20"></a>gid  = gid + 1;</div>
-<div class="line">      neighbor.<a name="a21"></a>proc = assigner.rank(neighbor.gid);</div>
-<div class="line">      link-&gt;<a name="a22"></a>add_neighbor(neighbor);</div>
-<div class="line">    }</div>
-<div class="line">    <span class="keywordflow">if</span> (gid &gt; 0)</div>
-<div class="line">    {</div>
-<div class="line">      neighbor.gid  = gid - 1;</div>
-<div class="line">      neighbor.proc = assigner.rank(neighbor.gid);</div>
-<div class="line">      link-&gt;add_neighbor(neighbor);</div>
+<div class="line">        <span class="keywordflow">if</span> (world.<a name="a13"></a>rank() == 0)</div>
+<div class="line">            std::cout &lt;&lt; ops;</div>
+<div class="line">        <span class="keywordflow">return</span> 1;</div>
 <div class="line">    }</div>
 <div class="line"></div>
-<div class="line">    Block* b = <span class="keyword">new</span> Block;</div>
-<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; 3; ++i)</div>
+<div class="line">    <span class="comment">// diy initialization</span></div>
+<div class="line">    <a name="_a14"></a><a class="code" href="classdiy_1_1_file_storage.html">diy::FileStorage</a>          storage(prefix); <span class="comment">// used for blocks to be moved out of core</span></div>
+<div class="line">    <a name="_a15"></a><a class="code" href="classdiy_1_1_master.html">diy::Master</a>               master(world,    <span class="comment">// master is the diy top-level object</span></div>
+<div class="line">                                     threads,</div>
+<div class="line">                                     in_memory,</div>
+<div class="line">                                     &amp;create_block,</div>
+<div class="line">                                     &amp;destroy_block,</div>
+<div class="line">                                     &amp;storage,</div>
+<div class="line">                                     &amp;save_block,</div>
+<div class="line">                                     &amp;load_block);</div>
+<div class="line"></div>
+<div class="line">    <span class="comment">// choice of contiguous or round robin assigner</span></div>
+<div class="line">    <span class="comment">// diy::ContiguousAssigner   assigner(world.size(), nblocks);</span></div>
+<div class="line">    <a name="_a16"></a><a class="code" href="classdiy_1_1_round_robin_assigner.html">diy::RoundRobinAssigner</a>   assigner(world.<a name="a17"></a>size(), nblocks);</div>
+<div class="line"></div>
+<div class="line">    <span class="comment">// this example creates a linear chain of blocks</span></div>
+<div class="line">    std::vector&lt;int&gt; gids;                     <span class="comment">// global ids of local blocks</span></div>
+<div class="line">    assigner.<a name="a18"></a><a class="code" href="classdiy_1_1_round_robin_assigner.html#a82a47fd40bffad17ee280a439c8fd74c">local_gids</a>(world.rank(), gids);   <span class="comment">// get the gids of local blocks</span></div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; gids.size(); ++i) <span class="comment">// for the local blocks in this processor</span></div>
 <div class="line">    {</div>
-<div class="line">      b-&gt;values.push_back(gid*3 + i);</div>
-<div class="line">      <span class="comment">//std::cout &lt;&lt; gid &lt;&lt; &quot;: &quot; &lt;&lt; b-&gt;values.back() &lt;&lt; std::endl;</span></div>
+<div class="line">        <span class="keywordtype">int</span> gid = gids[i];</div>
+<div class="line"></div>
+<div class="line">        <a class="code" href="classdiy_1_1_link.html">diy::Link</a>*    link = <span class="keyword">new</span> <a class="code" href="classdiy_1_1_link.html">diy::Link</a>;  <span class="comment">// link is this block&#39;s neighborhood</span></div>
+<div class="line">        <a name="_a19"></a><a class="code" href="structgb__t.html">diy::BlockID</a>  neighbor;</div>
+<div class="line">        <span class="keywordflow">if</span> (gid &lt; nblocks - 1)               <span class="comment">// all but the last block in the global domain</span></div>
+<div class="line">        {</div>
+<div class="line">            neighbor.<a name="a20"></a>gid  = gid + 1;                     <span class="comment">// gid of the neighbor block</span></div>
+<div class="line">            neighbor.<a name="a21"></a>proc = assigner.rank(neighbor.gid); <span class="comment">// process of the neighbor block</span></div>
+<div class="line">            link-&gt;<a name="a22"></a>add_neighbor(neighbor);                <span class="comment">// add the neighbor block to the link</span></div>
+<div class="line">        }</div>
+<div class="line">        <span class="keywordflow">if</span> (gid &gt; 0)                         <span class="comment">// all but the first block in the global domain</span></div>
+<div class="line">        {</div>
+<div class="line">            neighbor.gid  = gid - 1;</div>
+<div class="line">            neighbor.proc = assigner.rank(neighbor.gid);</div>
+<div class="line">            link-&gt;add_neighbor(neighbor);</div>
+<div class="line">        }</div>
+<div class="line"></div>
+<div class="line">        Block* b = <span class="keyword">new</span> Block;                <span class="comment">// create a new block</span></div>
+<div class="line">        <span class="comment">// assign some values for the block</span></div>
+<div class="line">        <span class="comment">// in this example, simply based on the block global id</span></div>
+<div class="line">        <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; 3; ++i)</div>
+<div class="line">            b-&gt;values.push_back(gid * 3 + i);</div>
+<div class="line"></div>
+<div class="line">        master.add(gid, b, link);            <span class="comment">// add the current local block to the master</span></div>
 <div class="line">    }</div>
-<div class="line">    master.add(gid, b, link);</div>
-<div class="line">  }</div>
 <div class="line"></div>
-<div class="line">  master.foreach(&amp;local_average);</div>
-<div class="line">  master.exchange();</div>
+<div class="line">    <span class="comment">// compute, exchange, compute</span></div>
+<div class="line">    master.foreach(&amp;local_sum);              <span class="comment">// callback function executed on each local block</span></div>
+<div class="line">    master.exchange();                       <span class="comment">// exchange data between blocks in the link</span></div>
+<div class="line">    master.foreach(&amp;average_neighbors);      <span class="comment">// callback function executed on each local block</span></div>
 <div class="line"></div>
-<div class="line">  master.foreach(&amp;average_neighbors);</div>
-<div class="line"></div>
-<div class="line">  diy::io::write_blocks(<span class="stringliteral">&quot;blocks.out&quot;</span>, world, master);</div>
+<div class="line">    <span class="comment">// save the results in diy format</span></div>
+<div class="line">    diy::io::write_blocks(<span class="stringliteral">&quot;blocks.out&quot;</span>, world, master);</div>
 <div class="line">}</div>
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jul 23 2015 14:55:33 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 25 2015 15:25:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.7
 </small></address>

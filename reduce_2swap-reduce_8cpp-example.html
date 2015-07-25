@@ -83,7 +83,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">reduce/swap-reduce.cpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;cmath&gt;</span></div>
+<div class="fragment"><div class="line"><span class="comment">//</span></div>
+<div class="line"><span class="comment">// In swap-reduction, block data are split into k pieces that are swapped between the k members</span></div>
+<div class="line"><span class="comment">// of a group in each round. This example begins with an unsorted set of points that do not lie</span></div>
+<div class="line"><span class="comment">// in the bounds of the blocks, and the swap reduction is used to sort the points in the correct</span></div>
+<div class="line"><span class="comment">// blocks with respect to the block bounds.</span></div>
+<div class="line"><span class="comment">//</span></div>
+<div class="line"></div>
+<div class="line"><span class="preprocessor">#include &lt;cmath&gt;</span></div>
 <div class="line"></div>
 <div class="line"><span class="preprocessor">#include &lt;diy/master.hpp&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;diy/reduce.hpp&gt;</span></div>
@@ -102,138 +109,166 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><span class="keyword">typedef</span>     PointBlock&lt;DIM&gt;             Block;</div>
 <div class="line"><span class="keyword">typedef</span>     AddPointBlock&lt;DIM&gt;          AddBlock;</div>
 <div class="line"></div>
-<div class="line"><span class="keywordtype">void</span> redistribute(<span class="keywordtype">void</span>* b_, <span class="keyword">const</span> <a name="_a2"></a><a class="code" href="structdiy_1_1_reduce_proxy.html">diy::ReduceProxy</a>&amp; srp, <span class="keyword">const</span> <a name="_a3"></a><a class="code" href="structdiy_1_1_regular_swap_partners.html">diy::RegularSwapPartners</a>&amp; partners)</div>
+<div class="line"><span class="comment">// --- callback functions ---//</span></div>
+<div class="line"></div>
+<div class="line"><span class="comment">//</span></div>
+<div class="line"><span class="comment">// callback function for redistribute operator, called in each round of the reduction</span></div>
+<div class="line"><span class="comment">//</span></div>
+<div class="line"><span class="keywordtype">void</span> redistribute(<span class="keywordtype">void</span>* b_,                                 <span class="comment">// local block</span></div>
+<div class="line">                  <span class="keyword">const</span> <a name="_a2"></a><a class="code" href="structdiy_1_1_reduce_proxy.html">diy::ReduceProxy</a>&amp; srp,              <span class="comment">// communication proxy</span></div>
+<div class="line">                  <span class="keyword">const</span> <a name="_a3"></a><a class="code" href="structdiy_1_1_regular_swap_partners.html">diy::RegularSwapPartners</a>&amp; partners) <span class="comment">// user-defined additional arguments</span></div>
 <div class="line">{</div>
-<div class="line">    Block*                      b        = <span class="keyword">static_cast&lt;</span>Block*<span class="keyword">&gt;</span>(b_);</div>
-<div class="line">    <span class="keywordtype">unsigned</span>                    round    = srp.<a name="a4"></a><a class="code" href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">round</a>();</div>
+<div class="line">    Block*        b        = <span class="keyword">static_cast&lt;</span>Block*<span class="keyword">&gt;</span>(b_);</div>
+<div class="line">    <span class="keywordtype">unsigned</span>      round    = srp.<a name="a4"></a><a class="code" href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">round</a>();                   <span class="comment">// current round number</span></div>
 <div class="line"></div>
-<div class="line">    <span class="comment">//fprintf(stderr, &quot;in_link.size():  %d\n&quot;, srp.in_link().size());</span></div>
-<div class="line">    <span class="comment">//fprintf(stderr, &quot;out_link.size(): %d\n&quot;, srp.out_link().size());</span></div>
-<div class="line"></div>
-<div class="line">    <span class="comment">// step 1: dequeue and merge</span></div>
+<div class="line">    <span class="comment">// step 1: dequeue</span></div>
 <div class="line">    <span class="comment">// dequeue all the incoming points and add them to this block&#39;s vector</span></div>
 <div class="line">    <span class="comment">// could use srp.incoming() instead</span></div>
 <div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; srp.<a name="a5"></a><a class="code" href="structdiy_1_1_reduce_proxy.html#a4468710ba18007a4be74aa46b9e98386">in_link</a>().<a name="a6"></a>size(); ++i)</div>
 <div class="line">    {</div>
-<div class="line">      <span class="keywordtype">int</span> nbr_gid = srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a4468710ba18007a4be74aa46b9e98386">in_link</a>().<a name="a7"></a>target(i).<a name="a8"></a>gid;</div>
-<div class="line">      <span class="keywordflow">if</span> (nbr_gid == srp.<a name="a9"></a>gid())</div>
-<div class="line">          <span class="keywordflow">continue</span>;</div>
+<div class="line">        <span class="keywordtype">int</span> nbr_gid = srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a4468710ba18007a4be74aa46b9e98386">in_link</a>().<a name="a7"></a>target(i).<a name="a8"></a>gid;</div>
+<div class="line">        <span class="keywordflow">if</span> (nbr_gid == srp.<a name="a9"></a>gid())</div>
+<div class="line">            <span class="keywordflow">continue</span>;</div>
 <div class="line"></div>
-<div class="line">      std::vector&lt;Block::Point&gt;    in_points;</div>
-<div class="line">      srp.<a name="a10"></a><a class="code" href="structdiy_1_1_master_1_1_proxy.html#ad7af65dcf357c32fe550b82a872d8692">dequeue</a>(nbr_gid, in_points);</div>
-<div class="line">      fprintf(stderr, <span class="stringliteral">&quot;[%d] Received %d points from [%d]\n&quot;</span>, srp.gid(), (int) in_points.size(), nbr_gid);</div>
-<div class="line">      <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 0; j &lt; in_points.size(); ++j)</div>
-<div class="line">        b-&gt;points.push_back(in_points[j]);</div>
+<div class="line">        std::vector&lt;Block::Point&gt;    in_points;</div>
+<div class="line">        srp.<a name="a10"></a><a class="code" href="structdiy_1_1_master_1_1_proxy.html#ad7af65dcf357c32fe550b82a872d8692">dequeue</a>(nbr_gid, in_points);</div>
+<div class="line">        fprintf(stderr, <span class="stringliteral">&quot;[%d:%d] Received %d points from [%d]\n&quot;</span>,</div>
+<div class="line">                srp.gid(), round, (int) in_points.size(), nbr_gid);</div>
+<div class="line">        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 0; j &lt; in_points.size(); ++j)</div>
+<div class="line">            b-&gt;points.push_back(in_points[j]);</div>
 <div class="line">    }</div>
 <div class="line"></div>
-<div class="line">    <span class="comment">// step 2: subset and enqueue</span></div>
-<div class="line">    <span class="comment">//fprintf(stderr, &quot;[%d] out_link().size(): %d\n&quot;, srp.gid(), srp.out_link().size());</span></div>
+<div class="line">    <span class="comment">// step 2: sort and enqueue</span></div>
 <div class="line">    <span class="keywordflow">if</span> (srp.<a name="a11"></a><a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().size() == 0)        <span class="comment">// final round; nothing needs to be sent</span></div>
 <div class="line">        <span class="keywordflow">return</span>;</div>
 <div class="line"></div>
 <div class="line">    std::vector&lt; std::vector&lt;Block::Point&gt; &gt; out_points(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().size());</div>
-<div class="line">    <span class="keywordtype">int</span> group_size = srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().size();</div>
-<div class="line">    <span class="keywordtype">int</span> cur_dim    = partners.<a name="a12"></a>dim(round);</div>
-<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; b-&gt;points.size(); ++i)</div>
+<div class="line">    <span class="keywordtype">int</span> group_size = srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().size();  <span class="comment">// number of outbound partners</span></div>
+<div class="line">    <span class="keywordtype">int</span> cur_dim    = partners.<a name="a12"></a>dim(round);    <span class="comment">// current dimension along which groups are formed</span></div>
+<div class="line">    <span class="comment">// sort points into vectors corresponding to neighbor blocks</span></div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; b-&gt;points.size(); ++i) <span class="comment">// for all points</span></div>
 <div class="line">    {</div>
-<div class="line">      <span class="keywordtype">int</span> loc = floor((b-&gt;points[i][cur_dim] - b-&gt;box.min[cur_dim]) / (b-&gt;box.max[cur_dim] - b-&gt;box.min[cur_dim]) * group_size);</div>
-<div class="line">      out_points[loc].push_back(b-&gt;points[i]);</div>
+<div class="line">        <span class="keywordtype">int</span> loc = floor((b-&gt;points[i][cur_dim] - b-&gt;box.min[cur_dim]) /</div>
+<div class="line">                        (b-&gt;box.max[cur_dim] - b-&gt;box.min[cur_dim]) * group_size);</div>
+<div class="line">        out_points[loc].push_back(b-&gt;points[i]);</div>
 <div class="line">    }</div>
 <div class="line">    <span class="keywordtype">int</span> pos = -1;</div>
-<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; group_size; ++i)</div>
+<div class="line">    <span class="comment">// enqueue points to neighbor blocks</span></div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; group_size; ++i)     <span class="comment">// for all neighbors</span></div>
 <div class="line">    {</div>
-<div class="line">      <span class="keywordflow">if</span> (srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().target(i).gid == srp.gid())</div>
-<div class="line">      {</div>
-<div class="line">        b-&gt;points.swap(out_points[i]);</div>
-<div class="line">        pos = i;</div>
-<div class="line">      }</div>
-<div class="line">      <span class="keywordflow">else</span></div>
-<div class="line">      {</div>
-<div class="line">        srp.<a name="a13"></a><a class="code" href="structdiy_1_1_master_1_1_proxy.html#a05bcb6fd6968e054c0b2f818c6cd24de">enqueue</a>(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().target(i), out_points[i]);</div>
-<div class="line">        fprintf(stderr, <span class="stringliteral">&quot;[%d] Sent %d points to [%d]\n&quot;</span>, srp.gid(), (int) out_points[i].size(), srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().target(i).gid);</div>
-<div class="line">      }</div>
+<div class="line">        <span class="keywordflow">if</span> (srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().target(i).gid == srp.gid())</div>
+<div class="line">        {</div>
+<div class="line">            b-&gt;points.swap(out_points[i]);</div>
+<div class="line">            pos = i;</div>
+<div class="line">        }</div>
+<div class="line">        <span class="keywordflow">else</span></div>
+<div class="line">        {</div>
+<div class="line">            srp.<a name="a13"></a><a class="code" href="structdiy_1_1_master_1_1_proxy.html#a05bcb6fd6968e054c0b2f818c6cd24de">enqueue</a>(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().target(i), out_points[i]);</div>
+<div class="line">            fprintf(stderr, <span class="stringliteral">&quot;[%d] Sent %d points to [%d]\n&quot;</span>,</div>
+<div class="line">                    srp.gid(), (int) out_points[i].size(), srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().target(i).gid);</div>
+<div class="line">        }</div>
 <div class="line">    }</div>
-<div class="line">    <span class="keywordtype">float</span> new_min = b-&gt;box.min[cur_dim] + (b-&gt;box.max[cur_dim] - b-&gt;box.min[cur_dim])/group_size*pos;</div>
-<div class="line">    <span class="keywordtype">float</span> new_max = b-&gt;box.min[cur_dim] + (b-&gt;box.max[cur_dim] - b-&gt;box.min[cur_dim])/group_size*(pos + 1);</div>
+<div class="line"></div>
+<div class="line">    <span class="comment">// step 3: readjust box boundaries for next round</span></div>
+<div class="line">    <span class="keywordtype">float</span> new_min = b-&gt;box.min[cur_dim] + (b-&gt;box.max[cur_dim] -</div>
+<div class="line">                                           b-&gt;box.min[cur_dim])/group_size*pos;</div>
+<div class="line">    <span class="keywordtype">float</span> new_max = b-&gt;box.min[cur_dim] + (b-&gt;box.max[cur_dim] -</div>
+<div class="line">                                           b-&gt;box.min[cur_dim])/group_size*(pos + 1);</div>
 <div class="line">    b-&gt;box.min[cur_dim] = new_min;</div>
 <div class="line">    b-&gt;box.max[cur_dim] = new_max;</div>
 <div class="line">}</div>
 <div class="line"></div>
+<div class="line"><span class="comment">// --- main program ---//</span></div>
+<div class="line"></div>
 <div class="line"><span class="keywordtype">int</span> main(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>* argv[])</div>
 <div class="line">{</div>
-<div class="line">  <a name="_a14"></a><a class="code" href="structdiy_1_1mpi_1_1environment.html">diy::mpi::environment</a>     env(argc, argv);</div>
-<div class="line">  <a name="_a15"></a><a class="code" href="classdiy_1_1mpi_1_1communicator.html">diy::mpi::communicator</a>    world;</div>
+<div class="line">    <a name="_a14"></a><a class="code" href="structdiy_1_1mpi_1_1environment.html">diy::mpi::environment</a>     env(argc, argv); <span class="comment">// equivalent of MPI_Init(argc, argv)</span></div>
+<div class="line">    <a name="_a15"></a><a class="code" href="classdiy_1_1mpi_1_1communicator.html">diy::mpi::communicator</a>    world;           <span class="comment">// equivalent of MPI_COMM_WORLD</span></div>
 <div class="line"></div>
-<div class="line">  <span class="keywordtype">int</span>                       nblocks     = world.<a name="a16"></a>size();</div>
-<div class="line">  <span class="keywordtype">size_t</span>                    num_points  = 100;      <span class="comment">// points per block</span></div>
-<div class="line">  <span class="keywordtype">int</span>                       mem_blocks  = -1;</div>
-<div class="line">  <span class="keywordtype">int</span>                       threads     = -1;</div>
-<div class="line">  <span class="keywordtype">int</span>                       k           = 2;</div>
-<div class="line">  std::string               prefix      = <span class="stringliteral">&quot;./DIY.XXXXXX&quot;</span>;</div>
+<div class="line">    <span class="keywordtype">int</span>                       nblocks     = world.<a name="a16"></a>size();   <span class="comment">// global number of blocks</span></div>
+<div class="line">    <span class="keywordtype">size_t</span>                    num_points  = 100;            <span class="comment">// points per block</span></div>
+<div class="line">    <span class="keywordtype">int</span>                       mem_blocks  = -1;             <span class="comment">// all blocks in memory</span></div>
+<div class="line">    <span class="keywordtype">int</span>                       threads     = -1;             <span class="comment">// no multithreading</span></div>
+<div class="line">    <span class="keywordtype">int</span>                       k           = 2;              <span class="comment">// radix for k-ary reduction</span></div>
+<div class="line">    std::string               prefix      = <span class="stringliteral">&quot;./DIY.XXXXXX&quot;</span>; <span class="comment">// for saving block files out of core</span></div>
 <div class="line"></div>
-<div class="line">  Bounds domain;</div>
-<div class="line">  domain.<a name="a17"></a>min[0] = domain.min[1] = domain.min[2] = 0;</div>
-<div class="line">  domain.max[0] = domain.max[1] = domain.max[2] = 100.;</div>
+<div class="line">    <span class="comment">// get command line arguments</span></div>
+<div class="line">    <span class="keyword">using namespace </span>opts;</div>
+<div class="line">    Options ops(argc, argv);</div>
+<div class="line">    ops</div>
+<div class="line">        &gt;&gt; Option(<span class="charliteral">&#39;n&#39;</span>, <span class="stringliteral">&quot;number&quot;</span>,  num_points,     <span class="stringliteral">&quot;number of points per block&quot;</span>)</div>
+<div class="line">        &gt;&gt; Option(<span class="charliteral">&#39;k&#39;</span>, <span class="stringliteral">&quot;k&quot;</span>,       k,              <span class="stringliteral">&quot;use k-ary swap&quot;</span>)</div>
+<div class="line">        &gt;&gt; Option(<span class="charliteral">&#39;b&#39;</span>, <span class="stringliteral">&quot;blocks&quot;</span>,  nblocks,        <span class="stringliteral">&quot;number of blocks&quot;</span>)</div>
+<div class="line">        &gt;&gt; Option(<span class="charliteral">&#39;t&#39;</span>, <span class="stringliteral">&quot;thread&quot;</span>,  threads,        <span class="stringliteral">&quot;number of threads&quot;</span>)</div>
+<div class="line">        &gt;&gt; Option(<span class="charliteral">&#39;m&#39;</span>, <span class="stringliteral">&quot;memory&quot;</span>,  mem_blocks,     <span class="stringliteral">&quot;number of blocks to keep in memory&quot;</span>)</div>
+<div class="line">        &gt;&gt; Option(     <span class="stringliteral">&quot;prefix&quot;</span>,  prefix,         <span class="stringliteral">&quot;prefix for external storage&quot;</span>)</div>
+<div class="line">        ;</div>
+<div class="line">    ops</div>
+<div class="line">        &gt;&gt; Option(<span class="charliteral">&#39;x&#39;</span>,  <span class="stringliteral">&quot;max-x&quot;</span>,  domain.max[0],  <span class="stringliteral">&quot;domain max x&quot;</span>)</div>
+<div class="line">        &gt;&gt; Option(<span class="charliteral">&#39;y&#39;</span>,  <span class="stringliteral">&quot;max-y&quot;</span>,  domain.max[1],  <span class="stringliteral">&quot;domain max y&quot;</span>)</div>
+<div class="line">        &gt;&gt; Option(<span class="charliteral">&#39;z&#39;</span>,  <span class="stringliteral">&quot;max-z&quot;</span>,  domain.max[2],  <span class="stringliteral">&quot;domain max z&quot;</span>)</div>
+<div class="line">        ;</div>
+<div class="line">    <span class="keywordtype">bool</span>  verbose = ops &gt;&gt; Present(<span class="charliteral">&#39;v&#39;</span>, <span class="stringliteral">&quot;verbose&quot;</span>, <span class="stringliteral">&quot;print the block contents&quot;</span>);</div>
+<div class="line">    <span class="keywordflow">if</span> (ops &gt;&gt; Present(<span class="charliteral">&#39;h&#39;</span>, <span class="stringliteral">&quot;help&quot;</span>, <span class="stringliteral">&quot;show help&quot;</span>))</div>
+<div class="line">    {</div>
+<div class="line">        <span class="keywordflow">if</span> (world.<a name="a17"></a>rank() == 0)</div>
+<div class="line">        {</div>
+<div class="line">            std::cout &lt;&lt; <span class="stringliteral">&quot;Usage: &quot;</span> &lt;&lt; argv[0] &lt;&lt; <span class="stringliteral">&quot; [OPTIONS]\n&quot;</span>;</div>
+<div class="line">            std::cout &lt;&lt; <span class="stringliteral">&quot;Generates random particles in the domain and redistributes them into correct blocks.\n&quot;</span>;</div>
+<div class="line">            std::cout &lt;&lt; ops;</div>
+<div class="line">        }</div>
+<div class="line">        <span class="keywordflow">return</span> 1;</div>
+<div class="line">    }</div>
 <div class="line"></div>
-<div class="line">  <span class="keyword">using namespace </span>opts;</div>
-<div class="line">  Options ops(argc, argv);</div>
+<div class="line">    <span class="comment">// diy initialization</span></div>
+<div class="line">    <a name="_a18"></a><a class="code" href="classdiy_1_1_file_storage.html">diy::FileStorage</a>          storage(prefix);            <span class="comment">// used for blocks moved out of core</span></div>
+<div class="line">    <a name="_a19"></a><a class="code" href="classdiy_1_1_master.html">diy::Master</a>               master(world,               <span class="comment">// top-level diy object</span></div>
+<div class="line">                                     threads,</div>
+<div class="line">                                     mem_blocks,</div>
+<div class="line">                                     &amp;Block::create,</div>
+<div class="line">                                     &amp;Block::destroy,</div>
+<div class="line">                                     &amp;storage,</div>
+<div class="line">                                     &amp;<a name="a20"></a><a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">Block::save</a>,</div>
+<div class="line">                                     &amp;<a name="a21"></a><a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">Block::load</a>);</div>
+<div class="line">    AddBlock                  create(master, num_points); <span class="comment">// object for adding new blocks to master</span></div>
 <div class="line"></div>
-<div class="line">  ops</div>
-<div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;n&#39;</span>, <span class="stringliteral">&quot;number&quot;</span>,  num_points,     <span class="stringliteral">&quot;number of points per block&quot;</span>)</div>
-<div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;k&#39;</span>, <span class="stringliteral">&quot;k&quot;</span>,       k,              <span class="stringliteral">&quot;use k-ary swap&quot;</span>)</div>
-<div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;b&#39;</span>, <span class="stringliteral">&quot;blocks&quot;</span>,  nblocks,        <span class="stringliteral">&quot;number of blocks&quot;</span>)</div>
-<div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;t&#39;</span>, <span class="stringliteral">&quot;thread&quot;</span>,  threads,        <span class="stringliteral">&quot;number of threads&quot;</span>)</div>
-<div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;m&#39;</span>, <span class="stringliteral">&quot;memory&quot;</span>,  mem_blocks,     <span class="stringliteral">&quot;number of blocks to keep in memory&quot;</span>)</div>
-<div class="line">      &gt;&gt; Option(     <span class="stringliteral">&quot;prefix&quot;</span>,  prefix,         <span class="stringliteral">&quot;prefix for external storage&quot;</span>)</div>
-<div class="line">  ;</div>
+<div class="line">    <span class="comment">// set some global data bounds</span></div>
+<div class="line">    Bounds domain;</div>
+<div class="line">    domain.<a name="a22"></a>min[0] = domain.min[1] = domain.min[2] = 0;</div>
+<div class="line">    domain.max[0] = domain.max[1] = domain.max[2] = 100.;</div>
 <div class="line"></div>
-<div class="line">  ops</div>
-<div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;x&#39;</span>,  <span class="stringliteral">&quot;max-x&quot;</span>,  domain.max[0],  <span class="stringliteral">&quot;domain max x&quot;</span>)</div>
-<div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;y&#39;</span>,  <span class="stringliteral">&quot;max-y&quot;</span>,  domain.max[1],  <span class="stringliteral">&quot;domain max y&quot;</span>)</div>
-<div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;z&#39;</span>,  <span class="stringliteral">&quot;max-z&quot;</span>,  domain.max[2],  <span class="stringliteral">&quot;domain max z&quot;</span>)</div>
-<div class="line">  ;</div>
-<div class="line">  <span class="keywordtype">bool</span>  verbose = ops &gt;&gt; Present(<span class="charliteral">&#39;v&#39;</span>, <span class="stringliteral">&quot;verbose&quot;</span>, <span class="stringliteral">&quot;print the block contents&quot;</span>);</div>
+<div class="line">    <span class="keywordtype">int</span>   dim = DIM;</div>
 <div class="line"></div>
-<div class="line">  <span class="keywordflow">if</span> (ops &gt;&gt; Present(<span class="charliteral">&#39;h&#39;</span>, <span class="stringliteral">&quot;help&quot;</span>, <span class="stringliteral">&quot;show help&quot;</span>))</div>
-<div class="line">  {</div>
-<div class="line">      <span class="keywordflow">if</span> (world.<a name="a18"></a>rank() == 0)</div>
-<div class="line">      {</div>
-<div class="line">          std::cout &lt;&lt; <span class="stringliteral">&quot;Usage: &quot;</span> &lt;&lt; argv[0] &lt;&lt; <span class="stringliteral">&quot; [OPTIONS]\n&quot;</span>;</div>
-<div class="line">          std::cout &lt;&lt; <span class="stringliteral">&quot;Generates random particles in the domain and redistributes them into correct blocks.\n&quot;</span>;</div>
-<div class="line">          std::cout &lt;&lt; ops;</div>
-<div class="line">      }</div>
-<div class="line">      <span class="keywordflow">return</span> 1;</div>
-<div class="line">  }</div>
+<div class="line">    <span class="comment">// choice of contiguous or round robin assigner</span></div>
+<div class="line">    <a name="_a23"></a><a class="code" href="classdiy_1_1_contiguous_assigner.html">diy::ContiguousAssigner</a>   assigner(world.size(), nblocks);</div>
+<div class="line">    <span class="comment">//diy::RoundRobinAssigner   assigner(world.size(), nblocks);</span></div>
 <div class="line"></div>
-<div class="line">  <a name="_a19"></a><a class="code" href="classdiy_1_1_file_storage.html">diy::FileStorage</a>          storage(prefix);</div>
-<div class="line">  <a name="_a20"></a><a class="code" href="classdiy_1_1_master.html">diy::Master</a>               master(world,</div>
-<div class="line">                                   threads,</div>
-<div class="line">                                   mem_blocks,</div>
-<div class="line">                                   &amp;Block::create,</div>
-<div class="line">                                   &amp;Block::destroy,</div>
-<div class="line">                                   &amp;storage,</div>
-<div class="line">                                   &amp;<a name="a21"></a><a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">Block::save</a>,</div>
-<div class="line">                                   &amp;<a name="a22"></a><a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">Block::load</a>);</div>
+<div class="line">    <span class="comment">// decompose the domain into blocks</span></div>
+<div class="line">    <a name="a24"></a><a class="code" href="group___decomposition.html#gaf2e85a34f7b5adcdd0bbad32df5ad02a">diy::decompose</a>(dim, world.rank(), domain, assigner, create);</div>
 <div class="line"></div>
-<div class="line">  <span class="keywordtype">int</span>   dim = DIM;</div>
+<div class="line">    <span class="comment">// swap-based reduction: create the partners that determine how groups are formed</span></div>
+<div class="line">    <span class="comment">// in each round and then execute the reduction</span></div>
 <div class="line"></div>
-<div class="line">  <a name="_a23"></a><a class="code" href="classdiy_1_1_contiguous_assigner.html">diy::ContiguousAssigner</a>   assigner(world.size(), nblocks);</div>
-<div class="line">  <span class="comment">//diy::RoundRobinAssigner   assigner(world.size(), nblocks);</span></div>
-<div class="line">  AddBlock  create(master, num_points);</div>
-<div class="line">  <a name="a24"></a><a class="code" href="group___decomposition.html#gaf2e85a34f7b5adcdd0bbad32df5ad02a">diy::decompose</a>(dim, world.rank(), domain, assigner, create);</div>
+<div class="line">    <span class="comment">// partners for swap over regular block grid</span></div>
+<div class="line">    <a class="code" href="structdiy_1_1_regular_swap_partners.html">diy::RegularSwapPartners</a>  partners(dim,     <span class="comment">// dimensionality of block grid</span></div>
+<div class="line">                                       nblocks, <span class="comment">// total number of blocks</span></div>
+<div class="line">                                       k,       <span class="comment">// radix of k-ary reduction</span></div>
+<div class="line">                                       <span class="keyword">false</span>);  <span class="comment">// contiguous = true: distance doubling</span></div>
+<div class="line">                                                <span class="comment">// contiguous = false: distance halving</span></div>
 <div class="line"></div>
-<div class="line">  <a class="code" href="structdiy_1_1_regular_swap_partners.html">diy::RegularSwapPartners</a>  partners(dim, nblocks, k, <span class="keyword">false</span>);</div>
-<div class="line">  <span class="comment">//fprintf(stderr, &quot;%d %d %d\n&quot;, dim, nblocks, k);</span></div>
-<div class="line">  <span class="comment">//fprintf(stderr, &quot;partners.rounds(): %d\n&quot;, (int) partners.rounds());</span></div>
-<div class="line">  <a name="a25"></a><a class="code" href="group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f">diy::reduce</a>(master, assigner, partners, &amp;redistribute);</div>
+<div class="line">    <a name="a25"></a><a class="code" href="group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f">diy::reduce</a>(master,                         <span class="comment">// Master object</span></div>
+<div class="line">                assigner,                       <span class="comment">// Assigner object</span></div>
+<div class="line">                partners,                       <span class="comment">// RegularSwapPartners object</span></div>
+<div class="line">                &amp;redistribute);                 <span class="comment">// swap operator callback function</span></div>
 <div class="line"></div>
-<div class="line">  master.foreach(&amp;Block::print_block, &amp;verbose);</div>
-<div class="line">  master.foreach(&amp;Block::verify_block);</div>
+<div class="line">    <span class="comment">// callback functions for local block</span></div>
+<div class="line">    master.foreach(&amp;Block::print_block, &amp;verbose);</div>
+<div class="line">    master.foreach(&amp;Block::verify_block);</div>
 <div class="line">}</div>
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jul 23 2015 14:55:33 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 25 2015 15:25:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.7
 </small></address>
