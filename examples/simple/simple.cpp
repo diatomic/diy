@@ -1,5 +1,9 @@
-//! \example simple/simple.cpp
-
+//
+// Simple neighbor communication by creating a linear chain of blocks, each block connected
+// to two neighbors (predecessor and successor in the ring). Each block computes an average
+// of the values in its values and those of its neighbors. The average is stored in the block,
+// and the blocks are written to a file in storage.
+//
 
 #include <vector>
 #include <iostream>
@@ -15,129 +19,152 @@
 
 #include "block.h"
 
-// Compute average of local values
-void local_average(void* b_, const diy::Master::ProxyWithLink& cp, void*)
+// --- callback functions ---//
+
+//
+// compute sum of local values and enqueue the sum
+//
+void local_sum(void* b_,                             // local block
+               const diy::Master::ProxyWithLink& cp, // communication proxy
+               void*)                                // user-defined additional arguments
 {
-  Block*        b = static_cast<Block*>(b_);
-  diy::Link*    l = cp.link();
+    Block*        b = static_cast<Block*>(b_);
+    diy::Link*    l = cp.link();
 
-  int total = 0;
-  for (unsigned i = 0; i < b->values.size(); ++i)
-    total += b->values[i];
+    // compute local sum
+    int total = 0;
+    for (unsigned i = 0; i < b->values.size(); ++i)
+        total += b->values[i];
 
-  std::cout << "Total     (" << cp.gid() << "): " << total        << std::endl;
+    std::cout << "Total     (" << cp.gid() << "): " << total        << std::endl;
 
-  for (unsigned i = 0; i < l->size(); ++i)
-  {
-    //std::cout << "Enqueueing: " << cp.gid()
-    //          << " -> (" << l->target(i).gid << "," << l->target(i).proc << ")" << std::endl;
-    cp.enqueue(l->target(i), total);
-  }
+    // for all neighbor blocks
+    // enqueue data to be sent to this neighbor block in the next exchange
+    for (unsigned i = 0; i < l->size(); ++i)
+        cp.enqueue(l->target(i), total);
 
-  cp.all_reduce(total, std::plus<int>());
+    // diy collectives (optional) are piggybacking on the enqueue/exchange/dequeue mechanism.
+    // They are invoked by posting the collective at the time of the enqueue and getting the
+    // result at the time of the dequeue.
+    // all_reduce() is the posting of the collective.
+    cp.all_reduce(total, std::plus<int>());
 }
 
-// Average the values received from the neighbors
-void average_neighbors(void* b_, const diy::Master::ProxyWithLink& cp, void*)
+//
+// average the values received from the neighbors
+//
+void average_neighbors(void* b_,                             // local block
+                       const diy::Master::ProxyWithLink& cp, // communication proxy
+                       void*)                                // user-defined additional arguments
 {
-  Block*        b = static_cast<Block*>(b_);
-  diy::Link*    l = cp.link();
+    Block*        b = static_cast<Block*>(b_);
+    diy::Link*    l = cp.link();
 
-  int all_total = cp.get<int>();
-  std::cout << "All total (" << cp.gid() << "): " << all_total << std::endl;
+    // diy collectives (optional) are piggybacking on the enqueue/exchange/dequeue mechanism.
+    // They are invoked by posting the collective at the time of the enqueue and getting the
+    // result at the time of the dequeue.
+    // cp.get() is the result retrieval.
+    int all_total = cp.get<int>();
 
-  std::vector<int> in;
-  cp.incoming(in);
+    // gids of incoming neighbors in the link
+    std::vector<int> in;
+    cp.incoming(in);
 
-  int total = 0;
-  for (unsigned i = 0; i < in.size(); ++i)
-  {
-    int v;
-    cp.dequeue(in[i], v);
-    total += v;
-  }
-  b->average = float(total) / in.size();
-  std::cout << "Average   (" << cp.gid() << "): " << b->average   << std::endl;
+    // for all neighbor blocks
+    // dequeue data received from this neighbor block in the last exchange
+    int total = 0;
+    for (unsigned i = 0; i < in.size(); ++i)
+    {
+        int v;
+        cp.dequeue(in[i], v);
+        total += v;
+    }
+
+    // compute average and print it
+    b->average = float(total) / in.size();
+    std::cout << "Average   (" << cp.gid() << "): " << b->average   << std::endl;
 }
+
+// --- main program ---//
 
 int main(int argc, char* argv[])
 {
-  diy::mpi::environment     env(argc, argv);
-  diy::mpi::communicator    world;
+    diy::mpi::environment     env(argc, argv); // equivalent of MPI_Init(argc, argv)
+    diy::mpi::communicator    world;           // equivalent of MPI_COMM_WORLD
 
-  //int                       nblocks = 4*world.size();
-  int                       nblocks   = 128;
-  int                       threads   = 4;
-  int                       in_memory = 8;
-  std::string               prefix    = "./DIY.XXXXXX";
+    int                       nblocks   = 128; // global number of blocks
+    int                       threads   = 4;   // allow diy 4 threads for multithreading blocks
+    int                       in_memory = 8;   // allow diy to keep 8 local blocks in memory
+    std::string               prefix    = "./DIY.XXXXXX"; // prefix for temp files for blocks
+                                                          // moved out of core
 
-  using namespace opts;
-  Options ops(argc, argv);
-  ops
-      >> Option('b', "blocks",  nblocks,        "number of blocks")
-      >> Option('t', "thread",  threads,        "number of threads")
-      >> Option('m', "memory",  in_memory,      "maximum blocks to store in memory")
-      >> Option(     "prefix",  prefix,         "prefix for external storage")
-  ;
-
-  if (ops >> Present('h', "help", "show help"))
-  {
-    if (world.rank() == 0)
-        std::cout << ops;
-
-    return 1;
-  }
-
-  //! [Master initialization]
-  diy::FileStorage          storage(prefix);
-  diy::Master               master(world,
-                                   threads,
-                                   in_memory,
-                                   &create_block,
-                                   &destroy_block,
-                                   &storage,
-                                   &save_block,
-                                   &load_block);
-  //! [Master initialization]
-
-  //diy::ContiguousAssigner   assigner(world.size(), nblocks);
-  diy::RoundRobinAssigner   assigner(world.size(), nblocks);
-
-  // creates a linear chain of blocks
-  std::vector<int> gids;
-  assigner.local_gids(world.rank(), gids);
-  for (unsigned i = 0; i < gids.size(); ++i)
-  {
-    int gid = gids[i];
-
-    diy::Link*    link = new diy::Link;
-    diy::BlockID  neighbor;
-    if (gid < nblocks - 1)
+    // get command line arguments
+    using namespace opts;
+    Options ops(argc, argv);
+    ops
+        >> Option('b', "blocks",  nblocks,        "number of blocks")
+        >> Option('t', "thread",  threads,        "number of threads")
+        >> Option('m', "memory",  in_memory,      "maximum blocks to store in memory")
+        >> Option(     "prefix",  prefix,         "prefix for external storage")
+        ;
+    if (ops >> Present('h', "help", "show help"))
     {
-      neighbor.gid  = gid + 1;
-      neighbor.proc = assigner.rank(neighbor.gid);
-      link->add_neighbor(neighbor);
-    }
-    if (gid > 0)
-    {
-      neighbor.gid  = gid - 1;
-      neighbor.proc = assigner.rank(neighbor.gid);
-      link->add_neighbor(neighbor);
+        if (world.rank() == 0)
+            std::cout << ops;
+        return 1;
     }
 
-    Block* b = new Block;
-    for (unsigned i = 0; i < 3; ++i)
+    // diy initialization
+    diy::FileStorage          storage(prefix); // used for blocks to be moved out of core
+    diy::Master               master(world,    // master is the diy top-level object
+                                     threads,
+                                     in_memory,
+                                     &create_block,
+                                     &destroy_block,
+                                     &storage,
+                                     &save_block,
+                                     &load_block);
+
+    // choice of contiguous or round robin assigner
+    // diy::ContiguousAssigner   assigner(world.size(), nblocks);
+    diy::RoundRobinAssigner   assigner(world.size(), nblocks);
+
+    // this example creates a linear chain of blocks
+    std::vector<int> gids;                     // global ids of local blocks
+    assigner.local_gids(world.rank(), gids);   // get the gids of local blocks
+    for (unsigned i = 0; i < gids.size(); ++i) // for the local blocks in this processor
     {
-      b->values.push_back(gid*3 + i);
-      //std::cout << gid << ": " << b->values.back() << std::endl;
+        int gid = gids[i];
+
+        diy::Link*    link = new diy::Link;  // link is this block's neighborhood
+        diy::BlockID  neighbor;
+        if (gid < nblocks - 1)               // all but the last block in the global domain
+        {
+            neighbor.gid  = gid + 1;                     // gid of the neighbor block
+            neighbor.proc = assigner.rank(neighbor.gid); // process of the neighbor block
+            link->add_neighbor(neighbor);                // add the neighbor block to the link
+        }
+        if (gid > 0)                         // all but the first block in the global domain
+        {
+            neighbor.gid  = gid - 1;
+            neighbor.proc = assigner.rank(neighbor.gid);
+            link->add_neighbor(neighbor);
+        }
+
+        Block* b = new Block;                // create a new block
+        // assign some values for the block
+        // in this example, simply based on the block global id
+        for (unsigned i = 0; i < 3; ++i)
+            b->values.push_back(gid * 3 + i);
+
+        master.add(gid, b, link);            // add the current local block to the master
     }
-    master.add(gid, b, link);
-  }
 
-  master.foreach(&local_average);
-  master.exchange();
+    // compute, exchange, compute
+    master.foreach(&local_sum);              // callback function executed on each local block
+    master.exchange();                       // exchange data between blocks in the link
+    master.foreach(&average_neighbors);      // callback function executed on each local block
 
-  master.foreach(&average_neighbors);
-
-  diy::io::write_blocks("blocks.out", world, master);
+    // save the results in diy format
+    diy::io::write_blocks("blocks.out", world, master);
 }

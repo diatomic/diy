@@ -1,3 +1,10 @@
+//
+// In swap-reduction, block data are split into k pieces that are swapped between the k members
+// of a group in each round. This example begins with an unsorted set of points that do not lie
+// in the bounds of the blocks, and the swap reduction is used to sort the points in the correct
+// blocks with respect to the block bounds.
+//
+
 #include <cmath>
 
 #include <diy/master.hpp>
@@ -17,131 +24,159 @@ static const unsigned DIM = 3;
 typedef     PointBlock<DIM>             Block;
 typedef     AddPointBlock<DIM>          AddBlock;
 
-void redistribute(void* b_, const diy::ReduceProxy& srp, const diy::RegularSwapPartners& partners)
+// --- callback functions ---//
+
+//
+// callback function for redistribute operator, called in each round of the reduction
+//
+void redistribute(void* b_,                                 // local block
+                  const diy::ReduceProxy& srp,              // communication proxy
+                  const diy::RegularSwapPartners& partners) // user-defined additional arguments
 {
-    Block*                      b        = static_cast<Block*>(b_);
-    unsigned                    round    = srp.round();
+    Block*        b        = static_cast<Block*>(b_);
+    unsigned      round    = srp.round();                   // current round number
 
-    //fprintf(stderr, "in_link.size():  %d\n", srp.in_link().size());
-    //fprintf(stderr, "out_link.size(): %d\n", srp.out_link().size());
-
-    // step 1: dequeue and merge
+    // step 1: dequeue
     // dequeue all the incoming points and add them to this block's vector
     // could use srp.incoming() instead
     for (unsigned i = 0; i < srp.in_link().size(); ++i)
     {
-      int nbr_gid = srp.in_link().target(i).gid;
-      if (nbr_gid == srp.gid())
-          continue;
+        int nbr_gid = srp.in_link().target(i).gid;
+        if (nbr_gid == srp.gid())
+            continue;
 
-      std::vector<Block::Point>    in_points;
-      srp.dequeue(nbr_gid, in_points);
-      fprintf(stderr, "[%d] Received %d points from [%d]\n", srp.gid(), (int) in_points.size(), nbr_gid);
-      for (size_t j = 0; j < in_points.size(); ++j)
-        b->points.push_back(in_points[j]);
+        std::vector<Block::Point>    in_points;
+        srp.dequeue(nbr_gid, in_points);
+        fprintf(stderr, "[%d:%d] Received %d points from [%d]\n",
+                srp.gid(), round, (int) in_points.size(), nbr_gid);
+        for (size_t j = 0; j < in_points.size(); ++j)
+            b->points.push_back(in_points[j]);
     }
 
-    // step 2: subset and enqueue
-    //fprintf(stderr, "[%d] out_link().size(): %d\n", srp.gid(), srp.out_link().size());
+    // step 2: sort and enqueue
     if (srp.out_link().size() == 0)        // final round; nothing needs to be sent
         return;
 
     std::vector< std::vector<Block::Point> > out_points(srp.out_link().size());
-    int group_size = srp.out_link().size();
-    int cur_dim    = partners.dim(round);
-    for (size_t i = 0; i < b->points.size(); ++i)
+    int group_size = srp.out_link().size();  // number of outbound partners
+    int cur_dim    = partners.dim(round);    // current dimension along which groups are formed
+    // sort points into vectors corresponding to neighbor blocks
+    for (size_t i = 0; i < b->points.size(); ++i) // for all points
     {
-      int loc = floor((b->points[i][cur_dim] - b->box.min[cur_dim]) / (b->box.max[cur_dim] - b->box.min[cur_dim]) * group_size);
-      out_points[loc].push_back(b->points[i]);
+        int loc = floor((b->points[i][cur_dim] - b->box.min[cur_dim]) /
+                        (b->box.max[cur_dim] - b->box.min[cur_dim]) * group_size);
+        out_points[loc].push_back(b->points[i]);
     }
     int pos = -1;
-    for (int i = 0; i < group_size; ++i)
+    // enqueue points to neighbor blocks
+    for (int i = 0; i < group_size; ++i)     // for all neighbors
     {
-      if (srp.out_link().target(i).gid == srp.gid())
-      {
-        b->points.swap(out_points[i]);
-        pos = i;
-      }
-      else
-      {
-        srp.enqueue(srp.out_link().target(i), out_points[i]);
-        fprintf(stderr, "[%d] Sent %d points to [%d]\n", srp.gid(), (int) out_points[i].size(), srp.out_link().target(i).gid);
-      }
+        if (srp.out_link().target(i).gid == srp.gid())
+        {
+            b->points.swap(out_points[i]);
+            pos = i;
+        }
+        else
+        {
+            srp.enqueue(srp.out_link().target(i), out_points[i]);
+            fprintf(stderr, "[%d] Sent %d points to [%d]\n",
+                    srp.gid(), (int) out_points[i].size(), srp.out_link().target(i).gid);
+        }
     }
-    float new_min = b->box.min[cur_dim] + (b->box.max[cur_dim] - b->box.min[cur_dim])/group_size*pos;
-    float new_max = b->box.min[cur_dim] + (b->box.max[cur_dim] - b->box.min[cur_dim])/group_size*(pos + 1);
+
+    // step 3: readjust box boundaries for next round
+    float new_min = b->box.min[cur_dim] + (b->box.max[cur_dim] -
+                                           b->box.min[cur_dim])/group_size*pos;
+    float new_max = b->box.min[cur_dim] + (b->box.max[cur_dim] -
+                                           b->box.min[cur_dim])/group_size*(pos + 1);
     b->box.min[cur_dim] = new_min;
     b->box.max[cur_dim] = new_max;
 }
 
+// --- main program ---//
+
 int main(int argc, char* argv[])
 {
-  diy::mpi::environment     env(argc, argv);
-  diy::mpi::communicator    world;
+    diy::mpi::environment     env(argc, argv); // equivalent of MPI_Init(argc, argv)
+    diy::mpi::communicator    world;           // equivalent of MPI_COMM_WORLD
 
-  int                       nblocks     = world.size();
-  size_t                    num_points  = 100;      // points per block
-  int                       mem_blocks  = -1;
-  int                       threads     = -1;
-  int                       k           = 2;
-  std::string               prefix      = "./DIY.XXXXXX";
+    int                       nblocks     = world.size();   // global number of blocks
+    size_t                    num_points  = 100;            // points per block
+    int                       mem_blocks  = -1;             // all blocks in memory
+    int                       threads     = -1;             // no multithreading
+    int                       k           = 2;              // radix for k-ary reduction
+    std::string               prefix      = "./DIY.XXXXXX"; // for saving block files out of core
 
-  Bounds domain;
-  domain.min[0] = domain.min[1] = domain.min[2] = 0;
-  domain.max[0] = domain.max[1] = domain.max[2] = 100.;
+    // get command line arguments
+    using namespace opts;
+    Options ops(argc, argv);
+    ops
+        >> Option('n', "number",  num_points,     "number of points per block")
+        >> Option('k', "k",       k,              "use k-ary swap")
+        >> Option('b', "blocks",  nblocks,        "number of blocks")
+        >> Option('t', "thread",  threads,        "number of threads")
+        >> Option('m', "memory",  mem_blocks,     "number of blocks to keep in memory")
+        >> Option(     "prefix",  prefix,         "prefix for external storage")
+        ;
+    ops
+        >> Option('x',  "max-x",  domain.max[0],  "domain max x")
+        >> Option('y',  "max-y",  domain.max[1],  "domain max y")
+        >> Option('z',  "max-z",  domain.max[2],  "domain max z")
+        ;
+    bool  verbose = ops >> Present('v', "verbose", "print the block contents");
+    if (ops >> Present('h', "help", "show help"))
+    {
+        if (world.rank() == 0)
+        {
+            std::cout << "Usage: " << argv[0] << " [OPTIONS]\n";
+            std::cout << "Generates random particles in the domain and redistributes them into correct blocks.\n";
+            std::cout << ops;
+        }
+        return 1;
+    }
 
-  using namespace opts;
-  Options ops(argc, argv);
+    // diy initialization
+    diy::FileStorage          storage(prefix);            // used for blocks moved out of core
+    diy::Master               master(world,               // top-level diy object
+                                     threads,
+                                     mem_blocks,
+                                     &Block::create,
+                                     &Block::destroy,
+                                     &storage,
+                                     &Block::save,
+                                     &Block::load);
+    AddBlock                  create(master, num_points); // object for adding new blocks to master
 
-  ops
-      >> Option('n', "number",  num_points,     "number of points per block")
-      >> Option('k', "k",       k,              "use k-ary swap")
-      >> Option('b', "blocks",  nblocks,        "number of blocks")
-      >> Option('t', "thread",  threads,        "number of threads")
-      >> Option('m', "memory",  mem_blocks,     "number of blocks to keep in memory")
-      >> Option(     "prefix",  prefix,         "prefix for external storage")
-  ;
+    // set some global data bounds
+    Bounds domain;
+    domain.min[0] = domain.min[1] = domain.min[2] = 0;
+    domain.max[0] = domain.max[1] = domain.max[2] = 100.;
 
-  ops
-      >> Option('x',  "max-x",  domain.max[0],  "domain max x")
-      >> Option('y',  "max-y",  domain.max[1],  "domain max y")
-      >> Option('z',  "max-z",  domain.max[2],  "domain max z")
-  ;
-  bool  verbose = ops >> Present('v', "verbose", "print the block contents");
+    int   dim = DIM;
 
-  if (ops >> Present('h', "help", "show help"))
-  {
-      if (world.rank() == 0)
-      {
-          std::cout << "Usage: " << argv[0] << " [OPTIONS]\n";
-          std::cout << "Generates random particles in the domain and redistributes them into correct blocks.\n";
-          std::cout << ops;
-      }
-      return 1;
-  }
+    // choice of contiguous or round robin assigner
+    diy::ContiguousAssigner   assigner(world.size(), nblocks);
+    //diy::RoundRobinAssigner   assigner(world.size(), nblocks);
 
-  diy::FileStorage          storage(prefix);
-  diy::Master               master(world,
-                                   threads,
-                                   mem_blocks,
-                                   &Block::create,
-                                   &Block::destroy,
-                                   &storage,
-                                   &Block::save,
-                                   &Block::load);
+    // decompose the domain into blocks
+    diy::decompose(dim, world.rank(), domain, assigner, create);
 
-  int   dim = DIM;
+    // swap-based reduction: create the partners that determine how groups are formed
+    // in each round and then execute the reduction
 
-  diy::ContiguousAssigner   assigner(world.size(), nblocks);
-  //diy::RoundRobinAssigner   assigner(world.size(), nblocks);
-  AddBlock  create(master, num_points);
-  diy::decompose(dim, world.rank(), domain, assigner, create);
+    // partners for swap over regular block grid
+    diy::RegularSwapPartners  partners(dim,     // dimensionality of block grid
+                                       nblocks, // total number of blocks
+                                       k,       // radix of k-ary reduction
+                                       false);  // contiguous = true: distance doubling
+                                                // contiguous = false: distance halving
 
-  diy::RegularSwapPartners  partners(dim, nblocks, k, false);
-  //fprintf(stderr, "%d %d %d\n", dim, nblocks, k);
-  //fprintf(stderr, "partners.rounds(): %d\n", (int) partners.rounds());
-  diy::reduce(master, assigner, partners, &redistribute);
+    diy::reduce(master,                         // Master object
+                assigner,                       // Assigner object
+                partners,                       // RegularSwapPartners object
+                &redistribute);                 // swap operator callback function
 
-  master.foreach(&Block::print_block, &verbose);
-  master.foreach(&Block::verify_block);
+    // callback functions for local block
+    master.foreach(&Block::print_block, &verbose);
+    master.foreach(&Block::verify_block);
 }
