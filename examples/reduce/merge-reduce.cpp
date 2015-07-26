@@ -29,7 +29,7 @@ typedef     diy::RegularContinuousLink  RCLink;
 // create and destroy allocate and free the block, while
 // save and load serialize and deserialize the block
 // these four functions are called when blocks are cycled in- and out-of-core
-// they can be member functions of the block, as below, or separate
+// they can be member functions of the block, as below, or separate standalone functions
 struct Block
 {
     Block(const Bounds& bounds_):
@@ -81,7 +81,7 @@ struct AddBlock
 
             int             lid = m.add(gid, b, l); // add block to the master (mandatory)
 
-            b->generate_data(num_points);    // initialize block data (typical)
+            b->generate_data(num_points);          // initialize block data (typical)
         }
 
     diy::Master&  master;
