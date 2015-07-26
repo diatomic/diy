@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['base',['Base',['../struct_base.html',1,'']]],
   ['basecommand',['BaseCommand',['../structdiy_1_1_master_1_1_base_command.html',1,'diy::Master']]],
   ['bb_5fc_5ft',['bb_c_t',['../structbb__c__t.html',1,'']]],
   ['bb_5fd_5ft',['bb_d_t',['../structbb__d__t.html',1,'']]],
