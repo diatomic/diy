@@ -18,20 +18,6 @@
 
 #include "thread.hpp"
 
-// list of all examples so that doxygen can fill out the examples tab
-//! \example simple/simple.cpp
-//! \example simple/read-blocks.cpp
-//! \example simple/until-done.cpp
-//! \example decomposition/test-decomposition.cpp
-//! \example serialization/test-serialization.cpp
-//! \example io/test-io.cpp
-//! \example reduce/merge-reduce.cpp
-//! \example reduce/swap-reduce.cpp
-//! \example reduce/all-to-all.cpp
-//! \example reduce/kd-tree.cpp
-//! \example reduce/sort.cpp
-//! \example reduce/sample-sort.cpp
-
 namespace diy
 {
   // Stores and manages blocks; initiates serialization and communication when necessary.
