@@ -1,8 +1,9 @@
 //
-// Simple neighbor communication by creating a linear chain of blocks, each block connected
-// to two neighbors (predecessor and successor in the ring). Each block computes an average
-// of the values in its values and those of its neighbors. The average is stored in the block,
-// and the blocks are written to a file in storage.
+// Simple neighbor communication by creating a linear chain of blocks, each
+// block connected to two neighbors (predecessor and successor), except for the
+// first and the last blocks, which have only one or the other. Each block
+// computes an average of its values and those of its neighbors. The average is
+// stored in the block, and the blocks are written to a file in storage.
 //
 
 #include <vector>
@@ -89,7 +90,7 @@ void average_neighbors(void* b_,                             // local block
 
 int main(int argc, char* argv[])
 {
-    diy::mpi::environment     env(argc, argv); // equivalent of MPI_Init(argc, argv)
+    diy::mpi::environment     env(argc, argv); // equivalent of MPI_Init(argc, argv)/MPI_Finalize()
     diy::mpi::communicator    world;           // equivalent of MPI_COMM_WORLD
 
     int                       nblocks   = 128; // global number of blocks

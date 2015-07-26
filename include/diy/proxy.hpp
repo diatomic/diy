@@ -4,6 +4,7 @@
 
 namespace diy
 {
+  //! Communication proxy, used for enqueueing and dequeueing items for future exchange.
   struct Master::Proxy
   {
     template <class T>
@@ -64,6 +65,7 @@ namespace diy
     OutgoingQueues*     outgoing() const                                { return outgoing_; }
     MemoryBuffer&       outgoing(const BlockID& to) const               { return (*outgoing_)[to]; }
 
+    //! Post an all-reduce collective
     template<class T, class Op>
     inline void         all_reduce(const T& in, Op op) const;
     template<class T>

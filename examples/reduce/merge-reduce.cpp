@@ -1,9 +1,9 @@
 //
-// Merge reduction merges blocks together, in this example, computing a vector sum of
-// their values. At each round, one block of a group of k blocks is the root of the group.
-// The other blocks send their data to the root, which computes the vector sum, and the root
-// block (only) proceeds to the next round. After log_k(numblocks) rounds, one block contains
-// the global vector sum of the values.
+// Merge reduction merges blocks together, computing a sum of their values. At
+// each round, one block of a group of k blocks is the root of the group. The
+// other blocks send their data to the root, which computes the sum, and the
+// root block (only) proceeds to the next round. After log_k(numblocks) rounds,
+// one block contains the global sum of the values.
 //
 
 #include <cmath>
@@ -165,7 +165,7 @@ void print_block(void* b_,                             // local block
 
 int main(int argc, char* argv[])
 {
-    diy::mpi::environment     env(argc, argv); // equivalent of MPI_Init(argc, argv)
+    diy::mpi::environment     env(argc, argv); // equivalent of MPI_Init(argc, argv)/MPI_Finalize()
     diy::mpi::communicator    world;           // equivalent of MPI_COMM_WORLD
 
     int                       nblocks     = world.size(); // global number of blocks

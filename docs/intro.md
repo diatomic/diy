@@ -77,6 +77,7 @@ received and sent during rounds of message exchange.
     }
 ~~~~
 
+[More examples](\ref Examples).
 
 Components
 ----------
@@ -87,6 +88,7 @@ Components
  - \ref Communication
  - \ref Callbacks
  - \ref Immediate
+ - \ref Examples
 
  - diy::Master
  - diy::Communicator

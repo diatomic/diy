@@ -97,7 +97,7 @@ void redistribute(void* b_,                                 // local block
 
 int main(int argc, char* argv[])
 {
-    diy::mpi::environment     env(argc, argv); // equivalent of MPI_Init(argc, argv)
+    diy::mpi::environment     env(argc, argv); // equivalent of MPI_Init(argc, argv)/MPI_Finalize()
     diy::mpi::communicator    world;           // equivalent of MPI_COMM_WORLD
 
     int                       nblocks     = world.size();   // global number of blocks
