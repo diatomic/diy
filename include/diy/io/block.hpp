@@ -19,6 +19,7 @@ namespace io
   {
     typedef mpi::io::offset                 offset_t;
 
+    #pragma pack(push)
     #pragma pack(4)     // without this pragma the int gets padded and we lose exact binary match across saves
     struct GidOffsetCount
     {
@@ -34,6 +35,7 @@ namespace io
         offset_t    offset;
         offset_t    count;
     };
+    #pragma pack(pop)
   }
 
   inline
