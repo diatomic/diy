@@ -19,6 +19,7 @@ namespace io
   {
     typedef mpi::io::offset                 offset_t;
 
+    #pragma pack(4)     // without this pragma the int gets padded and we lose exact binary match across saves
     struct GidOffsetCount
     {
                     GidOffsetCount():                                   // need to initialize a vector of given size
