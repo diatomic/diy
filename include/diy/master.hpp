@@ -377,15 +377,15 @@ struct diy::Master::ProcessBlock
     {
       int cur = (*idx.access())++;
 
-      if (cur >= blocks.size())
+      if ((size_t)cur >= blocks.size())
           return;
 
       int i = blocks[cur];
       if (master.block(i))
       {
-        if (local.size() == local_limit)
-          master.unload(local);
-        local.push_back(i);
+          if (local.size() == (size_t)local_limit)
+              master.unload(local);
+          local.push_back(i);
       }
 
       //fprintf(stderr, "Processing block: %d\n", master.gid(i));
@@ -420,11 +420,11 @@ struct diy::Master::ProcessBlock
       {
           if (master.block(i) == 0)                             // block unloaded
           {
-            if (local.size() == local_limit)                    // reached the local limit
-              master.unload(local);
+              if (local.size() == (size_t)local_limit)                    // reached the local limit
+                  master.unload(local);
 
-            master.load(i);
-            local.push_back(i);
+              master.load(i);
+              local.push_back(i);
           }
 
           for (size_t cmd = 0; cmd < master.commands_.size(); ++cmd)
