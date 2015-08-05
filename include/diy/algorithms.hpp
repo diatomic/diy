@@ -22,7 +22,8 @@ void sort(Master&                   master,
           std::vector<T> Block::*   samples,
           size_t                    num_samples,
           const Cmp&                cmp,
-          int                       k   = 2)
+          int                       k   = 2,
+          bool                      samples_only = false)
 {
   bool immediate = master.immediate();
   master.set_immediate(false);
@@ -36,7 +37,8 @@ void sort(Master&                   master,
   reduce(master, assigner, partners, sorter.sample(), detail::SkipIntermediate(partners.rounds()));
 
   // all_to_all to exchange the values
-  all_to_all(master, assigner, sorter.exchange(), k);
+  if (!samples_only)
+      all_to_all(master, assigner, sorter.exchange(), k);
 
   master.set_immediate(immediate);
 }
