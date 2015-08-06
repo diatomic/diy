@@ -19,6 +19,8 @@ namespace io
   {
     typedef mpi::io::offset                 offset_t;
 
+    #pragma pack(push)
+    #pragma pack(4)     // without this pragma the int gets padded and we lose exact binary match across saves
     struct GidOffsetCount
     {
                     GidOffsetCount():                                   // need to initialize a vector of given size
@@ -33,6 +35,7 @@ namespace io
         offset_t    offset;
         offset_t    count;
     };
+    #pragma pack(pop)
   }
 
   inline
@@ -40,6 +43,7 @@ namespace io
   write_blocks(const std::string&           outfilename,
                const mpi::communicator&     comm,
                Master&                      master,
+               const MemoryBuffer&          extra = MemoryBuffer(),     //< meaningful only on rank == 0
                Master::SaveBlock            save = 0)
   {
     if (!save) save = master.saver();       // save is likely to be different from master.save()
@@ -114,9 +118,10 @@ namespace io
       }
       std::sort(all_offset_counts.begin(), all_offset_counts.end());        // sorts by gid
 
-      unsigned footer_size = all_offset_counts.size();        // should be the same as master.size();
       MemoryBuffer bb;
       diy::save(bb, all_offset_counts);
+      diy::save(bb, extra);
+      size_t footer_size = bb.size();
       diy::save(bb, footer_size);
 
       // find footer_offset as the max of (offset + count)
@@ -141,6 +146,7 @@ namespace io
               const mpi::communicator&     comm,
               Assigner&                    assigner,
               Master&                      master,
+              MemoryBuffer&                extra,
               Master::LoadBlock            load = 0)
   {
     if (!load) load = master.loader();      // load is likely to be different from master.load()
@@ -150,18 +156,26 @@ namespace io
 
     mpi::io::file f(comm, infilename, mpi::io::file::rdonly);
 
-    offset_t    footer_offset = f.size() - sizeof(unsigned);
-    unsigned size;
+    offset_t    footer_offset = f.size() - sizeof(size_t);
+    size_t footer_size;
 
     // Read the size
-    f.read_at_all(footer_offset, (char*) &size, sizeof(size));
+    f.read_at_all(footer_offset, (char*) &footer_size, sizeof(footer_size));
 
     // Read all_offset_counts
-    footer_offset -= size*sizeof(GidOffsetCount);
-    std::vector<GidOffsetCount>  all_offset_counts(size);
-    f.read_at_all(footer_offset, all_offset_counts);
+    footer_offset -= footer_size;
+
+    MemoryBuffer footer;
+    footer.buffer.resize(footer_size);
+    f.read_at_all(footer_offset, footer.buffer);
+
+    std::vector<GidOffsetCount>  all_offset_counts;
+    diy::load(footer, all_offset_counts);
+    diy::load(footer, extra);
+    extra.reset();
 
     // Get local gids from assigner
+    size_t size = all_offset_counts.size();
     assigner.set_nblocks(size);
     std::vector<int> gids;
     assigner.local_gids(comm.rank(), gids);
@@ -184,6 +198,31 @@ namespace io
         load(b, bb);
         master.add(gids[i], b, l);
     }
+  }
+
+
+  // Functions without the extra buffer, for compatibility with the old code
+  inline
+  void
+  write_blocks(const std::string&           outfilename,
+               const mpi::communicator&     comm,
+               Master&                      master,
+               Master::SaveBlock            save)
+  {
+    MemoryBuffer extra;
+    write_blocks(outfilename, comm, master, extra, save);
+  }
+
+  inline
+  void
+  read_blocks(const std::string&           infilename,
+              const mpi::communicator&     comm,
+              Assigner&                    assigner,
+              Master&                      master,
+              Master::LoadBlock            load = 0)
+  {
+    MemoryBuffer extra;     // dummy
+    read_blocks(infilename, comm, assigner, master, extra, load);
   }
 }
 }

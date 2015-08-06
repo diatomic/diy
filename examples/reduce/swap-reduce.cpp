@@ -107,6 +107,11 @@ int main(int argc, char* argv[])
     int                       k           = 2;              // radix for k-ary reduction
     std::string               prefix      = "./DIY.XXXXXX"; // for saving block files out of core
 
+    // set some global data bounds (defaults set before option parsing)
+    Bounds domain;
+    domain.min[0] = domain.min[1] = domain.min[2] = 0;
+    domain.max[0] = domain.max[1] = domain.max[2] = 100.;
+
     // get command line arguments
     using namespace opts;
     Options ops(argc, argv);
@@ -146,11 +151,6 @@ int main(int argc, char* argv[])
                                      &Block::save,
                                      &Block::load);
     AddBlock                  create(master, num_points); // object for adding new blocks to master
-
-    // set some global data bounds
-    Bounds domain;
-    domain.min[0] = domain.min[1] = domain.min[2] = 0;
-    domain.max[0] = domain.max[1] = domain.max[2] = 100.;
 
     int   dim = DIM;
 

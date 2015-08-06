@@ -63,15 +63,23 @@ struct Block
                   Block()                                  {}
 };
 
+struct WrapDomain
+{
+  bool          wrap;
+  const Bounds& domain;
+};
+
 struct KDTreePartners
 {
   // bool = are we in a swap (vs histogram) round
   // int  = round within that partner
   typedef           std::pair<bool, int>                    RoundType;
 
-                    KDTreePartners(int dim, int nblocks):
+                    KDTreePartners(int dim, int nblocks, bool wrap_, const Bounds& domain_):
                         histogram(1, nblocks, 2),
-                        swap(1, nblocks, 2, false)
+                        swap(1, nblocks, 2, false),
+                        wrap(wrap_),
+                        domain(domain_)
   {
     for (unsigned i = 0; i < swap.rounds(); ++i)
     {
@@ -149,8 +157,12 @@ struct KDTreePartners
     int         lid  = m.lid(gid);
     diy::Link*  link = m.link(lid);
 
+    std::set<int> result;       // partners must be unique
     for (size_t i = 0; i < link->size(); ++i)
-        partners.push_back(link->target(i).gid);
+        result.insert(link->target(i).gid);
+
+    for (std::set<int>::const_iterator it = result.begin(); it != result.end(); ++it)
+        partners.push_back(*it);
   }
 
   diy::RegularAllReducePartners     histogram;
@@ -158,6 +170,9 @@ struct KDTreePartners
 
   std::vector<RoundType>            rounds_;
   std::vector<int>                  dim_;
+
+  bool                              wrap;
+  Bounds                            domain;
 };
 
 void compute_local_histogram(void* b_, const diy::ReduceProxy& srp, int dim)
@@ -308,8 +323,15 @@ void update_neighbor_bounds(Bounds& bounds, float split, int dim, bool lower)
         bounds.min[dim] = split;
 }
 
-bool intersects(const Bounds& x, const Bounds& y, int dim)
+bool intersects(const Bounds& x, const Bounds& y, int dim, bool wrap, const Bounds& domain)
 {
+    if (wrap)
+    {
+        if (x.min[dim] == domain.min[dim] && y.max[dim] == domain.max[dim])
+            return true;
+        if (y.min[dim] == domain.min[dim] && x.max[dim] == domain.max[dim])
+            return true;
+    }
     return x.min[dim] <= y.max[dim] && y.min[dim] <= x.max[dim];
 }
 
@@ -340,17 +362,46 @@ int divide_gid(int gid, bool lower, int round, int rounds)
     return gid;
 }
 
-void update_links(void* b_, const diy::ReduceProxy& srp, int dim, int round, int rounds)    // round here is the outer iteration of the algorithm
+// round here is the outer iteration of the algorithm
+void update_links(void* b_, const diy::ReduceProxy& srp, int dim, int round, int rounds, bool wrap, const Bounds& domain)
 {
     Block*      b    = static_cast<Block*>(b_);
     int         gid  = srp.gid();
     int         lid  = srp.master()->lid(gid);
     RCLink*     link = static_cast<RCLink*>(srp.master()->link(lid));
 
+    // (gid, dir) -> i
+    std::map<std::pair<int,diy::Direction>, int> link_map;
+    for (int i = 0; i < link->size(); ++i)
+        link_map[std::make_pair(link->target(i).gid, link->direction(i))] = i;
+
     // NB: srp.enqueue(..., ...) should match the link
     std::vector<float>  splits(link->size());
     for (int i = 0; i < link->size(); ++i)
-        srp.dequeue(link->target(i).gid, splits[i]);
+    {
+        float split; diy::Direction dir;
+
+        int in_gid = link->target(i).gid;
+        while(srp.incoming(in_gid))
+        {
+            srp.dequeue(in_gid, split);
+            srp.dequeue(in_gid, dir);
+
+            // reverse dir
+            int j = 0;
+            while (dir >> (j + 1))
+                ++j;
+
+            if (j % 2 == 0)
+                dir = static_cast<diy::Direction>(dir << 1);
+            else
+                dir = static_cast<diy::Direction>(dir >> 1);
+
+            int k = link_map[std::make_pair(in_gid, dir)];
+            //printf("%d %d %f -> %d\n", in_gid, dir, split, k);
+            splits[k] = split;
+        }
+    }
 
     RCLink      new_link(DIM, b->box, b->box);
 
@@ -363,17 +414,20 @@ void update_links(void* b_, const diy::ReduceProxy& srp, int dim, int round, int
     for (int i = 0; i < link->size(); ++i)
     {
         diy::Direction  dir = link->direction(i);
-        if ((dir == left && lower) || (dir == right && !lower))
+        if (dir == left || dir == right)
         {
-            int nbr_gid = divide_gid(link->target(i).gid, dir != left, round, rounds);
-            diy::BlockID nbr = { nbr_gid, srp.assigner().rank(nbr_gid) };
-            new_link.add_neighbor(nbr);
+            if ((dir == left && lower) || (dir == right && !lower))
+            {
+                int nbr_gid = divide_gid(link->target(i).gid, dir != left, round, rounds);
+                diy::BlockID nbr = { nbr_gid, srp.assigner().rank(nbr_gid) };
+                new_link.add_neighbor(nbr);
 
-            new_link.add_direction(dir);
+                new_link.add_direction(dir);
 
-            Bounds bounds = link->bounds(i);
-            update_neighbor_bounds(bounds, splits[i], dim, dir != left);
-            new_link.add_bounds(bounds);
+                Bounds bounds = link->bounds(i);
+                update_neighbor_bounds(bounds, splits[i], dim, dir != left);
+                new_link.add_bounds(bounds);
+            }
         } else // non-aligned side
         {
             for (int j = 0; j < 2; ++j)
@@ -383,7 +437,7 @@ void update_links(void* b_, const diy::ReduceProxy& srp, int dim, int round, int
                 Bounds  bounds  = link->bounds(i);
                 update_neighbor_bounds(bounds, splits[i], dim, j == 0);
 
-                if (intersects(bounds, new_link.bounds(), dim))
+                if (intersects(bounds, new_link.bounds(), dim, wrap, domain))
                 {
                     diy::BlockID nbr = { nbr_gid, srp.assigner().rank(nbr_gid) };
                     new_link.add_neighbor(nbr);
@@ -424,7 +478,10 @@ void split_to_neighbors(void* b_, const diy::ReduceProxy& srp, int dim)
     float split = find_split(b->box, link->bounds());
 
     for (size_t i = 0; i < link->size(); ++i)
+    {
         srp.enqueue(link->target(i), split);
+        srp.enqueue(link->target(i), link->direction(i));
+    }
 }
 
 void partition(void* b_, const diy::ReduceProxy& srp, const KDTreePartners& partners)
@@ -436,7 +493,7 @@ void partition(void* b_, const diy::ReduceProxy& srp, const KDTreePartners& part
         dim = partners.dim(srp.round() - 1);
 
     if (srp.round() == partners.rounds())
-        update_links(b_, srp, dim, partners.sub_round(srp.round() - 2), partners.swap_rounds()); // -1 would be the "uninformative" link round
+        update_links(b_, srp, dim, partners.sub_round(srp.round() - 2), partners.swap_rounds(), partners.wrap, partners.domain); // -1 would be the "uninformative" link round
     else if (partners.swap_round(srp.round()) && partners.sub_round(srp.round()) < 0)       // link round
     {
         dequeue_exchange(b_, srp, dim);         // from the swap round
@@ -453,7 +510,7 @@ void partition(void* b_, const diy::ReduceProxy& srp, const KDTreePartners& part
             int prev_dim = dim - 1;
             if (prev_dim < 0)
                 prev_dim += DIM;
-            update_links(b_, srp, prev_dim, partners.sub_round(srp.round() - 2), partners.swap_rounds());    // -1 would be the "uninformative" link round
+            update_links(b_, srp, prev_dim, partners.sub_round(srp.round() - 2), partners.swap_rounds(), partners.wrap, partners.domain);    // -1 would be the "uninformative" link round
         }
 
         compute_local_histogram(b_, srp, dim);
@@ -472,14 +529,15 @@ void print_block(void* b_, const diy::Master::ProxyWithLink& cp, void* verbose_)
   bool     verbose   = *static_cast<bool*>(verbose_);
   RCLink*  link      = static_cast<RCLink*>(cp.link());
 
-  fprintf(stdout, "%d: [%f,%f,%f] - [%f,%f,%f]\n",
+  fprintf(stdout, "%d: [%f,%f,%f] - [%f,%f,%f] (%d neighbors)\n",
                   cp.gid(),
                   b->box.min[0], b->box.min[1], b->box.min[2],
-                  b->box.max[0], b->box.max[1], b->box.max[2]);
+                  b->box.max[0], b->box.max[1], b->box.max[2],
+                  link->size());
 
   for (size_t i = 0; i < link->size(); ++i)
   {
-      fprintf(stdout, "  (%d,%d):", link->target(i).gid, link->target(i).proc);
+      fprintf(stdout, "  (%d,%d,%d):", link->target(i).gid, link->target(i).proc, link->direction(i));
       const Bounds& bounds = link->bounds(i);
       fprintf(stdout, " [%f,%f,%f] - [%f,%f,%f]\n",
               bounds.min[0], bounds.min[1], bounds.min[2],
@@ -512,10 +570,13 @@ operator!=(const diy::ContinuousBounds& x, const diy::ContinuousBounds& y)
     return !(x == y);
 }
 
-void verify_block(void* b_, const diy::Master::ProxyWithLink& cp, void*)
+void verify_block(void* b_, const diy::Master::ProxyWithLink& cp, void* wrap_domain)
 {
   Block*   b    = static_cast<Block*>(b_);
   RCLink*  link = static_cast<RCLink*>(cp.link());
+
+  bool          wrap    = static_cast<WrapDomain*>(wrap_domain)->wrap;
+  const Bounds& domain  = static_cast<WrapDomain*>(wrap_domain)->domain;
 
   for (size_t i = 0; i < b->points.size(); ++i)
     for (int j = 0; j < DIM; ++j)
@@ -542,7 +603,7 @@ void verify_block(void* b_, const diy::Master::ProxyWithLink& cp, void*)
   for (int i = 0; i < link->size(); ++i)
       for (int j = 0; j < DIM; ++j)
       {
-          if (!intersects(b->box, link->bounds(i), j))
+          if (!intersects(b->box, link->bounds(i), j, wrap, domain))
               fprintf(stderr, "Warning: we don't intersect a block in the link: %d -> %d\n", cp.gid(), link->target(i).gid);
       }
 
@@ -553,7 +614,7 @@ void verify_block(void* b_, const diy::Master::ProxyWithLink& cp, void*)
       int j = 0;
       for (; j < DIM; ++j)
       {
-          if (!intersects(b->box, b->block_bounds[i], j))
+          if (!intersects(b->box, b->block_bounds[i], j, wrap, domain))
               break;
       }
       if (j == DIM)     // intersect
@@ -570,6 +631,7 @@ void verify_block(void* b_, const diy::Master::ProxyWithLink& cp, void*)
   }
 }
 
+// for debugging: everybody sends their bounds to everybody else
 void exchange_bounds(void* b_, const diy::ReduceProxy& srp)
 {
   Block*   b   = static_cast<Block*>(b_);
@@ -611,6 +673,7 @@ int main(int argc, char* argv[])
       >> Option('t', "thread",  threads,        "number of threads")
       >> Option(     "prefix",  prefix,         "prefix for external storage")
   ;
+  bool wrap = ops >> Present('w', "wrap", "use periodic boundary");
 
   if (ops >> Present('h', "help", "show help"))
   {
@@ -650,6 +713,22 @@ int main(int argc, char* argv[])
     Block*          b   = new Block(domain, 2*hist);
     RCLink*         l   = new RCLink(DIM, domain, domain);
 
+    if (wrap)
+    {
+        // link to self in every direction
+        for (int j = 0; j < DIM; ++j)
+            for (int k = 0; k < 2; ++k)
+            {
+                diy::BlockID nbr = { gid, world.rank() };
+                l->add_neighbor(nbr);
+
+                diy::Direction dir = static_cast<diy::Direction>(1 << (2*j + k));
+                l->add_direction(dir);
+
+                l->add_bounds(domain);
+            }
+    }
+
     // this could be replaced by reading values from a file
     b->generate_points(num_points);
 
@@ -657,19 +736,21 @@ int main(int argc, char* argv[])
   }
   std::cout << "Blocks generated" << std::endl;
 
-  KDTreePartners partners(DIM, nblocks);
+  KDTreePartners partners(DIM, nblocks, wrap, domain);
   diy::reduce(master, assigner, partners, &partition);
 
   // update master.expected to match the links
   int expected = 0;
   for (int i = 0; i < master.size(); ++i)
-    expected += master.link(i)->size();
+    expected += master.link(i)->size_unique();
   master.set_expected(expected);
   std::cout << "Expected set to " << expected << std::endl;
 
+  // debugging
   master.foreach(&print_block, &verbose);
   diy::all_to_all(master, assigner, exchange_bounds);
-  master.foreach(&verify_block);
+  WrapDomain wrap_domain = { wrap, domain };
+  master.foreach(&verify_block, &wrap_domain);
   if (world.rank() == 0)
     std::cout << "Blocks verified" << std::endl;
 }
