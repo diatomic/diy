@@ -3,12 +3,16 @@
 
 #include <string>
 #include <algorithm>
+#include <stdexcept>
 
 #include <unistd.h>
+#include <sys/stat.h>
+#include <dirent.h>
 
 #include "../mpi.hpp"
 #include "../assigner.hpp"
 #include "../master.hpp"
+#include "../storage.hpp"
 
 // Read and write collections of blocks using MPI-IO
 namespace diy
@@ -224,7 +228,136 @@ namespace io
     MemoryBuffer extra;     // dummy
     read_blocks(infilename, comm, assigner, master, extra, load);
   }
-}
-}
+
+namespace split
+{
+  inline
+  void
+  write_blocks(const std::string&           outfilename,
+               const mpi::communicator&     comm,
+               Master&                      master,
+               const MemoryBuffer&          extra = MemoryBuffer(),     //< meaningful only on rank == 0
+               Master::SaveBlock            save = 0)
+  {
+    if (!save) save = master.saver();       // save is likely to be different from master.save()
+
+    bool proceed = false;
+    size_t size = 0;
+    if (comm.rank() == 0)
+    {
+        struct stat s;
+        if (stat(outfilename.c_str(), &s) == 0)
+        {
+            if (S_ISDIR(s.st_mode))
+                proceed = true;
+        } else if (mkdir(outfilename.c_str(), 0755) == 0)
+            proceed = true;
+        mpi::broadcast(comm, proceed, 0);
+        mpi::reduce(comm, (size_t) master.size(), size, 0, std::plus<size_t>());
+    } else
+    {
+        mpi::broadcast(comm, proceed, 0);
+        mpi::reduce(comm, (size_t) master.size(), 0, std::plus<size_t>());
+    }
+
+    if (!proceed)
+        throw std::runtime_error("Cannot access or create directory: " + outfilename);
+
+    for (int i = 0; i < master.size(); ++i)
+    {
+        const void* block = master.get(i);
+
+        char gid_str[50];
+        sprintf(gid_str, "%d", master.gid(i));
+        std::string filename = outfilename + '/' + gid_str;
+
+        ::diy::detail::FileBuffer bb(fopen(filename.c_str(), "w"));
+
+        LinkFactory::save(bb, master.link(i));
+        save(block, bb);
+
+        fclose(bb.file);
+    }
+
+    if (comm.rank() == 0)
+    {
+        // save the extra buffer
+        std::string filename = outfilename + "/extra";
+        ::diy::detail::FileBuffer bb(fopen(filename.c_str(), "w"));
+        ::diy::save(bb, size);
+        ::diy::save(bb, extra);
+        fclose(bb.file);
+    }
+  }
+
+  inline
+  void
+  read_blocks(const std::string&           infilename,
+              const mpi::communicator&     comm,
+              Assigner&                    assigner,
+              Master&                      master,
+              MemoryBuffer&                extra,
+              Master::LoadBlock            load = 0)
+  {
+    if (!load) load = master.loader();      // load is likely to be different from master.load()
+
+    // load the extra buffer and size
+    size_t          size;
+    std::string filename = infilename + "/extra";
+    ::diy::detail::FileBuffer bb(fopen(filename.c_str(), "r"));
+    ::diy::load(bb, size);
+    ::diy::load(bb, extra);
+    extra.reset();
+    fclose(bb.file);
+
+    // Get local gids from assigner
+    assigner.set_nblocks(size);
+    std::vector<int> gids;
+    assigner.local_gids(comm.rank(), gids);
+
+    // Read our blocks;
+    for (unsigned i = 0; i < gids.size(); ++i)
+    {
+        char gid_str[50];
+        sprintf(gid_str, "%d", gids[i]);
+        std::string filename = infilename + '/' + gid_str;
+
+        ::diy::detail::FileBuffer bb(fopen(filename.c_str(), "r"));
+        Link* l = LinkFactory::load(bb);
+        l->fix(assigner);
+        void* b = master.create();
+        load(b, bb);
+        master.add(gids[i], b, l);
+
+        fclose(bb.file);
+    }
+  }
+
+  // Functions without the extra buffer, for compatibility with the old code
+  inline
+  void
+  write_blocks(const std::string&           outfilename,
+               const mpi::communicator&     comm,
+               Master&                      master,
+               Master::SaveBlock            save)
+  {
+    MemoryBuffer extra;
+    write_blocks(outfilename, comm, master, extra, save);
+  }
+
+  inline
+  void
+  read_blocks(const std::string&           infilename,
+              const mpi::communicator&     comm,
+              Assigner&                    assigner,
+              Master&                      master,
+              Master::LoadBlock            load = 0)
+  {
+    MemoryBuffer extra;     // dummy
+    read_blocks(infilename, comm, assigner, master, extra, load);
+  }
+} // split
+} // io
+} // diy
 
 #endif
