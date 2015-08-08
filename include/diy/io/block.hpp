@@ -23,8 +23,6 @@ namespace io
   {
     typedef mpi::io::offset                 offset_t;
 
-    #pragma pack(push)
-    #pragma pack(4)     // without this pragma the int gets padded and we lose exact binary match across saves
     struct GidOffsetCount
     {
                     GidOffsetCount():                                   // need to initialize a vector of given size
@@ -39,9 +37,33 @@ namespace io
         offset_t    offset;
         offset_t    count;
     };
-    #pragma pack(pop)
   }
+}
 
+// Serialize GidOffsetCount explicitly, to avoid alignment and unitialized data issues
+// (to get identical output files given the same block input)
+template<>
+struct Serialization<io::detail::GidOffsetCount>
+{
+    typedef             io::detail::GidOffsetCount                  GidOffsetCount;
+
+    static void         save(BinaryBuffer& bb, const GidOffsetCount& x)
+    {
+      diy::save(bb, x.gid);
+      diy::save(bb, x.offset);
+      diy::save(bb, x.count);
+    }
+
+    static void         load(BinaryBuffer& bb, GidOffsetCount& x)
+    {
+      diy::load(bb, x.gid);
+      diy::load(bb, x.offset);
+      diy::load(bb, x.count);
+    }
+};
+
+namespace io
+{
   inline
   void
   write_blocks(const std::string&           outfilename,
