@@ -93,7 +93,9 @@ namespace diy
 
       // bounds
       const Bounds& core() const                        { return core_; }
+      Bounds&       core()                              { return core_; }
       const Bounds& bounds() const                      { return bounds_; }
+      Bounds&       bounds()                            { return bounds_; }
       const Bounds& bounds(int i) const                 { return nbr_bounds_[i]; }
       void          add_bounds(const Bounds& bounds)    { nbr_bounds_.push_back(bounds); }
 

@@ -10,6 +10,7 @@
 #include "partners/swap.hpp"
 
 #include "detail/algorithms/sort.hpp"
+#include "detail/algorithms/kdtree.hpp"
 
 namespace diy
 {
@@ -52,6 +53,42 @@ void sort(Master&                   master,
           int                       k   = 2)
 {
     sort(master, assigner, values, samples, num_samples, std::less<T>(), k);
+}
+
+template<class Block, class Point>
+void kdtree(Master&                         master,
+            const Assigner&                 assigner,
+            int                             dim,
+            const ContinuousBounds&         domain,
+            std::vector<Point>  Block::*    points,
+            size_t                          bins,
+            bool                            wrap = false)
+{
+    if (assigner.nblocks() & (assigner.nblocks() - 1))
+    {
+        fprintf(stderr, "KD-tree requires a number of blocks that's a power of 2, got %d\n", assigner.nblocks());
+        std::abort();
+    }
+
+    typedef     diy::RegularContinuousLink      RCLink;
+
+    for (int i = 0; i < master.size(); ++i)
+    {
+        RCLink* link   = static_cast<RCLink*>(master.link(i));
+        link->core()   = domain;
+        link->bounds() = domain;
+    }
+
+    detail::KDTreePartition<Block,Point>    kdtree_partition(dim, points, bins);
+
+    detail::KDTreePartners                  partners(dim, assigner.nblocks(), wrap, domain);
+    reduce(master, assigner, partners, kdtree_partition);
+
+    // update master.expected to match the links
+    int expected = 0;
+    for (int i = 0; i < master.size(); ++i)
+      expected += master.link(i)->size_unique();
+    master.set_expected(expected);
 }
 
 }
