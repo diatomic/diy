@@ -8,13 +8,18 @@ namespace diy
   template<class Bounds, class Point, class OutIter>
   void near(const RegularLink<Bounds>& link, const Point& p, float r, OutIter out,
             const Bounds& domain);
+
   template<class Bounds, class Point, class OutIter>
   void in(const RegularLink<Bounds>& link, const Point& p, OutIter out, const Bounds& domain);
+
+  template<class Point>
+  float distance(int dim, const ContinuousBounds& bounds, const Point& p);
+
+  template<class Bounds>
+  void wrap_bounds(Bounds& bounds, int wrap_dir, const Bounds& domain, int dim);
+
   namespace detail
   {
-    template<class Bounds>
-    void wrap_bounds(Bounds& bounds, int wrap_dir, const Bounds& domain, int dim);
-
     template<class Point>
     void shift(float new_pt[DIY_MAX_DIM], const Point& p, float r, Direction dir, int dim);
   }
@@ -41,7 +46,7 @@ near(const RegularLink<Bounds>& link,  //!< neighbors
   {
     // wrap neighbor bounds, if necessary, otherwise bounds will be unchanged
     neigh_bounds = link.bounds(n);
-    detail::wrap_bounds(neigh_bounds, link.wrap() & link.direction(n), domain, link.dimension());
+    wrap_bounds(neigh_bounds, link.wrap() & link.direction(n), domain, link.dimension());
 
     detail::shift(new_pt, p, r, link.direction(n), link.dimension());
 
@@ -64,6 +69,29 @@ near(const RegularLink<Bounds>& link,  //!< neighbors
   } // for all neighbors
 }
 
+//! Find the distance between point `p` and box `bounds`.
+template<class Point>
+float
+diy::
+distance(int dim, const ContinuousBounds& bounds, const Point& p)
+{
+    float res = 0;
+    for (int i = 0; i < dim; ++i)
+    {
+        // avoids all the annoying case logic by finding
+        // diff = max(bounds.min[i] - p[i], 0, p[i] - bounds.max[i])
+        float diff = 0, d;
+
+        d = bounds.min[i] - p[i];
+        if (d > diff) diff = d;
+        d = p[i] - bounds.max[i];
+        if (d > diff) diff = d;
+
+        res += diff*diff;
+    }
+    return sqrt(res);
+}
+
 //! Finds the neighbor(s) containing the target point. Assumptions:
 //! 1. Only for a regular decomposition
 template<class Bounds, class Point, class OutIter>
@@ -82,7 +110,7 @@ in(const RegularLink<Bounds>& link,  //!< neighbors
   {
     // wrap neighbor bounds, if necessary, otherwise bounds will be unchanged
     neigh_bounds = link.bounds(n);
-    detail::wrap_bounds(neigh_bounds, link.wrap() & link.direction(n), domain, link.dimension());
+    wrap_bounds(neigh_bounds, link.wrap() & link.direction(n), domain, link.dimension());
 
     // check if p is in neighbor
     for (d = 0; d < link.dimension(); d++)
@@ -103,7 +131,7 @@ in(const RegularLink<Bounds>& link,  //!< neighbors
 // overall domain bounds and dimensionality are also needed
 template<class Bounds>
 void
-diy::detail::
+diy::
 wrap_bounds(Bounds& bounds, int wrap_dir, const Bounds& domain, int dim)
 {
   // wrapping toward the left transforms block bounds to the left, and vice versa
