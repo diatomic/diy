@@ -71,11 +71,11 @@ void print_block(void* b_, const diy::Master::ProxyWithLink& cp, void* verbose_)
   bool     verbose   = *static_cast<bool*>(verbose_);
   RCLink*  link      = static_cast<RCLink*>(cp.link());
 
-  fprintf(stdout, "%d: [%f,%f,%f] - [%f,%f,%f] (%d neighbors)\n",
+  fprintf(stdout, "%d: [%f,%f,%f] - [%f,%f,%f] (%d neighbors): %lu points\n",
                   cp.gid(),
                   link->bounds().min[0], link->bounds().min[1], link->bounds().min[2],
                   link->bounds().max[0], link->bounds().max[1], link->bounds().max[2],
-                  link->size());
+                  link->size(), b->points.size());
 
   for (size_t i = 0; i < link->size(); ++i)
   {

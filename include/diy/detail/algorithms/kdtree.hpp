@@ -32,7 +32,7 @@ struct KDTreePartition
     void        split_to_neighbors(Block* b, const diy::ReduceProxy& srp, int dim) const;
 
     void        compute_local_histogram(Block* b, const diy::ReduceProxy& srp, int dim) const;
-    void        add_histogram(Block* b, const diy::ReduceProxy& srp) const;
+    void        add_histogram(Block* b, const diy::ReduceProxy& srp, Histogram& histogram) const;
     void        receive_histogram(Block* b, const diy::ReduceProxy& srp,       Histogram& histogram) const;
     void        forward_histogram(Block* b, const diy::ReduceProxy& srp, const Histogram& histogram) const;
 
@@ -195,11 +195,15 @@ operator()(void* b_, const diy::ReduceProxy& srp, const KDTreePartners& partners
 
         compute_local_histogram(b, srp, dim);
     } else if (partners.sub_round(srp.round()) < partners.histogram.rounds()/2)
-        add_histogram(b, srp);
+    {
+        Histogram   histogram(bins_);
+        add_histogram(b, srp, histogram);
+        srp.enqueue(srp.out_link().target(0), histogram);
+    }
     else
     {
-        Histogram   histogram;
-        receive_histogram(b, srp, histogram);
+        Histogram   histogram(bins_);
+        add_histogram(b, srp, histogram);
         forward_histogram(b, srp, histogram);
     }
 }
@@ -374,10 +378,8 @@ compute_local_histogram(Block* b, const diy::ReduceProxy& srp, int dim) const
 template<class Block, class Point>
 void
 diy::detail::KDTreePartition<Block,Point>::
-add_histogram(Block* b, const diy::ReduceProxy& srp) const
+add_histogram(Block* b, const diy::ReduceProxy& srp, Histogram& histogram) const
 {
-    Histogram   histogram(bins_);
-
     // dequeue and add up the histograms
     for (unsigned i = 0; i < srp.in_link().size(); ++i)
     {
@@ -388,8 +390,6 @@ add_histogram(Block* b, const diy::ReduceProxy& srp) const
         for (size_t i = 0; i < hist.size(); ++i)
             histogram[i] += hist[i];
     }
-
-    srp.enqueue(srp.out_link().target(0), histogram);
 }
 
 template<class Block, class Point>
@@ -419,29 +419,31 @@ enqueue_exchange(Block* b, const diy::ReduceProxy& srp, int dim, const Histogram
 
     int k = srp.out_link().size();
 
+    if (k == 0)        // final round; nothing needs to be sent; this is actually redundant
+        return;
+
     // pick split points
     size_t total = 0;
     for (size_t i = 0; i < histogram.size(); ++i)
         total += histogram[i];
+    //fprintf(stderr, "Histogram total: %lu\n", total);
 
     size_t cur   = 0;
+    size_t last, next;
     float  width = (link->core().max[dim] - link->core().min[dim])/bins_;
     float  split;
     for (size_t i = 0; i < histogram.size(); ++i)
     {
         if (cur + histogram[i] > total/2)
         {
-            split = link->core().min[dim] + width*i + width/2;   // mid-point of the bin
+            split = link->core().min[dim] + width*i;
             break;
         }
-
         cur += histogram[i];
     }
+    //std::cout << "Found split: " << split << " (dim=" << dim << ") in " << link->core().min[dim] << " - " << link->core().max[dim] << std::endl;
 
     // subset and enqueue
-    if (srp.out_link().size() == 0)        // final round; nothing needs to be sent
-        return;
-
     std::vector< std::vector<Point> > out_points(srp.out_link().size());
     for (size_t i = 0; i < (b->*points_).size(); ++i)
     {
