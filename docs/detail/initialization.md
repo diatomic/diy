@@ -1,9 +1,5 @@
 \defgroup Initialization
 
-Master initialization snippet:
-\snippet examples/simple/simple.cpp Master initialization
-
-
 The following is an example of the steps needed to initialize diy:
 
 ~~~~{.cpp}
@@ -75,10 +71,10 @@ int main(int argc, char** argv)
     diy::mpi::communicator    world(comm);
     diy::FileStorage          storage("./DIY.XXXXXX");
     diy::Master               master(world,
+                                     num_threads,
+                                     mem_blocks,
                                      &Block::create,
                                      &Block::destroy,
-                                     mem_blocks,
-                                     num_threads,
                                      &storage,
                                      &Block::save,
                                      &Block::load);
@@ -144,10 +140,10 @@ diy::mpi::communicator    world(comm);                         // comm is the MP
 diy::FileStorage          storage("./DIY.XXXXXX");             // diy's out of core files are stored with this naming convention
 diy::Communicator         diy_comm(world);                     // diy's communicator object for all diy algorithms
 diy::Master               master(diy_comm,                     // the diy master object
+                                 num_threads,                  // number of threads diy can use (-1 = all)
+                                 mem_blocks,                   // number of blocks allowed in memory at a time (-1 = all)
                                  &Block::create,               // block create function
                                  &Block::destroy,              // block destroy function
-                                 mem_blocks,                   // number of blocks allowed in memory at a time (-1 = all)
-                                 num_threads,                  // number of threads diy can use (-1 = all)
                                  &storage,                     // the storage object above
                                  &Block::save,                 // block serialization, save out of core
                                  &Block::load);                // block serialization, load into core
@@ -157,4 +153,9 @@ diy::RoundRobinAssigner   assigner(world.size(), tot_blocks);  // assign blocks 
 AddBlock                  create(master, arg1, arg2, etc);     // add blocks to the master
 diy::decompose(dim, world.rank(), domain, assigner, create);   // decompose the domain in dim dimensions
 
+~~~~
+
+Note: When all blocks will remain in memory, there is a shorter form of the `master` constructor that can be used. In this case there is no need to specify most of the arguments because they relate to block loading/unloading.
+~~~~{.cpp}
+diy::Master               master(diy_comm, num_threads);
 ~~~~

@@ -11,6 +11,12 @@ class Master;
 //! Allreduce (reduction with results broadcasted to all blocks) is
 //! implemented as two merge reductions, with incoming and outgoing items swapped in second one.
 //! Ie, follows merge reduction up and down the merge tree
+
+/**
+ * \ingroup Communication
+ * \brief Partners for all-reduce
+ *
+ */
 struct RegularAllReducePartners: public RegularMergePartners
 {
   typedef       RegularMergePartners                            Parent; //!< base class merge reduction
@@ -18,14 +24,16 @@ struct RegularAllReducePartners: public RegularMergePartners
                 //! contiguous parameter indicates whether to match partners contiguously or in a round-robin fashion;
                 //! contiguous is useful when data needs to be united;
                 //! round-robin is useful for vector-"halving"
-                RegularAllReducePartners(int dim, //!< dimensionality of regular block grid
-                                         int nblocks, //!< total number of blocks
-                                         int k, //!< target k value
-                                         bool contiguous = true):
+                RegularAllReducePartners(int dim,                 //!< dimensionality of regular block grid
+                                         int nblocks,             //!< total number of blocks
+                                         int k,                   //!< target k value
+                                         bool contiguous = true   //!< distance halving (true) or doubling (false)
+                    ):
                   Parent(dim, nblocks, k, contiguous)         {}
                 RegularAllReducePartners(const DivisionVector&   divs, //!< explicit division vector
                                          const KVSVector&        kvs, //!< explicit k vector
-                                         bool  contiguous = true):
+                                         bool  contiguous = true //!< distance halving (true) or doubling (false)
+                    ):
                   Parent(divs, kvs, contiguous)               {}
 
   //! returns total number of rounds

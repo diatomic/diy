@@ -8,6 +8,11 @@ namespace diy
 
 class Master;
 
+/**
+ * \ingroup Communication
+ * \brief Partners for merge-reduce
+ *
+ */
 struct RegularMergePartners: public RegularPartners
 {
   typedef       RegularPartners                                 Parent;
@@ -15,11 +20,16 @@ struct RegularMergePartners: public RegularPartners
                 // contiguous parameter indicates whether to match partners contiguously or in a round-robin fashion;
                 // contiguous is useful when data needs to be united;
                 // round-robin is useful for vector-"halving"
-                RegularMergePartners(int dim, int nblocks, int k, bool contiguous = true):
+                RegularMergePartners(int dim,                 //!< dimensionality of regular block grid
+                                     int nblocks,             //!< total number of blocks
+                                     int k,                   //!< target k value
+                                     bool contiguous = true   //!< distance halving (true) or doubling (false)
+                    ):
                     Parent(dim, nblocks, k, contiguous)         {}
-                RegularMergePartners(const DivisionVector&   divs,
-                                     const KVSVector&        kvs,
-                                     bool  contiguous = true):
+                RegularMergePartners(const DivisionVector&   divs, //!< explicit division vector
+                                     const KVSVector&        kvs,  //!< explicit k vector
+                                     bool  contiguous = true       //!< distance halving (true) or doubling (false)
+                    ):
                     Parent(divs, kvs, contiguous)               {}
 
   inline bool   active(int round, int gid, const Master&) const;

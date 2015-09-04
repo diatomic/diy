@@ -119,19 +119,24 @@ namespace diy
 
 
     public:
-      // Helper functions specify how to:
-      //   * create an empty block,
-      //   * destroy a block (a function that's expected to upcast and delete),
-      //   * serialize a block
-                    Master(mpi::communicator    comm,
-                           int                  threads  = 1,
-                           int                  limit    = -1,      // blocks to store in memory
-                           CreateBlock          create   = 0,
-                           DestroyBlock         destroy  = 0,       // master takes ownership of blocks only if destroy != 0
-                           ExternalStorage*     storage  = 0,
-                           SaveBlock            save     = 0,
-                           LoadBlock            load     = 0,
-                           QueuePolicy*         q_policy = new QueueSizePolicy(4096)):
+     /**
+      * \ingroup Initialization
+      * \brief The main DIY object
+      *
+      * Helper functions specify how to:
+           * create an empty block,
+           * destroy a block (a function that's expected to upcast and delete),
+           * serialize a block
+      */
+                    Master(mpi::communicator    comm,          //!< communicator
+                           int                  threads  = 1,  //!< number of threads DIY can use
+                           int                  limit    = -1, //!< number of blocks to store in memory
+                           CreateBlock          create   = 0,  //!< block create function; master manages creation if create != 0
+                           DestroyBlock         destroy  = 0,  //!< block destroy function; master manages destruction if destroy != 0
+                           ExternalStorage*     storage  = 0,  //!< block storage path
+                           SaveBlock            save     = 0,  //!< block save function; master manages saving if save != 0
+                           LoadBlock            load     = 0,  //!< block load function; master manages loading if load != 0
+                           QueuePolicy*         q_policy = new QueueSizePolicy(4096)): //!< policy for managing message queues specifies maximum size of message queues to keep in memory
                       blocks_(create, destroy, storage, save, load),
                       queue_policy_(q_policy),
                       limit_(limit),

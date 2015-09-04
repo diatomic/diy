@@ -1,6 +1,6 @@
 \defgroup IO
 
-I/O (Input/Output): DIY writes and reads blocks to and from storage in either collective or independent mode. The collective mode, which is the default, creates one file. Independent mode creates one file per process. These features should be confused with the temporary block I/O that DIY does in the course of shuffling blocks in and out of core while executing the block `foreach` functions. This happens behind the scenes and is not the subject of the I/O module.
+Block I/O: DIY writes and reads blocks to and from storage in either collective or independent mode. The collective mode, which is the default, creates one file. Independent mode creates one file per process. These features should be confused with the temporary block I/O that DIY does in the course of shuffling blocks in and out of core while executing the block `foreach` functions. This happens behind the scenes and is not the subject of the I/O module.
 
 Collective I/O
 --------------

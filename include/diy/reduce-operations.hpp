@@ -8,6 +8,11 @@
 namespace diy
 {
 
+/**
+ * \ingroup Communication
+ * \brief all to all reduction
+ *
+ */
 template<class Op>
 void
 all_to_all(Master&              master,     //!< block owner
