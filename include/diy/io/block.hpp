@@ -73,7 +73,7 @@ namespace io
   write_blocks(const std::string&           outfilename,           //!< output file name
                const mpi::communicator&     comm,                  //!< communicator
                Master&                      master,                //!< master object
-               const MemoryBuffer&          extra = MemoryBuffer(),//!< meaningful only on rank == 0
+               const MemoryBuffer&          extra = MemoryBuffer(),//!< user-defined metadata for file header; meaningful only on rank == 0
                Master::SaveBlock            save = 0)              //!< block save function in case different than or undefined in the master
   {
     if (!save) save = master.saver();       // save is likely to be different from master.save()
@@ -180,7 +180,7 @@ namespace io
               const mpi::communicator&     comm,           //!< communicator
               Assigner&                    assigner,       //!< assigner object
               Master&                      master,         //!< master object
-              MemoryBuffer&                extra,          //!< ?
+              MemoryBuffer&                extra,          //!< user-defined metadata in file header
               Master::LoadBlock            load = 0)       //!< load block function in case different than or unefined in the master
   {
     if (!load) load = master.loader();      // load is likely to be different from master.load()
@@ -270,7 +270,7 @@ namespace split
   write_blocks(const std::string&           outfilename,           //!< output file name
                const mpi::communicator&     comm,                  //!< communicator
                Master&                      master,                //!< master object
-               const MemoryBuffer&          extra = MemoryBuffer(),//!< meaningful only on rank == 0
+               const MemoryBuffer&          extra = MemoryBuffer(),//!< user-defined metadata for file header; meaningful only on rank == 0
                Master::SaveBlock            save = 0)              //!< block save function in case different than or undefined in master
   {
     if (!save) save = master.saver();       // save is likely to be different from master.save()
@@ -334,7 +334,7 @@ namespace split
               const mpi::communicator&     comm,        //!< communicator
               Assigner&                    assigner,    //!< assigner object
               Master&                      master,      //!< master object
-              MemoryBuffer&                extra,       //!< ?
+              MemoryBuffer&                extra,       //!< user-defined metadata in file header
               Master::LoadBlock            load = 0)    //!< block load function in case different than or undefined in master
   {
     if (!load) load = master.loader();      // load is likely to be different from master.load()

@@ -133,7 +133,7 @@ namespace diy
                            int                  limit    = -1, //!< number of blocks to store in memory
                            CreateBlock          create   = 0,  //!< block create function; master manages creation if create != 0
                            DestroyBlock         destroy  = 0,  //!< block destroy function; master manages destruction if destroy != 0
-                           ExternalStorage*     storage  = 0,  //!< block storage path
+                           ExternalStorage*     storage  = 0,  //!< storage object (path, method, etc.) for storing temporary blocks being shuffled in/out of core
                            SaveBlock            save     = 0,  //!< block save function; master manages saving if save != 0
                            LoadBlock            load     = 0,  //!< block load function; master manages loading if load != 0
                            QueuePolicy*         q_policy = new QueueSizePolicy(4096)): //!< policy for managing message queues specifies maximum size of message queues to keep in memory

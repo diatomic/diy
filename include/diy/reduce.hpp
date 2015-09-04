@@ -102,7 +102,6 @@ namespace detail
  * \brief Implementation of the reduce communication pattern (includes
  *        swap-reduce, merge-reduce, and any other global communication).
  *
- * \TODO Detailed explanation.
  */
 template<class Reduce, class Partners, class Skip>
 void reduce(Master&                    master,

@@ -14,8 +14,10 @@
 
 namespace diy
 {
-
-    //! sample sort `values` of each block, store the boundaries between blocks in `samples`
+    /**
+     * \ingroup Algorithms
+     * \brief sample sort `values` of each block, store the boundaries between blocks in `samples`
+     */
     template<class Block, class T, class Cmp>
     void sort(Master&                   master,               //!< master object
               const Assigner&           assigner,             //!< assigner object
@@ -45,9 +47,12 @@ namespace diy
     }
 
 
-    //! sample sort `values` of each block, store the boundaries between blocks in `samples`
-    //! shorter version of above sort algorithm with the default less-than comparator used for T
-    //! and all_to_all exchange included
+    /**
+     * \ingroup Algorithms
+     * \brief sample sort `values` of each block, store the boundaries between blocks in `samples`
+     * shorter version of above sort algorithm with the default less-than comparator used for T
+     * and all_to_all exchange included
+     */
     template<class Block, class T>
     void sort(Master&                   master,      //!< master object
               const Assigner&           assigner,    //!< assigner object
@@ -59,7 +64,10 @@ namespace diy
         sort(master, assigner, values, samples, num_samples, std::less<T>(), k);
     }
 
-    //! build a kd-tree and sort a set of points into it
+    /**
+     * \ingroup Algorithms
+     * \brief build a kd-tree and sort a set of points into it
+     */
     template<class Block, class Point>
     void kdtree(Master&                         master,      //!< master object
                 const Assigner&                 assigner,    //!< assigner object

@@ -2,7 +2,7 @@
 
 The best way to learn DIY is by example, and the examples directory contains numerous complete programs that demonstrate most of the concepts in DIY. Example names preceded by the heading (*commented*) have ample comments embedded in the source code, meaning they are good starting points. The remaining, uncommented, examples are easier to understand once the commented ones are clear.
 
-- [simple](https://github.com/diatomic/diy2/tree/master/examples/simple):
+- [Simple](https://github.com/diatomic/diy2/tree/master/examples/simple):
 includes common operations such as initializing DIY, adding links to form block
 neighborhoods, creating callback functions for each block, communicating
 between block neighbors, performing collectives over all blocks, and writing
@@ -31,7 +31,7 @@ create, destroy, and serialize blocks in (*commented*) [block.h](\ref simple/blo
   The blocks from [simple.cpp](\ref simple/simple.cpp) are read back into
   memory from the file, and their values are printed.
 
-- [decomposition](https://github.com/diatomic/diy2/tree/master/examples/decomposition):
+- [Decomposition](https://github.com/diatomic/diy2/tree/master/examples/decomposition):
 demonstrates how to decompose a regular grid into blocks and assign blocks to
 processes.
 
@@ -40,7 +40,7 @@ processes.
   (`share_face`), overlapped (`ghosts`) and boundaries can be periodic
   (`wrap`).
 
-- [serialization](https://github.com/diatomic/diy2/tree/master/examples/serialization):
+- [Serialization](https://github.com/diatomic/diy2/tree/master/examples/serialization):
 blocks that are loaded and saved in and out of core are serialized by DIY. This
 example shows how to write the `load` and `save` functions for two data
 structures. Both require just a one-line definition because DIY can serialize
@@ -50,7 +50,7 @@ such structures automatically.
   a 3-d `Point` and an n-d `PointVec` are serialized automatically, and the
   main program tests loading and saving both structures.
 
-- [mpi](https://github.com/diatomic/diy2/tree/master/examples/mpi):
+- [MPI](https://github.com/diatomic/diy2/tree/master/examples/mpi):
 shows DIY's [convenience wrapper for MPI](\ref MPI). It exists only to make the
 code simpler; the user is free to use it or the original MPI routines
 interchangeably.
@@ -58,7 +58,7 @@ interchangeably.
   - [test-mpi.cpp](\ref mpi/test-mpi.cpp): this example exercises send,
   receive, iprobe, broadcast, reduce, scan, and all_gather
 
-- [io](https://github.com/diatomic/diy2/tree/master/examples/io): illustrates
+- [I/O](https://github.com/diatomic/diy2/tree/master/examples/io): illustrates
 BOV (brick of values) and NumPy I/O, which is built on top of MPI-IO and MPI
 sub-array types.
 
@@ -70,7 +70,7 @@ sub-array types.
   writers. The writer would typically be called from the `foreach` callback for
   each block.
 
-- [reduce](https://github.com/diatomic/diy2/tree/master/examples/reduce):
+- [Reduction](https://github.com/diatomic/diy2/tree/master/examples/reduce):
 DIY supports general reductions to implement more complex global operations
 than the collective one-liners. These reductions are general-purpose (any
 global communication pattern can be implemented); they operate over blocks,
@@ -109,26 +109,28 @@ can vary, but if it's fixed, the number of rounds is log_k(nblocks).
   and how to dequeue data at the end. `diy::all_to_all()` takes care of all the
   intermediate rounds, routing the data appropriately.
 
-  - [kd-tree.cpp](\ref reduce/kd-tree.cpp): Like swap-reduce, this
-  example begins with an unsorted set of points that do not lie in the bounds
-  of any blocks, but the points are sorted into kd-tree of blocks with
-  approximately equal numbers of points in each block.
-
   - [sort.cpp](\ref reduce/sort.cpp): shows how to use reduction to sort
   a 1-d vector of integers. The algorithm is a histogram-based sort that
   combines both merge and swap reductions. It merges histograms of local data
   distributions, computes quantiles of the histograms, and then swaps data
   values among blocks based on the quantiles.
 
-  - [sample-sort.cpp](\ref reduce/sample-sort.cpp): an alternative to
-  [sort.cpp](\ref reduce/sort.cpp), this example calls the parallel
+- [Algorithms](https://github.com/diatomic/diy2/tree/master/examples/reduce):
+Examples of the following algorithms are included.
+
+  - [sample-sort.cpp](\ref reduce/sample-sort.cpp): This example calls the parallel
   sample sort algorithm of [Blelloch 1998] that's included in DIY.
-  This is not an example of a reduction, but `diy::sort` is easier to use than
-  the manual sort implementation above. We are in the process of comparing the
-  performance of the two versions. One may note that
+  The built-in  `diy::sort` used in this example is easier to use than
+  the manual sort implemented by the example above, and we are in the process of comparing the
+  performance of the two versions. Note that
   [sort.cpp](\ref reduce/sort.cpp) can only sort arithmetic types (to be able
   to compute the histograms), whereas `diy::sort` supports any type, which has
-  a comparison operation.
+  a user-supplied comparison operation.
+
+  - [kd-tree.cpp](\ref reduce/kd-tree.cpp): Like the swap-reduce example above, this
+  example begins with an unsorted set of points that do not lie in the bounds
+  of any blocks, but the points are sorted into kd-tree of blocks with
+  approximately equal numbers of points in each block.
 
 Various other open-source projects have been DIY'ed, and these are also good, albeit more involved, places to learn DIY. Here are a few suggestions:
 

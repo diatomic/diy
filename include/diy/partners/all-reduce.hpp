@@ -27,12 +27,12 @@ struct RegularAllReducePartners: public RegularMergePartners
                 RegularAllReducePartners(int dim,                 //!< dimensionality of regular block grid
                                          int nblocks,             //!< total number of blocks
                                          int k,                   //!< target k value
-                                         bool contiguous = true   //!< distance halving (true) or doubling (false)
+                                         bool contiguous = true   //!< distance doubling (true) or halving (false)
                     ):
                   Parent(dim, nblocks, k, contiguous)         {}
-                RegularAllReducePartners(const DivisionVector&   divs, //!< explicit division vector
+                RegularAllReducePartners(const DivisionVector&   divs,//!< explicit division vector
                                          const KVSVector&        kvs, //!< explicit k vector
-                                         bool  contiguous = true //!< distance halving (true) or doubling (false)
+                                         bool  contiguous = true      //!< distance doubling (true) or halving (false)
                     ):
                   Parent(divs, kvs, contiguous)               {}
 
