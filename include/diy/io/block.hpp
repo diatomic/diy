@@ -64,13 +64,17 @@ struct Serialization<io::detail::GidOffsetCount>
 
 namespace io
 {
+/**
+ * \ingroup IO
+ * \brief Write blocks to storage collectively in one shared file
+ */
   inline
   void
-  write_blocks(const std::string&           outfilename,
-               const mpi::communicator&     comm,
-               Master&                      master,
-               const MemoryBuffer&          extra = MemoryBuffer(),     //< meaningful only on rank == 0
-               Master::SaveBlock            save = 0)
+  write_blocks(const std::string&           outfilename,           //!< output file name
+               const mpi::communicator&     comm,                  //!< communicator
+               Master&                      master,                //!< master object
+               const MemoryBuffer&          extra = MemoryBuffer(),//!< meaningful only on rank == 0
+               Master::SaveBlock            save = 0)              //!< block save function in case different than or undefined in the master
   {
     if (!save) save = master.saver();       // save is likely to be different from master.save()
 
@@ -166,14 +170,18 @@ namespace io
     }
   }
 
+/**
+ * \ingroup IO
+ * \brief Read blocks from storage collectively from one shared file
+ */
   inline
   void
-  read_blocks(const std::string&           infilename,
-              const mpi::communicator&     comm,
-              Assigner&                    assigner,
-              Master&                      master,
-              MemoryBuffer&                extra,
-              Master::LoadBlock            load = 0)
+  read_blocks(const std::string&           infilename,     //!< input file name
+              const mpi::communicator&     comm,           //!< communicator
+              Assigner&                    assigner,       //!< assigner object
+              Master&                      master,         //!< master object
+              MemoryBuffer&                extra,          //!< ?
+              Master::LoadBlock            load = 0)       //!< load block function in case different than or unefined in the master
   {
     if (!load) load = master.loader();      // load is likely to be different from master.load()
 
@@ -253,13 +261,17 @@ namespace io
 
 namespace split
 {
+/**
+ * \ingroup IO
+ * \brief Write blocks to storage independently in one file per process
+ */
   inline
   void
-  write_blocks(const std::string&           outfilename,
-               const mpi::communicator&     comm,
-               Master&                      master,
-               const MemoryBuffer&          extra = MemoryBuffer(),     //< meaningful only on rank == 0
-               Master::SaveBlock            save = 0)
+  write_blocks(const std::string&           outfilename,           //!< output file name
+               const mpi::communicator&     comm,                  //!< communicator
+               Master&                      master,                //!< master object
+               const MemoryBuffer&          extra = MemoryBuffer(),//!< meaningful only on rank == 0
+               Master::SaveBlock            save = 0)              //!< block save function in case different than or undefined in master
   {
     if (!save) save = master.saver();       // save is likely to be different from master.save()
 
@@ -312,14 +324,18 @@ namespace split
     }
   }
 
+/**
+ * \ingroup IO
+ * \brief Read blocks from storage independently from one file per process
+ */
   inline
   void
-  read_blocks(const std::string&           infilename,
-              const mpi::communicator&     comm,
-              Assigner&                    assigner,
-              Master&                      master,
-              MemoryBuffer&                extra,
-              Master::LoadBlock            load = 0)
+  read_blocks(const std::string&           infilename,  //!< input file name
+              const mpi::communicator&     comm,        //!< communicator
+              Assigner&                    assigner,    //!< assigner object
+              Master&                      master,      //!< master object
+              MemoryBuffer&                extra,       //!< ?
+              Master::LoadBlock            load = 0)    //!< block load function in case different than or undefined in master
   {
     if (!load) load = master.loader();      // load is likely to be different from master.load()
 
