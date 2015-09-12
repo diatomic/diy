@@ -175,6 +175,34 @@ namespace detail
     RegularDecomposer<Bounds>(dim, domain, assigner, share_face, wrap, ghosts, divs).decompose(rank, create);
   }
 
+  /**
+   * \ingroup Decomposition
+   * \brief A "null" decompositon that simply creates the blocks and adds them to the master
+   *
+   * @param rank       local rank
+   * @param assigner   decides how processors are assigned to blocks (maps a gid to a rank)
+   *                   also communicates the total number of blocks
+   * @param create     the creator functor
+   *
+   * `create(...)` is called with each block assigned to the local domain. See [decomposition example](#decomposition-example).
+   */
+  template<class Creator>
+  void decompose(int                rank,
+                 const Assigner&    assigner,
+                 const Creator&     create)
+  {
+      // fake a dimension and a domain so that a regular decomposer can be used
+      int dim = 3;
+      ContinuousBounds domain;
+      for (int i = 0; i < dim; ++i)
+      {
+          domain.min[i] = 0.0;
+          domain.max[i] = 1.0;
+      }
+      // RegularDecomposer<ContinuousBounds>(dim, domain, assigner, share_face, wrap, ghosts, divs).decompose(rank, create);
+      RegularDecomposer<ContinuousBounds>(dim, domain, assigner).decompose(rank, create);
+  }
+
   //! Decomposition example: \example decomposition/test-decomposition.cpp
 }
 
