@@ -32,6 +32,7 @@ namespace detail
     {
         int width = (max - min + 1)/n;
         int res = (x - min)/width;
+        if (res >= n) res = n - 1;
 
         if (shared && x == from(res, n, min, max, shared))
             --res;
