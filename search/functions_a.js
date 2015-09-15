@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['out_5flink',['out_link',['../structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9',1,'diy::ReduceProxy']]]
+  ['master',['Master',['../group___initialization.html#ga41e082628686ec3e798171b20ccced63',1,'diy::Master']]]
 ];

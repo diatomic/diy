@@ -1,7 +1,11 @@
 var searchData=
 [
-  ['nblocks',['nblocks',['../classdiy_1_1_assigner.html#a61ea8499c8c28934f94e18e635e06436',1,'diy::Assigner::nblocks()'],['../structdiy_1_1_reduce_proxy.html#ab340a062e8e96bfb7428186e6f3046a8',1,'diy::ReduceProxy::nblocks()']]],
-  ['near',['near',['../namespacediy.html#a2f1f55e20353c603b621bb3e61cee3e5',1,'diy']]],
-  ['neverskip',['NeverSkip',['../structdiy_1_1_master_1_1_never_skip.html',1,'diy::Master']]],
-  ['numpy',['NumPy',['../classdiy_1_1io_1_1_num_py.html',1,'diy::io']]]
+  ['master',['Master',['../classdiy_1_1_master.html',1,'diy']]],
+  ['master',['Master',['../group___initialization.html#ga41e082628686ec3e798171b20ccced63',1,'diy::Master']]],
+  ['maximum',['maximum',['../structdiy_1_1mpi_1_1maximum.html',1,'diy::mpi']]],
+  ['mpi',['mpi',['../md_docs_detail_mpi.html',1,'']]],
+  ['memorybuffer',['MemoryBuffer',['../structdiy_1_1_memory_buffer.html',1,'diy']]],
+  ['minimum',['minimum',['../structdiy_1_1mpi_1_1minimum.html',1,'diy::mpi']]],
+  ['mpi',['MPI',['../group___m_p_i.html',1,'']]],
+  ['mutex',['mutex',['../structdiy_1_1mutex.html',1,'diy']]]
 ];
