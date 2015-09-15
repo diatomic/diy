@@ -294,8 +294,8 @@ namespace split
         mpi::reduce(comm, (size_t) master.size(), 0, std::plus<size_t>());
     }
 
-    if (!proceed)
-        throw std::runtime_error("Cannot access or create directory: " + outfilename);
+    // if (!proceed)
+    //     throw std::runtime_error("Cannot access or create directory: " + outfilename);
 
     for (int i = 0; i < master.size(); ++i)
     {

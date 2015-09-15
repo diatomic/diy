@@ -199,7 +199,6 @@ namespace detail
           domain.min[i] = 0.0;
           domain.max[i] = 1.0;
       }
-      // RegularDecomposer<ContinuousBounds>(dim, domain, assigner, share_face, wrap, ghosts, divs).decompose(rank, create);
       RegularDecomposer<ContinuousBounds>(dim, domain, assigner).decompose(rank, create);
   }
 
