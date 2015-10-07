@@ -8,6 +8,7 @@
 
 #include "link.hpp"
 #include "assigner.hpp"
+#include "master.hpp"
 
 namespace diy
 {
@@ -76,7 +77,7 @@ namespace detail
     /// @param assigner:  decides how processors are assigned to blocks (maps a gid to a rank)
     ///                   also communicates the total number of blocks
     /// @param wrap:      indicates dimensions on which to wrap the boundary
-    /// @param ghosts:    indicates how many ghosts to use in each dimension 
+    /// @param ghosts:    indicates how many ghosts to use in each dimension
     /// @param divisions: indicates how many cuts to make along each dimension
     ///                   (0 means "no constraint," i.e., leave it up to the algorithm)
                     RegularDecomposer(int               dim_,
@@ -155,7 +156,7 @@ namespace detail
    *                   also communicates the total number of blocks
    * @param create     the callback functor
    * @param wrap       indicates dimensions on which to wrap the boundary
-   * @param ghosts     indicates how many ghosts to use in each dimension 
+   * @param ghosts     indicates how many ghosts to use in each dimension
    * @param divs       indicates how many cuts to make along each dimension
    *                   (0 means "no constraint," i.e., leave it up to the algorithm)
    *
@@ -175,6 +176,57 @@ namespace detail
     RegularDecomposer<Bounds>(dim, domain, assigner, share_face, wrap, ghosts, divs).decompose(rank, create);
   }
 
+namespace detail
+{
+  template<class Bounds>
+  struct AddBlock
+  {
+    typedef typename RegularDecomposer<Bounds>::Link        Link;
+
+            AddBlock(diy::Master* master):
+              master_(master)               {}
+
+    void    operator()(int gid, const Bounds& core, const Bounds& bounds, const Bounds& domain, const Link& link) const
+    {
+      void*     b = master_->create();
+      Link*     l = new Link(link);
+      master_->add(gid, b, l);
+    }
+
+    diy::Master* master_;
+  };
+}
+
+  /**
+   * \ingroup Decomposition
+   * \brief Decomposes the domain into a prescribed pattern of blocks.
+   *
+   * @param dim        dimension of the domain
+   * @param rank       local rank
+   * @param assigner   decides how processors are assigned to blocks (maps a gid to a rank)
+   *                   also communicates the total number of blocks
+   * @param master     gets the blocks once this function returns
+   * @param wrap       indicates dimensions on which to wrap the boundary
+   * @param ghosts     indicates how many ghosts to use in each dimension
+   * @param divs       indicates how many cuts to make along each dimension
+   *                   (0 means "no constraint," i.e., leave it up to the algorithm)
+   *
+   * `master` must have been supplied a create function in order for this function to work.
+   */
+  template<class Bounds, class Assigner>
+  void decompose(int                dim,
+                 int                rank,
+                 const Bounds&      domain,
+                 const Assigner&    assigner,
+                 Master&            master,
+                 typename RegularDecomposer<Bounds>::BoolVector       share_face = typename RegularDecomposer<Bounds>::BoolVector(),
+                 typename RegularDecomposer<Bounds>::BoolVector       wrap       = typename RegularDecomposer<Bounds>::BoolVector(),
+                 typename RegularDecomposer<Bounds>::CoordinateVector ghosts     = typename RegularDecomposer<Bounds>::CoordinateVector(),
+                 typename RegularDecomposer<Bounds>::DivisionsVector  divs       = typename RegularDecomposer<Bounds>::DivisionsVector())
+  {
+    RegularDecomposer<Bounds>(dim, domain, assigner, share_face, wrap, ghosts, divs).decompose(rank, detail::AddBlock<Bounds>(&master));
+  }
+
   /**
    * \ingroup Decomposition
    * \brief A "null" decompositon that simply creates the blocks and adds them to the master
@@ -182,27 +234,21 @@ namespace detail
    * @param rank       local rank
    * @param assigner   decides how processors are assigned to blocks (maps a gid to a rank)
    *                   also communicates the total number of blocks
-   * @param create     the creator functor
-   *
-   * `create(...)` is called with each block assigned to the local domain. See [decomposition example](#decomposition-example).
+   * @param master     gets the blocks once this function returns
    */
-  template<class Creator>
   void decompose(int                rank,
                  const Assigner&    assigner,
-                 const Creator&     create)
+                 Master&            master)
   {
-      // fake a dimension and a domain so that a regular decomposer can be used
-      int dim = 3;
-      ContinuousBounds domain;
-      for (int i = 0; i < dim; ++i)
-      {
-          domain.min[i] = 0.0;
-          domain.max[i] = 1.0;
-      }
-      RegularDecomposer<ContinuousBounds>(dim, domain, assigner).decompose(rank, create);
+    std::vector<int>  local_gids;
+    assigner.local_gids(rank, local_gids);
+
+    for (size_t i = 0; i < local_gids.size(); ++i)
+      master.add(local_gids[i], master.create(), new diy::Link);
   }
 
   //! Decomposition example: \example decomposition/test-decomposition.cpp
+  //! Direct master insertion example: \example decomposition/test-direct-master.cpp
 }
 
 template<class Bounds>
