@@ -15,16 +15,13 @@ typedef  diy::RegularContinuousLink  RCLink;
 //
 struct Block
 {
-  // often useful to save the block bounds with the block, but not mandatory
-  Block(const Bounds& bounds_): bounds(bounds_)               {}
   static void*    create()                                    { return new Block; }
   static void     destroy(void* b)                            { delete static_cast<Block*>(b); }
   static void     save(const void* b, diy::BinaryBuffer& bb)
     { diy::save(bb, *static_cast<const Block*>(b)); }
   static void     load(void* b, diy::BinaryBuffer& bb)
     { diy::load(bb, *static_cast<Block*>(b)); }
-  // It's usually a good idea to initialize the data right here, whether by reading from a file, etc.
-  void generate_data(size_t n)
+  void generate_data(size_t n)  // Usually a good idea to initialize the data here
   {
     data.resize(n);
     for (size_t i = 0; i < n; ++i)
@@ -36,31 +33,6 @@ struct Block
   vector<float> data; // usually there will be some block data
   int gid;            // diy can often tell you the gid during communication, but you may also want to save it
 private:
-  Block() {}          // the create() function above needs an empty constructor
-};
-//
-// add blocks to diy
-//
-struct AddBlock
-{
-  // add any extra arguments to the constructor
-  AddBlock(diy::Master& master_, size_t num_elems_): master(master_), num_elems(num_elems_) {}
-
-  // operator() is always defined as follows; arguments are fixed
-  void operator()(int gid, const Bounds& core, const Bounds& bounds, const Bounds& domain,
-                   const RCLink& link) const
-  {
-    Block*        b = new Block(core);
-    RCLink*       l = new RCLink(link);
-    diy::Master&  m = const_cast<diy::Master&>(master);
-    m.add(gid, b, l);
-    b->gid = gid;
-    // initializing the block data when the block is created will save one serialization and storage cycle
-    b->generate_data(num_elems);
-  }
-  // members that are needed above are declared here
-  diy::Master&  master;
-  size_t num_elems;
 };
 
 int main(int argc, char** argv)
@@ -79,14 +51,13 @@ int main(int argc, char** argv)
                                      &Block::save,
                                      &Block::load);
     diy::ContiguousAssigner   assigner(world.size(), tot_blocks);
-    AddBlock                  create(master, arg1, arg2, etc);
-    diy::decompose(dim, world.rank(), domain, assigner, create);
+    diy::decompose(dim, world.rank(), domain, assigner, master);
 
     ...
 }
 ~~~~
 
-In addition the the comments in the above code, more details about various sections of the code follow below.
+See the example in [test-direct-master.cpp](\ref decomposition/test-direct-master.cpp). More details about various sections of the example follow below.
 
 ### Continuous and Discrete Decompositions
 
@@ -100,33 +71,15 @@ typedef  diy::DiscreteBounds         Bounds;
 typedef  diy::RegularLink            RLink;
 ~~~~
 
-### Block and AddBlock Objects
+### Block Objects
 
-A block object must be defined and must include the following functions:
-
-~~~~{.cpp}
-static void*    create();
-static void     destroy(void* b);
-static void     save(const void* b, diy::BinaryBuffer& bb);
-static void     load(void* b, diy::BinaryBuffer& bb);
-~~~~
-An object to add blocks (AddBlock in the above example) is also required. It must include the following definition of the () operator:
+A block object includes the following functions:
 
 ~~~~{.cpp}
-// gid: the block global id
-// core: block bounds without any additional ghost region
-// bounds: block bounds including any additional ghost region
-// domain: overall global domain bounds
-// link: neighbors of this block (use continuous or regular link, depending on decomposition type)
-void operator()(int gid, const Bounds& core, const Bounds& bounds, const Bounds& domain,
-                const RCLink& link) const
-{
-  Block*        b = new Block(core);                   // arguments depend on the Block constructor above
-  RCLink*       l = new RCLink(link);                  // or RLink for discrete (not continuous) link
-  diy::Master&  m = const_cast<diy::Master&>(master);
-  m.add(gid, b, l);
-  // followed by any other initialization of the block data
-}
+static void*    create();                                      // allocate a new block
+static void     destroy(void* b);                              // free a block
+static void     save(const void* b, diy::BinaryBuffer& bb);    // serialize a block to storage
+static void     load(void* b, diy::BinaryBuffer& bb);          // deserialize a block from storage
 ~~~~
 
 ### Initialize DIY
@@ -150,12 +103,26 @@ diy::Master               master(diy_comm,                     // the diy master
 diy::ContiguousAssigner   assigner(world.size(), tot_blocks);  // assign contiguous blocks to processes; tot_blocks is total number of blocks in the domain
 // or
 diy::RoundRobinAssigner   assigner(world.size(), tot_blocks);  // assign blocks to processes in round robin order
-AddBlock                  create(master, arg1, arg2, etc);     // add blocks to the master
-diy::decompose(dim, world.rank(), domain, assigner, create);   // decompose the domain in dim dimensions
+diy::decompose(dim, world.rank(), domain, assigner, master);   // decompose the domain in dim dimensions
 
 ~~~~
 
-Note: When all blocks will remain in memory, there is a shorter form of the `master` constructor that can be used. In this case there is no need to specify most of the arguments because they relate to block loading/unloading.
+Notes:
+
+When all blocks will remain in memory, there is a shorter form of the `master` constructor that can be used. In this case there is no need to specify most of the arguments because they relate to block loading/unloading.
 ~~~~{.cpp}
 diy::Master               master(diy_comm, num_threads);
 ~~~~
+
+An alternative form of decomposition does not require an entire block object, and only takes a block create function. The pattern is:
+
+~~~~{.cpp}
+void create(int gid, const Bounds& core, const Bounds& bounds, const Bounds& domain,
+            const diy::Link& link)
+{
+    ...
+}
+diy::decompose(dim, world.rank(), domain, assigner, create);
+~~~~
+
+See the example in [test-decomposition.cpp](\ref decomposition/test-decomposition.cpp). (This example does not even create a master object, only a decomposition.)
