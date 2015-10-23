@@ -122,10 +122,13 @@ Functions</h2></td></tr>
 <tr class="memitem:gaf2e85a34f7b5adcdd0bbad32df5ad02a"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group___decomposition.html#gaf2e85a34f7b5adcdd0bbad32df5ad02a">diy::decompose</a> (int dim, int rank, const Bounds &amp;domain, const Assigner &amp;assigner, const Creator &amp;create, typename RegularDecomposer&lt; Bounds &gt;::BoolVector share_face=typename RegularDecomposer&lt; Bounds &gt;::BoolVector(), typename RegularDecomposer&lt; Bounds &gt;::BoolVector wrap=typename RegularDecomposer&lt; Bounds &gt;::BoolVector(), typename RegularDecomposer&lt; Bounds &gt;::CoordinateVector ghosts=typename RegularDecomposer&lt; Bounds &gt;::CoordinateVector(), typename RegularDecomposer&lt; Bounds &gt;::DivisionsVector divs=typename RegularDecomposer&lt; Bounds &gt;::DivisionsVector())</td></tr>
 <tr class="memdesc:gaf2e85a34f7b5adcdd0bbad32df5ad02a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decomposes the domain into a prescribed pattern of blocks.  <a href="group___decomposition.html#gaf2e85a34f7b5adcdd0bbad32df5ad02a">More...</a><br /></td></tr>
 <tr class="separator:gaf2e85a34f7b5adcdd0bbad32df5ad02a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga71b093a1b858688bc960d0545612312c"><td class="memTemplParams" colspan="2">template&lt;class Creator &gt; </td></tr>
-<tr class="memitem:ga71b093a1b858688bc960d0545612312c"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group___decomposition.html#ga71b093a1b858688bc960d0545612312c">diy::decompose</a> (int rank, const Assigner &amp;assigner, const Creator &amp;create)</td></tr>
-<tr class="memdesc:ga71b093a1b858688bc960d0545612312c"><td class="mdescLeft">&#160;</td><td class="mdescRight">A "null" decompositon that simply creates the blocks and adds them to the master.  <a href="group___decomposition.html#ga71b093a1b858688bc960d0545612312c">More...</a><br /></td></tr>
-<tr class="separator:ga71b093a1b858688bc960d0545612312c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga43ef4fb4029c660349c1b2bcf380c9cc"><td class="memTemplParams" colspan="2">template&lt;class Bounds , class Assigner &gt; </td></tr>
+<tr class="memitem:ga43ef4fb4029c660349c1b2bcf380c9cc"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group___decomposition.html#ga43ef4fb4029c660349c1b2bcf380c9cc">diy::decompose</a> (int dim, int rank, const Bounds &amp;domain, const Assigner &amp;assigner, Master &amp;master, typename RegularDecomposer&lt; Bounds &gt;::BoolVector share_face=typename RegularDecomposer&lt; Bounds &gt;::BoolVector(), typename RegularDecomposer&lt; Bounds &gt;::BoolVector wrap=typename RegularDecomposer&lt; Bounds &gt;::BoolVector(), typename RegularDecomposer&lt; Bounds &gt;::CoordinateVector ghosts=typename RegularDecomposer&lt; Bounds &gt;::CoordinateVector(), typename RegularDecomposer&lt; Bounds &gt;::DivisionsVector divs=typename RegularDecomposer&lt; Bounds &gt;::DivisionsVector())</td></tr>
+<tr class="memdesc:ga43ef4fb4029c660349c1b2bcf380c9cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decomposes the domain into a prescribed pattern of blocks.  <a href="group___decomposition.html#ga43ef4fb4029c660349c1b2bcf380c9cc">More...</a><br /></td></tr>
+<tr class="separator:ga43ef4fb4029c660349c1b2bcf380c9cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga237b2fc3adf9dfc2a486f76bbf62aea9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___decomposition.html#ga237b2fc3adf9dfc2a486f76bbf62aea9">diy::decompose</a> (int rank, const Assigner &amp;assigner, Master &amp;master)</td></tr>
+<tr class="memdesc:ga237b2fc3adf9dfc2a486f76bbf62aea9"><td class="mdescLeft">&#160;</td><td class="mdescRight">A "null" decompositon that simply creates the blocks and adds them to the master.  <a href="group___decomposition.html#ga237b2fc3adf9dfc2a486f76bbf62aea9">More...</a><br /></td></tr>
+<tr class="separator:ga237b2fc3adf9dfc2a486f76bbf62aea9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga54823e6a2b9fa3ffe41f6e93d0483a43"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___decomposition.html#ga54823e6a2b9fa3ffe41f6e93d0483a43">diy::RegularDecomposer&lt; Bounds_ &gt;::fill_bounds</a> (Bounds &amp;bounds, const DivisionsVector &amp;coords, bool add_ghosts=false) const </td></tr>
 <tr class="memdesc:ga54823e6a2b9fa3ffe41f6e93d0483a43"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the bounds, with or without ghosts, for a block specified by its block coordinates.  <a href="#ga54823e6a2b9fa3ffe41f6e93d0483a43">More...</a><br /></td></tr>
 <tr class="separator:ga54823e6a2b9fa3ffe41f6e93d0483a43"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -216,15 +219,98 @@ template&lt;class Bounds , class Assigner , class Creator &gt; </div>
   </dd>
 </dl>
 <p><code>create(...)</code> is called with each block assigned to the local domain. See <a href="#decomposition-example">decomposition example</a>. </p>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="decomposition_2test-decomposition_8cpp-example.html#a7">decomposition/test-decomposition.cpp</a>, <a class="el" href="reduce_2merge-reduce_8cpp-example.html#a25">reduce/merge-reduce.cpp</a>, and <a class="el" href="reduce_2swap-reduce_8cpp-example.html#a24">reduce/swap-reduce.cpp</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="decomposition_2test-decomposition_8cpp-example.html#a7">decomposition/test-decomposition.cpp</a>, <a class="el" href="decomposition_2test-direct-master_8cpp-example.html#a15">decomposition/test-direct-master.cpp</a>, <a class="el" href="reduce_2merge-reduce_8cpp-example.html#a25">reduce/merge-reduce.cpp</a>, and <a class="el" href="reduce_2swap-reduce_8cpp-example.html#a24">reduce/swap-reduce.cpp</a>.</dd>
 </dl>
 </div>
 </div>
-<a class="anchor" id="ga71b093a1b858688bc960d0545612312c"></a>
+<a class="anchor" id="ga43ef4fb4029c660349c1b2bcf380c9cc"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Creator &gt; </div>
+template&lt;class Bounds , class Assigner &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void diy::decompose </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>dim</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>rank</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Bounds &amp;&#160;</td>
+          <td class="paramname"><em>domain</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classdiy_1_1_assigner.html">Assigner</a> &amp;&#160;</td>
+          <td class="paramname"><em>assigner</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classdiy_1_1_master.html">Master</a> &amp;&#160;</td>
+          <td class="paramname"><em>master</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">typename <a class="el" href="structdiy_1_1_regular_decomposer.html">RegularDecomposer</a>&lt; Bounds &gt;::BoolVector&#160;</td>
+          <td class="paramname"><em>share_face</em> = <code>typename&#160;<a class="el" href="structdiy_1_1_regular_decomposer.html">RegularDecomposer</a>&lt;Bounds&gt;::BoolVector()</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">typename <a class="el" href="structdiy_1_1_regular_decomposer.html">RegularDecomposer</a>&lt; Bounds &gt;::BoolVector&#160;</td>
+          <td class="paramname"><em>wrap</em> = <code>typename&#160;<a class="el" href="structdiy_1_1_regular_decomposer.html">RegularDecomposer</a>&lt;Bounds&gt;::BoolVector()</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">typename <a class="el" href="structdiy_1_1_regular_decomposer.html">RegularDecomposer</a>&lt; Bounds &gt;::CoordinateVector&#160;</td>
+          <td class="paramname"><em>ghosts</em> = <code>typename&#160;<a class="el" href="structdiy_1_1_regular_decomposer.html">RegularDecomposer</a>&lt;Bounds&gt;::CoordinateVector()</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">typename <a class="el" href="structdiy_1_1_regular_decomposer.html">RegularDecomposer</a>&lt; Bounds &gt;::DivisionsVector&#160;</td>
+          <td class="paramname"><em>divs</em> = <code>typename&#160;<a class="el" href="structdiy_1_1_regular_decomposer.html">RegularDecomposer</a>&lt;Bounds&gt;::DivisionsVector()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Decomposes the domain into a prescribed pattern of blocks. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dim</td><td>dimension of the domain </td></tr>
+    <tr><td class="paramname">rank</td><td>local rank </td></tr>
+    <tr><td class="paramname">assigner</td><td>decides how processors are assigned to blocks (maps a gid to a rank) also communicates the total number of blocks </td></tr>
+    <tr><td class="paramname">master</td><td>gets the blocks once this function returns </td></tr>
+    <tr><td class="paramname">wrap</td><td>indicates dimensions on which to wrap the boundary </td></tr>
+    <tr><td class="paramname">ghosts</td><td>indicates how many ghosts to use in each dimension </td></tr>
+    <tr><td class="paramname">divs</td><td>indicates how many cuts to make along each dimension (0 means "no constraint," i.e., leave it up to the algorithm)</td></tr>
+  </table>
+  </dd>
+</dl>
+<p><code>master</code> must have been supplied a create function in order for this function to work. </p>
+
+</div>
+</div>
+<a class="anchor" id="ga237b2fc3adf9dfc2a486f76bbf62aea9"></a>
+<div class="memitem">
+<div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void diy::decompose </td>
@@ -241,8 +327,8 @@ template&lt;class Creator &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const Creator &amp;&#160;</td>
-          <td class="paramname"><em>create</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="classdiy_1_1_master.html">Master</a> &amp;&#160;</td>
+          <td class="paramname"><em>master</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -257,11 +343,10 @@ template&lt;class Creator &gt; </div>
   <table class="params">
     <tr><td class="paramname">rank</td><td>local rank </td></tr>
     <tr><td class="paramname">assigner</td><td>decides how processors are assigned to blocks (maps a gid to a rank) also communicates the total number of blocks </td></tr>
-    <tr><td class="paramname">create</td><td>the creator functor</td></tr>
+    <tr><td class="paramname">master</td><td>gets the blocks once this function returns </td></tr>
   </table>
   </dd>
 </dl>
-<p><code>create(...)</code> is called with each block assigned to the local domain. See <a href="#decomposition-example">decomposition example</a>. </p>
 
 </div>
 </div>
@@ -356,7 +441,7 @@ template&lt;class Bounds &gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Sep 15 2015 12:20:25 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Oct 23 2015 08:16:33 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.10
 </small></address>

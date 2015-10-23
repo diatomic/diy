@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.10"/>
-<title>DIY: decomposition/test-decomposition.cpp</title>
+<title>DIY: decomposition/test-direct-master.cpp</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -81,7 +81,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div class="header">
   <div class="headertitle">
-<div class="title">decomposition/test-decomposition.cpp</div>  </div>
+<div class="title">decomposition/test-direct-master.cpp</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;vector&gt;</span></div>
@@ -90,55 +90,62 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"></div>
 <div class="line"><span class="preprocessor">#include &lt;diy/decomposition.hpp&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;diy/assigner.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;diy/master.hpp&gt;</span></div>
 <div class="line"></div>
 <div class="line"><span class="keyword">typedef</span>     <a name="_a0"></a><a class="code" href="structbb__d__t.html">diy::DiscreteBounds</a>         Bounds;</div>
 <div class="line"><span class="comment">//typedef     diy::ContinuousBounds       Bounds;</span></div>
 <div class="line"></div>
-<div class="line"><span class="keywordtype">void</span> create(<span class="keywordtype">int</span> gid, <span class="keyword">const</span> Bounds&amp; core, <span class="keyword">const</span> Bounds&amp; bounds, <span class="keyword">const</span> Bounds&amp; domain,</div>
-<div class="line">            <span class="keyword">const</span> <a name="_a1"></a><a class="code" href="classdiy_1_1_link.html">diy::Link</a>&amp; link)</div>
+<div class="line"><span class="keyword">struct </span>Block</div>
 <div class="line">{</div>
-<div class="line">  <span class="keyword">const</span> <a name="_a2"></a><a class="code" href="classdiy_1_1_regular_link.html">diy::RegularLink&lt;Bounds&gt;</a>&amp; l = <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classdiy_1_1_regular_link.html">diy::RegularLink&lt;Bounds&gt;</a>&amp;<span class="keyword">&gt;</span>(link);</div>
-<div class="line">  std::cout &lt;&lt; <span class="stringliteral">&quot;   &quot;</span></div>
-<div class="line">            &lt;&lt; <span class="stringliteral">&quot;Creating block (&quot;</span> &lt;&lt; gid &lt;&lt; <span class="stringliteral">&quot;): &quot;</span></div>
-<div class="line">            &lt;&lt; core.min[0]   &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; core.min[1]   &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; core.min[2] &lt;&lt; <span class="stringliteral">&quot; - &quot;</span></div>
-<div class="line">            &lt;&lt; core.max[0]   &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; core.max[1]   &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; core.max[2] &lt;&lt; <span class="stringliteral">&quot; : &quot;</span></div>
-<div class="line">            &lt;&lt; bounds.min[0] &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; bounds.min[1] &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; bounds.min[2] &lt;&lt; <span class="stringliteral">&quot; - &quot;</span></div>
-<div class="line">            &lt;&lt; bounds.max[0] &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; bounds.max[1] &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; bounds.max[2] &lt;&lt; <span class="stringliteral">&quot; : &quot;</span></div>
-<div class="line">            &lt;&lt; link.<a name="a3"></a>size()   &lt;&lt; <span class="charliteral">&#39; &#39;</span> <span class="comment">//&lt;&lt; std::endl</span></div>
-<div class="line">            &lt;&lt; std::bitset&lt;32&gt;(l.<a name="a4"></a>wrap()) <span class="comment">//&lt;&lt; std::endl</span></div>
-<div class="line">            <span class="comment">//&lt;&lt; std::bitset&lt;32&gt;(l.direction(0))   &lt;&lt; std::endl</span></div>
-<div class="line">            <span class="comment">//&lt;&lt; std::bitset&lt;32&gt;(l.direction(0) &amp; l.wrap()) &lt;&lt; std::endl</span></div>
-<div class="line">            <span class="comment">//&lt;&lt; ((l.direction(0) &amp; l.wrap()) == l.direction(0)) &lt;&lt; &#39; &#39;</span></div>
-<div class="line">            &lt;&lt; std::dec</div>
-<div class="line">            &lt;&lt; std::endl;</div>
+<div class="line">    <span class="keyword">static</span> <span class="keywordtype">void</span>*    create()            { <span class="keywordflow">return</span> <span class="keyword">new</span> Block; }</div>
+<div class="line">    <span class="keyword">static</span> <span class="keywordtype">void</span>     destroy(<span class="keywordtype">void</span>* b)    { <span class="keyword">delete</span> <span class="keyword">static_cast&lt;</span>Block*<span class="keyword">&gt;</span>(b); }</div>
 <div class="line"></div>
-<div class="line">}</div>
+<div class="line">    <span class="keywordtype">void</span> show_link(<span class="keyword">const</span> <a name="_a1"></a><a class="code" href="structdiy_1_1_master_1_1_proxy_with_link.html">diy::Master::ProxyWithLink</a>&amp; cp, <span class="keywordtype">void</span>*)</div>
+<div class="line">    {</div>
+<div class="line">      <a name="_a2"></a><a class="code" href="classdiy_1_1_regular_link.html">diy::RegularLink&lt;Bounds&gt;</a>* link = <span class="keyword">static_cast&lt;</span><a class="code" href="classdiy_1_1_regular_link.html">diy::RegularLink&lt;Bounds&gt;</a>*<span class="keyword">&gt;</span>(cp.<a name="a3"></a>link());</div>
+<div class="line">      std::cout &lt;&lt; <span class="stringliteral">&quot;Block (&quot;</span> &lt;&lt; cp.<a name="a4"></a>gid() &lt;&lt; <span class="stringliteral">&quot;): &quot;</span></div>
+<div class="line">                &lt;&lt; link-&gt;<a name="a5"></a>core().min[0]   &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; link-&gt;core().min[1]   &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; link-&gt;core().min[2] &lt;&lt; <span class="stringliteral">&quot; - &quot;</span></div>
+<div class="line">                &lt;&lt; link-&gt;core().max[0]   &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; link-&gt;core().max[1]   &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; link-&gt;core().max[2] &lt;&lt; <span class="stringliteral">&quot; : &quot;</span></div>
+<div class="line">                &lt;&lt; link-&gt;<a name="a6"></a>bounds().min[0] &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; link-&gt;bounds().min[1] &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; link-&gt;bounds().min[2] &lt;&lt; <span class="stringliteral">&quot; - &quot;</span></div>
+<div class="line">                &lt;&lt; link-&gt;bounds().max[0] &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; link-&gt;bounds().max[1] &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; link-&gt;bounds().max[2] &lt;&lt; <span class="stringliteral">&quot; : &quot;</span></div>
+<div class="line">                &lt;&lt; link-&gt;<a name="a7"></a>size()   &lt;&lt; <span class="charliteral">&#39; &#39;</span> <span class="comment">//&lt;&lt; std::endl</span></div>
+<div class="line">                &lt;&lt; std::bitset&lt;32&gt;(link-&gt;<a name="a8"></a>wrap()) <span class="comment">//&lt;&lt; std::endl</span></div>
+<div class="line">                &lt;&lt; std::dec</div>
+<div class="line">                &lt;&lt; std::endl;</div>
+<div class="line">    }</div>
+<div class="line">};</div>
 <div class="line"></div>
 <div class="line"><span class="keywordtype">int</span> main(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>* argv[])</div>
 <div class="line">{</div>
+<div class="line">  <a name="_a9"></a><a class="code" href="structdiy_1_1mpi_1_1environment.html">diy::mpi::environment</a>     env(argc, argv);</div>
+<div class="line">  <a name="_a10"></a><a class="code" href="classdiy_1_1mpi_1_1communicator.html">diy::mpi::communicator</a>    world;</div>
+<div class="line"></div>
 <div class="line">  <span class="keywordtype">int</span>                       size    = 8;</div>
 <div class="line">  <span class="keywordtype">int</span>                       nblocks = 32;</div>
-<div class="line">  <a name="_a5"></a><a class="code" href="classdiy_1_1_contiguous_assigner.html">diy::ContiguousAssigner</a>   assigner(size, nblocks);</div>
+<div class="line">  <a name="_a11"></a><a class="code" href="classdiy_1_1_contiguous_assigner.html">diy::ContiguousAssigner</a>   assigner(size, nblocks);</div>
 <div class="line">  <span class="comment">//diy::RoundRobinAssigner   assigner(size, nblocks);</span></div>
 <div class="line"></div>
 <div class="line">  Bounds domain;</div>
-<div class="line">  domain.<a name="a6"></a>min[0] = domain.min[1] = domain.min[2] = 0;</div>
+<div class="line">  domain.<a name="a12"></a>min[0] = domain.min[1] = domain.min[2] = 0;</div>
 <div class="line">  domain.max[0] = domain.max[1] = domain.max[2] = 255;</div>
 <div class="line">  <span class="comment">//domain.max[0] = domain.max[1] = domain.max[2] = 128;</span></div>
 <div class="line"></div>
-<div class="line">  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> rank = 0; rank &lt; size; ++ rank)</div>
-<div class="line">  {</div>
-<div class="line">    std::cout &lt;&lt; <span class="stringliteral">&quot;Rank &quot;</span> &lt;&lt; rank &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt; std::endl;</div>
-<div class="line">    diy::RegularDecomposer&lt;Bounds&gt;::BoolVector          share_face;</div>
-<div class="line">    share_face.push_back(<span class="keyword">true</span>);</div>
-<div class="line">    diy::RegularDecomposer&lt;Bounds&gt;::BoolVector          wrap;</div>
-<div class="line">    wrap.push_back(<span class="keyword">true</span>);</div>
-<div class="line">    wrap.push_back(<span class="keyword">true</span>);</div>
-<div class="line">    diy::RegularDecomposer&lt;Bounds&gt;::CoordinateVector    ghosts;</div>
-<div class="line">    ghosts.push_back(1); ghosts.push_back(2);</div>
-<div class="line">    <a name="a7"></a><a class="code" href="group___decomposition.html#gaf2e85a34f7b5adcdd0bbad32df5ad02a">diy::decompose</a>(3, rank, domain, assigner, create, share_face, wrap, ghosts);</div>
-<div class="line">  }</div>
+<div class="line">  <span class="keywordtype">int</span> rank = world.<a name="a13"></a>rank();</div>
+<div class="line">  std::cout &lt;&lt; <span class="stringliteral">&quot;Rank &quot;</span> &lt;&lt; rank &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line">  <a name="_a14"></a><a class="code" href="classdiy_1_1_master.html">diy::Master</a> master(world, 1, -1, &amp;Block::create, &amp;Block::destroy);</div>
+<div class="line"></div>
+<div class="line">  diy::RegularDecomposer&lt;Bounds&gt;::BoolVector          share_face;</div>
+<div class="line">  share_face.push_back(<span class="keyword">true</span>);</div>
+<div class="line">  diy::RegularDecomposer&lt;Bounds&gt;::BoolVector          wrap;</div>
+<div class="line">  wrap.push_back(<span class="keyword">true</span>);</div>
+<div class="line">  wrap.push_back(<span class="keyword">true</span>);</div>
+<div class="line">  diy::RegularDecomposer&lt;Bounds&gt;::CoordinateVector    ghosts;</div>
+<div class="line">  ghosts.push_back(1); ghosts.push_back(2);</div>
+<div class="line">  <a name="a15"></a><a class="code" href="group___decomposition.html#gaf2e85a34f7b5adcdd0bbad32df5ad02a">diy::decompose</a>(3, rank, domain, assigner, master, share_face, wrap, ghosts);</div>
+<div class="line"></div>
+<div class="line">  master.foreach(&amp;Block::show_link);</div>
 <div class="line">}</div>
+<div class="line"></div>
 <div class="line"></div>
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->

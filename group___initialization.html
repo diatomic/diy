@@ -100,16 +100,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><span class="comment">//</span></div>
 <div class="line"><span class="keyword">struct </span>Block</div>
 <div class="line">{</div>
-<div class="line">  <span class="comment">// often useful to save the block bounds with the block, but not mandatory</span></div>
-<div class="line">  Block(<span class="keyword">const</span> Bounds&amp; bounds_): bounds(bounds_)               {}</div>
 <div class="line">  <span class="keyword">static</span> <span class="keywordtype">void</span>*    create()                                    { <span class="keywordflow">return</span> <span class="keyword">new</span> Block; }</div>
 <div class="line">  <span class="keyword">static</span> <span class="keywordtype">void</span>     destroy(<span class="keywordtype">void</span>* b)                            { <span class="keyword">delete</span> <span class="keyword">static_cast&lt;</span>Block*<span class="keyword">&gt;</span>(b); }</div>
 <div class="line">  <span class="keyword">static</span> <span class="keywordtype">void</span>     <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>(<span class="keyword">const</span> <span class="keywordtype">void</span>* b, <a class="code" href="structdiy_1_1_binary_buffer.html">diy::BinaryBuffer</a>&amp; bb)</div>
 <div class="line">    { <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">diy::save</a>(bb, *static_cast&lt;const Block*&gt;(b)); }</div>
 <div class="line">  <span class="keyword">static</span> <span class="keywordtype">void</span>     <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a>(<span class="keywordtype">void</span>* b, <a class="code" href="structdiy_1_1_binary_buffer.html">diy::BinaryBuffer</a>&amp; bb)</div>
 <div class="line">    { <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a>(bb, *static_cast&lt;Block*&gt;(b)); }</div>
-<div class="line">  <span class="comment">// It&#39;s usually a good idea to initialize the data right here, whether by reading from a file, etc.</span></div>
-<div class="line">  <span class="keywordtype">void</span> generate_data(<span class="keywordtype">size_t</span> n)</div>
+<div class="line">  <span class="keywordtype">void</span> generate_data(<span class="keywordtype">size_t</span> n)  <span class="comment">// Usually a good idea to initialize the data here</span></div>
 <div class="line">  {</div>
 <div class="line">    data.resize(n);</div>
 <div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; n; ++i)</div>
@@ -121,31 +118,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">  vector&lt;float&gt; data; <span class="comment">// usually there will be some block data</span></div>
 <div class="line">  <span class="keywordtype">int</span> gid;            <span class="comment">// diy can often tell you the gid during communication, but you may also want to save it</span></div>
 <div class="line"><span class="keyword">private</span>:</div>
-<div class="line">  Block() {}          <span class="comment">// the create() function above needs an empty constructor</span></div>
-<div class="line">};</div>
-<div class="line"><span class="comment">//</span></div>
-<div class="line"><span class="comment">// add blocks to diy</span></div>
-<div class="line"><span class="comment">//</span></div>
-<div class="line"><span class="keyword">struct </span>AddBlock</div>
-<div class="line">{</div>
-<div class="line">  <span class="comment">// add any extra arguments to the constructor</span></div>
-<div class="line">  AddBlock(<a class="code" href="classdiy_1_1_master.html">diy::Master</a>&amp; master_, <span class="keywordtype">size_t</span> num_elems_): master(master_), num_elems(num_elems_) {}</div>
-<div class="line"></div>
-<div class="line">  <span class="comment">// operator() is always defined as follows; arguments are fixed</span></div>
-<div class="line">  <span class="keywordtype">void</span> operator()(<span class="keywordtype">int</span> gid, <span class="keyword">const</span> Bounds&amp; core, <span class="keyword">const</span> Bounds&amp; bounds, <span class="keyword">const</span> Bounds&amp; domain,</div>
-<div class="line">                   <span class="keyword">const</span> RCLink&amp; link)<span class="keyword"> const</span></div>
-<div class="line"><span class="keyword">  </span>{</div>
-<div class="line">    Block*        b = <span class="keyword">new</span> Block(core);</div>
-<div class="line">    RCLink*       l = <span class="keyword">new</span> RCLink(link);</div>
-<div class="line">    <a class="code" href="classdiy_1_1_master.html">diy::Master</a>&amp;  m = <span class="keyword">const_cast&lt;</span><a class="code" href="classdiy_1_1_master.html">diy::Master</a>&amp;<span class="keyword">&gt;</span>(master);</div>
-<div class="line">    m.<a class="code" href="classdiy_1_1_master.html#aeab2723bb0ecd4f7316b4805c1b53a61">add</a>(gid, b, l);</div>
-<div class="line">    b-&gt;gid = gid;</div>
-<div class="line">    <span class="comment">// initializing the block data when the block is created will save one serialization and storage cycle</span></div>
-<div class="line">    b-&gt;generate_data(num_elems);</div>
-<div class="line">  }</div>
-<div class="line">  <span class="comment">// members that are needed above are declared here</span></div>
-<div class="line">  <a class="code" href="classdiy_1_1_master.html">diy::Master</a>&amp;  master;</div>
-<div class="line">  <span class="keywordtype">size_t</span> num_elems;</div>
 <div class="line">};</div>
 <div class="line"></div>
 <div class="line"><span class="keywordtype">int</span> main(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv)</div>
@@ -164,12 +136,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">                                     &amp;<a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">Block::save</a>,</div>
 <div class="line">                                     &amp;<a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">Block::load</a>);</div>
 <div class="line">    <a class="code" href="classdiy_1_1_contiguous_assigner.html">diy::ContiguousAssigner</a>   assigner(world.size(), tot_blocks);</div>
-<div class="line">    AddBlock                  create(master, arg1, arg2, etc);</div>
-<div class="line">    <a class="code" href="group___decomposition.html#gaf2e85a34f7b5adcdd0bbad32df5ad02a">diy::decompose</a>(dim, world.rank(), domain, assigner, create);</div>
+<div class="line">    <a class="code" href="group___decomposition.html#gaf2e85a34f7b5adcdd0bbad32df5ad02a">diy::decompose</a>(dim, world.rank(), domain, assigner, master);</div>
 <div class="line"></div>
 <div class="line">    ...</div>
 <div class="line">}</div>
-</div><!-- fragment --><p>In addition the the comments in the above code, more details about various sections of the code follow below.</p>
+</div><!-- fragment --><p>See the example in <a class="el" href="decomposition_2test-direct-master_8cpp-example.html">test-direct-master.cpp</a>. More details about various sections of the example follow below.</p>
 <h3>Continuous and Discrete Decompositions</h3>
 <p>Regular decompositions can be continous (floating-point extents that share common boundaries) or discrete (i,j,k integer extents that may or may not overlap). They are defined as follows:</p>
 <div class="fragment"><div class="line"><span class="keyword">typedef</span>  <a class="code" href="structbb__c__t.html">diy::ContinuousBounds</a>       Bounds;</div>
@@ -177,27 +148,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><span class="comment">// or</span></div>
 <div class="line"><span class="keyword">typedef</span>  <a class="code" href="structbb__d__t.html">diy::DiscreteBounds</a>         Bounds;</div>
 <div class="line"><span class="keyword">typedef</span>  <a class="code" href="classdiy_1_1_regular_link.html">diy::RegularLink</a>            RLink;</div>
-</div><!-- fragment --><h3>Block and AddBlock Objects</h3>
-<p>A block object must be defined and must include the following functions:</p>
-<div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keywordtype">void</span>*    create();</div>
-<div class="line"><span class="keyword">static</span> <span class="keywordtype">void</span>     destroy(<span class="keywordtype">void</span>* b);</div>
-<div class="line"><span class="keyword">static</span> <span class="keywordtype">void</span>     <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>(<span class="keyword">const</span> <span class="keywordtype">void</span>* b, <a class="code" href="structdiy_1_1_binary_buffer.html">diy::BinaryBuffer</a>&amp; bb);</div>
-<div class="line"><span class="keyword">static</span> <span class="keywordtype">void</span>     <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a>(<span class="keywordtype">void</span>* b, <a class="code" href="structdiy_1_1_binary_buffer.html">diy::BinaryBuffer</a>&amp; bb);</div>
-</div><!-- fragment --><p> An object to add blocks (AddBlock in the above example) is also required. It must include the following definition of the () operator:</p>
-<div class="fragment"><div class="line"><span class="comment">// gid: the block global id</span></div>
-<div class="line"><span class="comment">// core: block bounds without any additional ghost region</span></div>
-<div class="line"><span class="comment">// bounds: block bounds including any additional ghost region</span></div>
-<div class="line"><span class="comment">// domain: overall global domain bounds</span></div>
-<div class="line"><span class="comment">// link: neighbors of this block (use continuous or regular link, depending on decomposition type)</span></div>
-<div class="line"><span class="keywordtype">void</span> operator()(<span class="keywordtype">int</span> gid, <span class="keyword">const</span> Bounds&amp; core, <span class="keyword">const</span> Bounds&amp; bounds, <span class="keyword">const</span> Bounds&amp; domain,</div>
-<div class="line">                <span class="keyword">const</span> RCLink&amp; link)<span class="keyword"> const</span></div>
-<div class="line"><span class="keyword"></span>{</div>
-<div class="line">  Block*        b = <span class="keyword">new</span> Block(core);                   <span class="comment">// arguments depend on the Block constructor above</span></div>
-<div class="line">  RCLink*       l = <span class="keyword">new</span> RCLink(link);                  <span class="comment">// or RLink for discrete (not continuous) link</span></div>
-<div class="line">  <a class="code" href="classdiy_1_1_master.html">diy::Master</a>&amp;  m = <span class="keyword">const_cast&lt;</span><a class="code" href="classdiy_1_1_master.html">diy::Master</a>&amp;<span class="keyword">&gt;</span>(master);</div>
-<div class="line">  m.<a class="code" href="classdiy_1_1_master.html#aeab2723bb0ecd4f7316b4805c1b53a61">add</a>(gid, b, l);</div>
-<div class="line">  <span class="comment">// followed by any other initialization of the block data</span></div>
-<div class="line">}</div>
+</div><!-- fragment --><h3>Block Objects</h3>
+<p>A block object includes the following functions:</p>
+<div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keywordtype">void</span>*    create();                                      <span class="comment">// allocate a new block</span></div>
+<div class="line"><span class="keyword">static</span> <span class="keywordtype">void</span>     destroy(<span class="keywordtype">void</span>* b);                              <span class="comment">// free a block</span></div>
+<div class="line"><span class="keyword">static</span> <span class="keywordtype">void</span>     <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>(<span class="keyword">const</span> <span class="keywordtype">void</span>* b, <a class="code" href="structdiy_1_1_binary_buffer.html">diy::BinaryBuffer</a>&amp; bb);    <span class="comment">// serialize a block to storage</span></div>
+<div class="line"><span class="keyword">static</span> <span class="keywordtype">void</span>     <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a>(<span class="keywordtype">void</span>* b, <a class="code" href="structdiy_1_1_binary_buffer.html">diy::BinaryBuffer</a>&amp; bb);          <span class="comment">// deserialize a block from storage</span></div>
 </div><!-- fragment --><h3>Initialize DIY</h3>
 <p>Finally, launch diy as follows:</p>
 <div class="fragment"><div class="line">diy::Bounds               domain;                              <span class="comment">// the global domain bounds</span></div>
@@ -215,10 +171,18 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a class="code" href="classdiy_1_1_contiguous_assigner.html">diy::ContiguousAssigner</a>   assigner(world.size(), tot_blocks);  <span class="comment">// assign contiguous blocks to processes; tot_blocks is total number of blocks in the domain</span></div>
 <div class="line"><span class="comment">// or</span></div>
 <div class="line"><a class="code" href="classdiy_1_1_round_robin_assigner.html">diy::RoundRobinAssigner</a>   assigner(world.size(), tot_blocks);  <span class="comment">// assign blocks to processes in round robin order</span></div>
-<div class="line">AddBlock                  create(master, arg1, arg2, etc);     <span class="comment">// add blocks to the master</span></div>
-<div class="line"><a class="code" href="group___decomposition.html#gaf2e85a34f7b5adcdd0bbad32df5ad02a">diy::decompose</a>(dim, world.rank(), domain, assigner, create);   <span class="comment">// decompose the domain in dim dimensions</span></div>
-</div><!-- fragment --><p>Note: When all blocks will remain in memory, there is a shorter form of the <code>master</code> constructor that can be used. In this case there is no need to specify most of the arguments because they relate to block loading/unloading. </p><div class="fragment"><div class="line"><a class="code" href="classdiy_1_1_master.html">diy::Master</a>               master(diy_comm, num_threads);</div>
-</div><!-- fragment --> <table class="memberdecls">
+<div class="line"><a class="code" href="group___decomposition.html#gaf2e85a34f7b5adcdd0bbad32df5ad02a">diy::decompose</a>(dim, world.rank(), domain, assigner, master);   <span class="comment">// decompose the domain in dim dimensions</span></div>
+</div><!-- fragment --><p>Notes:</p>
+<p>When all blocks will remain in memory, there is a shorter form of the <code>master</code> constructor that can be used. In this case there is no need to specify most of the arguments because they relate to block loading/unloading. </p><div class="fragment"><div class="line"><a class="code" href="classdiy_1_1_master.html">diy::Master</a>               master(diy_comm, num_threads);</div>
+</div><!-- fragment --><p>An alternative form of decomposition does not require an entire block object, and only takes a block create function. The pattern is:</p>
+<div class="fragment"><div class="line"><span class="keywordtype">void</span> create(<span class="keywordtype">int</span> gid, <span class="keyword">const</span> Bounds&amp; core, <span class="keyword">const</span> Bounds&amp; bounds, <span class="keyword">const</span> Bounds&amp; domain,</div>
+<div class="line">            <span class="keyword">const</span> <a class="code" href="classdiy_1_1_link.html">diy::Link</a>&amp; link)</div>
+<div class="line">{</div>
+<div class="line">    ...</div>
+<div class="line">}</div>
+<div class="line"><a class="code" href="group___decomposition.html#gaf2e85a34f7b5adcdd0bbad32df5ad02a">diy::decompose</a>(dim, world.rank(), domain, assigner, create);</div>
+</div><!-- fragment --><p>See the example in <a class="el" href="decomposition_2test-decomposition_8cpp-example.html">test-decomposition.cpp</a>. (This example does not even create a master object, only a decomposition.) </p>
+<table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:ga41e082628686ec3e798171b20ccced63"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___initialization.html#ga41e082628686ec3e798171b20ccced63">diy::Master::Master</a> (mpi::communicator comm, int threads=1, int limit=-1, CreateBlock create=0, DestroyBlock destroy=0, ExternalStorage *storage=0, SaveBlock save=0, LoadBlock load=0, QueuePolicy *q_policy=new QueueSizePolicy(4096))</td></tr>
@@ -321,7 +285,7 @@ Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Sep 15 2015 12:20:25 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Oct 23 2015 08:16:33 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.10
 </small></address>
