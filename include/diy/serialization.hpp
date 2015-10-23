@@ -11,6 +11,7 @@
 #if __cplusplus > 199711L           // C++11
 #include <tuple>
 #include <unordered_map>
+#include <type_traits>              // this is used for a safety check for default serialization
 #endif
 #endif
 
@@ -90,6 +91,12 @@ namespace diy
   template<class T>
   struct Serialization: public detail::Default
   {
+#ifndef BUILD_GYP                   // C++11 does not work right in my nwjs- and node-gyp builds--TP
+#if __cplusplus > 199711L           // C++11
+    static_assert(std::is_trivially_copyable<T>::value, "Default serialization works only for trivially copyable types");
+#endif
+#endif
+
     static void         save(BinaryBuffer& bb, const T& x)          { bb.save_binary((const char*)  &x, sizeof(T)); }
     static void         load(BinaryBuffer& bb, T& x)                { bb.load_binary((char*)        &x, sizeof(T)); }
   };
