@@ -93,7 +93,9 @@ namespace diy
   {
 #ifndef BUILD_GYP                   // C++11 does not work right in my nwjs- and node-gyp builds--TP
 #if __cplusplus > 199711L           // C++11
+#if !defined(__GNUG__) || __GNUC__ >= 5
     static_assert(std::is_trivially_copyable<T>::value, "Default serialization works only for trivially copyable types");
+#endif
 #endif
 #endif
 
