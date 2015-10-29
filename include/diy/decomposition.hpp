@@ -236,6 +236,7 @@ namespace detail
    *                   also communicates the total number of blocks
    * @param master     gets the blocks once this function returns
    */
+  inline
   void decompose(int                rank,
                  const Assigner&    assigner,
                  Master&            master)
