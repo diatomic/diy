@@ -204,6 +204,33 @@ namespace diy
     }
   };
 
+  // save/load for std::string
+  template<>
+  struct Serialization< std::string >
+  {
+    typedef             std::string             String;
+
+    static void         save(BinaryBuffer& bb, const String& s)
+    {
+      size_t sz = s.size();
+      diy::save(bb, sz);
+      diy::save(bb, s.c_str(), sz);
+    }
+
+    static void         load(BinaryBuffer& bb, String& s)
+    {
+      size_t sz;
+      diy::load(bb, sz);
+      s.resize(sz);
+      for (size_t i = 0; i < sz; ++i)
+      {
+          char c;
+          diy::load(bb, c);
+          s[i] = c;
+      }
+    }
+  };
+
   // save/load for std::pair<X,Y>
   template<class X, class Y>
   struct Serialization< std::pair<X,Y> >

@@ -21,6 +21,19 @@ namespace mpi
                 Datatype::datatype(), root, comm);
     }
 
+    static void broadcast(const communicator& comm, std::vector<T>& x, int root)
+    {
+      size_t sz = x.size();
+      Collectives<size_t, void*>::broadcast(comm, sz, root);
+
+      if (comm.rank() != root)
+          x.resize(sz);
+
+      MPI_Bcast(Datatype::address(x[0]),
+                x.size(),
+                Datatype::datatype(), root, comm);
+    }
+
     static void gather(const communicator& comm, const T& in, std::vector<T>& out, int root)
     {
       size_t s  = comm.size();
@@ -188,6 +201,12 @@ namespace mpi
     Collectives<T,void*>::broadcast(comm, x, root);
   }
 
+  //! Broadcast for vectors
+  template<class T>
+  void      broadcast(const communicator& comm, std::vector<T>& x, int root)
+  {
+    Collectives<T,void*>::broadcast(comm, x, root);
+  }
   //! Gather from all processes in `comm`.
   //!  On `root` process, `out` is resized to `comm.size()` and filled with
   //! elements from the respective ranks.
