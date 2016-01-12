@@ -28,7 +28,9 @@ DIY2 is a header-only library. It does not need to be built; you can simply
 include it in your project. The examples can be built using `cmake` from the
 top level directory.
 
-## [Documentation](https://diatomic.github.io/diy2)
+## Documentation
+
+[Doxygen pages](https://diatomic.github.io/diy2)
 
 ## Example
 

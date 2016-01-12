@@ -43,13 +43,26 @@ int main(int argc, char* argv[])
   for (int rank = 0; rank < size; ++ rank)
   {
     std::cout << "Rank " << rank << ":" << std::endl;
+
+    // share_face is an n-dim (size 3 in this example) vector of bools
+    // indicating whether faces are shared in each dimension
+    // uninitialized values default to false
     diy::RegularDecomposer<Bounds>::BoolVector          share_face;
     share_face.push_back(true);
+
+    // wrap is an n-dim (size 3 in this example) vector of bools
+    // indicating whether boundary conditions are periodic in each dimension
+    // uninitialized values default to false
     diy::RegularDecomposer<Bounds>::BoolVector          wrap;
     wrap.push_back(true);
     wrap.push_back(true);
+
+    // ghosts is an n-dim (size 3 in this example) vector of ints
+    // indicating number of ghost cells per side in each dimension
+    // uninitialized values default to 0
     diy::RegularDecomposer<Bounds>::CoordinateVector    ghosts;
     ghosts.push_back(1); ghosts.push_back(2);
+
     diy::decompose(3, rank, domain, assigner, create, share_face, wrap, ghosts);
   }
 }

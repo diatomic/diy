@@ -11,7 +11,13 @@ namespace diy
   class Assigner
   {
     public:
-                    Assigner(int size, int nblocks):
+     /**
+      * \ingroup Assignment
+      * \brief Manages how blocks are assigned to processes
+      */
+                    Assigner(int size,     //!< total number of processes
+                             int nblocks   //!< total (global) number of blocks
+                             ):
                       size_(size), nblocks_(nblocks)    {}
 
       //! returns the total number of process ranks
@@ -33,7 +39,13 @@ namespace diy
   class ContiguousAssigner: public Assigner
   {
     public:
-            ContiguousAssigner(int size, int nblocks):
+     /**
+      * \ingroup Assignment
+      * \brief Assigns blocks to processes in contiguous gid (block global id) order
+      */
+            ContiguousAssigner(int size,     //!< total number of processes
+                               int nblocks   //!< total (global) number of blocks
+                               ):
               Assigner(size, nblocks)           {}
 
       using Assigner::size;
@@ -59,7 +71,13 @@ namespace diy
   class RoundRobinAssigner: public Assigner
   {
     public:
-            RoundRobinAssigner(int size, int nblocks):
+     /**
+      * \ingroup Assignment
+      * \brief Assigns blocks to processes in cyclic or round-robin gid (block global id) order
+      */
+            RoundRobinAssigner(int size,     //!< total number of processes
+                               int nblocks   //!< total (global) number of blocks
+                               ):
               Assigner(size, nblocks)           {}
 
       using Assigner::size;
