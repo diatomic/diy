@@ -8,7 +8,7 @@ var searchData=
   ['load_5fbinary',['load_binary',['../structdiy_1_1_binary_buffer.html#a53b5ba450ddf8b6e9b262c552b2ef673',1,'diy::BinaryBuffer::load_binary()'],['../structdiy_1_1_memory_buffer.html#a23b65b27938651c30726fc9511008adf',1,'diy::MemoryBuffer::load_binary()']]],
   ['load_5fbinary_5fback',['load_binary_back',['../structdiy_1_1_binary_buffer.html#a4bf1ffd8ae3aecf1851f357a30f97656',1,'diy::BinaryBuffer::load_binary_back()'],['../structdiy_1_1_memory_buffer.html#a257319ddbc7f3eec8c2a409941183ce6',1,'diy::MemoryBuffer::load_binary_back()']]],
   ['local',['local',['../classdiy_1_1_master.html#a14b0c7fc215e53ed655e44186a18dc42',1,'diy::Master']]],
-  ['local_5fgids',['local_gids',['../classdiy_1_1_assigner.html#afc82188c77416edb8be519916328a9c4',1,'diy::Assigner::local_gids()'],['../classdiy_1_1_contiguous_assigner.html#a2c7c3b958b3dcd165176064cd845d94a',1,'diy::ContiguousAssigner::local_gids()'],['../classdiy_1_1_round_robin_assigner.html#a82a47fd40bffad17ee280a439c8fd74c',1,'diy::RoundRobinAssigner::local_gids()']]],
+  ['local_5fgids',['local_gids',['../classdiy_1_1_assigner.html#a08785c292ae854385892389ad8a8877d',1,'diy::Assigner::local_gids()'],['../classdiy_1_1_contiguous_assigner.html#a2c7c3b958b3dcd165176064cd845d94a',1,'diy::ContiguousAssigner::local_gids()'],['../classdiy_1_1_round_robin_assigner.html#a82a47fd40bffad17ee280a439c8fd74c',1,'diy::RoundRobinAssigner::local_gids()']]],
   ['lock_5fguard',['lock_guard',['../structdiy_1_1lock__guard.html',1,'diy']]],
   ['lock_5fguard_3c_20mutex_20_3e',['lock_guard&lt; Mutex &gt;',['../structdiy_1_1lock__guard.html',1,'diy']]]
 ];
