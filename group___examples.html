@@ -91,8 +91,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li><a class="el" href="simple_2read-blocks_8cpp-example.html">read-blocks.cpp</a>: shows how to read a DIY file back into memory and create a new DIY master and assignment of blocks to processes that may be different than when the blocks were written. The blocks from <a class="el" href="simple_2simple_8cpp-example.html">simple.cpp</a> are read back into memory from the file, and their values are printed.</li>
 </ul>
 </li>
-<li><a href="https://github.com/diatomic/diy2/tree/master/examples/decomposition">Decomposition</a>: demonstrates how to decompose a regular grid into blocks and assign blocks to processes.<ul>
-<li><a class="el" href="decomposition_2test-decomposition_8cpp-example.html">test-decomposition.cpp</a>: blocks can have either discrete or continuous bounds, faces of blocks can be shared (<code>share_face</code>), overlapped (<code>ghosts</code>) and boundaries can be periodic (<code>wrap</code>).</li>
+<li><a href="https://github.com/diatomic/diy2/tree/master/examples/decomposition">Decomposition</a>: demonstrates how to decompose a regular grid into blocks and create links between them.<ul>
+<li>regular-decomposer-long.cpp: blocks defined with an AddBlock functor (i.e., the "long" form of the block creator) are decomposed by providing the block creator to the decomposer. This example shows how to set shared faces, ghost regions, and periodic boundaries in the decomposition. It also shows both how to create a <code>RegularDecomposer</code> and call its <code>decompose</code> member function, as well as how to combine those two steps using one helper function.</li>
+<li>regular-decomposer-short.cpp: blocks defined without the AddBlock functor or the long form of the block create function (i.e., using a simple <code>void * create()</code> function ("short form") can be decomposed just by providing the master object to the decomposer. This example shows how.</li>
 </ul>
 </li>
 <li><a href="https://github.com/diatomic/diy2/tree/master/examples/serialization">Serialization</a>: blocks that are loaded and saved in and out of core are serialized by DIY. This example shows how to write the <code>load</code> and <code>save</code> functions for two data structures. Both require just a one-line definition because DIY can serialize such structures automatically.<ul>
@@ -133,7 +134,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Jan 11 2016 19:06:57 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jan 16 2016 13:56:18 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.7
 </small></address>
