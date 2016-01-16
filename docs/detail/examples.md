@@ -32,13 +32,19 @@ create, destroy, and serialize blocks in (*commented*) [block.h](\ref simple/blo
   memory from the file, and their values are printed.
 
 - [Decomposition](https://github.com/diatomic/diy2/tree/master/examples/decomposition):
-demonstrates how to decompose a regular grid into blocks and assign blocks to
-processes.
+demonstrates how to decompose a regular grid into blocks and create links between them.
 
-  - [test-decomposition.cpp](\ref decomposition/test-decomposition.cpp): blocks
-  can have either discrete or continuous bounds, faces of blocks can be shared
-  (`share_face`), overlapped (`ghosts`) and boundaries can be periodic
-  (`wrap`).
+  - [regular-decomposer-long.cpp](\ref decomposition/regular-decomposer-short.cpp): blocks
+  defined with an AddBlock functor (i.e., the "long" form of the block creator) are decomposed
+  by providing the block creator to the decomposer. This example shows how to set shared faces,
+  ghost regions, and periodic boundaries in the decomposition. It also shows both how to create
+  a ```RegularDecomposer``` and call its ```decompose``` member function, as well as how to combine
+  those two steps using one helper function.
+
+  - [regular-decomposer-short.cpp](\ref decomposition/regular-decomposer-short.cpp): blocks
+  defined without the AddBlock functor or the long form of the block create function (i.e.,
+  using a simple ```void * create()``` function ("short form") can be decomposed just by providing
+  the master object to the decomposer. This example shows how.
 
 - [Serialization](https://github.com/diatomic/diy2/tree/master/examples/serialization):
 blocks that are loaded and saved in and out of core are serialized by DIY. This

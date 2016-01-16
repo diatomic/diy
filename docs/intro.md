@@ -77,7 +77,7 @@ received and sent during rounds of message exchange.
     }
 ~~~~
 
-[More examples](\ref Examples).
+More information about getting started creating blocks, assigning them to processes, and decomposing a domain can be found in the [Initialization](\ref Initialization) page. Complete examples of working programs can be found in the [Examples](\ref Examples) page.
 
 Components
 ----------
