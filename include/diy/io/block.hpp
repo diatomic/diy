@@ -194,14 +194,29 @@ namespace io
     size_t footer_size;
 
     // Read the size
-    f.read_at_all(footer_offset, (char*) &footer_size, sizeof(footer_size));
+    try
+    {
+        f.read_at_all(footer_offset, (char*) &footer_size, sizeof(footer_size));
+    }
+    catch(...)
+    {
+        fprintf(stderr, "Error reading footer size\n");
+        throw(1);
+    }
 
     // Read all_offset_counts
     footer_offset -= footer_size;
-
     MemoryBuffer footer;
-    footer.buffer.resize(footer_size);
-    f.read_at_all(footer_offset, footer.buffer);
+    try
+    {
+        footer.buffer.resize(footer_size);
+        f.read_at_all(footer_offset, footer.buffer);
+    }
+    catch(...)
+    {
+        fprintf(stderr, "Error reading footer\n");
+        throw(1);
+    }
 
     std::vector<GidOffsetCount>  all_offset_counts;
     diy::load(footer, all_offset_counts);
@@ -216,21 +231,30 @@ namespace io
 
     // Read our blocks;
     // TODO: use collective IO, when possible
-    for (unsigned i = 0; i < gids.size(); ++i)
+    try
     {
-        if (gids[i] != all_offset_counts[gids[i]].gid)
-            fprintf(stderr, "Warning: gids don't match in diy::io::read_blocks(), %d vs %d\n", gids[i], all_offset_counts[gids[i]].gid);
+        for (unsigned i = 0; i < gids.size(); ++i)
+        {
+            if (gids[i] != all_offset_counts[gids[i]].gid)
+                fprintf(stderr, "Warning: gids don't match in diy::io::read_blocks(), %d vs %d\n",
+                        gids[i], all_offset_counts[gids[i]].gid);
 
-        offset_t offset = all_offset_counts[gids[i]].offset,
-                 count  = all_offset_counts[gids[i]].count;
-        MemoryBuffer bb;
-        bb.buffer.resize(count);
-        f.read_at(offset, bb.buffer);
-        Link* l = LinkFactory::load(bb);
-        l->fix(assigner);
-        void* b = master.create();
-        load(b, bb);
-        master.add(gids[i], b, l);
+            offset_t offset = all_offset_counts[gids[i]].offset,
+                count  = all_offset_counts[gids[i]].count;
+            MemoryBuffer bb;
+            bb.buffer.resize(count);
+            f.read_at(offset, bb.buffer);
+            Link* l = LinkFactory::load(bb);
+            l->fix(assigner);
+            void* b = master.create();
+            load(b, bb);
+            master.add(gids[i], b, l);
+        }
+    }
+    catch(...)
+    {
+        fprintf(stderr, "Error reading blocks\n");
+        throw(1);
     }
   }
 
