@@ -83,7 +83,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">DIY Documentation</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>DIY is a data-parallel library for writing scalable distributed- and shared-memory parallel algorithms that can run both in- and out-of-core. The same program can be executed with one or more threads per MPI process and with one or more data blocks resident in main memory. The abstraction enabling these capabilities is block-based parallelism; blocks and their message queues are mapped onto processing elements (MPI processes or threads) and are migrated between memory and storage by the DIY runtime. Complex communication patterns, including neighbor exchange, merge reduction, swap reduction, and all-to-all exchange, are implemented in DIY.</p>
+<div class="textblock"><p>DIY is a block-parallel library for writing scalable distributed- and shared-memory parallel algorithms that can run both in- and out-of-core. The same program can be executed with one or more threads per MPI process and with one or more data blocks resident in main memory. The abstraction enabling these capabilities is block-parallelism; blocks and their message queues are mapped onto processing elements (MPI processes or threads) and are migrated between memory and storage by the DIY runtime. Complex communication patterns, including neighbor exchange, merge reduction, swap reduction, and all-to-all exchange, are implemented in DIY.</p>
 <p>DIY follows a bulk-synchronous processing (BSP) programming model. A simple program, shown below, consists of the following components:</p>
 <ul>
 <li><code>struct</code>s called blocks,</li>
@@ -135,7 +135,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">    }</div>
 <div class="line">    b-&gt;average = average / cp.link()-&gt;size();</div>
 <div class="line">}</div>
-</div><!-- fragment --><p>More information about getting started creating blocks, assigning them to processes, and decomposing a domain can be found in the <a class="el" href="group___initialization.html">Initialization</a> page. Complete examples of working programs can be found in the <a class="el" href="group___examples.html">Examples</a> page.</p>
+</div><!-- fragment --><h2>Getting Started </h2>
+<p>More information about getting started creating blocks, assigning them to processes, and decomposing a domain can be found in the <a class="el" href="group___initialization.html">Initialization</a> page. Complete examples of working programs can be found in the <a class="el" href="group___examples.html">Examples</a> page.</p>
 <h2>Components </h2>
 <ul>
 <li><a class="el" href="group___initialization.html">Initialization</a></li>
@@ -160,7 +161,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Jan 16 2016 13:56:18 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Jan 22 2016 10:17:35 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.7
 </small></address>

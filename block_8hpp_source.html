@@ -280,205 +280,229 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    <span class="keywordtype">size_t</span> footer_size;</div>
 <div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;</div>
 <div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="comment">// Read the size</span></div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    f.read_at_all(footer_offset, (<span class="keywordtype">char</span>*) &amp;footer_size, <span class="keyword">sizeof</span>(footer_size));</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    <span class="comment">// Read all_offset_counts</span></div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    footer_offset -= footer_size;</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <a class="code" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a> footer;</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    footer.buffer.resize(footer_size);</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    f.read_at_all(footer_offset, footer.buffer);</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    std::vector&lt;GidOffsetCount&gt;  all_offset_counts;</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a>(footer, all_offset_counts);</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a>(footer, extra);</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    extra.reset();</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    <span class="comment">// Get local gids from assigner</span></div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    <span class="keywordtype">size_t</span> size = all_offset_counts.size();</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    assigner.<a class="code" href="classdiy_1_1_assigner.html#a36ff8dfc23aac3e8faf76748cf3b3cfc">set_nblocks</a>(size);</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    std::vector&lt;int&gt; gids;</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    assigner.<a class="code" href="classdiy_1_1_assigner.html#a08785c292ae854385892389ad8a8877d">local_gids</a>(comm.rank(), gids);</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    <span class="comment">// Read our blocks;</span></div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    <span class="comment">// TODO: use collective IO, when possible</span></div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; gids.size(); ++i)</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    {</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;        <span class="keywordflow">if</span> (gids[i] != all_offset_counts[gids[i]].gid)</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;            fprintf(stderr, <span class="stringliteral">&quot;Warning: gids don&#39;t match in diy::io::read_blocks(), %d vs %d\n&quot;</span>, gids[i], all_offset_counts[gids[i]].gid);</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;        offset_t offset = all_offset_counts[gids[i]].offset,</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;                 count  = all_offset_counts[gids[i]].count;</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;        <a class="code" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a> bb;</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;        bb.buffer.resize(count);</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;        f.read_at(offset, bb.buffer);</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;        <a class="code" href="classdiy_1_1_link.html">Link</a>* l = LinkFactory::load(bb);</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;        l-&gt;fix(assigner);</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;        <span class="keywordtype">void</span>* b = master.create();</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;        <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a>(b, bb);</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;        master.<a class="code" href="classdiy_1_1_master.html#aeab2723bb0ecd4f7316b4805c1b53a61">add</a>(gids[i], b, l);</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    }</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;  }</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;  <span class="comment">// Functions without the extra buffer, for compatibility with the old code</span></div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;  <span class="keyword">inline</span></div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;  <span class="keywordtype">void</span></div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;  <a class="code" href="group___i_o.html#ga89b32ee9be0f8de92f6bcb7a096b7f58">write_blocks</a>(<span class="keyword">const</span> std::string&amp;           outfilename,</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;               <span class="keyword">const</span> <a class="code" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a>&amp;     comm,</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;               <a class="code" href="classdiy_1_1_master.html">Master</a>&amp;                      master,</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;               Master::SaveBlock            <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>)</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;  {</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    <a class="code" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a> extra;</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    <a class="code" href="group___i_o.html#ga89b32ee9be0f8de92f6bcb7a096b7f58">write_blocks</a>(outfilename, comm, master, extra, save);</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;  }</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;  <span class="keyword">inline</span></div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;  <span class="keywordtype">void</span></div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;  <a class="code" href="group___i_o.html#gae1028f6aa9f522e8fd57859c81bbc466">read_blocks</a>(<span class="keyword">const</span> std::string&amp;           infilename,</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;              <span class="keyword">const</span> mpi::communicator&amp;     comm,</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;              Assigner&amp;                    assigner,</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;              Master&amp;                      master,</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;              Master::LoadBlock            <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a> = 0)</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;  {</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    MemoryBuffer extra;     <span class="comment">// dummy</span></div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    <a class="code" href="group___i_o.html#gae1028f6aa9f522e8fd57859c81bbc466">read_blocks</a>(infilename, comm, assigner, master, extra, <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a>);</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;  }</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <span class="keywordflow">try</span></div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    {</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;        f.read_at_all(footer_offset, (<span class="keywordtype">char</span>*) &amp;footer_size, <span class="keyword">sizeof</span>(footer_size));</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    }</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    <span class="keywordflow">catch</span>(...)</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    {</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;        fprintf(stderr, <span class="stringliteral">&quot;Error reading footer size\n&quot;</span>);</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;        <span class="keywordflow">throw</span>(1);</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    }</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <span class="comment">// Read all_offset_counts</span></div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    footer_offset -= footer_size;</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    <a class="code" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a> footer;</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    <span class="keywordflow">try</span></div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    {</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;        footer.buffer.resize(footer_size);</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;        f.read_at_all(footer_offset, footer.buffer);</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    }</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <span class="keywordflow">catch</span>(...)</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    {</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;        fprintf(stderr, <span class="stringliteral">&quot;Error reading footer\n&quot;</span>);</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;        <span class="keywordflow">throw</span>(1);</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    }</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    std::vector&lt;GidOffsetCount&gt;  all_offset_counts;</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a>(footer, all_offset_counts);</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a>(footer, extra);</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    extra.reset();</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <span class="comment">// Get local gids from assigner</span></div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="keywordtype">size_t</span> size = all_offset_counts.size();</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    assigner.<a class="code" href="classdiy_1_1_assigner.html#a36ff8dfc23aac3e8faf76748cf3b3cfc">set_nblocks</a>(size);</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    std::vector&lt;int&gt; gids;</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    assigner.<a class="code" href="classdiy_1_1_assigner.html#a08785c292ae854385892389ad8a8877d">local_gids</a>(comm.rank(), gids);</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    <span class="comment">// Read our blocks;</span></div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    <span class="comment">// TODO: use collective IO, when possible</span></div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    <span class="keywordflow">try</span></div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    {</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; gids.size(); ++i)</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;        {</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;            <span class="keywordflow">if</span> (gids[i] != all_offset_counts[gids[i]].gid)</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;                fprintf(stderr, <span class="stringliteral">&quot;Warning: gids don&#39;t match in diy::io::read_blocks(), %d vs %d\n&quot;</span>,</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;                        gids[i], all_offset_counts[gids[i]].gid);</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;            offset_t offset = all_offset_counts[gids[i]].offset,</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;                count  = all_offset_counts[gids[i]].count;</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;            <a class="code" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a> bb;</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;            bb.buffer.resize(count);</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;            f.read_at(offset, bb.buffer);</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;            <a class="code" href="classdiy_1_1_link.html">Link</a>* l = LinkFactory::load(bb);</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;            l-&gt;fix(assigner);</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;            <span class="keywordtype">void</span>* b = master.create();</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;            <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a>(b, bb);</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;            master.<a class="code" href="classdiy_1_1_master.html#aeab2723bb0ecd4f7316b4805c1b53a61">add</a>(gids[i], b, l);</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;        }</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    }</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    <span class="keywordflow">catch</span>(...)</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    {</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;        fprintf(stderr, <span class="stringliteral">&quot;Error reading blocks\n&quot;</span>);</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;        <span class="keywordflow">throw</span>(1);</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    }</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;  }</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;</div>
 <div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;<span class="keyword">namespace </span>split</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;{</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;  <span class="keyword">inline</span></div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;  <span class="keywordtype">void</span></div>
-<div class="line"><a name="l00270"></a><span class="lineno"><a class="line" href="group___i_o.html#ga89b32ee9be0f8de92f6bcb7a096b7f58">  270</a></span>&#160;  <a class="code" href="group___i_o.html#ga89b32ee9be0f8de92f6bcb7a096b7f58">write_blocks</a>(<span class="keyword">const</span> std::string&amp;           outfilename,           </div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;               <span class="keyword">const</span> <a class="code" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a>&amp;     comm,                  </div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;               <a class="code" href="classdiy_1_1_master.html">Master</a>&amp;                      master,                </div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;               <span class="keyword">const</span> <a class="code" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a>&amp;          extra = <a class="code" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a>(),</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;               Master::SaveBlock            <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a> = 0)              </div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;  {</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;    <span class="keywordflow">if</span> (!<a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>) <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a> = master.saver();       <span class="comment">// save is likely to be different from master.save()</span></div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;    <span class="keywordtype">bool</span> proceed = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    <span class="keywordtype">size_t</span> size = 0;</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    <span class="keywordflow">if</span> (comm.rank() == 0)</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;    {</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;        <span class="keyword">struct </span>stat s;</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;        <span class="keywordflow">if</span> (stat(outfilename.c_str(), &amp;s) == 0)</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;        {</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;            <span class="keywordflow">if</span> (S_ISDIR(s.st_mode))</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;                proceed = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (mkdir(outfilename.c_str(), 0755) == 0)</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;            proceed = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;        <a class="code" href="group___m_p_i.html#ga306425d8ccbecd1b6fd77ec0950c86a6">mpi::broadcast</a>(comm, proceed, 0);</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;        <a class="code" href="group___m_p_i.html#ga13ff29a892870f09695ff7fd3832e764">mpi::reduce</a>(comm, (<span class="keywordtype">size_t</span>) master.<a class="code" href="classdiy_1_1_master.html#afd41d766a657a7b5e3aa6eb2ed141ecd">size</a>(), size, 0, std::plus&lt;size_t&gt;());</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    } <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;    {</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;        <a class="code" href="group___m_p_i.html#ga306425d8ccbecd1b6fd77ec0950c86a6">mpi::broadcast</a>(comm, proceed, 0);</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;        <a class="code" href="group___m_p_i.html#ga13ff29a892870f09695ff7fd3832e764">mpi::reduce</a>(comm, (<span class="keywordtype">size_t</span>) master.<a class="code" href="classdiy_1_1_master.html#afd41d766a657a7b5e3aa6eb2ed141ecd">size</a>(), 0, std::plus&lt;size_t&gt;());</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    }</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;    <span class="keywordflow">if</span> (!proceed)</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;        <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Cannot access or create directory: &quot;</span> + outfilename);</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; (int)master.<a class="code" href="classdiy_1_1_master.html#afd41d766a657a7b5e3aa6eb2ed141ecd">size</a>(); ++i)</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;    {</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">void</span>* block = master.<a class="code" href="classdiy_1_1_master.html#a97a88f274e2b86738171a2c852027729">get</a>(i);</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;        <span class="keywordtype">char</span> gid_str[50];</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;        sprintf(gid_str, <span class="stringliteral">&quot;%d&quot;</span>, master.<a class="code" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>(i));</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;        std::string filename = outfilename + <span class="charliteral">&#39;/&#39;</span> + gid_str;</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;        ::diy::detail::FileBuffer bb(fopen(filename.c_str(), <span class="stringliteral">&quot;w&quot;</span>));</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;        <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">LinkFactory::save</a>(bb, master.link(i));</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;        <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>(block, bb);</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;        fclose(bb.file);</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    }</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;    <span class="keywordflow">if</span> (comm.rank() == 0)</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;    {</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;        <span class="comment">// save the extra buffer</span></div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;        std::string filename = outfilename + <span class="stringliteral">&quot;/extra&quot;</span>;</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;        ::diy::detail::FileBuffer bb(fopen(filename.c_str(), <span class="stringliteral">&quot;w&quot;</span>));</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;        <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">::diy::save</a>(bb, size);</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;        <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">::diy::save</a>(bb, extra);</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;        fclose(bb.file);</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;    }</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;  }</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;</div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;  <span class="keyword">inline</span></div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;  <span class="keywordtype">void</span></div>
-<div class="line"><a name="l00333"></a><span class="lineno"><a class="line" href="group___i_o.html#gae1028f6aa9f522e8fd57859c81bbc466">  333</a></span>&#160;  <a class="code" href="group___i_o.html#gae1028f6aa9f522e8fd57859c81bbc466">read_blocks</a>(<span class="keyword">const</span> std::string&amp;           infilename,  </div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;              <span class="keyword">const</span> <a class="code" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a>&amp;     comm,        </div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;              <a class="code" href="classdiy_1_1_assigner.html">Assigner</a>&amp;                    assigner,    </div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;              <a class="code" href="classdiy_1_1_master.html">Master</a>&amp;                      master,      </div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;              <a class="code" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a>&amp;                extra,       </div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;              Master::LoadBlock            <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a> = 0)    </div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;  {</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;    <span class="keywordflow">if</span> (!<a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a>) <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a> = master.loader();      <span class="comment">// load is likely to be different from master.load()</span></div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;</div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;    <span class="comment">// load the extra buffer and size</span></div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;    <span class="keywordtype">size_t</span>          size;</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;    std::string filename = infilename + <span class="stringliteral">&quot;/extra&quot;</span>;</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;    ::diy::detail::FileBuffer bb(fopen(filename.c_str(), <span class="stringliteral">&quot;r&quot;</span>));</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;    <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">::diy::load</a>(bb, size);</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;    <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">::diy::load</a>(bb, extra);</div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;    extra.reset();</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;    fclose(bb.file);</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;  <span class="comment">// Functions without the extra buffer, for compatibility with the old code</span></div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;  <span class="keyword">inline</span></div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;  <span class="keywordtype">void</span></div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;  <a class="code" href="group___i_o.html#ga89b32ee9be0f8de92f6bcb7a096b7f58">write_blocks</a>(<span class="keyword">const</span> std::string&amp;           outfilename,</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;               <span class="keyword">const</span> <a class="code" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a>&amp;     comm,</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;               <a class="code" href="classdiy_1_1_master.html">Master</a>&amp;                      master,</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;               Master::SaveBlock            <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>)</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;  {</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    <a class="code" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a> extra;</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    <a class="code" href="group___i_o.html#ga89b32ee9be0f8de92f6bcb7a096b7f58">write_blocks</a>(outfilename, comm, master, extra, save);</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;  }</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;  <span class="keyword">inline</span></div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;  <span class="keywordtype">void</span></div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;  <a class="code" href="group___i_o.html#gae1028f6aa9f522e8fd57859c81bbc466">read_blocks</a>(<span class="keyword">const</span> std::string&amp;           infilename,</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;              <span class="keyword">const</span> mpi::communicator&amp;     comm,</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;              Assigner&amp;                    assigner,</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;              Master&amp;                      master,</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;              Master::LoadBlock            <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a> = 0)</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;  {</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    MemoryBuffer extra;     <span class="comment">// dummy</span></div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;    <a class="code" href="group___i_o.html#gae1028f6aa9f522e8fd57859c81bbc466">read_blocks</a>(infilename, comm, assigner, master, extra, <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a>);</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;  }</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;<span class="keyword">namespace </span>split</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;{</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;  <span class="keyword">inline</span></div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;  <span class="keywordtype">void</span></div>
+<div class="line"><a name="l00294"></a><span class="lineno"><a class="line" href="group___i_o.html#ga89b32ee9be0f8de92f6bcb7a096b7f58">  294</a></span>&#160;  <a class="code" href="group___i_o.html#ga89b32ee9be0f8de92f6bcb7a096b7f58">write_blocks</a>(<span class="keyword">const</span> std::string&amp;           outfilename,           </div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;               <span class="keyword">const</span> <a class="code" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a>&amp;     comm,                  </div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;               <a class="code" href="classdiy_1_1_master.html">Master</a>&amp;                      master,                </div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;               <span class="keyword">const</span> <a class="code" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a>&amp;          extra = <a class="code" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a>(),</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;               Master::SaveBlock            <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a> = 0)              </div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;  {</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    <span class="keywordflow">if</span> (!<a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>) <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a> = master.saver();       <span class="comment">// save is likely to be different from master.save()</span></div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;    <span class="keywordtype">bool</span> proceed = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;    <span class="keywordtype">size_t</span> size = 0;</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;    <span class="keywordflow">if</span> (comm.rank() == 0)</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;    {</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;        <span class="keyword">struct </span>stat s;</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;        <span class="keywordflow">if</span> (stat(outfilename.c_str(), &amp;s) == 0)</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;        {</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;            <span class="keywordflow">if</span> (S_ISDIR(s.st_mode))</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;                proceed = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (mkdir(outfilename.c_str(), 0755) == 0)</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;            proceed = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;        <a class="code" href="group___m_p_i.html#ga306425d8ccbecd1b6fd77ec0950c86a6">mpi::broadcast</a>(comm, proceed, 0);</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;        <a class="code" href="group___m_p_i.html#ga13ff29a892870f09695ff7fd3832e764">mpi::reduce</a>(comm, (<span class="keywordtype">size_t</span>) master.<a class="code" href="classdiy_1_1_master.html#afd41d766a657a7b5e3aa6eb2ed141ecd">size</a>(), size, 0, std::plus&lt;size_t&gt;());</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    } <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;    {</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;        <a class="code" href="group___m_p_i.html#ga306425d8ccbecd1b6fd77ec0950c86a6">mpi::broadcast</a>(comm, proceed, 0);</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;        <a class="code" href="group___m_p_i.html#ga13ff29a892870f09695ff7fd3832e764">mpi::reduce</a>(comm, (<span class="keywordtype">size_t</span>) master.<a class="code" href="classdiy_1_1_master.html#afd41d766a657a7b5e3aa6eb2ed141ecd">size</a>(), 0, std::plus&lt;size_t&gt;());</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;    }</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;    <span class="keywordflow">if</span> (!proceed)</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;        <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Cannot access or create directory: &quot;</span> + outfilename);</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; (int)master.<a class="code" href="classdiy_1_1_master.html#afd41d766a657a7b5e3aa6eb2ed141ecd">size</a>(); ++i)</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    {</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">void</span>* block = master.<a class="code" href="classdiy_1_1_master.html#a97a88f274e2b86738171a2c852027729">get</a>(i);</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;        <span class="keywordtype">char</span> gid_str[50];</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;        sprintf(gid_str, <span class="stringliteral">&quot;%d&quot;</span>, master.<a class="code" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>(i));</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;        std::string filename = outfilename + <span class="charliteral">&#39;/&#39;</span> + gid_str;</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;        ::diy::detail::FileBuffer bb(fopen(filename.c_str(), <span class="stringliteral">&quot;w&quot;</span>));</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;</div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;        <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">LinkFactory::save</a>(bb, master.link(i));</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;        <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>(block, bb);</div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;        fclose(bb.file);</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;    }</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;    <span class="keywordflow">if</span> (comm.rank() == 0)</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;    {</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;        <span class="comment">// save the extra buffer</span></div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;        std::string filename = outfilename + <span class="stringliteral">&quot;/extra&quot;</span>;</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;        ::diy::detail::FileBuffer bb(fopen(filename.c_str(), <span class="stringliteral">&quot;w&quot;</span>));</div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;        <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">::diy::save</a>(bb, size);</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;        <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">::diy::save</a>(bb, extra);</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;        fclose(bb.file);</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;    }</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;  }</div>
 <div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;    <span class="comment">// Get local gids from assigner</span></div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;    assigner.<a class="code" href="classdiy_1_1_assigner.html#a36ff8dfc23aac3e8faf76748cf3b3cfc">set_nblocks</a>(size);</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;    std::vector&lt;int&gt; gids;</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;    assigner.<a class="code" href="classdiy_1_1_assigner.html#a08785c292ae854385892389ad8a8877d">local_gids</a>(comm.rank(), gids);</div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;</div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;    <span class="comment">// Read our blocks;</span></div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; gids.size(); ++i)</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;    {</div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;        <span class="keywordtype">char</span> gid_str[50];</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;        sprintf(gid_str, <span class="stringliteral">&quot;%d&quot;</span>, gids[i]);</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;        std::string filename = infilename + <span class="charliteral">&#39;/&#39;</span> + gid_str;</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;        ::diy::detail::FileBuffer bb(fopen(filename.c_str(), <span class="stringliteral">&quot;r&quot;</span>));</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;        <a class="code" href="classdiy_1_1_link.html">Link</a>* l = <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">LinkFactory::load</a>(bb);</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;        l-&gt;fix(assigner);</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;        <span class="keywordtype">void</span>* b = master.create();</div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;        <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a>(b, bb);</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;        master.<a class="code" href="classdiy_1_1_master.html#aeab2723bb0ecd4f7316b4805c1b53a61">add</a>(gids[i], b, l);</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;        fclose(bb.file);</div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;    }</div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;  }</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;  <span class="comment">// Functions without the extra buffer, for compatibility with the old code</span></div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;  <span class="keyword">inline</span></div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;  <span class="keywordtype">void</span></div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;  <a class="code" href="group___i_o.html#ga89b32ee9be0f8de92f6bcb7a096b7f58">write_blocks</a>(<span class="keyword">const</span> std::string&amp;           outfilename,</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;               <span class="keyword">const</span> <a class="code" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a>&amp;     comm,</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;               <a class="code" href="classdiy_1_1_master.html">Master</a>&amp;                      master,</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;               Master::SaveBlock            <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>)</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;  {</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;    <a class="code" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a> extra;</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;    <a class="code" href="group___i_o.html#ga89b32ee9be0f8de92f6bcb7a096b7f58">write_blocks</a>(outfilename, comm, master, extra, save);</div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;  }</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;</div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;  <span class="keyword">inline</span></div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;  <span class="keywordtype">void</span></div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;  <a class="code" href="group___i_o.html#gae1028f6aa9f522e8fd57859c81bbc466">read_blocks</a>(<span class="keyword">const</span> std::string&amp;           infilename,</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;              <span class="keyword">const</span> <a class="code" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a>&amp;     comm,</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;              <a class="code" href="classdiy_1_1_assigner.html">Assigner</a>&amp;                    assigner,</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;              <a class="code" href="classdiy_1_1_master.html">Master</a>&amp;                      master,</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;              Master::LoadBlock            <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a> = 0)</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;  {</div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;    <a class="code" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a> extra;     <span class="comment">// dummy</span></div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;    <a class="code" href="group___i_o.html#gae1028f6aa9f522e8fd57859c81bbc466">read_blocks</a>(infilename, comm, assigner, master, extra, <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a>);</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;  <span class="keyword">inline</span></div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;  <span class="keywordtype">void</span></div>
+<div class="line"><a name="l00357"></a><span class="lineno"><a class="line" href="group___i_o.html#gae1028f6aa9f522e8fd57859c81bbc466">  357</a></span>&#160;  <a class="code" href="group___i_o.html#gae1028f6aa9f522e8fd57859c81bbc466">read_blocks</a>(<span class="keyword">const</span> std::string&amp;           infilename,  </div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;              <span class="keyword">const</span> <a class="code" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a>&amp;     comm,        </div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;              <a class="code" href="classdiy_1_1_assigner.html">Assigner</a>&amp;                    assigner,    </div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;              <a class="code" href="classdiy_1_1_master.html">Master</a>&amp;                      master,      </div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;              <a class="code" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a>&amp;                extra,       </div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;              Master::LoadBlock            <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a> = 0)    </div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;  {</div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;    <span class="keywordflow">if</span> (!<a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a>) <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a> = master.loader();      <span class="comment">// load is likely to be different from master.load()</span></div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;    <span class="comment">// load the extra buffer and size</span></div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;    <span class="keywordtype">size_t</span>          size;</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;    std::string filename = infilename + <span class="stringliteral">&quot;/extra&quot;</span>;</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;    ::diy::detail::FileBuffer bb(fopen(filename.c_str(), <span class="stringliteral">&quot;r&quot;</span>));</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;    <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">::diy::load</a>(bb, size);</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;    <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">::diy::load</a>(bb, extra);</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;    extra.reset();</div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;    fclose(bb.file);</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;</div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;    <span class="comment">// Get local gids from assigner</span></div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;    assigner.<a class="code" href="classdiy_1_1_assigner.html#a36ff8dfc23aac3e8faf76748cf3b3cfc">set_nblocks</a>(size);</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;    std::vector&lt;int&gt; gids;</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;    assigner.<a class="code" href="classdiy_1_1_assigner.html#a08785c292ae854385892389ad8a8877d">local_gids</a>(comm.rank(), gids);</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;</div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;    <span class="comment">// Read our blocks;</span></div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; gids.size(); ++i)</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;    {</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;        <span class="keywordtype">char</span> gid_str[50];</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;        sprintf(gid_str, <span class="stringliteral">&quot;%d&quot;</span>, gids[i]);</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;        std::string filename = infilename + <span class="charliteral">&#39;/&#39;</span> + gid_str;</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;        ::diy::detail::FileBuffer bb(fopen(filename.c_str(), <span class="stringliteral">&quot;r&quot;</span>));</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;        <a class="code" href="classdiy_1_1_link.html">Link</a>* l = <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">LinkFactory::load</a>(bb);</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;        l-&gt;fix(assigner);</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;        <span class="keywordtype">void</span>* b = master.create();</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;        <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a>(b, bb);</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;        master.<a class="code" href="classdiy_1_1_master.html#aeab2723bb0ecd4f7316b4805c1b53a61">add</a>(gids[i], b, l);</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;</div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;        fclose(bb.file);</div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;    }</div>
 <div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;  }</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;} <span class="comment">// split</span></div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;} <span class="comment">// io</span></div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;} <span class="comment">// diy</span></div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;  <span class="comment">// Functions without the extra buffer, for compatibility with the old code</span></div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;  <span class="keyword">inline</span></div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;  <span class="keywordtype">void</span></div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;  <a class="code" href="group___i_o.html#ga89b32ee9be0f8de92f6bcb7a096b7f58">write_blocks</a>(<span class="keyword">const</span> std::string&amp;           outfilename,</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;               <span class="keyword">const</span> <a class="code" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a>&amp;     comm,</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;               <a class="code" href="classdiy_1_1_master.html">Master</a>&amp;                      master,</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;               Master::SaveBlock            <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>)</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;  {</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;    <a class="code" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a> extra;</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;    <a class="code" href="group___i_o.html#ga89b32ee9be0f8de92f6bcb7a096b7f58">write_blocks</a>(outfilename, comm, master, extra, save);</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;  }</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;  <span class="keyword">inline</span></div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;  <span class="keywordtype">void</span></div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;  <a class="code" href="group___i_o.html#gae1028f6aa9f522e8fd57859c81bbc466">read_blocks</a>(<span class="keyword">const</span> std::string&amp;           infilename,</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;              <span class="keyword">const</span> <a class="code" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a>&amp;     comm,</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;              <a class="code" href="classdiy_1_1_assigner.html">Assigner</a>&amp;                    assigner,</div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;              <a class="code" href="classdiy_1_1_master.html">Master</a>&amp;                      master,</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;              Master::LoadBlock            <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a> = 0)</div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;  {</div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;    <a class="code" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a> extra;     <span class="comment">// dummy</span></div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;    <a class="code" href="group___i_o.html#gae1028f6aa9f522e8fd57859c81bbc466">read_blocks</a>(infilename, comm, assigner, master, extra, <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a>);</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;  }</div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;} <span class="comment">// split</span></div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;} <span class="comment">// io</span></div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;} <span class="comment">// diy</span></div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="structdiy_1_1mpi_1_1maximum_html"><div class="ttname"><a href="structdiy_1_1mpi_1_1maximum.html">diy::mpi::maximum</a></div><div class="ttdef"><b>Definition:</b> operations.hpp:10</div></div>
-<div class="ttc" id="group___i_o_html_gae1028f6aa9f522e8fd57859c81bbc466"><div class="ttname"><a href="group___i_o.html#gae1028f6aa9f522e8fd57859c81bbc466">diy::io::split::read_blocks</a></div><div class="ttdeci">void read_blocks(const std::string &amp;infilename, const mpi::communicator &amp;comm, Assigner &amp;assigner, Master &amp;master, MemoryBuffer &amp;extra, Master::LoadBlock load=0)</div><div class="ttdoc">Read blocks from storage independently from one file per process. </div><div class="ttdef"><b>Definition:</b> block.hpp:333</div></div>
+<div class="ttc" id="group___i_o_html_gae1028f6aa9f522e8fd57859c81bbc466"><div class="ttname"><a href="group___i_o.html#gae1028f6aa9f522e8fd57859c81bbc466">diy::io::split::read_blocks</a></div><div class="ttdeci">void read_blocks(const std::string &amp;infilename, const mpi::communicator &amp;comm, Assigner &amp;assigner, Master &amp;master, MemoryBuffer &amp;extra, Master::LoadBlock load=0)</div><div class="ttdoc">Read blocks from storage independently from one file per process. </div><div class="ttdef"><b>Definition:</b> block.hpp:357</div></div>
 <div class="ttc" id="group___serialization_html_gae54f4c5c6740fcf7627009bdcfe02aa1"><div class="ttname"><a href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a></div><div class="ttdeci">void load(BinaryBuffer &amp;bb, T &amp;x)</div><div class="ttdoc">Loads x from bb by calling diy::Serialization<T>::load(bb,x). </div><div class="ttdef"><b>Definition:</b> serialization.hpp:112</div></div>
 <div class="ttc" id="classdiy_1_1_master_html_a97a88f274e2b86738171a2c852027729"><div class="ttname"><a href="classdiy_1_1_master.html#a97a88f274e2b86738171a2c852027729">diy::Master::get</a></div><div class="ttdeci">void * get(int i)</div><div class="ttdoc">return the i-th block, loading it if necessary </div><div class="ttdef"><b>Definition:</b> master.hpp:185</div></div>
 <div class="ttc" id="classdiy_1_1_assigner_html_a36ff8dfc23aac3e8faf76748cf3b3cfc"><div class="ttname"><a href="classdiy_1_1_assigner.html#a36ff8dfc23aac3e8faf76748cf3b3cfc">diy::Assigner::set_nblocks</a></div><div class="ttdeci">void set_nblocks(int nblocks)</div><div class="ttdoc">sets the total number of global blocks </div><div class="ttdef"><b>Definition:</b> assigner.hpp:28</div></div>
@@ -498,7 +522,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="classdiy_1_1_assigner_html_a08785c292ae854385892389ad8a8877d"><div class="ttname"><a href="classdiy_1_1_assigner.html#a08785c292ae854385892389ad8a8877d">diy::Assigner::local_gids</a></div><div class="ttdeci">virtual void local_gids(int rank, std::vector&lt; int &gt; &amp;gids) const =0</div><div class="ttdoc">gets the local gids for a given process rank </div></div>
 <div class="ttc" id="structdiy_1_1_serialization_html"><div class="ttname"><a href="structdiy_1_1_serialization.html">diy::Serialization</a></div><div class="ttdoc">Main interface to serialization, meant to be specialized for the types that require special handling...</div><div class="ttdef"><b>Definition:</b> serialization.hpp:92</div></div>
 <div class="ttc" id="group___m_p_i_html_ga44987b4d3a2fbc6b22f458617a445dc5"><div class="ttname"><a href="group___m_p_i.html#ga44987b4d3a2fbc6b22f458617a445dc5">diy::mpi::all_reduce</a></div><div class="ttdeci">void all_reduce(const communicator &amp;comm, const T &amp;in, T &amp;out, const Op &amp;op)</div><div class="ttdoc">all_reduce </div><div class="ttdef"><b>Definition:</b> collectives.hpp:272</div></div>
-<div class="ttc" id="group___i_o_html_ga89b32ee9be0f8de92f6bcb7a096b7f58"><div class="ttname"><a href="group___i_o.html#ga89b32ee9be0f8de92f6bcb7a096b7f58">diy::io::split::write_blocks</a></div><div class="ttdeci">void write_blocks(const std::string &amp;outfilename, const mpi::communicator &amp;comm, Master &amp;master, const MemoryBuffer &amp;extra=MemoryBuffer(), Master::SaveBlock save=0)</div><div class="ttdoc">Write blocks to storage independently in one file per process. </div><div class="ttdef"><b>Definition:</b> block.hpp:270</div></div>
+<div class="ttc" id="group___i_o_html_ga89b32ee9be0f8de92f6bcb7a096b7f58"><div class="ttname"><a href="group___i_o.html#ga89b32ee9be0f8de92f6bcb7a096b7f58">diy::io::split::write_blocks</a></div><div class="ttdeci">void write_blocks(const std::string &amp;outfilename, const mpi::communicator &amp;comm, Master &amp;master, const MemoryBuffer &amp;extra=MemoryBuffer(), Master::SaveBlock save=0)</div><div class="ttdoc">Write blocks to storage independently in one file per process. </div><div class="ttdef"><b>Definition:</b> block.hpp:294</div></div>
 <div class="ttc" id="group___m_p_i_html_ga306425d8ccbecd1b6fd77ec0950c86a6"><div class="ttname"><a href="group___m_p_i.html#ga306425d8ccbecd1b6fd77ec0950c86a6">diy::mpi::broadcast</a></div><div class="ttdeci">void broadcast(const communicator &amp;comm, T &amp;x, int root)</div><div class="ttdoc">Broadcast to all processes in comm. </div><div class="ttdef"><b>Definition:</b> collectives.hpp:199</div></div>
 <div class="ttc" id="structdiy_1_1_binary_buffer_html"><div class="ttname"><a href="structdiy_1_1_binary_buffer.html">diy::BinaryBuffer</a></div><div class="ttdoc">A serialization buffer. </div><div class="ttdef"><b>Definition:</b> serialization.hpp:21</div></div>
 <div class="ttc" id="group___m_p_i_html_ga75f0871fe23708ce65e6be87ecdc974f"><div class="ttname"><a href="group___m_p_i.html#ga75f0871fe23708ce65e6be87ecdc974f">diy::mpi::gather</a></div><div class="ttdeci">void gather(const communicator &amp;comm, const T &amp;in, std::vector&lt; T &gt; &amp;out, int root)</div><div class="ttdoc">Gather from all processes in comm. On root process, out is resized to comm.size() and filled with ele...</div><div class="ttdef"><b>Definition:</b> collectives.hpp:214</div></div>
@@ -507,7 +531,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Jan 16 2016 13:56:18 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Jan 22 2016 10:17:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.7
 </small></address>
