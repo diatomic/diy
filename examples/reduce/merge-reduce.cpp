@@ -99,7 +99,7 @@ struct AddBlock
 //
 void sum(void* b_,                                  // local block
          const diy::ReduceProxy& rp,                // communication proxy
-         const diy::RegularMergePartners& partners) // user-defined additional arguments
+         const diy::RegularMergePartners& partners) // partners of the current block
 {
     Block*     b        = static_cast<Block*>(b_);
     unsigned   round    = rp.round();               // current round number

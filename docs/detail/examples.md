@@ -34,17 +34,19 @@ create, destroy, and serialize blocks in (*commented*) [block.h](\ref simple/blo
 - [Decomposition](https://github.com/diatomic/diy2/tree/master/examples/decomposition):
 demonstrates how to decompose a regular grid into blocks and create links between them.
 
-  - [regular-decomposer-long.cpp](\ref decomposition/regular-decomposer-short.cpp): blocks
-  defined with an AddBlock functor (i.e., the "long" form of the block creator) are decomposed
-  by providing the block creator to the decomposer. This example shows how to set shared faces,
-  ghost regions, and periodic boundaries in the decomposition. It also shows both how to create
-  a ```RegularDecomposer``` and call its ```decompose``` member function, as well as how to combine
-  those two steps using one helper function.
+  - (*commented*) [regular-decomposer-long.cpp](\ref decomposition/regular-decomposer-long.cpp):
+  blocks defined with an AddBlock functor (i.e.,
+  the "long" form of the block creator) are decomposed by providing the block creator to the
+  decomposer. This example shows how to set shared faces, ghost regions, and periodic
+  boundaries in the decomposition. It also shows both how to create a ```RegularDecomposer```
+  and call its ```decompose``` member function, as well as how to combine those two steps using
+  one helper function.
 
-  - [regular-decomposer-short.cpp](\ref decomposition/regular-decomposer-short.cpp): blocks
-  defined without the AddBlock functor or the long form of the block create function (i.e.,
-  using a simple ```void * create()``` function ("short form") can be decomposed just by providing
-  the master object to the decomposer. This example shows how.
+  - (*commented*) [regular-decomposer-short.cpp](\ref decomposition/regular-decomposer-short.cpp):
+  blocks defined without the AddBlock functor or
+  the long form of the block create function (i.e., using a simple ```void * create()```
+  function ("short form") can be decomposed just by providing the master object to the
+  decomposer. This example shows how.
 
 - [Serialization](https://github.com/diatomic/diy2/tree/master/examples/serialization):
 blocks that are loaded and saved in and out of core are serialized by DIY. This
@@ -115,6 +117,10 @@ can vary, but if it's fixed, the number of rounds is log_k(nblocks).
   and how to dequeue data at the end. `diy::all_to_all()` takes care of all the
   intermediate rounds, routing the data appropriately.
 
+  - (*commented*) [all-done.cpp](\ref reduce/all-done.cpp): this is another example of using
+    `diy::all_to_all()` for a very common case: to determine globally whether any blocks have
+    any local work left to do.
+
   - [sort.cpp](\ref reduce/sort.cpp): shows how to use reduction to sort
   a 1-d vector of integers. The algorithm is a histogram-based sort that
   combines both merge and swap reductions. It merges histograms of local data
@@ -152,12 +158,15 @@ Various other open-source projects have been DIY'ed, and these are also good, al
 \example simple/read-blocks.cpp
 \example simple/until-done.cpp
 \example decomposition/test-decomposition.cpp
+\example decomposition/regular-decomposer-short.cpp
+\example decomposition/regular-decomposer-long.cpp
 \example serialization/test-serialization.cpp
 \example io/test-io.cpp
 \example mpi/test-mpi.cpp
 \example reduce/merge-reduce.cpp
 \example reduce/swap-reduce.cpp
 \example reduce/all-to-all.cpp
+\example reduce/all-done.cpp
 \example reduce/kd-tree.cpp
 \example reduce/sort.cpp
 \example reduce/sample-sort.cpp

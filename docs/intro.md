@@ -1,10 +1,10 @@
 DIY
 ===
 
-DIY is a data-parallel library for writing scalable distributed- and shared-memory parallel
+DIY is a block-parallel library for writing scalable distributed- and shared-memory parallel
 algorithms that can run both in- and out-of-core. The same program can be executed with one
 or more threads per MPI process and with one or more data blocks resident in main memory.  The
-abstraction enabling these capabilities is block-based parallelism; blocks and their message
+abstraction enabling these capabilities is block-parallelism; blocks and their message
 queues are mapped onto processing elements (MPI processes or threads) and are migrated between
 memory and storage by the DIY runtime. Complex communication patterns, including neighbor
 exchange, merge reduction, swap reduction, and all-to-all exchange, are implemented in DIY.
@@ -76,6 +76,9 @@ received and sent during rounds of message exchange.
         b->average = average / cp.link()->size();
     }
 ~~~~
+
+Getting Started
+---------------
 
 More information about getting started creating blocks, assigning them to processes, and decomposing a domain can be found in the [Initialization](\ref Initialization) page. Complete examples of working programs can be found in the [Examples](\ref Examples) page.
 
