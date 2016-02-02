@@ -4,6 +4,8 @@
 // first and the last blocks, which have only one or the other. Each block
 // computes an average of its values and those of its neighbors. The average is
 // stored in the block, and the blocks are written to a file in storage.
+// Also demonstrates the use of the all_reduce proxy collective in conjunction
+// with the neighbor communication.
 //
 
 #include <vector>

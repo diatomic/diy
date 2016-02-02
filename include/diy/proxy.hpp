@@ -66,11 +66,23 @@ namespace diy
     OutgoingQueues*     outgoing() const                                { return outgoing_; }
     MemoryBuffer&       outgoing(const BlockID& to) const               { return (*outgoing_)[to]; }
 
-    //! Post an all-reduce collective
+/**
+ * \ingroup Communication
+ * \brief Post an all-reduce collective on top of an existing communication proxy.
+ * Available operators are:
+ * maximum<T>, minimum<T>, std::plus<T>, std::multiplies<T>, std::logical_and<T>, and
+ * std::logical_or<T>.
+ */
     template<class T, class Op>
-    inline void         all_reduce(const T& in, Op op) const;
+    inline void         all_reduce(const T& in,                  //!< local value being reduced
+                                   Op op                         //!< operator
+                                   ) const;
     template<class T>
     inline T            read() const;
+/**
+ * \ingroup Communication
+ * \brief Return the result of a collective on top of an existing communication proxy.
+ */
     template<class T>
     inline T            get() const;
 

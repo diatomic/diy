@@ -104,11 +104,11 @@ namespace detail
  *
  */
 template<class Reduce, class Partners, class Skip>
-void reduce(Master&                    master,
-            const Assigner&            assigner,
-            const Partners&            partners,
-            const Reduce&              reduce,
-            const Skip&                skip)
+void reduce(Master&                    master,        //!< master object
+            const Assigner&            assigner,      //!< assigner object
+            const Partners&            partners,      //!< partners object
+            const Reduce&              reduce,        //!< reduction callback function
+            const Skip&                skip)          //!< object determining whether a block should be skipped
 {
   int original_expected = master.expected();
 
@@ -142,11 +142,17 @@ void reduce(Master&                    master,
   master.set_expected(original_expected);
 }
 
+/**
+ * \ingroup Communication
+ * \brief Implementation of the reduce communication pattern (includes
+ *        swap-reduce, merge-reduce, and any other global communication).
+ *
+ */
 template<class Reduce, class Partners>
-void reduce(Master&                    master,
-            const Assigner&            assigner,
-            const Partners&            partners,
-            const Reduce&              reducer)
+void reduce(Master&                    master,        //!< master object
+            const Assigner&            assigner,      //!< assigner object
+            const Partners&            partners,      //!< partners object
+            const Reduce&              reducer)       //!< reduction callback function
 {
   reduce(master, assigner, partners, reducer, detail::ReduceNeverSkip());
 }
