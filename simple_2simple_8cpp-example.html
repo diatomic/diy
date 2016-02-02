@@ -89,6 +89,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><span class="comment">// first and the last blocks, which have only one or the other. Each block</span></div>
 <div class="line"><span class="comment">// computes an average of its values and those of its neighbors. The average is</span></div>
 <div class="line"><span class="comment">// stored in the block, and the blocks are written to a file in storage.</span></div>
+<div class="line"><span class="comment">// Also demonstrates the use of the all_reduce proxy collective in conjunction</span></div>
+<div class="line"><span class="comment">// with the neighbor communication.</span></div>
 <div class="line"><span class="comment">//</span></div>
 <div class="line"></div>
 <div class="line"><span class="preprocessor">#include &lt;vector&gt;</span></div>
@@ -133,7 +135,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">    <span class="comment">// They are invoked by posting the collective at the time of the enqueue and getting the</span></div>
 <div class="line">    <span class="comment">// result at the time of the dequeue.</span></div>
 <div class="line">    <span class="comment">// all_reduce() is the posting of the collective.</span></div>
-<div class="line">    cp.<a name="a7"></a><a class="code" href="structdiy_1_1_master_1_1_proxy.html#abce4381d1244875967dc3d127227bd45">all_reduce</a>(total, std::plus&lt;int&gt;());</div>
+<div class="line">    cp.<a name="a7"></a><a class="code" href="group___communication.html#gabce4381d1244875967dc3d127227bd45">all_reduce</a>(total, std::plus&lt;int&gt;());</div>
 <div class="line">}</div>
 <div class="line"></div>
 <div class="line"><span class="comment">//</span></div>
@@ -150,7 +152,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">    <span class="comment">// They are invoked by posting the collective at the time of the enqueue and getting the</span></div>
 <div class="line">    <span class="comment">// result at the time of the dequeue.</span></div>
 <div class="line">    <span class="comment">// cp.get() is the result retrieval.</span></div>
-<div class="line">    <span class="keywordtype">int</span> all_total = cp.<a name="a8"></a>get&lt;<span class="keywordtype">int</span>&gt;();</div>
+<div class="line">    <span class="keywordtype">int</span> all_total = cp.<a name="a8"></a><a class="code" href="group___communication.html#gae5ffa2d35209fbe7b2e9161e9fb79d96">get</a>&lt;<span class="keywordtype">int</span>&gt;();</div>
 <div class="line"></div>
 <div class="line">    <span class="comment">// gids of incoming neighbors in the link</span></div>
 <div class="line">    std::vector&lt;int&gt; <a class="code" href="namespacediy.html#a861d8601719a75414c57d6aa6a99e0fc">in</a>;</div>
@@ -257,7 +259,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Jan 22 2016 10:17:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 1 2016 19:50:16 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.7
 </small></address>
