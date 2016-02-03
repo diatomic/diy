@@ -68,7 +68,7 @@ namespace diy
 
 /**
  * \ingroup Communication
- * \brief Post an all-reduce collective on top of an existing communication proxy.
+ * \brief Post an all-reduce collective using an existing communication proxy.
  * Available operators are:
  * maximum<T>, minimum<T>, std::plus<T>, std::multiplies<T>, std::logical_and<T>, and
  * std::logical_or<T>.
@@ -77,11 +77,15 @@ namespace diy
     inline void         all_reduce(const T& in,                  //!< local value being reduced
                                    Op op                         //!< operator
                                    ) const;
+/**
+ * \ingroup Communication
+ * \brief Return the result of a proxy collective without popping it off the collectives list (same result would be returned multiple times). The list can be cleared with collectives()->clear().
+ */
     template<class T>
     inline T            read() const;
 /**
  * \ingroup Communication
- * \brief Return the result of a collective on top of an existing communication proxy.
+ * \brief Return the result of a proxy collective; result is popped off the collectives list.
  */
     template<class T>
     inline T            get() const;
@@ -89,6 +93,10 @@ namespace diy
     template<class T>
     inline void         scratch(const T& in) const;
 
+/**
+ * \ingroup Communication
+ * \brief Return the list of proxy collectives (values and operations)
+ */
     CollectivesList*    collectives() const                             { return collectives_; }
 
     Master*             master() const                                  { return master_; }

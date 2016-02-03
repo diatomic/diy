@@ -40,7 +40,13 @@ The following patterns are currently available.
 Proxy Collectives
 -----------------
 
-When a lightweight reduction needs to be mixed into an existing pattern such as a neighborhood exchange, DIY has a mechanism for this. An example is a neighbor exchange that must iterate until the collective result indicates it is time to terminate (as in particle tracing in rounds until no block has any more work to do). The collective mechanism compares with the above reductions as follows:
+When a lightweight reduction needs to be mixed into an existing pattern such as a neighborhood exchange, DIY has a mechanism for this. An example is a neighbor exchange that must iterate until the collective result indicates it is time to terminate (as in particle tracing in rounds until no block has any more work to do). The underlying mechanism works as follows.
+
+- The input values from each block are pushed to a vector of inputs for the process.
+- The corresponding MPI collective is called by the process.
+- The reduced results are redistributed to the process' blocks.
+
+The inputs are pushed by calling `all_reduce` from each block, and the outputs are popped by calling `get` from each block. The collective mechanism compares with the above reductions as follows:
 
 - It is a simple member function of the communication proxy that is piggybacked onto the underlying proxy, not a completely new pattern using k-ary reductions (unlike above).
 - The reduction works per block and can be out of core (as above) because it uses the underlying proxy.
