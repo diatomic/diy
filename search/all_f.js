@@ -1,6 +1,7 @@
 var searchData=
 [
   ['rank',['rank',['../classdiy_1_1_assigner.html#a272d33bcc94394f39880603084b55f38',1,'diy::Assigner::rank()'],['../classdiy_1_1_contiguous_assigner.html#af4c8d5184b03faf02e63b674c2481968',1,'diy::ContiguousAssigner::rank()'],['../classdiy_1_1_round_robin_assigner.html#a68351bf83c2957ab73fa24bb3b580ca7',1,'diy::RoundRobinAssigner::rank()']]],
+  ['read',['read',['../group___communication.html#ga39e95469ec8128e4f4f4bcc20c2a6205',1,'diy::Master::Proxy']]],
   ['read_5fblocks',['read_blocks',['../group___i_o.html#ga58ad86682cb639add4d3ef0b1806b0c0',1,'diy::io::read_blocks()'],['../group___i_o.html#gae1028f6aa9f522e8fd57859c81bbc466',1,'diy::io::split::read_blocks()']]],
   ['recursive_5fmutex',['recursive_mutex',['../structdiy_1_1recursive__mutex.html',1,'diy']]],
   ['recv',['recv',['../classdiy_1_1mpi_1_1communicator.html#a49d6b9d40158decf77b6b2f9b866779d',1,'diy::mpi::communicator']]],
@@ -15,8 +16,8 @@ var searchData=
   ['regularlinkselector',['RegularLinkSelector',['../structdiy_1_1_regular_link_selector.html',1,'diy']]],
   ['regularlinkselector_3c_20continuousbounds_20_3e',['RegularLinkSelector&lt; ContinuousBounds &gt;',['../structdiy_1_1_regular_link_selector_3_01_continuous_bounds_01_4.html',1,'diy']]],
   ['regularlinkselector_3c_20discretebounds_20_3e',['RegularLinkSelector&lt; DiscreteBounds &gt;',['../structdiy_1_1_regular_link_selector_3_01_discrete_bounds_01_4.html',1,'diy']]],
-  ['regularmergepartners',['RegularMergePartners',['../structdiy_1_1_regular_merge_partners.html',1,'diy']]],
   ['regularmergepartners',['RegularMergePartners',['../structdiy_1_1_regular_merge_partners.html#adb4558fa38a8295827fb0a009f855bc0',1,'diy::RegularMergePartners::RegularMergePartners(int dim, int nblocks, int k, bool contiguous=true)'],['../structdiy_1_1_regular_merge_partners.html#a9ffbb27bb7d66e660d4e244f163bbd18',1,'diy::RegularMergePartners::RegularMergePartners(const DivisionVector &amp;divs, const KVSVector &amp;kvs, bool contiguous=true)']]],
+  ['regularmergepartners',['RegularMergePartners',['../structdiy_1_1_regular_merge_partners.html',1,'diy']]],
   ['regularpartners',['RegularPartners',['../structdiy_1_1_regular_partners.html',1,'diy']]],
   ['regularswappartners',['RegularSwapPartners',['../structdiy_1_1_regular_swap_partners.html#a72e6b2a04e62ac95a24278a6f5667a3e',1,'diy::RegularSwapPartners::RegularSwapPartners(int dim, int nblocks, int k, bool contiguous=true)'],['../structdiy_1_1_regular_swap_partners.html#a9a2a18721741fd117f76c40c5106953f',1,'diy::RegularSwapPartners::RegularSwapPartners(const DivisionVector &amp;divs, const KVSVector &amp;kvs, bool contiguous=true)']]],
   ['regularswappartners',['RegularSwapPartners',['../structdiy_1_1_regular_swap_partners.html',1,'diy']]],

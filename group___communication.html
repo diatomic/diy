@@ -118,7 +118,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </li>
 </ul>
 <h2>Proxy Collectives </h2>
-<p>When a lightweight reduction needs to be mixed into an existing pattern such as a neighborhood exchange, DIY has a mechanism for this. An example is a neighbor exchange that must iterate until the collective result indicates it is time to terminate (as in particle tracing in rounds until no block has any more work to do). The collective mechanism compares with the above reductions as follows:</p>
+<p>When a lightweight reduction needs to be mixed into an existing pattern such as a neighborhood exchange, DIY has a mechanism for this. An example is a neighbor exchange that must iterate until the collective result indicates it is time to terminate (as in particle tracing in rounds until no block has any more work to do). The underlying mechanism works as follows.</p>
+<ul>
+<li>The input values from each block are pushed to a vector of inputs for the process.</li>
+<li>The corresponding MPI collective is called by the process.</li>
+<li>The reduced results are redistributed to the process' blocks.</li>
+</ul>
+<p>The inputs are pushed by calling <code>all_reduce</code> from each block, and the outputs are popped by calling <code>get</code> from each block. The collective mechanism compares with the above reductions as follows:</p>
 <ul>
 <li>It is a simple member function of the communication proxy that is piggybacked onto the underlying proxy, not a completely new pattern using k-ary reductions (unlike above).</li>
 <li>The reduction works per block and can be out of core (as above) because it uses the underlying proxy.</li>
@@ -173,13 +179,22 @@ Classes</h2></td></tr>
 Functions</h2></td></tr>
 <tr class="memitem:gabce4381d1244875967dc3d127227bd45"><td class="memTemplParams" colspan="2">template&lt;class T , class Op &gt; </td></tr>
 <tr class="memitem:gabce4381d1244875967dc3d127227bd45"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group___communication.html#gabce4381d1244875967dc3d127227bd45">diy::Master::Proxy::all_reduce</a> (const T &amp;in, Op op) const </td></tr>
-<tr class="memdesc:gabce4381d1244875967dc3d127227bd45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Post an all-reduce collective on top of an existing communication proxy. Available operators are: maximum&lt;T&gt;, minimum&lt;T&gt;, std::plus&lt;T&gt;, std::multiplies&lt;T&gt;, std::logical_and&lt;T&gt;, and std::logical_or&lt;T&gt;.  <a href="#gabce4381d1244875967dc3d127227bd45">More...</a><br /></td></tr>
+<tr class="memdesc:gabce4381d1244875967dc3d127227bd45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Post an all-reduce collective using an existing communication proxy. Available operators are: maximum&lt;T&gt;, minimum&lt;T&gt;, std::plus&lt;T&gt;, std::multiplies&lt;T&gt;, std::logical_and&lt;T&gt;, and std::logical_or&lt;T&gt;.  <a href="#gabce4381d1244875967dc3d127227bd45">More...</a><br /></td></tr>
 <tr class="separator:gabce4381d1244875967dc3d127227bd45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga39e95469ec8128e4f4f4bcc20c2a6205"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga39e95469ec8128e4f4f4bcc20c2a6205"></a>
+template&lt;class T &gt; </td></tr>
+<tr class="memitem:ga39e95469ec8128e4f4f4bcc20c2a6205"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group___communication.html#ga39e95469ec8128e4f4f4bcc20c2a6205">diy::Master::Proxy::read</a> () const </td></tr>
+<tr class="memdesc:ga39e95469ec8128e4f4f4bcc20c2a6205"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the result of a proxy collective without popping it off the collectives list (same result would be returned multiple times). The list can be cleared with <a class="el" href="group___communication.html#gae3dbd9440a4a0b72abf3b8e35891c5d4" title="Return the list of proxy collectives (values and operations) ">collectives()</a>-&gt;clear(). <br /></td></tr>
+<tr class="separator:ga39e95469ec8128e4f4f4bcc20c2a6205"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gae5ffa2d35209fbe7b2e9161e9fb79d96"><td class="memTemplParams" colspan="2"><a class="anchor" id="gae5ffa2d35209fbe7b2e9161e9fb79d96"></a>
 template&lt;class T &gt; </td></tr>
 <tr class="memitem:gae5ffa2d35209fbe7b2e9161e9fb79d96"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group___communication.html#gae5ffa2d35209fbe7b2e9161e9fb79d96">diy::Master::Proxy::get</a> () const </td></tr>
-<tr class="memdesc:gae5ffa2d35209fbe7b2e9161e9fb79d96"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the result of a collective on top of an existing communication proxy. <br /></td></tr>
+<tr class="memdesc:gae5ffa2d35209fbe7b2e9161e9fb79d96"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the result of a proxy collective; result is popped off the collectives list. <br /></td></tr>
 <tr class="separator:gae5ffa2d35209fbe7b2e9161e9fb79d96"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae3dbd9440a4a0b72abf3b8e35891c5d4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gae3dbd9440a4a0b72abf3b8e35891c5d4"></a>
+CollectivesList *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___communication.html#gae3dbd9440a4a0b72abf3b8e35891c5d4">diy::Master::Proxy::collectives</a> () const </td></tr>
+<tr class="memdesc:gae3dbd9440a4a0b72abf3b8e35891c5d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the list of proxy collectives (values and operations) <br /></td></tr>
+<tr class="separator:gae3dbd9440a4a0b72abf3b8e35891c5d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga3dfb1bdb9c078d9f18fc6953295a0208"><td class="memTemplParams" colspan="2">template&lt;class Op &gt; </td></tr>
 <tr class="memitem:ga3dfb1bdb9c078d9f18fc6953295a0208"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group___communication.html#ga3dfb1bdb9c078d9f18fc6953295a0208">diy::all_to_all</a> (Master &amp;master, const Assigner &amp;assigner, const Op &amp;op, int k=2)</td></tr>
 <tr class="memdesc:ga3dfb1bdb9c078d9f18fc6953295a0208"><td class="mdescLeft">&#160;</td><td class="mdescRight">all to all reduction  <a href="#ga3dfb1bdb9c078d9f18fc6953295a0208">More...</a><br /></td></tr>
@@ -228,7 +243,7 @@ template&lt;class T , class Op &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Post an all-reduce collective on top of an existing communication proxy. Available operators are: maximum&lt;T&gt;, minimum&lt;T&gt;, std::plus&lt;T&gt;, std::multiplies&lt;T&gt;, std::logical_and&lt;T&gt;, and std::logical_or&lt;T&gt;. </p>
+<p>Post an all-reduce collective using an existing communication proxy. Available operators are: maximum&lt;T&gt;, minimum&lt;T&gt;, std::plus&lt;T&gt;, std::multiplies&lt;T&gt;, std::logical_and&lt;T&gt;, and std::logical_or&lt;T&gt;. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">in</td><td>local value being reduced </td></tr>
@@ -405,7 +420,7 @@ template&lt;class Reduce , class Partners &gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Feb 1 2016 19:50:16 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 2 2016 19:06:55 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.7
 </small></address>

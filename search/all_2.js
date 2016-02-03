@@ -2,6 +2,7 @@ var searchData=
 [
   ['collection',['Collection',['../classdiy_1_1_collection.html',1,'diy']]],
   ['collective',['Collective',['../structdiy_1_1_master_1_1_collective.html',1,'diy::Master']]],
+  ['collectives',['collectives',['../group___communication.html#gae3dbd9440a4a0b72abf3b8e35891c5d4',1,'diy::Master::Proxy']]],
   ['command',['Command',['../structdiy_1_1_master_1_1_command.html',1,'diy::Master']]],
   ['communication',['Communication',['../group___communication.html',1,'']]],
   ['communicator',['communicator',['../classdiy_1_1mpi_1_1communicator.html',1,'diy::mpi']]],

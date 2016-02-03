@@ -1,6 +1,7 @@
 var searchData=
 [
   ['rank',['rank',['../classdiy_1_1_assigner.html#a272d33bcc94394f39880603084b55f38',1,'diy::Assigner::rank()'],['../classdiy_1_1_contiguous_assigner.html#af4c8d5184b03faf02e63b674c2481968',1,'diy::ContiguousAssigner::rank()'],['../classdiy_1_1_round_robin_assigner.html#a68351bf83c2957ab73fa24bb3b580ca7',1,'diy::RoundRobinAssigner::rank()']]],
+  ['read',['read',['../group___communication.html#ga39e95469ec8128e4f4f4bcc20c2a6205',1,'diy::Master::Proxy']]],
   ['read_5fblocks',['read_blocks',['../group___i_o.html#ga58ad86682cb639add4d3ef0b1806b0c0',1,'diy::io::read_blocks()'],['../group___i_o.html#gae1028f6aa9f522e8fd57859c81bbc466',1,'diy::io::split::read_blocks()']]],
   ['recv',['recv',['../classdiy_1_1mpi_1_1communicator.html#a49d6b9d40158decf77b6b2f9b866779d',1,'diy::mpi::communicator']]],
   ['reduce',['reduce',['../group___m_p_i.html#ga13ff29a892870f09695ff7fd3832e764',1,'diy::mpi::reduce(const communicator &amp;comm, const T &amp;in, T &amp;out, int root, const Op &amp;op)'],['../group___m_p_i.html#ga8d25825b156fc8b5ded921b1094f7520',1,'diy::mpi::reduce(const communicator &amp;comm, const T &amp;in, int root, const Op &amp;op)'],['../group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f',1,'diy::reduce(Master &amp;master, const Assigner &amp;assigner, const Partners &amp;partners, const Reduce &amp;reduce, const Skip &amp;skip)'],['../group___communication.html#gac4f9294e9a7e7a7f2034bcbddf4e7084',1,'diy::reduce(Master &amp;master, const Assigner &amp;assigner, const Partners &amp;partners, const Reduce &amp;reducer)']]],
