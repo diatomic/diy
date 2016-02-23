@@ -27,8 +27,6 @@ struct SimplePoint
     float   operator[](unsigned i) const                    { return coords[i]; }
 };
 
-float random(float min, float max)      { return min + float(rand() % 1024) / 1024 * (max - min); }
-
 struct Block
 {
   typedef         SimplePoint<DIM>                            Point;
@@ -41,13 +39,36 @@ struct Block
   static void     save(const void* b, diy::BinaryBuffer& bb)    { diy::save(bb, *static_cast<const Block*>(b)); }
   static void     load(void* b, diy::BinaryBuffer& bb)          { diy::load(bb, *static_cast<Block*>(b)); }
 
-
   void            generate_points(size_t n)
   {
     points.resize(n);
     for (size_t i = 0; i < n; ++i)
       for (unsigned j = 0; j < DIM; ++j)
-        points[i][j] = random(domain.min[j], domain.max[j]);
+      {
+        float min = domain.min[j];
+        float max = domain.max[j];
+        float u = float(rand() % 1024) / 1024;
+        points[i][j] = min + u * (max - min);
+      }
+  }
+
+  void            generate_points_exponential(size_t n)
+  {
+    points.resize(n);
+    for (size_t i = 0; i < n; ++i)
+      for (unsigned j = 0; j < DIM; ++j)
+      {
+        float min = domain.min[j];
+        float max = domain.max[j];
+        float u = float(rand() % 1024) / 1024;
+        float x = min - log(u) * 10 * log(2) / (max - min);     // median at min + (max - min) / 10
+        if (x < min)
+          points[i][j] = min;
+        else if (x > max)
+          points[i][j] = max;
+        else
+          points[i][j] = x;
+      }
   }
 
   Bounds                domain;
@@ -239,6 +260,7 @@ int main(int argc, char* argv[])
   ;
   bool wrap = ops >> Present('w', "wrap", "use periodic boundary");
   bool sample = ops >> Present('s', "sample", "use sampling k-d tree");
+  bool exponential = ops >> Present('e', "exponential", "use exponential distribution of points");
 
   if (ops >> Present('h', "help", "show help"))
   {
@@ -295,7 +317,10 @@ int main(int argc, char* argv[])
     }
 
     // this could be replaced by reading values from a file
-    b->generate_points(num_points);
+    if (exponential)
+      b->generate_points_exponential(num_points);
+    else
+      b->generate_points(num_points);
 
     master.add(gid, b, l);
   }
