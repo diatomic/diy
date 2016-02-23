@@ -207,6 +207,13 @@ void exchange_bounds(void* b_, const diy::ReduceProxy& srp)
   }
 }
 
+void min_max(void* b_, const diy::Master::ProxyWithLink& cp, void*)
+{
+  Block*   b   = static_cast<Block*>(b_);
+  cp.all_reduce(b->points.size(), diy::mpi::minimum<size_t>());
+  cp.all_reduce(b->points.size(), diy::mpi::maximum<size_t>());
+}
+
 int main(int argc, char* argv[])
 {
   diy::mpi::environment     env(argc, argv);
@@ -231,6 +238,7 @@ int main(int argc, char* argv[])
       >> Option(     "prefix",  prefix,         "prefix for external storage")
   ;
   bool wrap = ops >> Present('w', "wrap", "use periodic boundary");
+  bool sample = ops >> Present('s', "sample", "use sampling k-d tree");
 
   if (ops >> Present('h', "help", "show help"))
   {
@@ -293,7 +301,10 @@ int main(int argc, char* argv[])
   }
   std::cout << "Blocks generated" << std::endl;
 
-  diy::kdtree(master, assigner, 3, domain, &Block::points, 2*hist, wrap);
+  if (sample)
+    diy::kdtree_sampling(master, assigner, 3, domain, &Block::points, 2*hist, wrap);
+  else
+    diy::kdtree(master, assigner, 3, domain, &Block::points, 2*hist, wrap);
 
   // debugging
   master.foreach(&print_block, &verbose);
@@ -302,4 +313,14 @@ int main(int argc, char* argv[])
   master.foreach(&verify_block, &wrap_domain);
   if (world.rank() == 0)
     std::cout << "Blocks verified" << std::endl;
+
+  // find out the minimum and maximum number of points
+  master.foreach(&min_max);
+  master.exchange();
+  if (world.rank() == 0)
+  {
+    size_t min = master.proxy(master.loaded_block()).get<size_t>();
+    size_t max = master.proxy(master.loaded_block()).get<size_t>();
+    std::cout << "min = " << min << "; max = " << max << "; max/avg = " << float(max) / num_points << std::endl;
+  }
 }

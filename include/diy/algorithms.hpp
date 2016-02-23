@@ -11,6 +11,7 @@
 
 #include "detail/algorithms/sort.hpp"
 #include "detail/algorithms/kdtree.hpp"
+#include "detail/algorithms/kdtree-sampling.hpp"
 
 namespace diy
 {
@@ -66,7 +67,7 @@ namespace diy
 
     /**
      * \ingroup Algorithms
-     * \brief build a kd-tree and sort a set of points into it
+     * \brief build a kd-tree and sort a set of points into it (use histograms to determine split values)
      */
     template<class Block, class Point>
     void kdtree(Master&                         master,      //!< master object
@@ -104,6 +105,46 @@ namespace diy
         master.set_expected(expected);
     }
 
+    /**
+     * \ingroup Algorithms
+     * \brief build a kd-tree and sort a set of points into it (use sampling to determine split values)
+     */
+    template<class Block, class Point>
+    void kdtree_sampling
+               (Master&                         master,      //!< master object
+                const Assigner&                 assigner,    //!< assigner object
+                int                             dim,         //!< dimensionality
+                const ContinuousBounds&         domain,      //!< global data extents
+                std::vector<Point>  Block::*    points,      //!< input points to sort into kd-tree
+                size_t                          samples,     //!< number of samples to take in each block
+                bool                            wrap = false)//!< periodic boundaries in all dimensions
+    {
+        if (assigner.nblocks() & (assigner.nblocks() - 1))
+        {
+            fprintf(stderr, "KD-tree requires a number of blocks that's a power of 2, got %d\n", assigner.nblocks());
+            std::abort();
+        }
+
+        typedef     diy::RegularContinuousLink      RCLink;
+
+        for (int i = 0; i < master.size(); ++i)
+        {
+            RCLink* link   = static_cast<RCLink*>(master.link(i));
+            link->core()   = domain;
+            link->bounds() = domain;
+        }
+
+        detail::KDTreeSamplingPartition<Block,Point>    kdtree_partition(dim, points, samples);
+
+        detail::KDTreePartners                          partners(dim, assigner.nblocks(), wrap, domain);
+        reduce(master, assigner, partners, kdtree_partition);
+
+        // update master.expected to match the links
+        int expected = 0;
+        for (int i = 0; i < master.size(); ++i)
+            expected += master.link(i)->size_unique();
+        master.set_expected(expected);
+    }
 }
 
 #endif
