@@ -104,13 +104,13 @@ operator()(void* b_, const diy::ReduceProxy& srp, const KDTreePartners& partners
     {
         Samples samples;
         add_samples(b, srp, samples);
-        if (partners.sub_round(srp.round()) == partners.histogram.rounds()/2)
+        if (samples.size() != 1)
         {
             // pick the median
-            //std::nth_element(samples.begin(), samples.begin() + samples.size()/2, samples.end());
-            //std::swap(samples[0], samples[samples.size()/2]);
-            std::sort(samples.begin(), samples.end());
-            samples[0] = (samples[samples.size()/2] + samples[samples.size()/2 + 1])/2;
+            std::nth_element(samples.begin(), samples.begin() + samples.size()/2, samples.end());
+            std::swap(samples[0], samples[samples.size()/2]);
+            //std::sort(samples.begin(), samples.end());
+            //samples[0] = (samples[samples.size()/2] + samples[samples.size()/2 + 1])/2;
             samples.resize(1);
         }
         forward_samples(b, srp, samples);
