@@ -263,8 +263,6 @@ compute_local_samples(Block* b, const diy::ReduceProxy& srp, int dim) const
     int         lid  = srp.master()->lid(srp.gid());
     RCLink*     link = static_cast<RCLink*>(srp.master()->link(lid));
 
-    fprintf(stderr, "Warning: empty block during k-d tree construction\n");
-
     // compute and enqueue local samples
     Samples samples;
     size_t points_size = (b->*points_).size();
