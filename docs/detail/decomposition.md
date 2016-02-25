@@ -95,7 +95,6 @@ decomposer.decompose(world.rank(),
 
 // call the decomposer's decompose function given master only
 // (uses the master's AddBlock functor instead)
-decomposer.decompose(world.rank(),
-                     diy::detail::AddBlock<Bounds>(&master));
+decomposer.decompose(world.rank(), master);
 
 ~~~

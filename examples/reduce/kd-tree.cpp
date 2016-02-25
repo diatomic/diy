@@ -27,8 +27,6 @@ struct SimplePoint
     float   operator[](unsigned i) const                    { return coords[i]; }
 };
 
-float random(float min, float max)      { return min + float(rand() % 1024) / 1024 * (max - min); }
-
 struct Block
 {
   typedef         SimplePoint<DIM>                            Point;
@@ -41,13 +39,36 @@ struct Block
   static void     save(const void* b, diy::BinaryBuffer& bb)    { diy::save(bb, *static_cast<const Block*>(b)); }
   static void     load(void* b, diy::BinaryBuffer& bb)          { diy::load(bb, *static_cast<Block*>(b)); }
 
-
   void            generate_points(size_t n)
   {
     points.resize(n);
     for (size_t i = 0; i < n; ++i)
       for (unsigned j = 0; j < DIM; ++j)
-        points[i][j] = random(domain.min[j], domain.max[j]);
+      {
+        float min = domain.min[j];
+        float max = domain.max[j];
+        float u = float(rand() % 1024) / 1024;
+        points[i][j] = min + u * (max - min);
+      }
+  }
+
+  void            generate_points_exponential(size_t n)
+  {
+    points.resize(n);
+    for (size_t i = 0; i < n; ++i)
+      for (unsigned j = 0; j < DIM; ++j)
+      {
+        float min = domain.min[j];
+        float max = domain.max[j];
+        float u = float(rand() % 1024) / 1024;
+        float x = min - log(u) * 10 * log(2) / (max - min);     // median at min + (max - min) / 10
+        if (x < min)
+          points[i][j] = min;
+        else if (x > max)
+          points[i][j] = max;
+        else
+          points[i][j] = x;
+      }
   }
 
   Bounds                domain;
@@ -207,6 +228,13 @@ void exchange_bounds(void* b_, const diy::ReduceProxy& srp)
   }
 }
 
+void min_max(void* b_, const diy::Master::ProxyWithLink& cp, void*)
+{
+  Block*   b   = static_cast<Block*>(b_);
+  cp.all_reduce(b->points.size(), diy::mpi::minimum<size_t>());
+  cp.all_reduce(b->points.size(), diy::mpi::maximum<size_t>());
+}
+
 int main(int argc, char* argv[])
 {
   diy::mpi::environment     env(argc, argv);
@@ -231,6 +259,8 @@ int main(int argc, char* argv[])
       >> Option(     "prefix",  prefix,         "prefix for external storage")
   ;
   bool wrap = ops >> Present('w', "wrap", "use periodic boundary");
+  bool sample = ops >> Present('s', "sample", "use sampling k-d tree");
+  bool exponential = ops >> Present('e', "exponential", "use exponential distribution of points");
 
   if (ops >> Present('h', "help", "show help"))
   {
@@ -287,13 +317,19 @@ int main(int argc, char* argv[])
     }
 
     // this could be replaced by reading values from a file
-    b->generate_points(num_points);
+    if (exponential)
+      b->generate_points_exponential(num_points);
+    else
+      b->generate_points(num_points);
 
     master.add(gid, b, l);
   }
   std::cout << "Blocks generated" << std::endl;
 
-  diy::kdtree(master, assigner, 3, domain, &Block::points, 2*hist, wrap);
+  if (sample)
+    diy::kdtree_sampling(master, assigner, 3, domain, &Block::points, 2*hist, wrap);
+  else
+    diy::kdtree(master, assigner, 3, domain, &Block::points, 2*hist, wrap);
 
   // debugging
   master.foreach(&print_block, &verbose);
@@ -302,4 +338,14 @@ int main(int argc, char* argv[])
   master.foreach(&verify_block, &wrap_domain);
   if (world.rank() == 0)
     std::cout << "Blocks verified" << std::endl;
+
+  // find out the minimum and maximum number of points
+  master.foreach(&min_max);
+  master.exchange();
+  if (world.rank() == 0)
+  {
+    size_t min = master.proxy(master.loaded_block()).get<size_t>();
+    size_t max = master.proxy(master.loaded_block()).get<size_t>();
+    std::cout << "min = " << min << "; max = " << max << "; max/avg = " << float(max) / num_points << std::endl;
+  }
 }

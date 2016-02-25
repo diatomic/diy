@@ -106,6 +106,8 @@ namespace detail
     template<class Updater>
     void            redecompose(int rank, Master& master, const Updater& update);
 
+    void            decompose(int rank, Master& master);
+
     // find lowest gid that owns a particular point
     template<class Point>
     int             lowest_gid(const Point& p) const;
@@ -226,7 +228,7 @@ namespace detail
                  typename RegularDecomposer<Bounds>::CoordinateVector ghosts     = typename RegularDecomposer<Bounds>::CoordinateVector(),
                  typename RegularDecomposer<Bounds>::DivisionsVector  divs       = typename RegularDecomposer<Bounds>::DivisionsVector())
   {
-    RegularDecomposer<Bounds>(dim, domain, assigner, share_face, wrap, ghosts, divs).decompose(rank, detail::AddBlock<Bounds>(&master));
+    RegularDecomposer<Bounds>(dim, domain, assigner, share_face, wrap, ghosts, divs).decompose(rank, master);
   }
 
   /**
@@ -284,6 +286,14 @@ namespace detail
 }
 
 // decomposes domain and adds blocks to the master
+template<class Bounds>
+void
+diy::RegularDecomposer<Bounds>::
+decompose(int rank, Master& master)
+{
+  decompose(rank, detail::AddBlock<Bounds>(&master));
+}
+
 template<class Bounds>
 template<class Creator>
 void

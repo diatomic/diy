@@ -173,6 +173,17 @@ namespace mpi
                     comm);
     }
 
+    static void all_reduce(const communicator& comm, const std::vector<T>& in, std::vector<T>& out, const Op&)
+    {
+      out.resize(in.size());
+      MPI_Allreduce(Datatype::address(const_cast<T&>(in[0])),
+                    Datatype::address(out[0]),
+                    in.size(),
+                    Datatype::datatype(),
+                    detail::mpi_op<Op>::get(),
+                    comm);
+    }
+
     static void scan(const communicator& comm, const T& in, T& out, const Op&)
     {
       MPI_Scan(Datatype::address(const_cast<T&>(in)),
@@ -270,6 +281,13 @@ namespace mpi
   //! all_reduce
   template<class T, class Op>
   void      all_reduce(const communicator& comm, const T& in, T& out, const Op& op)
+  {
+    Collectives<T, Op>::all_reduce(comm, in, out, op);
+  }
+
+  //! Same as above, but for vectors.
+  template<class T, class Op>
+  void      all_reduce(const communicator& comm, const std::vector<T>& in, std::vector<T>& out, const Op& op)
   {
     Collectives<T, Op>::all_reduce(comm, in, out, op);
   }

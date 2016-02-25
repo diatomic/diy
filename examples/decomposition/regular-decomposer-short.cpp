@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
                                               share_face,
                                               wrap,
                                               ghosts);
-    decomposer.decompose(rank, diy::detail::AddBlock<Bounds>(&master));
+    decomposer.decompose(rank, master);
 
     // or combine the two lines above into the following helper function
     // but the decomposer gets destroyed afterwards

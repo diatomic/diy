@@ -15,6 +15,9 @@ namespace diy
   template<class Point>
   float distance(int dim, const ContinuousBounds& bounds, const Point& p);
 
+  inline
+  float distance(int dim, const ContinuousBounds& bounds1, const ContinuousBounds& bounds2);
+
   template<class Bounds>
   void wrap_bounds(Bounds& bounds, int wrap_dir, const Bounds& domain, int dim);
 
@@ -92,6 +95,30 @@ distance(int dim, const ContinuousBounds& bounds, const Point& p)
     return sqrt(res);
 }
 
+float
+diy::
+distance(int dim, const ContinuousBounds& bounds1, const ContinuousBounds& bounds2)
+{
+    float res = 0;
+    for (int i = 0; i < dim; ++i)
+    {
+        float diff = 0, d;
+
+        float d1 = bounds1.max[i] - bounds2.min[i];
+        float d2 = bounds2.max[i] - bounds1.min[i];
+
+        if (d1 > 0 && d2 > 0)
+            diff = 0;
+        else if (d1 <= 0)
+            diff = -d1;
+        else if (d2 <= 0)
+            diff = -d2;
+
+        res += diff*diff;
+    }
+    return sqrt(res);
+}
+
 //! Finds the neighbor(s) containing the target point. Assumptions:
 //! 1. Only for a regular decomposition
 template<class Bounds, class Point, class OutIter>
@@ -134,49 +161,20 @@ void
 diy::
 wrap_bounds(Bounds& bounds, int wrap_dir, const Bounds& domain, int dim)
 {
-  // wrapping toward the left transforms block bounds to the left, and vice versa
-  if (dim > 0 && (wrap_dir & DIY_X0) == DIY_X0)
+  for (int i = 0; i < dim; ++i)
   {
-    bounds.min[0] -= (domain.max[0] - domain.min[0]);
-    bounds.max[0] -= (domain.max[0] - domain.min[0]);
-  }
-  if (dim > 0 && (wrap_dir & DIY_X1) == DIY_X1)
-  {
-    bounds.min[0] += (domain.max[0] - domain.min[0]);
-    bounds.max[0] += (domain.max[0] - domain.min[0]);
-  }
-
-  if (dim > 1 && (wrap_dir & DIY_Y0) == DIY_Y0)
-  {
-    bounds.min[1] -= (domain.max[1] - domain.min[1]);
-    bounds.max[1] -= (domain.max[1] - domain.min[1]);
-  }
-  if (dim > 1 && (wrap_dir & DIY_Y1) == DIY_Y1)
-  {
-    bounds.min[1] += (domain.max[1] - domain.min[1]);
-    bounds.max[1] += (domain.max[1] - domain.min[1]);
-  }
-
-  if (dim > 2 && (wrap_dir & DIY_Z0) == DIY_Z0)
-  {
-    bounds.min[2] -= (domain.max[2] - domain.min[2]);
-    bounds.max[2] -= (domain.max[2] - domain.min[2]);
-  }
-  if (dim > 2 && (wrap_dir & DIY_Z1) == DIY_Z1)
-  {
-    bounds.min[2] += (domain.max[2] - domain.min[2]);
-    bounds.max[2] += (domain.max[2] - domain.min[2]);
-  }
-
-  if (dim > 3 && (wrap_dir & DIY_T0) == DIY_T0)
-  {
-    bounds.min[3] -= (domain.max[3] - domain.min[3]);
-    bounds.max[3] -= (domain.max[3] - domain.min[3]);
-  }
-  if (dim > 3 && (wrap_dir & DIY_T1) == DIY_T1)
-  {
-    bounds.min[3] += (domain.max[3] - domain.min[3]);
-    bounds.max[3] += (domain.max[3] - domain.min[3]);
+    int left  = 1 << (2*dim);
+    int right = 1 << (2*dim + 1);
+    if (wrap_dir & left)
+    {
+      bounds.min[dim] -= (domain.max[dim] - domain.min[dim]);
+      bounds.max[dim] -= (domain.max[dim] - domain.min[dim]);
+    }
+    if (wrap_dir & right)
+    {
+      bounds.min[dim] += (domain.max[dim] - domain.min[dim]);
+      bounds.max[dim] += (domain.max[dim] - domain.min[dim]);
+    }
   }
 }
 
@@ -185,22 +183,15 @@ void
 diy::detail::
 shift(float new_pt[DIY_MAX_DIM], const Point& p, float r, Direction dir, int dim)
 {
-  if (dim > 0 && (dir & DIY_X0))
-      new_pt[0] = p[0] - r;
-  if (dim > 0 && (dir & DIY_X1))
-      new_pt[0] = p[0] + r;
-  if (dim > 1 && (dir & DIY_Y0))
-      new_pt[1] = p[1] - r;
-  if (dim > 1 && (dir & DIY_Y1))
-      new_pt[1] = p[1] + r;
-  if (dim > 2 && (dir & DIY_Z0))
-      new_pt[2] = p[2] - r;
-  if (dim > 2 && (dir & DIY_Z1))
-      new_pt[2] = p[2] + r;
-  if (dim > 3 && (dir & DIY_T0))
-      new_pt[3] = p[3] - r;
-  if (dim > 3 && (dir & DIY_T1))
-      new_pt[3] = p[3] + r;
+  for (int i = 0; i < dim; ++i)
+  {
+    int left  = 1 << (2*dim);
+    int right = 1 << (2*dim + 1);
+    if (dir & left)
+      new_pt[dim] = p[dim] - r;
+    if (dir & right)
+      new_pt[dim] = p[dim] + r;
+  }
 }
 
 
