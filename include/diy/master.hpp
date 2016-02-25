@@ -256,6 +256,7 @@ namespace diy
       void              set_expected(int expected)      { expected_ = expected; }
       void              add_expected(int i)             { expected_ += i; }
       int               expected() const                { return expected_; }
+      void              replace_link(int i, Link* link) { links_[i] = link; }
 
     public:
       // Communicator functionality

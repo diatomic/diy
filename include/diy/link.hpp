@@ -80,6 +80,7 @@ namespace diy
                 RegularLink(int dim, const Bounds& core, const Bounds& bounds, Direction wrap = Direction(0)):
                   dim_(dim), wrap_(wrap), core_(core), bounds_(bounds)            {}
 
+      // dimension
       int       dimension() const                   { return dim_; }
 
       // direction
