@@ -104,7 +104,7 @@ namespace detail
     template<class Creator>
     void            decompose(int rank, const Creator& create);
     template<class Updater>
-    void            redecompose(int rank, Master& master, const Updater& update);
+    void            decompose(int rank, Master& master, const Updater& update);
 
     void            decompose(int rank, Master& master);
 
@@ -262,23 +262,23 @@ namespace detail
      *                   also communicates the total number of blocks
      */
   template<class Bounds, class Assigner, class Updater>
-  void redecompose(int                dim,
-                   int                rank,
-                   const Bounds&      domain,
-                   const Assigner&    assigner,
-                   Master&            master,
-                   const Updater&     update,
-                   typename RegularDecomposer<Bounds>::BoolVector       share_face =
-                   typename RegularDecomposer<Bounds>::BoolVector(),
-                   typename RegularDecomposer<Bounds>::BoolVector       wrap       =
-                   typename RegularDecomposer<Bounds>::BoolVector(),
-                   typename RegularDecomposer<Bounds>::CoordinateVector ghosts     =
-                   typename RegularDecomposer<Bounds>::CoordinateVector(),
-                   typename RegularDecomposer<Bounds>::DivisionsVector  divs       =
-                   typename RegularDecomposer<Bounds>::DivisionsVector())
+  void decompose(int                dim,
+                 int                rank,
+                 const Bounds&      domain,
+                 const Assigner&    assigner,
+                 Master&            master,
+                 const Updater&     update,
+                 typename RegularDecomposer<Bounds>::BoolVector       share_face =
+                 typename RegularDecomposer<Bounds>::BoolVector(),
+                 typename RegularDecomposer<Bounds>::BoolVector       wrap       =
+                 typename RegularDecomposer<Bounds>::BoolVector(),
+                 typename RegularDecomposer<Bounds>::CoordinateVector ghosts     =
+                 typename RegularDecomposer<Bounds>::CoordinateVector(),
+                 typename RegularDecomposer<Bounds>::DivisionsVector  divs       =
+                 typename RegularDecomposer<Bounds>::DivisionsVector())
   {
       RegularDecomposer<Bounds>(dim, domain, assigner, share_face, wrap, ghosts, divs).
-          redecompose(rank, master, update);
+          decompose(rank, master, update);
   }
 
   //! Decomposition example: \example decomposition/test-decomposition.cpp
@@ -388,7 +388,7 @@ template<class Bounds>
 template<class Updater>
 void
 diy::RegularDecomposer<Bounds>::
-redecompose(int rank, Master& master, const Updater& update)
+decompose(int rank, Master& master, const Updater& update)
 {
     master.set_expected(0);
     std::vector<int> gids;
