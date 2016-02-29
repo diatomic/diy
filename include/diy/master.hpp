@@ -206,6 +206,8 @@ namespace diy
       int           threads() const                     { return threads_; }
       int           in_memory() const                   { return *blocks_.in_memory().const_access(); }
 
+      void          set_threads(int threads)            { threads_ = threads; }
+
       CreateBlock   creator() const                     { return blocks_.creator(); }
       DestroyBlock  destroyer() const                   { return blocks_.destroyer(); }
       LoadBlock     loader() const                      { return blocks_.loader(); }
