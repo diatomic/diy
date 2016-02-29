@@ -103,6 +103,7 @@ namespace detail
     // Calls create(int gid, const Bounds& bounds, const Link& link)
     template<class Creator>
     void            decompose(int rank, const Creator& create);
+
     template<class Updater>
     void            decompose(int rank, Master& master, const Updater& update);
 
@@ -199,6 +200,26 @@ namespace detail
 
     diy::Master* master_;
   };
+
+  template<class Bounds, class Update>
+  struct Updater
+  {
+    typedef typename RegularDecomposer<Bounds>::Link        Link;
+
+            Updater(diy::Master* master, const Update& update):
+                master_(master), update_(update)                    {}
+
+    void    operator()(int gid, const Bounds& core, const Bounds& bounds, const Bounds& domain, const Link& link) const
+    {
+        int lid = master_->lid(gid);
+        Link* l = new Link(link);
+        master_->replace_link(lid, l);
+        update_(gid, lid, core, bounds, domain, *l);
+    }
+
+    diy::Master*    master_;
+    const Update&   update_;
+  };
 }
 
   /**
@@ -261,13 +282,13 @@ namespace detail
      * @param assigner   decides how processors are assigned to blocks (maps a gid to a rank)
      *                   also communicates the total number of blocks
      */
-  template<class Bounds, class Assigner, class Updater>
+  template<class Bounds, class Assigner, class Update>
   void decompose(int                dim,
                  int                rank,
                  const Bounds&      domain,
                  const Assigner&    assigner,
                  Master&            master,
-                 const Updater&     update,
+                 const Update&      update,
                  typename RegularDecomposer<Bounds>::BoolVector       share_face =
                  typename RegularDecomposer<Bounds>::BoolVector(),
                  typename RegularDecomposer<Bounds>::BoolVector       wrap       =
@@ -385,95 +406,12 @@ decompose(int rank, const Creator& create)
 
 // decomposes domain but does not add blocks to master, assumes they were added already
 template<class Bounds>
-template<class Updater>
+template<class Update>
 void
 diy::RegularDecomposer<Bounds>::
-decompose(int rank, Master& master, const Updater& update)
+decompose(int rank, Master& master, const Update& update)
 {
-    master.set_expected(0);
-    std::vector<int> gids;
-    assigner.local_gids(rank, gids);
-    for (int i = 0; i < (int)gids.size(); ++i)
-    {
-        int gid = gids[i];
-
-        DivisionsVector coords;
-        gid_to_coords(gid, coords);
-
-        Bounds core, bounds;
-        fill_bounds(core,   coords);
-        fill_bounds(bounds, coords, true);
-
-        // Fill link with all the neighbors
-        Link* link = new Link(dim, core, bounds);
-        std::vector<int>  offsets(dim, -1);
-        offsets[0] = -2;
-        while (!all(offsets, 1))
-        {
-            // next offset
-            int i;
-            for (i = 0; i < dim; ++i)
-                if (offsets[i] == 1)
-                    offsets[i] = -1;
-                else
-                    break;
-            ++offsets[i];
-
-            if (all(offsets, 0)) continue;      // skip ourselves
-
-            DivisionsVector     nhbr_coords(dim);
-            int                 dir      = 0;
-            bool                inbounds = true;
-            for (int i = 0; i < dim; ++i)
-            {
-                nhbr_coords[i] = coords[i] + offsets[i];
-
-                // wrap
-                if (nhbr_coords[i] < 0)
-                {
-                    if (wrap[i])
-                    {
-                        nhbr_coords[i] = divisions[i] - 1;
-                        link->add_wrap(Direction(1 << 2*i));
-                    }
-                    else
-                        inbounds = false;
-                }
-
-                if (nhbr_coords[i] >= divisions[i])
-                {
-                    if (wrap[i])
-                    {
-                        nhbr_coords[i] = 0;
-                        link->add_wrap(Direction(1 << (2*i + 1)));
-                    }
-                    else
-                        inbounds = false;
-                }
-
-                // NB: this needs to match the addressing scheme in dir_t (in constants.h)
-                if (offsets[i] == -1)
-                    dir |= 1 << (2*i + 0);
-                if (offsets[i] == 1)
-                    dir |= 1 << (2*i + 1);
-            } // for (dim)
-            if (!inbounds) continue;
-
-            int nhbr_gid = coords_to_gid(nhbr_coords);
-            BlockID bid; bid.gid = nhbr_gid; bid.proc = assigner.rank(nhbr_gid);
-            link->add_neighbor(bid);
-            master.add_expected(1);
-
-            Bounds nhbr_bounds;
-            fill_bounds(nhbr_bounds, nhbr_coords);
-            link->add_bounds(nhbr_bounds);
-
-            link->add_direction(static_cast<Direction>(dir));
-        } // while (!all(offsets, 1))
-
-        master.replace_link(i, link);
-        update(gid, i, core, bounds, domain, *link);
-    } // for (gids)
+    decompose(rank, detail::Updater<Bounds,Update>(&master, update));
 }
 
 template<class Bounds>
