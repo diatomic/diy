@@ -86,11 +86,16 @@ namespace diy
 
         typedef     diy::RegularContinuousLink      RCLink;
 
+        Direction all_wrap = Direction(0);
+        if (wrap)
+            all_wrap = static_cast<Direction>((1 << 2*dim) - 1);
+
         for (int i = 0; i < master.size(); ++i)
         {
             RCLink* link   = static_cast<RCLink*>(master.link(i));
             link->core()   = domain;
             link->bounds() = domain;
+            link->wrap()   = all_wrap;
         }
 
         detail::KDTreePartition<Block,Point>    kdtree_partition(dim, points, bins);
@@ -127,11 +132,16 @@ namespace diy
 
         typedef     diy::RegularContinuousLink      RCLink;
 
+        Direction all_wrap = Direction(0);
+        if (wrap)
+            all_wrap = static_cast<Direction>((1 << 2*dim) - 1);
+
         for (int i = 0; i < master.size(); ++i)
         {
             RCLink* link   = static_cast<RCLink*>(master.link(i));
             link->core()   = domain;
             link->bounds() = domain;
+            link->wrap()   = all_wrap;
         }
 
         detail::KDTreeSamplingPartition<Block,Point>    kdtree_partition(dim, points, samples);

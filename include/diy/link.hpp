@@ -91,6 +91,7 @@ namespace diy
       // wrap
       void      add_wrap(Direction dir)             { wrap_ = static_cast<Direction>(wrap_ | dir); }
       Direction wrap() const                        { return wrap_; }
+      Direction& wrap()                             { return wrap_; }
 
       // bounds
       const Bounds& core() const                        { return core_; }

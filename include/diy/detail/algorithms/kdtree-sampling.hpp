@@ -231,6 +231,18 @@ update_links(Block* b, const diy::ReduceProxy& srp, int dim, int round, int roun
     else
         new_link.add_direction(left);
 
+    // update wrap
+    if (wrap)
+    {
+        new_link.wrap() = link->wrap();
+        new_link.wrap() = static_cast<diy::Direction>(new_link.wrap() & ~left);
+        new_link.wrap() = static_cast<diy::Direction>(new_link.wrap() & ~right);
+        if (new_link.bounds().min[dim] == domain.min[dim])
+            new_link.add_wrap(left);
+        if (new_link.bounds().max[dim] == domain.max[dim])
+            new_link.add_wrap(right);
+    }
+
     // update the link; notice that this won't conflict with anything since
     // reduce is using its own notion of the link constructed through the
     // partners
