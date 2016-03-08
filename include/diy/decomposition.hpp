@@ -115,7 +115,8 @@ namespace detail
 
     void            gid_to_coords(int gid, DivisionsVector& coords) const       { gid_to_coords(gid, coords, divisions); }
     int             coords_to_gid(const DivisionsVector& coords) const          { return coords_to_gid(coords, divisions); }
-    void            fill_divisions(int nblocks)                                 { fill_divisions(dim, nblocks, divisions); }
+    void            fill_divisions(int dim, int nblocks, std::vector<int>& divisions, int unused);
+      void            fill_divisions(int nblocks)                                 { fill_divisions(dim, nblocks, divisions, 0); }
 
     void            fill_bounds(Bounds& bounds, const DivisionsVector& coords, bool add_ghosts = false) const;
     void            fill_bounds(Bounds& bounds, int gid, bool add_ghosts = false) const;
@@ -124,6 +125,7 @@ namespace detail
     static void     gid_to_coords(int gid, DivisionsVector& coords, const DivisionsVector& divisions);
     static int      coords_to_gid(const DivisionsVector& coords, const DivisionsVector& divisions);
     static void     fill_divisions(int dim, int nblocks, std::vector<int>& divisions);
+
     static void     factor(std::vector<unsigned>& factors, int n);
 
     // Point to GIDs functions
@@ -542,6 +544,121 @@ fill_divisions(int dim, int nblocks, std::vector<int>& divisions)
   for (unsigned i = 0; i < dim; ++i)
     if (divisions[i] == 0)
       divisions[i] = missing_divs[c++];
+}
+
+// current state of division in one dimension used in fill_divisions below
+struct Div
+{
+    int dim;                                 // 0, 1, 2, etc. e.g. for x, y, z etc.
+    int nb;                                  // number of blocks so far in this dimension
+    float b_size;                            // block size so far in this dimension
+};
+
+// sort on descending block size unless tied, in which case
+// sort on ascending num blocks in current dim unless tied, in which case
+// sort on ascending dimension
+struct comp {
+    bool operator() (Div lhs, Div rhs)
+        {
+            // sort on second value of the pair unless tied, in which case sort on first
+            if (lhs.b_size == rhs.b_size)
+            {
+                if (lhs.nb == rhs.nb)
+                    return(lhs.dim < rhs.dim);
+                return(lhs.nb < rhs.nb);
+            }
+            return(lhs.b_size > rhs.b_size);
+        }
+};
+
+// TODO: unused argument forces this version of fill_divisions to be used with decompose()
+// while not breaking other calls to fill_divisions (eg., regular partners in reductions)
+// that call the static version
+// those other uses need to be fixed too, but unsure how to get the domain when the static version
+// is used (ie, there isn't a RegularDecomposer object)
+template<class Bounds>
+void
+diy::RegularDecomposer<Bounds>::
+fill_divisions(int dim, int nblocks, std::vector<int>& divisions, int unused)
+{
+    // prod = number of blocks unconstrained by user; c = number of unconstrained dimensions
+    int prod = 1; int c = 0;
+    for (unsigned i = 0; i < dim; ++i)
+        if (divisions[i] != 0)
+        {
+            prod *= divisions[i];
+            ++c;
+        }
+
+    if (nblocks % prod != 0)
+    {
+        fprintf(stderr, "Total number of blocks cannot be factored into provided divs\n");
+        return;
+    }
+
+    if (c == divisions.size())               // nothing to do; user provided all divs
+        return;
+
+    // factor number of blocks left in unconstrained dimensions
+    // factorization is sorted from smallest to largest factors
+    std::vector<unsigned> factors;
+    factor(factors, nblocks/prod);
+
+    std::vector<Div> missing_divs;              // pairs consisting of (dim, #divs)
+    comp my_comp;                               // comparison object
+
+    // init missing_divs
+    for (size_t i = 0; i < dim; i++)
+    {
+        if (divisions[i] == 0)
+        {
+            Div div;
+            div.dim = i;
+            div.nb = 1;
+            div.b_size = domain.max[i] - domain.min[i];
+            missing_divs.push_back(div);
+        }
+    }
+
+    // iterate over factorization of number of blocks (factors are sorted smallest to largest)
+    // NB: using int instead of size_t because must be negative in order to break out of loop
+    for (int i = factors.size() - 1; i >= 0; --i)
+    {
+        // fill in missing divs by dividing dimension w/ largest block size
+        // except when this would be illegal (resulting in bounds.max < bounds.min;
+        // only a problem for discrete bounds
+
+        // sort on decreasing block size
+        std::sort(missing_divs.begin(), missing_divs.end(), my_comp);
+
+        // split the dimension with the largest block size (first element in vector)
+        float min =
+            detail::BoundsHelper<Bounds>::from(0,
+                                               missing_divs[0].nb * factors[i],
+                                               domain.min[missing_divs[0].dim],
+                                               domain.max[missing_divs[0].dim],
+                                               share_face[missing_divs[0].dim]);
+        float max =
+            detail::BoundsHelper<Bounds>::to(0,
+                                             missing_divs[0].nb * factors[i],
+                                             domain.min[missing_divs[0].dim],
+                                             domain.max[missing_divs[0].dim],
+                                             share_face[missing_divs[0].dim]);
+        if (max >= min)
+        {
+            missing_divs[0].nb    *= factors[i];
+            missing_divs[0].b_size = max - min;
+        }
+        else
+        {
+            fprintf(stderr, "Error: unable to decompose domain into %d blocks\n", nblocks);
+            return;
+        }
+    }
+
+    // assign the divisions
+    for (size_t i = 0; i < missing_divs.size(); i++)
+        divisions[missing_divs[i].dim] = missing_divs[i].nb;
 }
 
 template<class Bounds>
