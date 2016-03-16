@@ -86,16 +86,33 @@ namespace diy
 
         typedef     diy::RegularContinuousLink      RCLink;
 
-        Direction all_wrap = Direction(0);
-        if (wrap)
-            all_wrap = static_cast<Direction>((1 << 2*dim) - 1);
-
         for (int i = 0; i < master.size(); ++i)
         {
             RCLink* link   = static_cast<RCLink*>(master.link(i));
-            link->core()   = domain;
-            link->bounds() = domain;
-            link->wrap()   = all_wrap;
+            *link = RCLink(dim, domain, domain);
+
+            if (wrap)       // set up the links to self
+            {
+                diy::BlockID self = { master.gid(i), master.communicator().rank() };
+                for (int j = 0; j < dim; ++j)
+                {
+                    diy::Direction dir, wrap_dir;
+
+                    // left
+                    dir.x[j] = -1; wrap_dir.x[j] = -1;
+                    link->add_neighbor(self);
+                    link->add_bounds(domain);
+                    link->add_direction(dir);
+                    link->add_wrap(wrap_dir);
+
+                    // right
+                    dir.x[j] = 1; wrap_dir.x[j] = 1;
+                    link->add_neighbor(self);
+                    link->add_bounds(domain);
+                    link->add_direction(dir);
+                    link->add_wrap(wrap_dir);
+                }
+            }
         }
 
         detail::KDTreePartition<Block,Point>    kdtree_partition(dim, points, bins);
@@ -132,16 +149,33 @@ namespace diy
 
         typedef     diy::RegularContinuousLink      RCLink;
 
-        Direction all_wrap = Direction(0);
-        if (wrap)
-            all_wrap = static_cast<Direction>((1 << 2*dim) - 1);
-
         for (int i = 0; i < master.size(); ++i)
         {
             RCLink* link   = static_cast<RCLink*>(master.link(i));
-            link->core()   = domain;
-            link->bounds() = domain;
-            link->wrap()   = all_wrap;
+            *link = RCLink(dim, domain, domain);
+
+            if (wrap)       // set up the links to self
+            {
+                diy::BlockID self = { master.gid(i), master.communicator().rank() };
+                for (int j = 0; j < dim; ++j)
+                {
+                    diy::Direction dir, wrap_dir;
+
+                    // left
+                    dir.x[j] = -1; wrap_dir.x[j] = -1;
+                    link->add_neighbor(self);
+                    link->add_bounds(domain);
+                    link->add_direction(dir);
+                    link->add_wrap(wrap_dir);
+
+                    // right
+                    dir.x[j] = 1; wrap_dir.x[j] = 1;
+                    link->add_neighbor(self);
+                    link->add_bounds(domain);
+                    link->add_direction(dir);
+                    link->add_wrap(wrap_dir);
+                }
+            }
         }
 
         detail::KDTreeSamplingPartition<Block,Point>    kdtree_partition(dim, points, samples);

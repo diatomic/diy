@@ -23,7 +23,6 @@ struct Block
                 << link->bounds().min[0] << ' ' << link->bounds().min[1] << ' ' << link->bounds().min[2] << " - "
                 << link->bounds().max[0] << ' ' << link->bounds().max[1] << ' ' << link->bounds().max[2] << " : "
                 << link->size()   << ' ' //<< std::endl
-                << std::bitset<32>(link->wrap()) //<< std::endl
                 << std::dec
                 << std::endl;
     }

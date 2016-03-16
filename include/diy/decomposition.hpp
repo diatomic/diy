@@ -352,7 +352,7 @@ decompose(int rank, const Creator& create)
       if (all(offsets, 0)) continue;      // skip ourselves
 
       DivisionsVector     nhbr_coords(dim);
-      int                 dir      = 0;
+      Direction           dir, wrap_dir;
       bool                inbounds = true;
       for (int i = 0; i < dim; ++i)
       {
@@ -364,7 +364,7 @@ decompose(int rank, const Creator& create)
           if (wrap[i])
           {
             nhbr_coords[i] = divisions[i] - 1;
-            link.add_wrap(Direction(1 << 2*i));
+            wrap_dir[i] = -1;
           }
           else
             inbounds = false;
@@ -375,17 +375,15 @@ decompose(int rank, const Creator& create)
           if (wrap[i])
           {
             nhbr_coords[i] = 0;
-            link.add_wrap(Direction(1 << (2*i + 1)));
+            wrap_dir[i] = 1;
           }
           else
             inbounds = false;
         }
 
         // NB: this needs to match the addressing scheme in dir_t (in constants.h)
-        if (offsets[i] == -1)
-          dir |= 1 << (2*i + 0);
-        if (offsets[i] == 1)
-          dir |= 1 << (2*i + 1);
+        if (offsets[i] == -1 || offsets[i] == 1)
+          dir[i] = offsets[i];
       }
       if (!inbounds) continue;
 
@@ -397,7 +395,8 @@ decompose(int rank, const Creator& create)
       fill_bounds(nhbr_bounds, nhbr_coords);
       link.add_bounds(nhbr_bounds);
 
-      link.add_direction(static_cast<Direction>(dir));
+      link.add_direction(dir);
+      link.add_wrap(wrap_dir);
     }
 
     create(gid, core, bounds, domain, link);

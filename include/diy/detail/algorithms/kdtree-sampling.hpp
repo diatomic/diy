@@ -37,6 +37,8 @@ struct KDTreeSamplingPartition
     int         divide_gid(int gid, bool lower, int round, int rounds) const;
     void        update_links(Block* b, const diy::ReduceProxy& srp, int dim, int round, int rounds, bool wrap, const Bounds& domain) const;
     void        split_to_neighbors(Block* b, const diy::ReduceProxy& srp, int dim) const;
+    diy::Direction
+                find_wrap(const Bounds& bounds, const Bounds& nbr_bounds, const Bounds& domain) const;
 
     void        compute_local_samples(Block* b, const diy::ReduceProxy& srp, int dim) const;
     void        add_samples(Block* b, const diy::ReduceProxy& srp, Samples& samples) const;
@@ -157,14 +159,8 @@ update_links(Block* b, const diy::ReduceProxy& srp, int dim, int round, int roun
             srp.dequeue(in_gid, dir);
 
             // reverse dir
-            int j = 0;
-            while (dir >> (j + 1))
-                ++j;
-
-            if (j % 2 == 0)
-                dir = static_cast<diy::Direction>(dir << 1);
-            else
-                dir = static_cast<diy::Direction>(dir >> 1);
+            for (int j = 0; j < dim_; ++j)
+                dir[j] = -dir[j];
 
             int k = link_map[std::make_pair(in_gid, dir)];
             //printf("%d %d %f -> %d\n", in_gid, dir, split, k);
@@ -174,28 +170,31 @@ update_links(Block* b, const diy::ReduceProxy& srp, int dim, int round, int roun
 
     RCLink      new_link(dim_, link->core(), link->core());
 
-    diy::Direction left  = static_cast<diy::Direction>(1 <<   2*dim);
-    diy::Direction right = static_cast<diy::Direction>(1 <<  (2*dim + 1));
-
     bool lower = !(gid & (1 << (rounds - 1 - round)));
 
     // fill out the new link
     for (int i = 0; i < link->size(); ++i)
     {
         diy::Direction  dir = link->direction(i);
-        if (dir == left || dir == right)
+        //diy::Direction  wrap_dir = link->wrap(i);     // we don't use existing wrap, but restore it from scratch
+        if (dir[dim] != 0)
         {
-            if ((dir == left && lower) || (dir == right && !lower))
+            if ((dir[dim] < 0 && lower) || (dir[dim] > 0 && !lower))
             {
-                int nbr_gid = divide_gid(link->target(i).gid, dir != left, round, rounds);
+                int nbr_gid = divide_gid(link->target(i).gid, !lower, round, rounds);
                 diy::BlockID nbr = { nbr_gid, srp.assigner().rank(nbr_gid) };
                 new_link.add_neighbor(nbr);
 
                 new_link.add_direction(dir);
 
                 Bounds bounds = link->bounds(i);
-                update_neighbor_bounds(bounds, splits[i], dim, dir != left);
+                update_neighbor_bounds(bounds, splits[i], dim, !lower);
                 new_link.add_bounds(bounds);
+
+                if (wrap)
+                    new_link.add_wrap(find_wrap(new_link.bounds(), bounds, domain));
+                else
+                    new_link.add_wrap(diy::Direction());
             }
         } else // non-aligned side
         {
@@ -212,6 +211,11 @@ update_links(Block* b, const diy::ReduceProxy& srp, int dim, int round, int roun
                     new_link.add_neighbor(nbr);
                     new_link.add_direction(dir);
                     new_link.add_bounds(bounds);
+
+                    if (wrap)
+                        new_link.add_wrap(find_wrap(new_link.bounds(), bounds, domain));
+                    else
+                        new_link.add_wrap(diy::Direction());
                 }
             }
         }
@@ -226,21 +230,18 @@ update_links(Block* b, const diy::ReduceProxy& srp, int dim, int round, int roun
     update_neighbor_bounds(nbr_bounds, find_split(new_link.bounds(), nbr_bounds), dim, !lower);
     new_link.add_bounds(nbr_bounds);
 
-    if (lower)
-        new_link.add_direction(right);
-    else
-        new_link.add_direction(left);
+    new_link.add_wrap(diy::Direction());    // dual block cannot be wrapped
 
-    // update wrap
-    if (wrap)
+    if (lower)
     {
-        new_link.wrap() = link->wrap();
-        new_link.wrap() = static_cast<diy::Direction>(new_link.wrap() & ~left);
-        new_link.wrap() = static_cast<diy::Direction>(new_link.wrap() & ~right);
-        if (new_link.bounds().min[dim] == domain.min[dim])
-            new_link.add_wrap(left);
-        if (new_link.bounds().max[dim] == domain.max[dim])
-            new_link.add_wrap(right);
+        diy::Direction right;
+        right[dim] = 1;
+        new_link.add_direction(right);
+    } else
+    {
+        diy::Direction left;
+        left[dim] = -1;
+        new_link.add_direction(left);
     }
 
     // update the link; notice that this won't conflict with anything since
@@ -424,18 +425,31 @@ float
 diy::detail::KDTreeSamplingPartition<Block,Point>::
 find_split(const Bounds& changed, const Bounds& original) const
 {
-    diy::Direction dir = DIY_X0;
     for (int i = 0; i < dim_; ++i)
     {
         if (changed.min[i] != original.min[i])
             return changed.min[i];
-        dir = static_cast<diy::Direction>(dir << 1);
         if (changed.max[i] != original.max[i])
             return changed.max[i];
-        dir = static_cast<diy::Direction>(dir << 1);
     }
     assert(0);
     return -1;
+}
+
+template<class Block, class Point>
+diy::Direction
+diy::detail::KDTreeSamplingPartition<Block,Point>::
+find_wrap(const Bounds& bounds, const Bounds& nbr_bounds, const Bounds& domain) const
+{
+    diy::Direction wrap;
+    for (int i = 0; i < dim_; ++i)
+    {
+        if (bounds.min[i] == domain.min[i] && nbr_bounds.max[i] == domain.max[i])
+            wrap[i] = -1;
+        if (bounds.max[i] == domain.max[i] && nbr_bounds.min[i] == domain.min[i])
+            wrap[i] =  1;
+    }
+    return wrap;
 }
 
 

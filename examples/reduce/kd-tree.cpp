@@ -16,7 +16,7 @@
 typedef     diy::RegularContinuousLink  RCLink;
 typedef     diy::ContinuousBounds       Bounds;
 
-static const unsigned DIM = 3;
+static const unsigned DIM = 2;
 
 template<unsigned D>
 struct SimplePoint
@@ -100,7 +100,11 @@ void print_block(void* b_, const diy::Master::ProxyWithLink& cp, void* verbose_)
 
   for (size_t i = 0; i < link->size(); ++i)
   {
-      fprintf(stdout, "  (%d,%d,%d):", link->target(i).gid, link->target(i).proc, link->direction(i));
+      fprintf(stdout, "  (%d,%d,(%d,%d,%d)):",
+                      link->target(i).gid, link->target(i).proc,
+                      link->direction(i)[0],
+                      link->direction(i)[1],
+                      link->direction(i)[2]);
       const Bounds& bounds = link->bounds(i);
       fprintf(stdout, " [%f,%f,%f] - [%f,%f,%f]\n",
               bounds.min[0], bounds.min[1], bounds.min[2],
@@ -173,6 +177,24 @@ void verify_block(void* b_, const diy::Master::ProxyWithLink& cp, void* wrap_dom
                           b->block_bounds[nbr_gid].max[0], b->block_bounds[nbr_gid].max[1], b->block_bounds[nbr_gid].max[2]);
       }
   }
+
+  // verify wrap
+  if (wrap)
+      for (int i = 0; i < link->size(); ++i)
+      {
+          for (int j = 0; j < DIM; ++j)
+          {
+            if (!(link->wrap(i)[j] == -1 && !(link->bounds().min[j] == domain.min[j] && link->bounds(i).max[j] == domain.max[j])) ||
+                 (link->wrap(i)[j] ==  1 && !(link->bounds().max[j] == domain.max[j] && link->bounds(i).min[j] == domain.min[j])))
+                continue;
+
+            fprintf(stderr, "Warning: wrap doesn't match:\n");
+            fprintf(stderr, "  [%d] -> %d: wrap = (%d,%d,%d), mismatch in %d\n",
+                            cp.gid(), link->target(i).gid,
+                            link->wrap(i)[0], link->wrap(i)[1], link->wrap(i)[2], j);
+          }
+      }
+
 
   // verify that we intersect everybody in the link
   for (int i = 0; i < link->size(); ++i)
@@ -300,22 +322,6 @@ int main(int argc, char* argv[])
     Block*          b   = new Block(domain);
     RCLink*         l   = new RCLink(DIM, domain, domain);
 
-    if (wrap)
-    {
-        // link to self in every direction
-        for (int j = 0; j < DIM; ++j)
-            for (int k = 0; k < 2; ++k)
-            {
-                diy::BlockID nbr = { gid, world.rank() };
-                l->add_neighbor(nbr);
-
-                diy::Direction dir = static_cast<diy::Direction>(1 << (2*j + k));
-                l->add_direction(dir);
-
-                l->add_bounds(domain);
-            }
-    }
-
     // this could be replaced by reading values from a file
     if (exponential)
       b->generate_points_exponential(num_points);
@@ -327,9 +333,9 @@ int main(int argc, char* argv[])
   std::cout << "Blocks generated" << std::endl;
 
   if (sample)
-    diy::kdtree_sampling(master, assigner, 3, domain, &Block::points, 2*hist, wrap);
+    diy::kdtree_sampling(master, assigner, DIM, domain, &Block::points, 2*hist, wrap);
   else
-    diy::kdtree(master, assigner, 3, domain, &Block::points, 2*hist, wrap);
+    diy::kdtree(master, assigner, DIM, domain, &Block::points, 2*hist, wrap);
 
   // debugging
   master.foreach(&print_block, &verbose);

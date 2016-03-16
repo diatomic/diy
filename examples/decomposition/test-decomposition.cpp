@@ -19,13 +19,25 @@ void create(int gid, const Bounds& core, const Bounds& bounds, const Bounds& dom
             << bounds.min[0] << ' ' << bounds.min[1] << ' ' << bounds.min[2] << " - "
             << bounds.max[0] << ' ' << bounds.max[1] << ' ' << bounds.max[2] << " : "
             << link.size()   << ' ' //<< std::endl
-            << std::bitset<32>(l.wrap()) //<< std::endl
             //<< std::bitset<32>(l.direction(0))   << std::endl
             //<< std::bitset<32>(l.direction(0) & l.wrap()) << std::endl
             //<< ((l.direction(0) & l.wrap()) == l.direction(0)) << ' '
             << std::dec
             << std::endl;
 
+  for (int i = 0; i < l.size(); ++i)
+  {
+      std::cout << "      " << l.target(i).gid
+                << "; direction = "
+                << l.direction(i)[0] << ' '
+                << l.direction(i)[1] << ' '
+                << l.direction(i)[2] << ' '
+                << "; wrap = "
+                << l.wrap(i)[0] << ' '
+                << l.wrap(i)[1] << ' '
+                << l.wrap(i)[2]
+                << std::endl;
+  }
 }
 
 int main(int argc, char* argv[])

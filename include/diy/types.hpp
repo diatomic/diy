@@ -12,7 +12,25 @@ namespace diy
   typedef   bb_d_t      DiscreteBounds;
   typedef   bb_c_t      ContinuousBounds;
 
-  typedef   dir_t       Direction;
+  struct Direction: public dir_t
+  {
+            Direction()                 { for (int i = 0; i < DIY_MAX_DIM; ++i) x[i] = 0; }
+
+    int     operator[](int i) const     { return x[i]; }
+    int&    operator[](int i)           { return x[i]; }
+
+    // lexicographic comparison
+    bool
+    operator<(const diy::Direction& y) const
+    {
+      for (int i = 0; i < DIY_MAX_DIM; ++i)
+      {
+          if ((*this)[i] < y[i]) return true;
+          if ((*this)[i] > y[i]) return false;
+      }
+      return false;
+    }
+  };
 
   // Selector of bounds value type
   template<class Bounds_>
