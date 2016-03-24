@@ -115,8 +115,8 @@ namespace detail
 
     void            gid_to_coords(int gid, DivisionsVector& coords) const       { gid_to_coords(gid, coords, divisions); }
     int             coords_to_gid(const DivisionsVector& coords) const          { return coords_to_gid(coords, divisions); }
-    void            fill_divisions(int dim, int nblocks, std::vector<int>& divisions, int unused);
-    void            fill_divisions(int nblocks)                                 { fill_divisions(dim, nblocks, divisions, 0); }
+    void            fill_divisions(int dim, int nblocks, std::vector<int>& divisions);
+    void            fill_divisions(int nblocks)                                 { fill_divisions(dim, nblocks, divisions); }
 
     void            fill_bounds(Bounds& bounds, const DivisionsVector& coords, bool add_ghosts = false) const;
     void            fill_bounds(Bounds& bounds, int gid, bool add_ghosts = false) const;
@@ -124,7 +124,6 @@ namespace detail
     static bool     all(const std::vector<int>& v, int x);
     static void     gid_to_coords(int gid, DivisionsVector& coords, const DivisionsVector& divisions);
     static int      coords_to_gid(const DivisionsVector& coords, const DivisionsVector& divisions);
-    static void     fill_divisions(int dim, int nblocks, std::vector<int>& divisions);
 
     static void     factor(std::vector<unsigned>& factors, int n);
 
@@ -510,49 +509,14 @@ fill_bounds(Bounds& bounds,                  //!< (output) bounds
         fill_bounds(bounds, coords);
 }
 
-template<class Bounds>
-void
-diy::RegularDecomposer<Bounds>::
-fill_divisions(int dim, int nblocks, std::vector<int>& divisions)
-{
-  int prod = 1; int c = 0;
-  for (unsigned i = 0; i < dim; ++i)
-    if (divisions[i] != 0)
-    {
-      prod *= divisions[i];
-      ++c;
-    }
-
-  if (nblocks % prod != 0)
-  {
-    std::cerr << "Incompatible requirements" << std::endl;
-    return;
-  }
-
-  if (c == divisions.size())
-    return;
-
-  std::vector<unsigned> factors;
-  factor(factors, nblocks/prod);
-
-  // Fill the missing divs using LPT algorithm
-  std::vector<unsigned> missing_divs(divisions.size() - c, 1);
-  for (int i = factors.size() - 1; i >= 0; --i)
-    *std::min_element(missing_divs.begin(), missing_divs.end()) *= factors[i];
-
-  c = 0;
-  for (unsigned i = 0; i < dim; ++i)
-    if (divisions[i] == 0)
-      divisions[i] = missing_divs[c++];
-}
-
 namespace diy { namespace detail {
 // current state of division in one dimension used in fill_divisions below
+template<class Coordinate>
 struct Div
 {
     int dim;                                 // 0, 1, 2, etc. e.g. for x, y, z etc.
     int nb;                                  // number of blocks so far in this dimension
-    float b_size;                            // block size so far in this dimension
+    Coordinate b_size;                       // block size so far in this dimension
 
     // sort on descending block size unless tied, in which case
     // sort on ascending num blocks in current dim unless tied, in which case
@@ -579,7 +543,7 @@ struct Div
 template<class Bounds>
 void
 diy::RegularDecomposer<Bounds>::
-fill_divisions(int dim, int nblocks, std::vector<int>& divisions, int unused)
+fill_divisions(int dim, int nblocks, std::vector<int>& divisions)
 {
     // prod = number of blocks unconstrained by user; c = number of unconstrained dimensions
     int prod = 1; int c = 0;
@@ -605,14 +569,14 @@ fill_divisions(int dim, int nblocks, std::vector<int>& divisions, int unused)
     factor(factors, nblocks/prod);
 
     using detail::Div;
-    std::vector<Div> missing_divs;              // pairs consisting of (dim, #divs)
+    std::vector< Div<Coordinate> > missing_divs;              // pairs consisting of (dim, #divs)
 
     // init missing_divs
     for (size_t i = 0; i < dim; i++)
     {
         if (divisions[i] == 0)
         {
-            Div div;
+            Div<Coordinate> div;
             div.dim = i;
             div.nb = 1;
             div.b_size = domain.max[i] - domain.min[i];
@@ -632,13 +596,13 @@ fill_divisions(int dim, int nblocks, std::vector<int>& divisions, int unused)
         std::sort(missing_divs.begin(), missing_divs.end());
 
         // split the dimension with the largest block size (first element in vector)
-        float min =
+        Coordinate min =
             detail::BoundsHelper<Bounds>::from(0,
                                                missing_divs[0].nb * factors[i],
                                                domain.min[missing_divs[0].dim],
                                                domain.max[missing_divs[0].dim],
                                                share_face[missing_divs[0].dim]);
-        float max =
+        Coordinate max =
             detail::BoundsHelper<Bounds>::to(0,
                                              missing_divs[0].nb * factors[i],
                                              domain.min[missing_divs[0].dim],
