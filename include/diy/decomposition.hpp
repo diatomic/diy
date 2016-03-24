@@ -115,8 +115,8 @@ namespace detail
 
     void            gid_to_coords(int gid, DivisionsVector& coords) const       { gid_to_coords(gid, coords, divisions); }
     int             coords_to_gid(const DivisionsVector& coords) const          { return coords_to_gid(coords, divisions); }
-    void            fill_divisions(int dim, int nblocks, std::vector<int>& divisions);
-    void            fill_divisions(int nblocks)                                 { fill_divisions(dim, nblocks, divisions); }
+    void            fill_divisions(int nblocks, std::vector<int>& divisions);
+    void            fill_divisions(int nblocks)                                 { fill_divisions(nblocks, divisions); }
 
     void            fill_bounds(Bounds& bounds, const DivisionsVector& coords, bool add_ghosts = false) const;
     void            fill_bounds(Bounds& bounds, int gid, bool add_ghosts = false) const;
@@ -535,15 +535,10 @@ struct Div
 };
 } }
 
-// TODO: unused argument forces this version of fill_divisions to be used with decompose()
-// while not breaking other calls to fill_divisions (eg., regular partners in reductions)
-// that call the static version
-// those other uses need to be fixed too, but unsure how to get the domain when the static version
-// is used (ie, there isn't a RegularDecomposer object)
 template<class Bounds>
 void
 diy::RegularDecomposer<Bounds>::
-fill_divisions(int dim, int nblocks, std::vector<int>& divisions)
+fill_divisions(int nblocks, std::vector<int>& divisions)
 {
     // prod = number of blocks unconstrained by user; c = number of unconstrained dimensions
     int prod = 1; int c = 0;
