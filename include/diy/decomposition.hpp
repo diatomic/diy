@@ -116,7 +116,7 @@ namespace detail
     void            gid_to_coords(int gid, DivisionsVector& coords) const       { gid_to_coords(gid, coords, divisions); }
     int             coords_to_gid(const DivisionsVector& coords) const          { return coords_to_gid(coords, divisions); }
     void            fill_divisions(int dim, int nblocks, std::vector<int>& divisions, int unused);
-      void            fill_divisions(int nblocks)                                 { fill_divisions(dim, nblocks, divisions, 0); }
+    void            fill_divisions(int nblocks)                                 { fill_divisions(dim, nblocks, divisions, 0); }
 
     void            fill_bounds(Bounds& bounds, const DivisionsVector& coords, bool add_ghosts = false) const;
     void            fill_bounds(Bounds& bounds, int gid, bool add_ghosts = false) const;
@@ -546,30 +546,30 @@ fill_divisions(int dim, int nblocks, std::vector<int>& divisions)
       divisions[i] = missing_divs[c++];
 }
 
+namespace diy { namespace detail {
 // current state of division in one dimension used in fill_divisions below
 struct Div
 {
     int dim;                                 // 0, 1, 2, etc. e.g. for x, y, z etc.
     int nb;                                  // number of blocks so far in this dimension
     float b_size;                            // block size so far in this dimension
-};
 
-// sort on descending block size unless tied, in which case
-// sort on ascending num blocks in current dim unless tied, in which case
-// sort on ascending dimension
-struct comp {
-    bool operator() (Div lhs, Div rhs)
+    // sort on descending block size unless tied, in which case
+    // sort on ascending num blocks in current dim unless tied, in which case
+    // sort on ascending dimension
+    bool operator<(Div rhs) const
+    {
+        // sort on second value of the pair unless tied, in which case sort on first
+        if (b_size == rhs.b_size)
         {
-            // sort on second value of the pair unless tied, in which case sort on first
-            if (lhs.b_size == rhs.b_size)
-            {
-                if (lhs.nb == rhs.nb)
-                    return(lhs.dim < rhs.dim);
-                return(lhs.nb < rhs.nb);
-            }
-            return(lhs.b_size > rhs.b_size);
+            if (nb == rhs.nb)
+                return(dim < rhs.dim);
+            return(nb < rhs.nb);
         }
+        return(b_size > rhs.b_size);
+    }
 };
+} }
 
 // TODO: unused argument forces this version of fill_divisions to be used with decompose()
 // while not breaking other calls to fill_divisions (eg., regular partners in reductions)
@@ -604,8 +604,8 @@ fill_divisions(int dim, int nblocks, std::vector<int>& divisions, int unused)
     std::vector<unsigned> factors;
     factor(factors, nblocks/prod);
 
+    using detail::Div;
     std::vector<Div> missing_divs;              // pairs consisting of (dim, #divs)
-    comp my_comp;                               // comparison object
 
     // init missing_divs
     for (size_t i = 0; i < dim; i++)
@@ -629,7 +629,7 @@ fill_divisions(int dim, int nblocks, std::vector<int>& divisions, int unused)
         // only a problem for discrete bounds
 
         // sort on decreasing block size
-        std::sort(missing_divs.begin(), missing_divs.end(), my_comp);
+        std::sort(missing_divs.begin(), missing_divs.end());
 
         // split the dimension with the largest block size (first element in vector)
         float min =
