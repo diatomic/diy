@@ -96,8 +96,7 @@ namespace detail
       if (ghosts.size() < dim)      ghosts.resize(dim);
       if (divisions.size() < dim)   divisions.resize(dim);
 
-      int nblocks = assigner.nblocks();
-      fill_divisions(nblocks);
+      fill_divisions(divisions);
     }
 
     // Calls create(int gid, const Bounds& bounds, const Link& link)
@@ -115,8 +114,7 @@ namespace detail
 
     void            gid_to_coords(int gid, DivisionsVector& coords) const       { gid_to_coords(gid, coords, divisions); }
     int             coords_to_gid(const DivisionsVector& coords) const          { return coords_to_gid(coords, divisions); }
-    void            fill_divisions(int nblocks, std::vector<int>& divisions);
-    void            fill_divisions(int nblocks)                                 { fill_divisions(nblocks, divisions); }
+    void            fill_divisions(std::vector<int>& divisions);
 
     void            fill_bounds(Bounds& bounds, const DivisionsVector& coords, bool add_ghosts = false) const;
     void            fill_bounds(Bounds& bounds, int gid, bool add_ghosts = false) const;
@@ -538,8 +536,10 @@ struct Div
 template<class Bounds>
 void
 diy::RegularDecomposer<Bounds>::
-fill_divisions(int nblocks, std::vector<int>& divisions)
+fill_divisions(std::vector<int>& divisions)
 {
+    int nblocks = assigner.nblocks();
+
     // prod = number of blocks unconstrained by user; c = number of unconstrained dimensions
     int prod = 1; int c = 0;
     for (unsigned i = 0; i < dim; ++i)
