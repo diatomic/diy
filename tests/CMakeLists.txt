@@ -7,5 +7,10 @@ add_custom_target           (test-scripts ALL
 add_executable              (kd-tree-test           kd-tree.cpp)
 target_link_libraries       (kd-tree-test           ${libraries})
 
-add_test                    (kd-tree-test           scripts/kd-tree.sh)
-add_test                    (kd-tree-test-sampling  scripts/kd-tree.sh -s)
+add_executable              (decomposer-test        decomposer.cpp)
+
+add_test                    (kd-tree-test                       scripts/kd-tree.sh)
+add_test                    (kd-tree-test-sampling              scripts/kd-tree.sh -s)
+add_test                    (kd-tree-test-sampling-exponential  scripts/kd-tree.sh -s -e)
+
+add_test                    (decomposer-test        decomposer-test)
