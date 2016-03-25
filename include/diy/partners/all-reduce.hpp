@@ -24,12 +24,12 @@ struct RegularAllReducePartners: public RegularMergePartners
                 //! contiguous parameter indicates whether to match partners contiguously or in a round-robin fashion;
                 //! contiguous is useful when data needs to be united;
                 //! round-robin is useful for vector-"halving"
-                RegularAllReducePartners(int dim,                 //!< dimensionality of regular block grid
-                                         int nblocks,             //!< total number of blocks
-                                         int k,                   //!< target k value
-                                         bool contiguous = true   //!< distance doubling (true) or halving (false)
+  template<class Decomposer>
+                RegularAllReducePartners(const Decomposer& decomposer,  //!< domain decomposition
+                                         int k,                         //!< target k value
+                                         bool contiguous = true         //!< distance doubling (true) or halving (false)
                     ):
-                  Parent(dim, nblocks, k, contiguous)         {}
+                  Parent(decomposer, k, contiguous)         {}
                 RegularAllReducePartners(const DivisionVector&   divs,//!< explicit division vector
                                          const KVSVector&        kvs, //!< explicit k vector
                                          bool  contiguous = true      //!< distance doubling (true) or halving (false)

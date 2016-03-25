@@ -221,7 +221,8 @@ int main(int argc, char* argv[])
     //diy::RoundRobinAssigner   assigner(world.size(), nblocks);
 
     // decompose the domain into blocks
-    diy::decompose(dim, world.rank(), domain, assigner, create);
+    diy::RegularDecomposer<Bounds> decomposer(dim, domain, nblocks);
+    decomposer.decompose(world.rank(), assigner, create);
 
     // merge-based reduction: create the partners that determine how groups are formed
     // in each round and then execute the reduction
@@ -229,8 +230,7 @@ int main(int argc, char* argv[])
     int k = 2;                               // the radix of the k-ary reduction tree
 
     // partners for merge over regular block grid
-    diy::RegularMergePartners  partners(dim,         // dimensionality of block grid
-                                        nblocks,     // total global number of blocks
+    diy::RegularMergePartners  partners(decomposer,  // domain decomposition
                                         k,           // radix of k-ary reduction
                                         contiguous); // contiguous = true: distance doubling
                                                      // contiguous = false: distance halving

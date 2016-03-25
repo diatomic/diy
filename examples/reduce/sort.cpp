@@ -29,8 +29,9 @@ struct SortPartners
   typedef       std::pair<bool, int>            RoundType;
 
                     SortPartners(int nblocks, int k):
-                        histogram(1, nblocks, k),
-                        exchange(1, nblocks, k, false)
+                        decomposer(1, diy::interval(0,nblocks), nblocks),
+                        histogram(decomposer, k),
+                        exchange(decomposer, k, false)
   {
     for (unsigned i = 0; i < exchange.rounds(); ++i)
     {
@@ -72,10 +73,11 @@ struct SortPartners
         histogram.outgoing(sub_round(round), gid, partners, m);
   }
 
-  diy::RegularSwapPartners          histogram;
-  diy::RegularSwapPartners          exchange;
+  diy::RegularDecomposer<diy::DiscreteBounds>   decomposer;
+  diy::RegularSwapPartners                      histogram;
+  diy::RegularSwapPartners                      exchange;
 
-  std::vector<RoundType>            rounds_;
+  std::vector<RoundType>                        rounds_;
 };
 
 // Functor that tells reduce to skip histogram rounds

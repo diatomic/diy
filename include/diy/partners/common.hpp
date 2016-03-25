@@ -19,17 +19,18 @@ struct RegularPartners
     int size;           // group size
   };
 
-  // The part of RegularDecomposer that we need works the same with either Bounds (so we fix them arbitrarily)
-  typedef       DiscreteBounds                      Bounds;
-  typedef       RegularDecomposer<Bounds>           Decomposer;
-
   typedef       std::vector<int>                    CoordVector;
   typedef       std::vector<int>                    DivisionVector;
   typedef       std::vector<DimK>                   KVSVector;
 
-                RegularPartners(int dim, int nblocks, int k, bool contiguous = true):
-                  divisions_(dim, 0),
-                  contiguous_(contiguous)                       { Decomposer::fill_divisions(dim, nblocks, divisions_); factor(k, divisions_, kvs_); fill_steps(); }
+  // The part of RegularDecomposer that we need works the same with either Bounds (so we fix them arbitrarily)
+  typedef       DiscreteBounds                      Bounds;
+  typedef       RegularDecomposer<Bounds>           Decomposer;
+
+  template<class Decomposer_>
+                RegularPartners(const Decomposer_& decomposer, int k, bool contiguous = true):
+                  divisions_(decomposer.divisions),
+                  contiguous_(contiguous)                       { factor(k, divisions_, kvs_); fill_steps(); }
                 RegularPartners(const DivisionVector&   divs,
                                 const KVSVector&        kvs,
                                 bool  contiguous = true):
