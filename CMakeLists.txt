@@ -40,4 +40,6 @@ include_directories         (${CMAKE_CURRENT_BINARY_DIR}
                              ${CMAKE_CURRENT_SOURCE_DIR}/include
                              SYSTEM ${MPI_INCLUDE_PATH})
 
+enable_testing              ()
 add_subdirectory            (examples)
+add_subdirectory            (tests)
