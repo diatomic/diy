@@ -74,20 +74,18 @@ namespace detail
     typedef         std::vector<Coordinate>                         CoordinateVector;
     typedef         std::vector<int>                                DivisionsVector;
 
-    /// @param assigner:  decides how processors are assigned to blocks (maps a gid to a rank)
-    ///                   also communicates the total number of blocks
     /// @param wrap:      indicates dimensions on which to wrap the boundary
     /// @param ghosts:    indicates how many ghosts to use in each dimension
     /// @param divisions: indicates how many cuts to make along each dimension
     ///                   (0 means "no constraint," i.e., leave it up to the algorithm)
                     RegularDecomposer(int               dim_,
                                       const Bounds&     domain_,
-                                      const Assigner&   assigner_,
+                                      int               nblocks_,
                                       BoolVector        share_face_ = BoolVector(),
                                       BoolVector        wrap_       = BoolVector(),
                                       CoordinateVector  ghosts_     = CoordinateVector(),
                                       DivisionsVector   divisions_  = DivisionsVector()):
-                      dim(dim_), domain(domain_), assigner(assigner_),
+                      dim(dim_), domain(domain_), nblocks(nblocks_),
                       share_face(share_face_),
                       wrap(wrap_), ghosts(ghosts_), divisions(divisions_)
     {
@@ -101,12 +99,12 @@ namespace detail
 
     // Calls create(int gid, const Bounds& bounds, const Link& link)
     template<class Creator>
-    void            decompose(int rank, const Creator& create);
+    void            decompose(int rank, const Assigner& assigner, const Creator& create);
 
     template<class Updater>
-    void            decompose(int rank, Master& master, const Updater& update);
+    void            decompose(int rank, const Assigner& assigner, Master& master, const Updater& update);
 
-    void            decompose(int rank, Master& master);
+    void            decompose(int rank, const Assigner& assigner, Master& master);
 
     // find lowest gid that owns a particular point
     template<class Point>
@@ -114,7 +112,7 @@ namespace detail
 
     void            gid_to_coords(int gid, DivisionsVector& coords) const       { gid_to_coords(gid, coords, divisions); }
     int             coords_to_gid(const DivisionsVector& coords) const          { return coords_to_gid(coords, divisions); }
-    void            fill_divisions(std::vector<int>& divisions);
+    void            fill_divisions(std::vector<int>& divisions) const;
 
     void            fill_bounds(Bounds& bounds, const DivisionsVector& coords, bool add_ghosts = false) const;
     void            fill_bounds(Bounds& bounds, int gid, bool add_ghosts = false) const;
@@ -141,8 +139,8 @@ namespace detail
 
 
     int               dim;
-    const Bounds&     domain;
-    const Assigner&   assigner;
+    Bounds            domain;
+    int               nblocks;
     BoolVector        share_face;
     BoolVector        wrap;
     CoordinateVector  ghosts;
@@ -166,7 +164,7 @@ namespace detail
    *
    * `create(...)` is called with each block assigned to the local domain. See [decomposition example](#decomposition-example).
    */
-  template<class Bounds, class Assigner, class Creator>
+  template<class Bounds, class Creator>
   void decompose(int                dim,
                  int                rank,
                  const Bounds&      domain,
@@ -177,7 +175,7 @@ namespace detail
                  typename RegularDecomposer<Bounds>::CoordinateVector ghosts     = typename RegularDecomposer<Bounds>::CoordinateVector(),
                  typename RegularDecomposer<Bounds>::DivisionsVector  divs       = typename RegularDecomposer<Bounds>::DivisionsVector())
   {
-    RegularDecomposer<Bounds>(dim, domain, assigner, share_face, wrap, ghosts, divs).decompose(rank, create);
+    RegularDecomposer<Bounds>(dim, domain, assigner.nblocks(), share_face, wrap, ghosts, divs).decompose(rank, assigner, create);
   }
 
 namespace detail
@@ -237,7 +235,7 @@ namespace detail
    *
    * `master` must have been supplied a create function in order for this function to work.
    */
-  template<class Bounds, class Assigner>
+  template<class Bounds>
   void decompose(int                dim,
                  int                rank,
                  const Bounds&      domain,
@@ -248,7 +246,7 @@ namespace detail
                  typename RegularDecomposer<Bounds>::CoordinateVector ghosts     = typename RegularDecomposer<Bounds>::CoordinateVector(),
                  typename RegularDecomposer<Bounds>::DivisionsVector  divs       = typename RegularDecomposer<Bounds>::DivisionsVector())
   {
-    RegularDecomposer<Bounds>(dim, domain, assigner, share_face, wrap, ghosts, divs).decompose(rank, master);
+    RegularDecomposer<Bounds>(dim, domain, assigner.nblocks(), share_face, wrap, ghosts, divs).decompose(rank, assigner, master);
   }
 
   /**
@@ -281,7 +279,7 @@ namespace detail
      * @param assigner   decides how processors are assigned to blocks (maps a gid to a rank)
      *                   also communicates the total number of blocks
      */
-  template<class Bounds, class Assigner, class Update>
+  template<class Bounds, class Update>
   void decompose(int                dim,
                  int                rank,
                  const Bounds&      domain,
@@ -297,8 +295,8 @@ namespace detail
                  typename RegularDecomposer<Bounds>::DivisionsVector  divs       =
                  typename RegularDecomposer<Bounds>::DivisionsVector())
   {
-      RegularDecomposer<Bounds>(dim, domain, assigner, share_face, wrap, ghosts, divs).
-          decompose(rank, master, update);
+      RegularDecomposer<Bounds>(dim, domain, share_face, wrap, ghosts, divs).
+          decompose(rank, assigner, master, update);
   }
 
   //! Decomposition example: \example decomposition/test-decomposition.cpp
@@ -309,16 +307,16 @@ namespace detail
 template<class Bounds>
 void
 diy::RegularDecomposer<Bounds>::
-decompose(int rank, Master& master)
+decompose(int rank, const Assigner& assigner, Master& master)
 {
-  decompose(rank, detail::AddBlock<Bounds>(&master));
+  decompose(rank, assigner, detail::AddBlock<Bounds>(&master));
 }
 
 template<class Bounds>
 template<class Creator>
 void
 diy::RegularDecomposer<Bounds>::
-decompose(int rank, const Creator& create)
+decompose(int rank, const Assigner& assigner, const Creator& create)
 {
   std::vector<int> gids;
   assigner.local_gids(rank, gids);
@@ -407,9 +405,9 @@ template<class Bounds>
 template<class Update>
 void
 diy::RegularDecomposer<Bounds>::
-decompose(int rank, Master& master, const Update& update)
+decompose(int rank, const Assigner& assigner, Master& master, const Update& update)
 {
-    decompose(rank, detail::Updater<Bounds,Update>(&master, update));
+    decompose(rank, assigner, detail::Updater<Bounds,Update>(&master, update));
 }
 
 template<class Bounds>
@@ -536,10 +534,8 @@ struct Div
 template<class Bounds>
 void
 diy::RegularDecomposer<Bounds>::
-fill_divisions(std::vector<int>& divisions)
+fill_divisions(std::vector<int>& divisions) const
 {
-    int nblocks = assigner.nblocks();
-
     // prod = number of blocks unconstrained by user; c = number of unconstrained dimensions
     int prod = 1; int c = 0;
     for (unsigned i = 0; i < dim; ++i)

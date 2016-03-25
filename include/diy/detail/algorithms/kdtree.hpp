@@ -61,8 +61,9 @@ struct diy::detail::KDTreePartners
   typedef           diy::ContinuousBounds                   Bounds;
 
                     KDTreePartners(int dim, int nblocks, bool wrap_, const Bounds& domain_):
-                        histogram(1, nblocks, 2),
-                        swap(1, nblocks, 2, false),
+                        decomposer(1, interval(0,nblocks), nblocks),
+                        histogram(decomposer, 2),
+                        swap(decomposer, 2, false),
                         wrap(wrap_),
                         domain(domain_)
   {
@@ -149,6 +150,9 @@ struct diy::detail::KDTreePartners
     for (std::set<int>::const_iterator it = result.begin(); it != result.end(); ++it)
         partners.push_back(*it);
   }
+
+  // 1-D domain to feed into histogram and swap
+  diy::RegularDecomposer<diy::DiscreteBounds>   decomposer;
 
   diy::RegularAllReducePartners     histogram;
   diy::RegularSwapPartners          swap;

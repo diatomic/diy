@@ -37,7 +37,8 @@ namespace diy
         detail::SampleSort<Block,T,Cmp> sorter(values, samples, cmp, num_samples);
 
         // swap-reduce to all-gather samples
-        RegularSwapPartners   partners(1, assigner.nblocks(), k);
+        RegularDecomposer<DiscreteBounds> decomposer(1, interval(0,assigner.nblocks()), assigner.nblocks());
+        RegularSwapPartners   partners(decomposer, k);
         reduce(master, assigner, partners, sorter.sample(), detail::SkipIntermediate(partners.rounds()));
 
         // all_to_all to exchange the values

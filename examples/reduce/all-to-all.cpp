@@ -154,8 +154,8 @@ int main(int argc, char* argv[])
   //diy::RoundRobinAssigner   assigner(world.size(), nblocks);
   AddBlock      create(master, num_points);
 
-  Decomposer    decomposer(dim, domain, assigner);
-  decomposer.decompose(world.rank(), create);
+  Decomposer    decomposer(dim, domain, nblocks);
+  decomposer.decompose(world.rank(), assigner, create);
   diy::all_to_all(master, assigner, Redistribute(decomposer), k);
 
   master.foreach(&Block::print_block, &verbose);

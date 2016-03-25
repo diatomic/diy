@@ -112,11 +112,11 @@ int main(int argc, char* argv[])
     // (having the decomposer available is useful for its other member functions
     diy::RegularDecomposer<Bounds> decomposer(3,
                                               domain,
-                                              assigner,
+                                              nblocks,
                                               share_face,
                                               wrap,
                                               ghosts);
-    decomposer.decompose(rank, addblock);
+    decomposer.decompose(rank, assigner, addblock);
 
     // or combine the two lines above into the following helper function
     // but the decomposer gets destroyed afterwards

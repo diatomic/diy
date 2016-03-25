@@ -21,7 +21,9 @@ all_to_all(Master&              master,     //!< block owner
            int                  k = 2       //!< reduction fanout
           )
 {
-  RegularSwapPartners  partners(1, assigner.nblocks(), k, false);
+  DiscreteBounds bounds; bounds.min[0] = 0; bounds.max[1] = assigner.nblocks();
+  RegularDecomposer<DiscreteBounds> decomposer(1, bounds, assigner.nblocks());
+  RegularSwapPartners  partners(decomposer, k, false);
   reduce(master, assigner, partners, detail::AllToAllReduce<Op>(op, assigner), detail::SkipIntermediate(partners.rounds()));
 }
 

@@ -159,14 +159,14 @@ int main(int argc, char* argv[])
     //diy::RoundRobinAssigner   assigner(world.size(), nblocks);
 
     // decompose the domain into blocks
-    diy::decompose(dim, world.rank(), domain, assigner, create);
+    diy::RegularDecomposer<Bounds> decomposer(dim, domain, nblocks);
+    decomposer.decompose(world.rank(), assigner, create);
 
     // swap-based reduction: create the partners that determine how groups are formed
     // in each round and then execute the reduction
 
     // partners for swap over regular block grid
-    diy::RegularSwapPartners  partners(dim,     // dimensionality of block grid
-                                       nblocks, // total number of blocks
+    diy::RegularSwapPartners  partners(decomposer,  // domain decomposition
                                        k,       // radix of k-ary reduction
                                        false);  // contiguous = true: distance doubling
                                                 // contiguous = false: distance halving
