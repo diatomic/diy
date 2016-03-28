@@ -60,8 +60,7 @@ struct AddBlock
             RGLink*         l   = new RGLink(link);
             diy::Master&    m   = const_cast<diy::Master&>(master);
 
-            int             lid = m.add(gid, b, l);    // add block to the master (mandatory)
-
+            m.add(gid, b, l);    // add block to the master (mandatory)
         }
 
     diy::Master&  master;

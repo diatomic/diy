@@ -22,6 +22,8 @@
 
 #include "block.h"
 
+#define UNUSED(expr) do { (void)(expr); } while (0)
+
 // --- callback functions ---//
 
 //
@@ -61,13 +63,13 @@ void average_neighbors(void* b_,                             // local block
                        void*)                                // user-defined additional arguments
 {
     Block*        b = static_cast<Block*>(b_);
-    diy::Link*    l = cp.link();
+    diy::Link*    l = cp.link(); UNUSED(l);
 
     // diy collectives (optional) are piggybacking on the enqueue/exchange/dequeue mechanism.
     // They are invoked by posting the collective at the time of the enqueue and getting the
     // result at the time of the dequeue.
     // cp.get() is the result retrieval.
-    int all_total = cp.get<int>();
+    int all_total = cp.get<int>(); UNUSED(all_total);
 
     // gids of incoming neighbors in the link
     std::vector<int> in;

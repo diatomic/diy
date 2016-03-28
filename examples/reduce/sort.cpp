@@ -120,8 +120,6 @@ void compute_local_histogram(void* b_, const diy::ReduceProxy& srp)
 
 void receive_histogram(void* b_, const diy::ReduceProxy& srp, Histogram& histogram)
 {
-    ValueBlock* b = static_cast<ValueBlock*>(b_);
-
     // dequeue and add up the histograms
     for (unsigned i = 0; i < srp.in_link().size(); ++i)
     {
@@ -138,8 +136,6 @@ void receive_histogram(void* b_, const diy::ReduceProxy& srp, Histogram& histogr
 
 void add_histogram(void* b_, const diy::ReduceProxy& srp)
 {
-    ValueBlock* b = static_cast<ValueBlock*>(b_);
-
     Histogram histogram;
     receive_histogram(b_, srp, histogram);
 

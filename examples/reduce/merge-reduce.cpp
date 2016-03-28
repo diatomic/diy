@@ -79,7 +79,7 @@ struct AddBlock
             RCLink*         l   = new RCLink(link);
             diy::Master&    m   = const_cast<diy::Master&>(master);
 
-            int             lid = m.add(gid, b, l); // add block to the master (mandatory)
+            m.add(gid, b, l); // add block to the master (mandatory)
 
             b->generate_data(num_points);          // initialize block data (typical)
         }

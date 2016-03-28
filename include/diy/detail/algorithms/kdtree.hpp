@@ -445,7 +445,6 @@ enqueue_exchange(Block* b, const diy::ReduceProxy& srp, int dim, const Histogram
     //fprintf(stderr, "Histogram total: %lu\n", total);
 
     size_t cur   = 0;
-    size_t last, next;
     float  width = (link->core().max[dim] - link->core().min[dim])/bins_;
     float  split;
     for (size_t i = 0; i < histogram.size(); ++i)
