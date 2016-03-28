@@ -29,7 +29,7 @@ struct SortPartners
   typedef       std::pair<bool, int>            RoundType;
 
                     SortPartners(int nblocks, int k):
-                        decomposer(1, diy::interval(0,nblocks), nblocks),
+                        decomposer(1, diy::interval(0,nblocks-1), nblocks),
                         histogram(decomposer, k),
                         exchange(decomposer, k, false)
   {

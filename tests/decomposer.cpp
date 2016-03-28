@@ -18,17 +18,43 @@ void  test(int gid,                                         // block global id
     REQUIRE(bounds.max[2] == 100.);
 }
 
+void  test_interval(int gid,
+                    const diy::DiscreteBounds& core,
+                    const diy::DiscreteBounds& bounds,
+                    const diy::DiscreteBounds& domain,
+                    const diy::RegularGridLink& link)
+{
+    REQUIRE(bounds.min[0] == gid);
+    REQUIRE(bounds.max[0] == gid);
+    REQUIRE(bounds.min[0] == gid);
+    REQUIRE(bounds.max[0] == gid);
+}
+
+
 TEST_CASE("RegularDecomposer", "[decomposition]")
 {
-    int nblocks = 9;
-    diy::ContinuousBounds domain;
-    for(int i = 0; i < 3; ++i)
+    SECTION("simple 3D decomposition")
     {
-        domain.min[i] = 0.;
-        domain.max[i] = 100.;
-    }
-    diy::RegularDecomposer<diy::ContinuousBounds>   decomposer(3, domain, nblocks);
+        int nblocks = 9;
+        diy::ContinuousBounds domain;
+        for(int i = 0; i < 3; ++i)
+        {
+            domain.min[i] = 0.;
+            domain.max[i] = 100.;
+        }
+        diy::RegularDecomposer<diy::ContinuousBounds>   decomposer(3, domain, nblocks);
 
-    diy::ContiguousAssigner assigner(nblocks, nblocks);
-    decomposer.decompose(0, assigner, test);
+        diy::ContiguousAssigner assigner(nblocks, nblocks);
+        decomposer.decompose(0, assigner, test);
+    }
+
+    SECTION("1D decomposition of an interval")
+    {
+        for (int nblocks = 1; nblocks < 33; ++nblocks)
+        {
+            diy::RegularDecomposer<diy::DiscreteBounds> decomposer(1, diy::interval(0,nblocks-1), nblocks);
+            diy::ContiguousAssigner assigner(1, nblocks);
+            decomposer.decompose(0, assigner, test_interval);
+        }
+    }
 }

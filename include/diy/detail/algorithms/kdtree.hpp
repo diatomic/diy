@@ -61,7 +61,7 @@ struct diy::detail::KDTreePartners
   typedef           diy::ContinuousBounds                   Bounds;
 
                     KDTreePartners(int dim, int nblocks, bool wrap_, const Bounds& domain_):
-                        decomposer(1, interval(0,nblocks), nblocks),
+                        decomposer(1, interval(0,nblocks-1), nblocks),
                         histogram(decomposer, 2),
                         swap(decomposer, 2, false),
                         wrap(wrap_),

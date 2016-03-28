@@ -606,7 +606,9 @@ fill_divisions(std::vector<int>& divisions) const
         }
         else
         {
-            fprintf(stderr, "Error: unable to decompose domain into %d blocks\n", nblocks);
+            fprintf(stderr, "Error: unable to decompose domain into %d blocks: ", nblocks);
+            std::cerr << min << " " << max << std::endl;
+            throw std::runtime_error("unable to decompose domain");
             return;
         }
     }
