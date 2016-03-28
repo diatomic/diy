@@ -105,7 +105,7 @@ void sum(void* b_,                                  // local block
     unsigned   round    = rp.round();               // current round number
 
     // step 1: dequeue and merge
-    for (unsigned i = 0; i < rp.in_link().size(); ++i)
+    for (int i = 0; i < rp.in_link().size(); ++i)
     {
         int nbr_gid = rp.in_link().target(i).gid;
         if (nbr_gid == rp.gid())

@@ -97,7 +97,7 @@ struct diy::detail::KDTreePartners
 
   inline bool   active(int round, int gid, const diy::Master& m) const
   {
-    if (round == rounds())
+    if (round == (int) rounds())
         return true;
     else if (swap_round(round) && sub_round(round) < 0)     // link round
         return true;
@@ -109,7 +109,7 @@ struct diy::detail::KDTreePartners
 
   inline void   incoming(int round, int gid, std::vector<int>& partners, const diy::Master& m) const
   {
-    if (round == rounds())
+    if (round == (int) rounds())
         link_neighbors(-1, gid, partners, m);
     else if (swap_round(round) && sub_round(round) < 0)       // link round
         swap.incoming(sub_round(round - 1) + 1, gid, partners, m);
@@ -128,7 +128,7 @@ struct diy::detail::KDTreePartners
 
   inline void   outgoing(int round, int gid, std::vector<int>& partners, const diy::Master& m) const
   {
-    if (round == rounds())
+    if (round == (int) rounds())
         swap.outgoing(sub_round(round-1) + 1, gid, partners, m);
     else if (swap_round(round) && sub_round(round) < 0)       // link round
         link_neighbors(-1, gid, partners, m);
@@ -144,7 +144,7 @@ struct diy::detail::KDTreePartners
     diy::Link*  link = m.link(lid);
 
     std::set<int> result;       // partners must be unique
-    for (size_t i = 0; i < link->size(); ++i)
+    for (int i = 0; i < link->size(); ++i)
         result.insert(link->target(i).gid);
 
     for (std::set<int>::const_iterator it = result.begin(); it != result.end(); ++it)
@@ -200,7 +200,7 @@ operator()(void* b_, const diy::ReduceProxy& srp, const KDTreePartners& partners
         }
 
         compute_local_histogram(b, srp, dim);
-    } else if (partners.sub_round(srp.round()) < partners.histogram.rounds()/2)
+    } else if (partners.sub_round(srp.round()) < (int) partners.histogram.rounds()/2)
     {
         Histogram   histogram(bins_);
         add_histogram(b, srp, histogram);
@@ -355,7 +355,7 @@ split_to_neighbors(Block* b, const diy::ReduceProxy& srp, int dim) const
     // determine split
     float split = find_split(link->core(), link->bounds());
 
-    for (size_t i = 0; i < link->size(); ++i)
+    for (int i = 0; i < link->size(); ++i)
     {
         srp.enqueue(link->target(i), split);
         srp.enqueue(link->target(i), link->direction(i));
@@ -383,7 +383,7 @@ compute_local_histogram(Block* b, const diy::ReduceProxy& srp, int dim) const
             std::cerr << loc << " " << x << " " << link->core().min[dim] << std::endl;
             std::abort();
         }
-        if (loc >= bins_)
+        if (loc >= (int) bins_)
             loc = bins_ - 1;
         ++(histogram[loc]);
     }
@@ -397,7 +397,7 @@ diy::detail::KDTreePartition<Block,Point>::
 add_histogram(Block* b, const diy::ReduceProxy& srp, Histogram& histogram) const
 {
     // dequeue and add up the histograms
-    for (unsigned i = 0; i < srp.in_link().size(); ++i)
+    for (int i = 0; i < srp.in_link().size(); ++i)
     {
         int nbr_gid = srp.in_link().target(i).gid;
 
@@ -421,7 +421,7 @@ void
 diy::detail::KDTreePartition<Block,Point>::
 forward_histogram(Block* b, const diy::ReduceProxy& srp, const Histogram& histogram) const
 {
-    for (unsigned i = 0; i < srp.out_link().size(); ++i)
+    for (int i = 0; i < srp.out_link().size(); ++i)
         srp.enqueue(srp.out_link().target(i), histogram);
 }
 
@@ -446,7 +446,7 @@ enqueue_exchange(Block* b, const diy::ReduceProxy& srp, int dim, const Histogram
 
     size_t cur   = 0;
     float  width = (link->core().max[dim] - link->core().min[dim])/bins_;
-    float  split;
+    float  split = 0;
     for (size_t i = 0; i < histogram.size(); ++i)
     {
         if (cur + histogram[i] > total/2)
@@ -491,7 +491,7 @@ dequeue_exchange(Block* b, const diy::ReduceProxy& srp, int dim) const
     int         lid  = srp.master()->lid(srp.gid());
     RCLink*     link = static_cast<RCLink*>(srp.master()->link(lid));
 
-    for (unsigned i = 0; i < srp.in_link().size(); ++i)
+    for (int i = 0; i < srp.in_link().size(); ++i)
     {
       int nbr_gid = srp.in_link().target(i).gid;
       if (nbr_gid == srp.gid())

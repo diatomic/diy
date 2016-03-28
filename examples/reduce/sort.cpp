@@ -52,7 +52,7 @@ struct SortPartners
 
   inline void   incoming(int round, int gid, std::vector<int>& partners, const diy::Master& m) const
   {
-    if (round == rounds())
+    if (round == (int) rounds())
         exchange.incoming(sub_round(round-1) + 1, gid, partners, m);
     else if (exchange_round(round))     // round != 0
         histogram.incoming(sub_round(round-1) + 1, gid, partners, m);
@@ -86,7 +86,7 @@ struct SkipHistogram
         SkipHistogram(const SortPartners& partners_):
             partners(partners_)                                             {}
 
-  bool  operator()(int round, int lid, const diy::Master& master) const     { return round < partners.rounds()  &&
+  bool  operator()(int round, int lid, const diy::Master& master) const     { return round < (int) partners.rounds()  &&
                                                                                     !partners.exchange_round(round) &&
                                                                                      partners.sub_round(round) != 0; }
 
@@ -114,14 +114,14 @@ void compute_local_histogram(void* b_, const diy::ReduceProxy& srp)
             loc = b->bins - 1;
         ++(histogram[loc]);
     }
-    for (unsigned i = 0; i < srp.out_link().size(); ++i)
+    for (int i = 0; i < srp.out_link().size(); ++i)
         srp.enqueue(srp.out_link().target(i), histogram);
 }
 
 void receive_histogram(void* b_, const diy::ReduceProxy& srp, Histogram& histogram)
 {
     // dequeue and add up the histograms
-    for (unsigned i = 0; i < srp.in_link().size(); ++i)
+    for (int i = 0; i < srp.in_link().size(); ++i)
     {
         int nbr_gid = srp.in_link().target(i).gid;
 
@@ -139,7 +139,7 @@ void add_histogram(void* b_, const diy::ReduceProxy& srp)
     Histogram histogram;
     receive_histogram(b_, srp, histogram);
 
-    for (unsigned i = 0; i < srp.out_link().size(); ++i)
+    for (int i = 0; i < srp.out_link().size(); ++i)
         srp.enqueue(srp.out_link().target(i), histogram);
 }
 
@@ -166,7 +166,7 @@ void enqueue_exchange(void* b_, const diy::ReduceProxy& srp, const Histogram& hi
 
         cur += histogram[i];
 
-        if (splits.size() == k)
+        if ((int) splits.size() == k)
             break;
     }
 
@@ -202,7 +202,7 @@ void dequeue_exchange(void* b_, const diy::ReduceProxy& srp)
 {
     ValueBlock* b = static_cast<ValueBlock*>(b_);
 
-    for (unsigned i = 0; i < srp.in_link().size(); ++i)
+    for (int i = 0; i < srp.in_link().size(); ++i)
     {
       int nbr_gid = srp.in_link().target(i).gid;
       if (nbr_gid == srp.gid())

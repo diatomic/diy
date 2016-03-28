@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
   //diy::ContiguousAssigner   assigner(world.size(), nblocks);
   diy::RoundRobinAssigner   assigner(world.size(), nblocks);
 
-  for (unsigned gid = 0; gid < nblocks; ++gid)
+  for (int gid = 0; gid < nblocks; ++gid)
     if (assigner.rank(gid) == world.rank())
       master.add(gid, new Block, new diy::Link);
 

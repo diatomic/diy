@@ -97,7 +97,7 @@ operator()(void* b_, const diy::ReduceProxy& srp, const KDTreePartners& partners
         }
 
         compute_local_samples(b, srp, dim);
-    } else if (partners.sub_round(srp.round()) < partners.histogram.rounds()/2)     // we are reusing partners class, so really we are talking about the samples rounds here
+    } else if (partners.sub_round(srp.round()) < (int) partners.histogram.rounds()/2)     // we are reusing partners class, so really we are talking about the samples rounds here
     {
         Samples samples;
         add_samples(b, srp, samples);
@@ -261,7 +261,7 @@ split_to_neighbors(Block* b, const diy::ReduceProxy& srp, int dim) const
     // determine split
     float split = find_split(link->core(), link->bounds());
 
-    for (size_t i = 0; i < link->size(); ++i)
+    for (int i = 0; i < link->size(); ++i)
     {
         srp.enqueue(link->target(i), split);
         srp.enqueue(link->target(i), link->direction(i));
@@ -293,7 +293,7 @@ diy::detail::KDTreeSamplingPartition<Block,Point>::
 add_samples(Block* b, const diy::ReduceProxy& srp, Samples& samples) const
 {
     // dequeue and combine the samples
-    for (unsigned i = 0; i < srp.in_link().size(); ++i)
+    for (int i = 0; i < srp.in_link().size(); ++i)
     {
         int nbr_gid = srp.in_link().target(i).gid;
 
@@ -317,7 +317,7 @@ void
 diy::detail::KDTreeSamplingPartition<Block,Point>::
 forward_samples(Block* b, const diy::ReduceProxy& srp, const Samples& samples) const
 {
-    for (unsigned i = 0; i < srp.out_link().size(); ++i)
+    for (int i = 0; i < srp.out_link().size(); ++i)
         srp.enqueue(srp.out_link().target(i), samples);
 }
 
@@ -370,7 +370,7 @@ dequeue_exchange(Block* b, const diy::ReduceProxy& srp, int dim) const
     int         lid  = srp.master()->lid(srp.gid());
     RCLink*     link = static_cast<RCLink*>(srp.master()->link(lid));
 
-    for (unsigned i = 0; i < srp.in_link().size(); ++i)
+    for (int i = 0; i < srp.in_link().size(); ++i)
     {
       int nbr_gid = srp.in_link().target(i).gid;
       if (nbr_gid == srp.gid())

@@ -45,7 +45,7 @@ void local_sum(void* b_,                             // local block
 
     // for all neighbor blocks
     // enqueue data to be sent to this neighbor block in the next exchange
-    for (unsigned i = 0; i < l->size(); ++i)
+    for (int i = 0; i < l->size(); ++i)
         cp.enqueue(l->target(i), total);
 
     // diy collectives (optional) are piggybacking on the enqueue/exchange/dequeue mechanism.

@@ -135,10 +135,10 @@ namespace mpi
 
       out.resize(comm.size());
       size_t cur = 0;
-      for (unsigned i = 0; i < comm.size(); ++i)
+      for (int i = 0; i < comm.size(); ++i)
       {
           out[i].reserve(counts[i]);
-          for (unsigned j = 0; j < counts[i]; ++j)
+          for (int j = 0; j < counts[i]; ++j)
               out[i].push_back(buffer[cur++]);
       }
     }

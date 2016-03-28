@@ -89,10 +89,10 @@ namespace detail
                       share_face(share_face_),
                       wrap(wrap_), ghosts(ghosts_), divisions(divisions_)
     {
-      if (share_face.size() < dim)  share_face.resize(dim);
-      if (wrap.size() < dim)        wrap.resize(dim);
-      if (ghosts.size() < dim)      ghosts.resize(dim);
-      if (divisions.size() < dim)   divisions.resize(dim);
+      if ((int) share_face.size() < dim)  share_face.resize(dim);
+      if ((int) wrap.size() < dim)        wrap.resize(dim);
+      if ((int) ghosts.size() < dim)      ghosts.resize(dim);
+      if ((int) divisions.size() < dim)   divisions.resize(dim);
 
       fill_divisions(divisions);
     }
@@ -538,7 +538,7 @@ fill_divisions(std::vector<int>& divisions) const
 {
     // prod = number of blocks unconstrained by user; c = number of unconstrained dimensions
     int prod = 1; int c = 0;
-    for (unsigned i = 0; i < dim; ++i)
+    for (int i = 0; i < dim; ++i)
         if (divisions[i] != 0)
         {
             prod *= divisions[i];
@@ -551,7 +551,7 @@ fill_divisions(std::vector<int>& divisions) const
         return;
     }
 
-    if (c == divisions.size())               // nothing to do; user provided all divs
+    if (c == (int) divisions.size())               // nothing to do; user provided all divs
         return;
 
     // factor number of blocks left in unconstrained dimensions
@@ -563,7 +563,7 @@ fill_divisions(std::vector<int>& divisions) const
     std::vector< Div<Coordinate> > missing_divs;              // pairs consisting of (dim, #divs)
 
     // init missing_divs
-    for (size_t i = 0; i < dim; i++)
+    for (int i = 0; i < dim; i++)
     {
         if (divisions[i] == 0)
         {
@@ -622,7 +622,7 @@ diy::RegularDecomposer<Bounds>::
 factor(std::vector<unsigned>& factors, int n)
 {
   while (n != 1)
-    for (unsigned i = 2; i <= n; ++i)
+    for (int i = 2; i <= n; ++i)
     {
       if (n % i == 0)
       {

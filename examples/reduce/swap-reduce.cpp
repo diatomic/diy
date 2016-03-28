@@ -39,7 +39,7 @@ void redistribute(void* b_,                                 // local block
     // step 1: dequeue
     // dequeue all the incoming points and add them to this block's vector
     // could use srp.incoming() instead
-    for (unsigned i = 0; i < srp.in_link().size(); ++i)
+    for (int i = 0; i < srp.in_link().size(); ++i)
     {
         int nbr_gid = srp.in_link().target(i).gid;
         if (nbr_gid == srp.gid())

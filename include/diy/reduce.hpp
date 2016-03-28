@@ -121,7 +121,7 @@ void reduce(Master&                    master,        //!< master object
     master.execute();
 
     int expected = 0;
-    for (int i = 0; i < master.size(); ++i)
+    for (unsigned i = 0; i < master.size(); ++i)
     {
       if (partners.active(round + 1, master.gid(i), master))
       {
@@ -180,8 +180,8 @@ namespace detail
 
       // touch the outgoing queues to make sure they exist
       Master::OutgoingQueues& outgoing = *cp.outgoing();
-      if (outgoing.size() < rp.out_link().size())
-        for (unsigned j = 0; j < rp.out_link().size(); ++j)
+      if (outgoing.size() < (size_t) rp.out_link().size())
+        for (int j = 0; j < rp.out_link().size(); ++j)
           outgoing[rp.out_link().target(j)];       // touch the outgoing queue, creating it if necessary
     }
 

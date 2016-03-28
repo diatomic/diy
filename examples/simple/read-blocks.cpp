@@ -9,7 +9,7 @@ void output(void* b_, const diy::Master::ProxyWithLink& cp, void*)
 {
   Block*        b = static_cast<Block*>(b_);
   std::cout << cp.gid() << " " << b->average << std::endl;
-  for (unsigned i = 0; i < cp.link()->size(); ++i)
+  for (int i = 0; i < cp.link()->size(); ++i)
     std::cout << "  " << cp.link()->target(i).gid << " " << cp.link()->target(i).proc << std::endl;
 }
 

@@ -65,7 +65,7 @@ void sum(void* b_,                                  // local block
         rp.enqueue(rp.out_link().target(i), b->my_work);
 
     // step 2: dequeue
-    for (unsigned i = 0; i < rp.in_link().size(); ++i)
+    for (int i = 0; i < rp.in_link().size(); ++i)
     {
         int in_val;
         rp.dequeue(rp.in_link().target(i).gid, in_val);

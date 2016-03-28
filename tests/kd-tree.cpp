@@ -101,7 +101,7 @@ void print_block(void* b_, const diy::Master::ProxyWithLink& cp, void* verbose_)
                   link->bounds().max[0], link->bounds().max[1], link->bounds().max[2],
                   link->size(), b->points.size());
 
-  for (size_t i = 0; i < link->size(); ++i)
+  for (int i = 0; i < link->size(); ++i)
   {
       fprintf(stdout, "  (%d,%d,(%d,%d,%d)):",
                       link->target(i).gid, link->target(i).proc,
@@ -123,7 +123,7 @@ inline
 bool
 operator==(const diy::ContinuousBounds& x, const diy::ContinuousBounds& y)
 {
-    for (int i = 0; i < DIM; ++i)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         if (x.min[i] != y.min[i])
             return false;
@@ -161,7 +161,7 @@ void verify_block(void* b_, const diy::Master::ProxyWithLink& cp, void* wrap_dom
   const Bounds& domain  = static_cast<WrapDomain*>(wrap_domain)->domain;
 
   for (size_t i = 0; i < b->points.size(); ++i)
-    for (int j = 0; j < DIM; ++j)
+    for (unsigned j = 0; j < DIM; ++j)
     {
       INFO("Point " << i << " outside bounds in dimension " << j);
       CHECK(b->points[i][j] >= link->bounds().min[j]);
@@ -180,7 +180,7 @@ void verify_block(void* b_, const diy::Master::ProxyWithLink& cp, void* wrap_dom
   if (wrap)
       for (int i = 0; i < link->size(); ++i)
       {
-          for (int j = 0; j < DIM; ++j)
+          for (unsigned j = 0; j < DIM; ++j)
           {
               if (link->wrap(i)[j] == -1)
               {
@@ -200,17 +200,17 @@ void verify_block(void* b_, const diy::Master::ProxyWithLink& cp, void* wrap_dom
 
   // verify that we intersect everybody in the link
   for (int i = 0; i < link->size(); ++i)
-      for (int j = 0; j < DIM; ++j)
+      for (unsigned j = 0; j < DIM; ++j)
       {
           INFO("Checking neighbor intersection: " << cp.gid() << " -> " << link->target(i).gid);
           CHECK(intersects(link->bounds(), link->bounds(i), j, wrap, domain));
       }
 
   // verify that we don't intersect anybody not in the link
-  for (size_t i = 0; i < b->block_bounds.size(); ++i)
+  for (int i = 0; i < (int) b->block_bounds.size(); ++i)
   {
       if (i == cp.gid()) continue;
-      int j = 0;
+      unsigned j = 0;
       for (; j < DIM; ++j)
       {
           if (!intersects(link->bounds(), b->block_bounds[i], j, wrap, domain))

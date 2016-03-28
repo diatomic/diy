@@ -74,7 +74,7 @@ read(const DiscreteBounds& bounds, T* buffer, bool collective, int chunk) const
   int dim   = shape_.size();
   int total = 1;
   std::vector<int> subsizes;
-  for (unsigned i = 0; i < dim; ++i)
+  for (int i = 0; i < dim; ++i)
   {
     subsizes.push_back(bounds.max[i] - bounds.min[i] + 1);
     total *= subsizes.back();
@@ -128,7 +128,7 @@ write(const DiscreteBounds& bounds, const T* buffer, const DiscreteBounds& core,
   int dim   = shape_.size();
   std::vector<int> subsizes;
   std::vector<int> buffer_shape, buffer_start;
-  for (unsigned i = 0; i < dim; ++i)
+  for (int i = 0; i < dim; ++i)
   {
     buffer_shape.push_back(bounds.max[i] - bounds.min[i] + 1);
     buffer_start.push_back(core.min[i] - bounds.min[i]);
