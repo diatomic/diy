@@ -174,7 +174,8 @@ char
 diy::io::detail::big_endian()
 {
   unsigned char x[] = {1,0};
-  short y = *(short*) x;
+  void* x_void = x;
+  short y = *static_cast<short*>(x_void);
   return y == 1 ? '<' : '>';
 }
 
