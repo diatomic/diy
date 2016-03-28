@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <iostream>
 #include <cmath>
+#include <sstream>
 
 #include "link.hpp"
 #include "assigner.hpp"
@@ -606,10 +607,9 @@ fill_divisions(std::vector<int>& divisions) const
         }
         else
         {
-            fprintf(stderr, "Error: unable to decompose domain into %d blocks: ", nblocks);
-            std::cerr << min << " " << max << std::endl;
-            throw std::runtime_error("unable to decompose domain");
-            return;
+            std::ostringstream oss;
+            oss << "Unable to decompose domain into " << nblocks << " blocks: " << min << " " << max;
+            throw std::runtime_error(oss.str());
         }
     }
 
