@@ -339,19 +339,10 @@ TEST_CASE_METHOD(KDTreeFixture, "k-d tree is built", "[kdtree]")
   master.foreach(&print_block, &verbose);
   diy::all_to_all(master, assigner, &exchange_bounds);
   WrapDomain wrap_domain = { wrap, domain };
+  master.set_threads(1);        // catch.hpp isn't thread-safe
   master.foreach(&verify_block, &wrap_domain);
   if (world.rank() == 0)
     std::cout << "Blocks verified" << std::endl;
-
-  // find out the minimum and maximum number of points
-  master.foreach(&min_max);
-  master.exchange();
-  if (world.rank() == 0)
-  {
-    size_t min = master.proxy(master.loaded_block()).get<size_t>();
-    size_t max = master.proxy(master.loaded_block()).get<size_t>();
-    std::cout << "min = " << min << "; max = " << max << "; max/avg = " << float(max) / num_points << std::endl;
-  }
 }
 
 int main(int argc, char* argv[])
