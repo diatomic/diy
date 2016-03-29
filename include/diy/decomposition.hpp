@@ -6,6 +6,7 @@
 #include <iostream>
 #include <cmath>
 #include <sstream>
+#include <stdexcept>
 
 #include "link.hpp"
 #include "assigner.hpp"
