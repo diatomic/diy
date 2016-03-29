@@ -13,6 +13,7 @@ namespace diy
   typedef   bb_c_t      ContinuousBounds;
 
   //! Helper to create a 1-dimensional discrete domain with the specified extents
+  inline
   diy::DiscreteBounds
   interval(int from, int to)            { DiscreteBounds domain; domain.min[0] = from; domain.max[0] = to; return domain; }
 
