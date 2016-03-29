@@ -297,7 +297,7 @@ namespace detail
                  typename RegularDecomposer<Bounds>::DivisionsVector  divs       =
                  typename RegularDecomposer<Bounds>::DivisionsVector())
   {
-      RegularDecomposer<Bounds>(dim, domain, share_face, wrap, ghosts, divs).
+      RegularDecomposer<Bounds>(dim, domain, assigner.nblocks(), share_face, wrap, ghosts, divs).
           decompose(rank, assigner, master, update);
   }
 
