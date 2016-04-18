@@ -161,7 +161,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><span class="comment">// allows access to all the methods in RegularDecomposer</span></div>
 <div class="line"><a class="code" href="namespacediy.html">diy</a>::RegularDecomposer&lt;Bounds&gt; decomposer(dim,</div>
 <div class="line">                                          domain,</div>
-<div class="line">                                          assigner,</div>
+<div class="line">                                          nblocks,</div>
 <div class="line">                                          share_face,</div>
 <div class="line">                                          wrap,</div>
 <div class="line">                                          ghosts);</div>
@@ -171,13 +171,16 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><span class="comment">// call the decomposer&#39;s decompose function given AddBlock or</span></div>
 <div class="line"><span class="comment">// a create function of the signature above</span></div>
 <div class="line">decomposer.<a class="code" href="group___decomposition.html#ga9d3afe581bc9139cec21175398bb38e8">decompose</a>(world.rank(),</div>
+<div class="line">                     assigner,</div>
 <div class="line">                     create);</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// --- or ---</span></div>
 <div class="line"></div>
 <div class="line"><span class="comment">// call the decomposer&#39;s decompose function given master only</span></div>
 <div class="line"><span class="comment">// (uses the master&#39;s AddBlock functor instead)</span></div>
-<div class="line">decomposer.<a class="code" href="group___decomposition.html#ga9d3afe581bc9139cec21175398bb38e8">decompose</a>(world.rank(), master);</div>
+<div class="line">decomposer.<a class="code" href="group___decomposition.html#ga9d3afe581bc9139cec21175398bb38e8">decompose</a>(world.rank(),</div>
+<div class="line">                     assigner,</div>
+<div class="line">                     master);</div>
 </div><!-- fragment --> <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
@@ -607,7 +610,7 @@ template&lt;class Bounds &gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Apr 18 2016 14:01:40 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Apr 18 2016 16:38:37 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.10
 </small></address>

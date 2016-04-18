@@ -194,30 +194,49 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><span class="keyword">typedef</span>  <a class="code" href="classdiy_1_1_regular_link.html">diy::RegularGridLink</a>        RGLink;</div>
 </div><!-- fragment --><p>Diy offers two versions of a <code>decompose</code> function, depending on whether the short or long form of the block is used. Recall that the long form has an <code>AddBlock</code> functor, while the short form does not. In the short form, one of the arguments to <code>decompose</code> is <code>master</code>, and in the long form, provide <code>addblock</code> instead:</p>
 <div class="fragment"><div class="line"><span class="comment">// in the short form, provide the master object in lieu of an AddBlock object</span></div>
-<div class="line"><a class="code" href="group___decomposition.html#ga9d3afe581bc9139cec21175398bb38e8">diy::decompose</a>(dim, rank, domain, assigner, master);</div>
+<div class="line"><a class="code" href="group___decomposition.html#ga9d3afe581bc9139cec21175398bb38e8">diy::decompose</a>(dim,</div>
+<div class="line">               rank,</div>
+<div class="line">               domain,</div>
+<div class="line">               assigner,</div>
+<div class="line">               master);</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// --- or ---</span></div>
 <div class="line"></div>
 <div class="line"><span class="comment">// in the long form, provide the AddBlock object</span></div>
-<div class="line"><a class="code" href="group___decomposition.html#ga9d3afe581bc9139cec21175398bb38e8">diy::decompose</a>(dim, rank, domain, assigner, addblock);</div>
+<div class="line"><a class="code" href="group___decomposition.html#ga9d3afe581bc9139cec21175398bb38e8">diy::decompose</a>(dim,</div>
+<div class="line">               rank,</div>
+<div class="line">               domain,</div>
+<div class="line">               assigner,</div>
+<div class="line">               addblock);</div>
 </div><!-- fragment --><p>Strictly speaking, the second (long form) decomposition does not require an entire <code>AddBlock</code> object, as long as the block create function has the same signature as <code>AddBlock</code>. That pattern is:</p>
-<div class="fragment"><div class="line"><span class="keywordtype">void</span> create(<span class="keywordtype">int</span> gid, <span class="keyword">const</span> Bounds&amp; core, <span class="keyword">const</span> Bounds&amp; bounds, <span class="keyword">const</span> Bounds&amp; domain,</div>
+<div class="fragment"><div class="line"><span class="keywordtype">void</span> create(<span class="keywordtype">int</span> gid,</div>
+<div class="line">            <span class="keyword">const</span> Bounds&amp; core,</div>
+<div class="line">            <span class="keyword">const</span> Bounds&amp; bounds,</div>
+<div class="line">            <span class="keyword">const</span> Bounds&amp; domain,</div>
 <div class="line">            <span class="keyword">const</span> <a class="code" href="classdiy_1_1_link.html">diy::Link</a>&amp; link);</div>
 <div class="line">...</div>
 <div class="line"></div>
-<div class="line">diy::decompose(dim, rank, domain, assigner, create);</div>
+<div class="line">diy::decompose(dim,</div>
+<div class="line">               rank,</div>
+<div class="line">               domain,</div>
+<div class="line">               assigner,</div>
+<div class="line">               create);</div>
 </div><!-- fragment --><p> <code>decompose</code> is actually a convenience function that creates a <code>RegularDecomposer</code> object, calls its <code>decompose</code> method, and then destroys the <code>RegularDecomposer</code>. The user may want persistent access to <code>RegularDecomposer</code> because it offers useful information about the decomposition (block bounds, numbers of blocks in each dimension, and so forth.). In that case, we suggest defining <code>RegularDecomposer</code> and calling its <code>decompose</code> function yourself:</p>
 <div class="fragment"><div class="line"><a class="code" href="structdiy_1_1_regular_decomposer.html">diy::RegularDecomposer&lt;Bounds&gt;</a> decomposer(dim,</div>
 <div class="line">                                          domain,</div>
-<div class="line">                                          assigner);</div>
+<div class="line">                                          nblocks);</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// in the short form, use diy&#39;s AddBlock object</span></div>
-<div class="line">decomposer.decompose(rank, diy::detail::AddBlock&lt;Bounds&gt;(&amp;master));</div>
+<div class="line">decomposer.decompose(rank,</div>
+<div class="line">                     assigner,</div>
+<div class="line">                     diy::detail::AddBlock&lt;Bounds&gt;(&amp;master));</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// --- or ---</span></div>
 <div class="line"></div>
 <div class="line"><span class="comment">// in the long form, provide your own AddBlock object</span></div>
-<div class="line">decomposer.decompose(rank, addblock);</div>
+<div class="line">decomposer.decompose(rank,</div>
+<div class="line">                     assigner,</div>
+<div class="line">                     addblock);</div>
 </div><!-- fragment --><h3>Put it all together.</h3>
 <p>Here is one version of each of the above options combined into a complete program. This example uses the short form of blocks:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;diy/decomposition.hpp&gt;</span></div>
@@ -419,7 +438,7 @@ Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Apr 18 2016 14:01:40 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Apr 18 2016 16:38:37 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.10
 </small></address>
