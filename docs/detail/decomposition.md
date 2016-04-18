@@ -79,7 +79,7 @@ diy::decompose(dim,
 // allows access to all the methods in RegularDecomposer
 diy::RegularDecomposer<Bounds> decomposer(dim,
                                           domain,
-                                          assigner,
+                                          nblocks,
                                           share_face,
                                           wrap,
                                           ghosts);
@@ -89,12 +89,15 @@ diy::RegularDecomposer<Bounds> decomposer(dim,
 // call the decomposer's decompose function given AddBlock or
 // a create function of the signature above
 decomposer.decompose(world.rank(),
+                     assigner,
                      create);
 
 // --- or ---
 
 // call the decomposer's decompose function given master only
 // (uses the master's AddBlock functor instead)
-decomposer.decompose(world.rank(), master);
+decomposer.decompose(world.rank(),
+                     assigner,
+                     master);
 
 ~~~

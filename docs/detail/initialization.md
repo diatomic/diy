@@ -148,12 +148,20 @@ Diy offers two versions of a ```decompose``` function, depending on whether the 
 ~~~~{.cpp}
 
 // in the short form, provide the master object in lieu of an AddBlock object
-diy::decompose(dim, rank, domain, assigner, master);
+diy::decompose(dim,
+               rank,
+               domain,
+               assigner,
+               master);
 
 // --- or ---
 
 // in the long form, provide the AddBlock object
-diy::decompose(dim, rank, domain, assigner, addblock);
+diy::decompose(dim,
+               rank,
+               domain,
+               assigner,
+               addblock);
 
 ~~~~
 
@@ -161,11 +169,18 @@ Strictly speaking, the second (long form) decomposition does not require an enti
 
 ~~~~{.cpp}
 
-void create(int gid, const Bounds& core, const Bounds& bounds, const Bounds& domain,
+void create(int gid,
+            const Bounds& core,
+            const Bounds& bounds,
+            const Bounds& domain,
             const diy::Link& link);
 ...
 
-diy::decompose(dim, rank, domain, assigner, create);
+diy::decompose(dim,
+               rank,
+               domain,
+               assigner,
+               create);
 
 ~~~~
 ```decompose``` is actually a convenience function that creates a ```RegularDecomposer``` object, calls its ```decompose``` method, and then destroys the ```RegularDecomposer```. The user may want persistent access to ```RegularDecomposer``` because it offers useful information about the decomposition (block bounds, numbers of blocks in each dimension, and so forth.). In that case, we suggest defining ```RegularDecomposer``` and calling its ```decompose``` function yourself:
@@ -174,15 +189,19 @@ diy::decompose(dim, rank, domain, assigner, create);
 
 diy::RegularDecomposer<Bounds> decomposer(dim,
                                           domain,
-                                          assigner);
+                                          nblocks);
 
 // in the short form, use diy's AddBlock object
-decomposer.decompose(rank, diy::detail::AddBlock<Bounds>(&master));
+decomposer.decompose(rank,
+                     assigner,
+                     diy::detail::AddBlock<Bounds>(&master));
 
 // --- or ---
 
 // in the long form, provide your own AddBlock object
-decomposer.decompose(rank, addblock);
+decomposer.decompose(rank,
+                     assigner,
+                     addblock);
 
 ~~~~
 
