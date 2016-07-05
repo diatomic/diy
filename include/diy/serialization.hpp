@@ -2,6 +2,7 @@
 #define DIY_SERIALIZATION_HPP
 
 #include <vector>
+#include <valarray>
 #include <map>
 #include <set>
 #include <string>
@@ -197,6 +198,34 @@ namespace diy
     }
 
     static void         load(BinaryBuffer& bb, Vector& v)
+    {
+      size_t s;
+      diy::load(bb, s);
+      v.resize(s);
+      diy::load(bb, &v[0], s);
+    }
+  };
+
+  template<class U>
+  struct Serialization< std::valarray<U> >
+  {
+    typedef             std::valarray<U>        ValArray;
+
+    static void         save(BinaryBuffer& bb, const ValArray& v)
+    {
+      size_t s = v.size();
+      diy::save(bb, s);
+#if __cplusplus > 199711L           // C++11
+      diy::save(bb, &v[0], v.size());
+#else
+      // Before C++11 valarray::operator[] const returns by value, not const
+      // reference, so we cannot dereference it and pass directly to save.
+      for (size_t i = 0; i < v.size(); ++i)
+          diy::save(bb, v[i]);
+#endif
+    }
+
+    static void         load(BinaryBuffer& bb, ValArray& v)
     {
       size_t s;
       diy::load(bb, s);
