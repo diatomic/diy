@@ -336,11 +336,11 @@ namespace diy
 
 #ifndef BUILD_GYP                   // C++11 does not work right in my nwjs- and node-gyp builds--TP
 #if __cplusplus > 199711L           // C++11
-  // save/load for std::unordered_map<K,V>
-  template<class K, class V>
-  struct Serialization< std::unordered_map<K,V> >
+  // save/load for std::unordered_map<K,V,H,E,A>
+  template<class K, class V, class H, class E, class A>
+  struct Serialization< std::unordered_map<K,V,H,E,A> >
   {
-    typedef             std::unordered_map<K,V>         Map;
+    typedef             std::unordered_map<K,V,H,E,A>   Map;
 
     static void         save(BinaryBuffer& bb, const Map& m)
     {
@@ -363,11 +363,11 @@ namespace diy
     }
   };
 
-  // save/load for std::unordered_set<T>
-  template<class T>
-  struct Serialization< std::unordered_set<T> >
+  // save/load for std::unordered_set<T,H,E,A>
+  template<class T, class H, class E, class A>
+  struct Serialization< std::unordered_set<T,H,E,A> >
   {
-    typedef             std::unordered_set<T>           Set;
+    typedef             std::unordered_set<T,H,E,A>     Set;
 
     static void         save(BinaryBuffer& bb, const Set& m)
     {
