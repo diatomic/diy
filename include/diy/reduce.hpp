@@ -199,7 +199,7 @@ namespace detail
     bool            operator()(int i, const Master& master) const               { return !partners.active(round, master.gid(i), master) || skip(round, i, master); }
     int             round;
     const Partners& partners;
-    const Skip&     skip;
+    Skip            skip;
   };
 }
 
