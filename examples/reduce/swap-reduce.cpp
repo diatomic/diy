@@ -29,11 +29,10 @@ typedef     AddPointBlock<DIM>          AddBlock;
 //
 // callback function for redistribute operator, called in each round of the reduction
 //
-void redistribute(void* b_,                                 // local block
+void redistribute(Block* b,                                 // local block
                   const diy::ReduceProxy& srp,              // communication proxy
                   const diy::RegularSwapPartners& partners) // partners of the current block
 {
-    Block*        b        = static_cast<Block*>(b_);
     unsigned      round    = srp.round();                   // current round number
 
     // step 1: dequeue

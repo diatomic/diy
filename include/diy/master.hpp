@@ -19,7 +19,7 @@
 
 #include "thread.hpp"
 
-#include "traits.hpp"
+#include "detail/block_traits.hpp"
 
 namespace diy
 {
@@ -226,19 +226,10 @@ namespace diy
       template<class Block>
       void          foreach_(const Callback<Block>& f, const Skip& s = NeverSkip());
 
-      // matches block member functions
-      template<class Block, class R, class... Args>
-      void          foreach(R(Block::*f)(Args...), const Skip& s = NeverSkip())         { foreach_<Block>(f, s); }
-
-      template<class Block, class R, class... Args>
-      void          foreach(R(Block::*f)(Args...) const, const Skip& s = NeverSkip())   { foreach_<Block>(f, s); }
-
-      // matches free functions and lambdas
       template<class F>
       void          foreach(const F& f, const Skip& s = NeverSkip())
       {
-          using traits = utils::function_traits<F>;
-          using Block = typename std::remove_pointer<typename traits::template arg<0>::type>::type;
+          using Block = typename detail::block_traits<F>::type;
           foreach_<Block>(f, s);
       }
 

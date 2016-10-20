@@ -52,11 +52,9 @@ struct Block
 // when using all-to-all, write the callback as if it is only called once at the beginning
 // round and once at the end; diy will take care of the intermediate rounds for you
 //
-void sum(void* b_,                                  // local block
+void sum(Block* b,                                  // local block
          const diy::ReduceProxy& rp)                // communication proxy
 {
-    Block*     b        = static_cast<Block*>(b_);
-
     if (!rp.in_link().size())                       // initialize global sum in first round
         b->tot_work = 0;
 

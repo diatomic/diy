@@ -103,11 +103,10 @@ struct AddBlock
 // root block of the group receives data from other blocks in the group and reduces the data
 // nonroot blocks send data to the root
 //
-void sum(void* b_,                                  // local block
+void sum(Block* b,                                  // local block
          const diy::ReduceProxy& rp,                // communication proxy
          const diy::RegularMergePartners& partners) // partners of the current block
 {
-    Block*     b        = static_cast<Block*>(b_);
     unsigned   round    = rp.round();               // current round number
 
     // step 1: dequeue and merge

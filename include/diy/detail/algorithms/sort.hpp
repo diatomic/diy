@@ -87,10 +87,8 @@ struct SampleSort<Block,T,Cmp>::Sampler
                     Sampler(ValuesVector values_, ValuesVector dividers_, const Cmp& cmp_, size_t num_samples_):
                         values(values_), dividers(dividers_), cmp(cmp_), num_samples(num_samples_)    {}
 
-    void            operator()(void* b_, const ReduceProxy& srp, const RegularSwapPartners& partners) const
+    void            operator()(Block* b, const ReduceProxy& srp, const RegularSwapPartners& partners) const
     {
-        Block* b = static_cast<Block*>(b_);
-
         int k_in  = srp.in_link().size();
         int k_out = srp.out_link().size();
 
@@ -136,10 +134,8 @@ struct SampleSort<Block,T,Cmp>::Exchanger
                     Exchanger(ValuesVector values_, ValuesVector samples_, const Cmp& cmp_):
                         values(values_), samples(samples_), cmp(cmp_)       {}
 
-    void            operator()(void* b_, const ReduceProxy& rp) const
+    void            operator()(Block* b, const ReduceProxy& rp) const
     {
-        Block* b = static_cast<Block*>(b_);
-
         if (rp.round() == 0)
         {
             // enqueue values to the correct locations

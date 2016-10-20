@@ -23,10 +23,8 @@ struct Redistribute
        Redistribute(const Decomposer& decomposer_):
            decomposer(decomposer_)              {}
 
-  void operator()(void* b_, const diy::ReduceProxy& rp) const
+  void operator()(Block* b, const diy::ReduceProxy& rp) const
   {
-      Block* b = static_cast<Block*>(b_);
-
       if (rp.in_link().size() == 0)
       {
           // queue points to the correct blocks

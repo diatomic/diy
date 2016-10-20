@@ -27,7 +27,7 @@ the standard library.
 
 namespace diy
 {
-namespace utils {
+namespace detail {
 
 /**
 .. macro:: DECLARE_HAS_TYPE_MEMBER(member_name)

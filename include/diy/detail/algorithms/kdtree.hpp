@@ -25,7 +25,7 @@ struct KDTreePartition
                                 size_t                          bins):
                     dim_(dim), points_(points), bins_(bins)            {}
 
-    void        operator()(void* b_, const diy::ReduceProxy& srp, const KDTreePartners& partners) const;
+    void        operator()(Block* b, const diy::ReduceProxy& srp, const KDTreePartners& partners) const;
 
     int         divide_gid(int gid, bool lower, int round, int rounds) const;
     void        update_links(Block* b, const diy::ReduceProxy& srp, int dim, int round, int rounds, bool wrap, const Bounds& domain) const;
@@ -167,10 +167,8 @@ struct diy::detail::KDTreePartners
 template<class Block, class Point>
 void
 diy::detail::KDTreePartition<Block,Point>::
-operator()(void* b_, const diy::ReduceProxy& srp, const KDTreePartners& partners) const
+operator()(Block* b, const diy::ReduceProxy& srp, const KDTreePartners& partners) const
 {
-    Block* b = static_cast<Block*>(b_);
-
     int dim;
     if (srp.round() < partners.rounds())
         dim = partners.dim(srp.round());
