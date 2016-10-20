@@ -36,20 +36,26 @@ struct Block
         bounds(bounds_)                         {}
 
     static void*    create()                                   // allocate a new block
-        { return new Block; }
+    { return new Block; }
     static void     destroy(void* b)                           // free a block
-        { delete static_cast<Block*>(b); }
+    { delete static_cast<Block*>(b); }
     static void     save(const void* b, diy::BinaryBuffer& bb) // serialize the block and write it
-        { diy::save(bb, *static_cast<const Block*>(b)); }
+    {
+        diy::save(bb, static_cast<const Block*>(b)->bounds);
+        diy::save(bb, static_cast<const Block*>(b)->data);
+    }
     static void     load(void* b, diy::BinaryBuffer& bb)       // read the block and deserialize it
-        { diy::load(bb, *static_cast<Block*>(b)); }
+    {
+        diy::load(bb, static_cast<Block*>(b)->bounds);
+        diy::load(bb, static_cast<Block*>(b)->data);
+    }
 
     void            generate_data(size_t n)                    // initialize block values
-        {
-            data.resize(n);
-            for (size_t i = 0; i < n; ++i)
-                data[i] = i;
-        }
+    {
+        data.resize(n);
+        for (size_t i = 0; i < n; ++i)
+            data[i] = i;
+    }
     // block data
     Bounds          bounds;
     vector<int>     data;

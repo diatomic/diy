@@ -8,14 +8,10 @@
 #include <string>
 #include <fstream>
 
-#ifndef BUILD_GYP                   // C++11 does not work right in my nwjs- and node-gyp builds--TP
-#if __cplusplus > 199711L           // C++11
 #include <tuple>
 #include <unordered_map>
 #include <unordered_set>
 #include <type_traits>              // this is used for a safety check for default serialization
-#endif
-#endif
 
 namespace diy
 {
@@ -93,12 +89,8 @@ namespace diy
   template<class T>
   struct Serialization: public detail::Default
   {
-#ifndef BUILD_GYP                   // C++11 does not work right in my nwjs- and node-gyp builds--TP
-#if __cplusplus > 199711L           // C++11
 #if defined(__clang__) || (defined(__GNUC__) && __GNUC__ >= 5)
     static_assert(std::is_trivially_copyable<T>::value, "Default serialization works only for trivially copyable types");
-#endif
-#endif
 #endif
 
     static void         save(BinaryBuffer& bb, const T& x)          { bb.save_binary((const char*)  &x, sizeof(T)); }
@@ -215,14 +207,7 @@ namespace diy
     {
       size_t s = v.size();
       diy::save(bb, s);
-#if __cplusplus > 199711L           // C++11
       diy::save(bb, &v[0], v.size());
-#else
-      // Before C++11 valarray::operator[] const returns by value, not const
-      // reference, so we cannot dereference it and pass directly to save.
-      for (size_t i = 0; i < v.size(); ++i)
-          diy::save(bb, v[i]);
-#endif
     }
 
     static void         load(BinaryBuffer& bb, ValArray& v)
@@ -334,8 +319,6 @@ namespace diy
     }
   };
 
-#ifndef BUILD_GYP                   // C++11 does not work right in my nwjs- and node-gyp builds--TP
-#if __cplusplus > 199711L           // C++11
   // save/load for std::unordered_map<K,V,H,E,A>
   template<class K, class V, class H, class E, class A>
   struct Serialization< std::unordered_map<K,V,H,E,A> >
@@ -423,8 +406,6 @@ namespace diy
                         load(BinaryBuffer& bb, Tuple& t)                { diy::load(bb, std::get<I>(t)); load<I+1>(bb, t); }
 
   };
-#endif
-#endif
 }
 
 void

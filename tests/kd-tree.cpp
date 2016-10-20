@@ -39,8 +39,18 @@ struct Block
 
   static void*    create()                                      { return new Block; }
   static void     destroy(void* b)                              { delete static_cast<Block*>(b); }
-  static void     save(const void* b, diy::BinaryBuffer& bb)    { diy::save(bb, *static_cast<const Block*>(b)); }
-  static void     load(void* b, diy::BinaryBuffer& bb)          { diy::load(bb, *static_cast<Block*>(b)); }
+  static void     save(const void* b, diy::BinaryBuffer& bb)
+  {
+      diy::save(bb, static_cast<const Block*>(b)->domain);
+      diy::save(bb, static_cast<const Block*>(b)->points);
+      diy::save(bb, static_cast<const Block*>(b)->block_bounds);
+  }
+  static void     load(void* b, diy::BinaryBuffer& bb)
+  {
+      diy::load(bb, static_cast<Block*>(b)->domain);
+      diy::load(bb, static_cast<Block*>(b)->points);
+      diy::load(bb, static_cast<Block*>(b)->block_bounds);
+  }
 
   void            generate_points(size_t n)
   {
