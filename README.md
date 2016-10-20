@@ -1,21 +1,21 @@
-## DIY2 is a block-parallel library
+## DIY is a block-parallel library
 
-DIY2 is a block-parallel library for implementing scalable algorithms that can execute both
+DIY is a block-parallel library for implementing scalable algorithms that can execute both
 in-core and out-of-core. The same program can be executed with one or more threads per MPI
 process, seamlessly combining distributed-memory message passing with shared-memory thread
 parallelism.  The abstraction enabling these capabilities is block parallelism; blocks
 and their message queues are mapped onto processing elements (MPI processes or threads) and are
-migrated between memory and storage by the DIY2 runtime. Complex communication patterns,
+migrated between memory and storage by the DIY runtime. Complex communication patterns,
 including neighbor exchange, merge reduction, swap reduction, and all-to-all exchange, are
-possible in- and out-of-core in DIY2.
+possible in- and out-of-core in DIY.
 
 ## Licensing
 
-DIY2 is released as open source software under a BSD style [license](./LICENSE.txt).
+DIY is released as open source software under a BSD style [license](./LICENSE.txt).
 
 ## Dependencies
 
-DIY2 requires an MPI installation. We recommend [MPICH](http://www.mpich.org/).
+DIY requires an MPI installation. We recommend [MPICH](http://www.mpich.org/).
 
 ## Download, build, install
 
@@ -24,17 +24,17 @@ DIY2 requires an MPI installation. We recommend [MPICH](http://www.mpich.org/).
 - You can download the [latest tarball](https://github.com/diatomic/diy2/archive/master.tar.gz).
 
 
-DIY2 is a header-only library. It does not need to be built; you can simply
+DIY is a header-only library. It does not need to be built; you can simply
 include it in your project. The examples can be built using `cmake` from the
 top level directory.
 
 ## Documentation
 
-[Doxygen pages](https://diatomic.github.io/diy2)
+[Doxygen pages](https://diatomic.github.io/diy)
 
 ## Example
 
-A simple DIY2 program, shown below, consists of the following components:
+A simple DIY program, shown below, consists of the following components:
 
 - `struct`s called blocks,
 - a diy object called the `master`,
