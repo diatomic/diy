@@ -165,7 +165,7 @@ namespace detail
                 ReductionFunctor(unsigned round_, const Reduce& reduce_, const Partners& partners_, const Assigner& assigner_):
                     round(round_), reduce(reduce_), partners(partners_), assigner(assigner_)        {}
 
-    void        operator()(void* b, const Master::ProxyWithLink& cp, void*) const
+    void        operator()(void* b, const Master::ProxyWithLink& cp) const
     {
       if (!partners.active(round, cp.gid(), *cp.master())) return;
 

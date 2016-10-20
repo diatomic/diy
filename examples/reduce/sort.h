@@ -35,10 +35,8 @@ struct Block
       values[i] = random<Value>(min, max);
   }
 
-  void          print_block(const diy::Master::ProxyWithLink& cp, void* verbose_)
+  void          print_block(const diy::Master::ProxyWithLink& cp, bool verbose)
   {
-    bool            verbose   = *static_cast<bool*>(verbose_);
-
     std::cout << cp.gid() << ": " << min << " - " << max << ": " << values.size() << std::endl;
 
     if (verbose)
@@ -46,7 +44,7 @@ struct Block
         std::cout << "  " << values[i] << std::endl;
   }
 
-  void          verify_block(const diy::Master::ProxyWithLink& cp, void*)
+  void          verify_block(const diy::Master::ProxyWithLink& cp)
   {
     for (size_t i = 0; i < values.size(); ++i)
       if (values[i] < min || values[i] > max)

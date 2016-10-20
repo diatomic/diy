@@ -22,7 +22,7 @@ struct Block
     static void     destroy(void* b)    { delete static_cast<Block*>(b); }
 
     // the rest is optional
-    void show_link(const diy::Master::ProxyWithLink& cp, void*)
+    void show_link(const diy::Master::ProxyWithLink& cp)
         {
             diy::RegularLink<Bounds>* link = static_cast<diy::RegularLink<Bounds>*>(cp.link());
             std::cout << "Block (" << cp.gid() << "): "

@@ -146,13 +146,10 @@ void sum(void* b_,                                  // local block
 //
 // prints the block values
 //
-void print_block(void* b_,                             // local block
+void print_block(Block* b,                             // local block
                  const diy::Master::ProxyWithLink& cp, // communication proxy
-                 void* verbose_)                       // user-defined additional arguments
+                 bool verbose)                         // user-defined additional arguments
 {
-    Block*   b       = static_cast<Block*>(b_);
-    bool     verbose = *static_cast<bool*>(verbose_);
-
     fprintf(stderr, "[%d] Bounds: %f %f %f -- %f %f %f\n",
             cp.gid(),
             b->bounds.min[0], b->bounds.min[1], b->bounds.min[2],
@@ -247,5 +244,6 @@ int main(int argc, char* argv[])
                 partners,                            // RegularMergePartners object
                 &sum);                               // merge operator callback function
 
-    master.foreach(&print_block, &verbose);  // callback function for each local block
+    master.foreach([verbose](Block* b, const diy::Master::ProxyWithLink& cp)
+                   { print_block(b, cp, verbose); });  // callback function for each local block
 }

@@ -6,6 +6,7 @@
 #include <list>
 #include <deque>
 #include <algorithm>
+#include <functional>
 
 #include "link.hpp"
 #include "collection.hpp"
@@ -17,6 +18,8 @@
 #include "time.hpp"
 
 #include "thread.hpp"
+
+#include "traits.hpp"
 
 namespace diy
 {
@@ -37,12 +40,14 @@ namespace diy
       // Commands
       struct BaseCommand;
 
-      template<class Block, class Functor, class Skip>
+      template<class Block>
       struct Command;
 
       typedef std::vector<BaseCommand*>     Commands;
 
       // Skip
+      using Skip = std::function<bool(int, const Master&)>;
+
       struct SkipNoIncoming;
       struct NeverSkip { bool    operator()(int i, const Master& master) const   { return false; } };
 
@@ -56,6 +61,10 @@ namespace diy
       // Communicator types
       struct Proxy;
       struct ProxyWithLink;
+
+      // foreach callback
+      template<class Block>
+      using Callback = std::function<void(Block*, const ProxyWithLink&)>;
 
       struct QueuePolicy
       {
@@ -214,33 +223,24 @@ namespace diy
       SaveBlock     saver() const                       { return blocks_.saver(); }
 
       //! call `f` with every block
-      template<class Functor>
-      void          foreach(const Functor& f)           { foreach<void>(f); }
-
-      template<class Block, class Functor>
-      void          foreach(const Functor& f)           { foreach<Block>(f, (void*) 0); }
-
-      template<class Functor, class T>
-      void          foreach(const Functor& f, T* aux)   { foreach<void>(f, aux); }
-
-      template<class Block, class Functor, class T>
-      void          foreach(const Functor& f, T* aux)   { foreach<Block>(f, NeverSkip(), aux); }
-
-      template<class Functor, class Skip>
-      void          foreach(const Functor& f, const Skip& skip, void* aux = 0)  { foreach<void>(f,skip,aux); }
-
-      template<class Block, class Functor, class Skip>
-      void          foreach(const Functor& f, const Skip& skip, void* aux = 0);
-
-      // calls to member functions
       template<class Block>
-      void          foreach(void (Block::*f)(const ProxyWithLink&, void*))                   { foreach<Block>(f, (void*) 0); }
+      void          foreach_(const Callback<Block>& f, const Skip& s = NeverSkip());
 
-      template<class Block, class T>
-      void          foreach(void (Block::*f)(const ProxyWithLink&, void*), T* aux)           { foreach<Block>(f, NeverSkip(), aux); }
+      // matches block member functions
+      template<class Block, class R, class... Args>
+      void          foreach(R(Block::*f)(Args...), const Skip& s = NeverSkip())         { foreach_<Block>(f, s); }
 
-      template<class Block, class Skip>
-      void          foreach(void (Block::*f)(const ProxyWithLink&, void*), const Skip& skip, void* aux = 0) { foreach<Block>(Binder<Block>(f), skip, aux); }
+      template<class Block, class R, class... Args>
+      void          foreach(R(Block::*f)(Args...) const, const Skip& s = NeverSkip())   { foreach_<Block>(f, s); }
+
+      // matches free functions and lambdas
+      template<class F>
+      void          foreach(const F& f, const Skip& s = NeverSkip())
+      {
+          using traits = utils::function_traits<F>;
+          using Block = typename std::remove_pointer<typename traits::template arg<0>::type>::type;
+          foreach_<Block>(f, s);
+      }
 
       inline void   execute();
 
@@ -310,27 +310,17 @@ namespace diy
       virtual bool  skip(int i, const Master& master) const                         =0;
   };
 
-  template<class Block, class Functor, class Skip>
+  template<class Block>
   struct Master::Command: public BaseCommand
   {
-            Command(const Functor& f_, const Skip& s_, void* aux_):
-                f(f_), s(s_), aux(aux_)                                             {}
+            Command(Callback<Block> f_, const Skip& s_):
+                f(f_), s(s_)                                                        {}
 
-      void  execute(void* b, const ProxyWithLink& cp) const                         { f(static_cast<Block*>(b), cp, aux); }
+      void  execute(void* b, const ProxyWithLink& cp) const                         { f(static_cast<Block*>(b), cp); }
       bool  skip(int i, const Master& m) const                                      { return s(i,m); }
 
-      Functor f;
-      Skip    s;
-      void*   aux;
-  };
-
-  template<class Block>
-  struct Master::Binder
-  {
-    typedef     void (Block::*MemberFn)(const ProxyWithLink&, void*);
-                Binder(MemberFn f): f_(f)                                           {}
-    void        operator()(Block* b, const ProxyWithLink& cp, void* aux) const      { if (b) (b->*f_)(cp, aux); }
-    MemberFn    f_;
+      Callback<Block>   f;
+      Skip              s;
   };
 
   struct Master::SkipNoIncoming
@@ -670,12 +660,12 @@ has_incoming(int i) const
   return false;
 }
 
-template<class Block, class Functor, class Skip>
+template<class Block>
 void
 diy::Master::
-foreach(const Functor& f, const Skip& skip, void* aux)
+foreach_(const Callback<Block>& f, const Skip& skip)
 {
-    commands_.push_back(new Command<Block, Functor, Skip>(f, skip, aux));
+    commands_.push_back(new Command<Block>(f, skip));
 
     if (immediate())
         execute();

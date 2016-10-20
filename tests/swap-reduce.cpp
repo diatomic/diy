@@ -119,8 +119,7 @@ bool        SwapReduceFixture::verbose     = false;
 
 // check that block values are in the block bounds (debug)
 void          verify_block(Block* b,
-                           const diy::Master::ProxyWithLink& cp, // communication proxy
-                           void*)
+                           const diy::Master::ProxyWithLink& cp) // communication proxy
 {
     const RCLink* link = dynamic_cast<RCLink*>(cp.link());
 
@@ -183,9 +182,10 @@ TEST_CASE_METHOD(SwapReduceFixture, "point sorting", "[swap-reduce]")
                 &redistribute);                 // swap operator callback function
 
     // callback functions for local block
-    master.foreach(&Block::print_block, &verbose);
+    bool v = verbose;
+    master.foreach([v](Block* b, const diy::Master::ProxyWithLink& cp) { b->print_block(cp, v); });
     master.set_threads(1);        // catch.hpp isn't thread-safe
-    master.foreach<Block>(&verify_block);
+    master.foreach(&verify_block);
 }
 
 int main(int argc, char* argv[])

@@ -93,16 +93,8 @@ struct Block
                   Block()                                  {}
 };
 
-struct WrapDomain
+void print_block(Block* b, const diy::Master::ProxyWithLink& cp, bool verbose)
 {
-  bool          wrap;
-  const Bounds& domain;
-};
-
-void print_block(void* b_, const diy::Master::ProxyWithLink& cp, void* verbose_)
-{
-  Block*   b         = static_cast<Block*>(b_);
-  bool     verbose   = *static_cast<bool*>(verbose_);
   RCLink*  link      = static_cast<RCLink*>(cp.link());
 
   fprintf(stdout, "%d: [%f,%f,%f] - [%f,%f,%f] (%d neighbors): %lu points\n",
@@ -162,13 +154,9 @@ bool intersects(const Bounds& x, const Bounds& y, int dim, bool wrap, const Boun
     return x.min[dim] <= y.max[dim] && y.min[dim] <= x.max[dim];
 }
 
-void verify_block(void* b_, const diy::Master::ProxyWithLink& cp, void* wrap_domain)
+void verify_block(Block* b, const diy::Master::ProxyWithLink& cp, bool wrap, const Bounds& domain)
 {
-  Block*   b    = static_cast<Block*>(b_);
   RCLink*  link = static_cast<RCLink*>(cp.link());
-
-  bool          wrap    = static_cast<WrapDomain*>(wrap_domain)->wrap;
-  const Bounds& domain  = static_cast<WrapDomain*>(wrap_domain)->domain;
 
   for (size_t i = 0; i < b->points.size(); ++i)
     for (unsigned j = 0; j < DIM; ++j)
@@ -346,11 +334,13 @@ TEST_CASE_METHOD(KDTreeFixture, "k-d tree is built", "[kdtree]")
     diy::kdtree(master, assigner, DIM, domain, &Block::points, 2*hist, wrap);
 
   // debugging
-  master.foreach(&print_block, &verbose);
+  auto v = verbose;
+  master.foreach([v](Block* b, const diy::Master::ProxyWithLink& cp) { print_block(b,cp,v); });
   diy::all_to_all(master, assigner, &exchange_bounds);
-  WrapDomain wrap_domain = { wrap, domain };
   master.set_threads(1);        // catch.hpp isn't thread-safe
-  master.foreach(&verify_block, &wrap_domain);
+  auto w = wrap;
+  auto d = domain;
+  master.foreach([w,d](Block* b, const diy::Master::ProxyWithLink& cp) { verify_block(b,cp,w,d); });
   if (world.rank() == 0)
     std::cout << "Blocks verified" << std::endl;
 }

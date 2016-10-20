@@ -90,16 +90,8 @@ struct Block
                   Block()                                  {}
 };
 
-struct WrapDomain
+void print_block(Block* b, const diy::Master::ProxyWithLink& cp, bool verbose)
 {
-  bool          wrap;
-  const Bounds& domain;
-};
-
-void print_block(void* b_, const diy::Master::ProxyWithLink& cp, void* verbose_)
-{
-  Block*   b         = static_cast<Block*>(b_);
-  bool     verbose   = *static_cast<bool*>(verbose_);
   RCLink*  link      = static_cast<RCLink*>(cp.link());
 
   fprintf(stdout, "%d: [%f,%f,%f] - [%f,%f,%f] (%d neighbors): %lu points\n",
@@ -159,13 +151,9 @@ bool intersects(const Bounds& x, const Bounds& y, int dim, bool wrap, const Boun
     return x.min[dim] <= y.max[dim] && y.min[dim] <= x.max[dim];
 }
 
-void verify_block(void* b_, const diy::Master::ProxyWithLink& cp, void* wrap_domain)
+void verify_block(Block* b, const diy::Master::ProxyWithLink& cp, bool wrap, const Bounds& domain)
 {
-  Block*   b    = static_cast<Block*>(b_);
   RCLink*  link = static_cast<RCLink*>(cp.link());
-
-  bool          wrap    = static_cast<WrapDomain*>(wrap_domain)->wrap;
-  const Bounds& domain  = static_cast<WrapDomain*>(wrap_domain)->domain;
 
   for (size_t i = 0; i < b->points.size(); ++i)
     for (unsigned j = 0; j < DIM; ++j)
@@ -260,9 +248,8 @@ void exchange_bounds(void* b_, const diy::ReduceProxy& srp)
   }
 }
 
-void min_max(void* b_, const diy::Master::ProxyWithLink& cp, void*)
+void min_max(Block* b, const diy::Master::ProxyWithLink& cp)
 {
-  Block*   b   = static_cast<Block*>(b_);
   cp.all_reduce(b->points.size(), diy::mpi::minimum<size_t>());
   cp.all_reduce(b->points.size(), diy::mpi::maximum<size_t>());
 }
@@ -348,10 +335,9 @@ int main(int argc, char* argv[])
     diy::kdtree(master, assigner, DIM, domain, &Block::points, 2*hist, wrap);
 
   // debugging
-  master.foreach(&print_block, &verbose);
+  master.foreach([verbose](Block* b, const diy::Master::ProxyWithLink& cp) { print_block(b,cp,verbose); });
   diy::all_to_all(master, assigner, &exchange_bounds);
-  WrapDomain wrap_domain = { wrap, domain };
-  master.foreach(&verify_block, &wrap_domain);
+  master.foreach([wrap,domain](Block* b, const diy::Master::ProxyWithLink& cp) { verify_block(b,cp,wrap,domain); });
   if (world.rank() == 0)
     std::cout << "Blocks verified" << std::endl;
 

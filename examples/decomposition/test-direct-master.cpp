@@ -14,7 +14,7 @@ struct Block
     static void*    create()            { return new Block; }
     static void     destroy(void* b)    { delete static_cast<Block*>(b); }
 
-    void show_link(const diy::Master::ProxyWithLink& cp, void*)
+    void show_link(const diy::Master::ProxyWithLink& cp)
     {
       diy::RegularLink<Bounds>* link = static_cast<diy::RegularLink<Bounds>*>(cp.link());
       std::cout << "Block (" << cp.gid() << "): "

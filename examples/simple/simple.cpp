@@ -29,11 +29,9 @@
 //
 // compute sum of local values and enqueue the sum
 //
-void local_sum(void* b_,                             // local block
-               const diy::Master::ProxyWithLink& cp, // communication proxy
-               void*)                                // user-defined additional arguments
+void local_sum(Block* b,                             // local block
+               const diy::Master::ProxyWithLink& cp) // communication proxy
 {
-    Block*        b = static_cast<Block*>(b_);
     diy::Link*    l = cp.link();
 
     // compute local sum
@@ -58,11 +56,9 @@ void local_sum(void* b_,                             // local block
 //
 // average the values received from the neighbors
 //
-void average_neighbors(void* b_,                             // local block
-                       const diy::Master::ProxyWithLink& cp, // communication proxy
-                       void*)                                // user-defined additional arguments
+void average_neighbors(Block* b,                             // local block
+                       const diy::Master::ProxyWithLink& cp) // communication proxy
 {
-    Block*        b = static_cast<Block*>(b_);
     diy::Link*    l = cp.link(); UNUSED(l);
 
     // diy collectives (optional) are piggybacking on the enqueue/exchange/dequeue mechanism.
@@ -166,9 +162,9 @@ int main(int argc, char* argv[])
     }
 
     // compute, exchange, compute
-    master.foreach(&local_sum);              // callback function executed on each local block
-    master.exchange();                       // exchange data between blocks in the link
-    master.foreach(&average_neighbors);      // callback function executed on each local block
+    master.foreach(&local_sum);          // callback function executed on each local block
+    master.exchange();                   // exchange data between blocks in the link
+    master.foreach(&average_neighbors);  // callback function executed on each local block
 
     // save the results in diy format
     diy::io::write_blocks("blocks.out", world, master);

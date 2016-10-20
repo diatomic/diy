@@ -177,6 +177,6 @@ int main(int argc, char* argv[])
                 &redistribute);                 // swap operator callback function
 
     // callback functions for local block
-    master.foreach(&Block::print_block, &verbose);
+    master.foreach([verbose](Block* b, const diy::Master::ProxyWithLink& cp) { b->print_block(cp, verbose); });
     master.foreach(&Block::verify_block);
 }

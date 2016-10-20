@@ -17,10 +17,8 @@
 typedef     diy::Link                   Link;
 typedef     Block<Value>                ValueBlock;
 
-void set_min_max(ValueBlock* b, const diy::Master::Proxy& cp, void* aux)
+void set_min_max(ValueBlock* b, const diy::Master::Proxy& cp, int nblocks)
 {
-    int nblocks = *static_cast<int*>(aux);
-
     if (cp.gid() == 0)
         b->min = -std::numeric_limits<Value>::max();
     else
@@ -175,12 +173,12 @@ int main(int argc, char* argv[])
             k);
 
   if (print || verify)
-    master.foreach<ValueBlock>(&set_min_max, &nblocks);
+    master.foreach([nblocks](ValueBlock* b, const diy::Master::ProxyWithLink& cp) { set_min_max(b, cp, nblocks); });
 
   if (print)
   {
     printf("Printing blocks\n");
-    master.foreach(&ValueBlock::print_block, &verbose);
+    master.foreach([verbose](ValueBlock* b, const diy::Master::ProxyWithLink& cp) { b->print_block(cp, verbose); });
   }
   if (verify)
   {

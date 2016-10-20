@@ -76,33 +76,27 @@ void sum(void* b_,                                  // local block
 //
 // prints the value of tot_work
 //
-void get_tot_work(void* b_,                             // local block
-                  const diy::Master::ProxyWithLink& cp, // communication proxy
-                  void*)                                // user-defined additional arguments
+void get_tot_work(Block* b,                             // local block
+                  const diy::Master::ProxyWithLink& cp) // communication proxy
 {
-    Block* b = static_cast<Block*>(b_);
     fprintf(stderr, "[%d] tot_work = %d\n", cp.gid(), b->tot_work);
 }
 
 //
 // sets my_work to be done for some of my blocks
 //
-void set_some_done(void* b_,                             // local block
-                   const diy::Master::ProxyWithLink& cp, // communication proxy
-                   void*)                                // user-defined additional arguments
+void set_some_done(Block* b,                             // local block
+                   const diy::Master::ProxyWithLink& cp) // communication proxy
 {
-    Block* b    = static_cast<Block*>(b_);
     b->my_work  = (cp.gid() % 2 ? 1 : 0);                // eg, setting every other block to be done
 }
 
 //
 // sets my_work to be done for all of my blocks
 //
-void set_all_done(void* b_,                             // local block
-                  const diy::Master::ProxyWithLink& cp, // communication proxy
-                  void*)                                // user-defined additional arguments
+void set_all_done(Block* b,                             // local block
+                  const diy::Master::ProxyWithLink& cp) // communication proxy
 {
-    Block* b   = static_cast<Block*>(b_);
     b->my_work = 0;
 }
 
@@ -149,7 +143,7 @@ int main(int argc, char* argv[])
     if (world.rank() == 0)
         fprintf(stderr, "None of the blocks are done; tot_work will be > 0 for all blocks:\n");
     // printing all blocks in this example to show they have the same value
-    master.foreach(&get_tot_work);                 // callback function for each local block
+    master.foreach(&get_tot_work);           // callback function for each local block
 
     // set some blocks to be done, reduce again, and print the result
     master.foreach(&set_some_done);

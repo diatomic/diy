@@ -158,6 +158,6 @@ int main(int argc, char* argv[])
   decomposer.decompose(world.rank(), assigner, create);
   diy::all_to_all(master, assigner, Redistribute(decomposer), k);
 
-  master.foreach(&Block::print_block, &verbose);
+  master.foreach([verbose](Block* b, const diy::Master::ProxyWithLink& cp) { b->print_block(cp, verbose); });
   master.foreach(&Block::verify_block);
 }

@@ -70,8 +70,7 @@ PointBlock(const Bounds& bounds_):
     // when they are, there is no need for the block to be passed as the first argument
 
     // check that block values are in the block bounds (debug)
-    void          verify_block(const diy::Master::ProxyWithLink& cp, // communication proxy
-                               void*)
+    void          verify_block(const diy::Master::ProxyWithLink& cp) // communication proxy
     {
         for (size_t i = 0; i < points.size(); ++i)
             for (unsigned j = 0; j < DIM; ++j)
@@ -86,10 +85,8 @@ PointBlock(const Bounds& bounds_):
     }
     // print block values
     void          print_block(const diy::Master::ProxyWithLink& cp,  // communication proxy
-                              void* verbose_)                        // amount of output
+                              bool verbose)                          // amount of output
     {
-        bool     verbose = *static_cast<bool*>(verbose_);
-
         fprintf(stdout, "[%d] Box:    %f %f %f -- %f %f %f\n",
                 cp.gid(),
                 box.min[0], box.min[1], box.min[2],

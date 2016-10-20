@@ -405,7 +405,7 @@ int main(int argc, char* argv[])
   if (print)
   {
     printf("Printing blocks\n");
-    master.foreach(&ValueBlock::print_block, &verbose);
+    master.foreach([verbose](ValueBlock* b, const diy::Master::ProxyWithLink& cp) { b->print_block(cp, verbose); });
   }
   if (verify)
   {
