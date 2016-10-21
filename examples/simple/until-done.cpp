@@ -23,10 +23,10 @@ void    load_block(void* b,
 void flip_coin(Block* b, const diy::Master::ProxyWithLink& cp)
 {
   b->count++;
-  bool done = rand() % 2;
+  int done = rand() % 2;
   //std::cout << cp.gid() << "  " << done << " " << b->count << std::endl;
   cp.collectives()->clear();
-  cp.all_reduce(done, std::logical_and<bool>());
+  cp.all_reduce(done, std::logical_and<int>());
 }
 
 int main(int argc, char* argv[])
