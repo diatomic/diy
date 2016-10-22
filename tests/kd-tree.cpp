@@ -121,9 +121,11 @@ void print_block(Block* b, const diy::Master::ProxyWithLink& cp, bool verbose)
       fprintf(stdout, "  %f %f %f\n", b->points[i][0], b->points[i][1], b->points[i][2]);
 }
 
+namespace diy
+{
 inline
 bool
-operator==(const diy::ContinuousBounds& x, const diy::ContinuousBounds& y)
+operator==(const ContinuousBounds& x, const ContinuousBounds& y)
 {
     for (unsigned i = 0; i < DIM; ++i)
     {
@@ -137,9 +139,10 @@ operator==(const diy::ContinuousBounds& x, const diy::ContinuousBounds& y)
 
 inline
 bool
-operator!=(const diy::ContinuousBounds& x, const diy::ContinuousBounds& y)
+operator!=(const ContinuousBounds& x, const ContinuousBounds& y)
 {
     return !(x == y);
+}
 }
 
 bool intersects(const Bounds& x, const Bounds& y, int dim, bool wrap, const Bounds& domain)

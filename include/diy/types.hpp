@@ -2,91 +2,84 @@
 #define DIY_TYPES_HPP
 
 #include <iostream>
-
-// Provides sane names for C types + helper types
-
-#include "types.h"
+#include "constants.h"
+#include "point.hpp"
 
 namespace diy
 {
-  typedef   gb_t        BlockID;
-
-  typedef   bb_d_t      DiscreteBounds;
-  typedef   bb_c_t      ContinuousBounds;
-
-  //! Helper to create a 1-dimensional discrete domain with the specified extents
-  inline
-  diy::DiscreteBounds
-  interval(int from, int to)            { DiscreteBounds domain; domain.min[0] = from; domain.max[0] = to; return domain; }
-
-  struct Direction: public dir_t
-  {
-            Direction()                 { for (int i = 0; i < DIY_MAX_DIM; ++i) x[i] = 0; }
-            Direction(int dir)
+    struct BlockID
     {
-        for (int i = 0; i < DIY_MAX_DIM; ++i) x[i] = 0;
-        if (dir & DIY_X0) x[0] -= 1;
-        if (dir & DIY_X1) x[0] += 1;
-        if (dir & DIY_Y0) x[1] -= 1;
-        if (dir & DIY_Y1) x[1] += 1;
-        if (dir & DIY_Z0) x[2] -= 1;
-        if (dir & DIY_Z1) x[2] += 1;
-        if (dir & DIY_T0) x[3] -= 1;
-        if (dir & DIY_T1) x[3] += 1;
-    }
+        int gid, proc;
+    };
 
-    int     operator[](int i) const     { return x[i]; }
-    int&    operator[](int i)           { return x[i]; }
-
-    bool
-    operator==(const diy::Direction& y) const
+    template<class Coordinate_>
+    struct Bounds
     {
-      for (int i = 0; i < DIY_MAX_DIM; ++i)
-          if ((*this)[i] != y[i]) return false;
-      return true;
-    }
+        using Coordinate = Coordinate_;
 
-    // lexicographic comparison
-    bool
-    operator<(const diy::Direction& y) const
+        Point<Coordinate, DIY_MAX_DIM>    min, max;
+    };
+    using DiscreteBounds   = Bounds<int>;
+    using ContinuousBounds = Bounds<float>;
+
+    //! Helper to create a 1-dimensional discrete domain with the specified extents
+    inline
+    diy::DiscreteBounds
+    interval(int from, int to)            { DiscreteBounds domain; domain.min[0] = from; domain.max[0] = to; return domain; }
+
+    struct Direction: public Point<int,DIY_MAX_DIM>
     {
-      for (int i = 0; i < DIY_MAX_DIM; ++i)
+              Direction()                 { for (int i = 0; i < DIY_MAX_DIM; ++i) (*this)[i] = 0; }
+              Direction(int dir)
       {
-          if ((*this)[i] < y[i]) return true;
-          if ((*this)[i] > y[i]) return false;
+          for (int i = 0; i < DIY_MAX_DIM; ++i) (*this)[i] = 0;
+          if (dir & DIY_X0) (*this)[0] -= 1;
+          if (dir & DIY_X1) (*this)[0] += 1;
+          if (dir & DIY_Y0) (*this)[1] -= 1;
+          if (dir & DIY_Y1) (*this)[1] += 1;
+          if (dir & DIY_Z0) (*this)[2] -= 1;
+          if (dir & DIY_Z1) (*this)[2] += 1;
+          if (dir & DIY_T0) (*this)[3] -= 1;
+          if (dir & DIY_T1) (*this)[3] += 1;
       }
-      return false;
-    }
 
-    friend std::ostream&
-    operator<<(std::ostream& out, Direction dir)    { out << dir[0]; for (int i = 1; i < DIY_MAX_DIM; ++i) out << ' ' << dir[i]; return out; }
-  };
+      bool
+      operator==(const diy::Direction& y) const
+      {
+        for (int i = 0; i < DIY_MAX_DIM; ++i)
+            if ((*this)[i] != y[i]) return false;
+        return true;
+      }
 
-  // Selector of bounds value type
-  template<class Bounds_>
-  struct BoundsValue;
+      // lexicographic comparison
+      bool
+      operator<(const diy::Direction& y) const
+      {
+        for (int i = 0; i < DIY_MAX_DIM; ++i)
+        {
+            if ((*this)[i] < y[i]) return true;
+            if ((*this)[i] > y[i]) return false;
+        }
+        return false;
+      }
+    };
 
-  template<>
-  struct BoundsValue<DiscreteBounds>
-  {
-    typedef     int     type;
-  };
+    // Selector of bounds value type
+    template<class Bounds_>
+    struct BoundsValue
+    {
+        using type = typename Bounds_::Coordinate;
+    };
 
-  template<>
-  struct BoundsValue<ContinuousBounds>
-  {
-    typedef     float   type;
-  };
+    inline
+    bool
+    operator<(const diy::BlockID& x, const diy::BlockID& y)
+    { return x.gid < y.gid; }
+
+    inline
+    bool
+    operator==(const diy::BlockID& x, const diy::BlockID& y)
+    { return x.gid == y.gid; }
 }
-
-inline
-bool
-operator<(const diy::BlockID& x, const diy::BlockID& y)
-{ return x.gid < y.gid; }
-
-inline
-bool
-operator==(const diy::BlockID& x, const diy::BlockID& y)
-{ return x.gid == y.gid; }
 
 #endif

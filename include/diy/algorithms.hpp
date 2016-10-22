@@ -100,14 +100,14 @@ namespace diy
                     diy::Direction dir, wrap_dir;
 
                     // left
-                    dir.x[j] = -1; wrap_dir.x[j] = -1;
+                    dir[j] = -1; wrap_dir[j] = -1;
                     link->add_neighbor(self);
                     link->add_bounds(domain);
                     link->add_direction(dir);
                     link->add_wrap(wrap_dir);
 
                     // right
-                    dir.x[j] = 1; wrap_dir.x[j] = 1;
+                    dir[j] = 1; wrap_dir[j] = 1;
                     link->add_neighbor(self);
                     link->add_bounds(domain);
                     link->add_direction(dir);
@@ -163,14 +163,14 @@ namespace diy
                     diy::Direction dir, wrap_dir;
 
                     // left
-                    dir.x[j] = -1; wrap_dir.x[j] = -1;
+                    dir[j] = -1; wrap_dir[j] = -1;
                     link->add_neighbor(self);
                     link->add_bounds(domain);
                     link->add_direction(dir);
                     link->add_wrap(wrap_dir);
 
                     // right
-                    dir.x[j] = 1; wrap_dir.x[j] = 1;
+                    dir[j] = 1; wrap_dir[j] = 1;
                     link->add_neighbor(self);
                     link->add_bounds(domain);
                     link->add_direction(dir);
