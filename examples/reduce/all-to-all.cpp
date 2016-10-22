@@ -45,11 +45,11 @@ struct Redistribute
             for (int j = 0; j < DIM; ++j)
               if (b->points[i][j] < bounds.min[j] || b->points[i][j] > bounds.max[j])
               {
-                fprintf(stderr, "!!! Point sent outside the target box !!!\n");
-                fprintf(stderr, "    %f %f %f\n", b->points[i][0], b->points[i][1], b->points[i][2]);
-                fprintf(stderr, "    %f %f %f - %f %f %f\n",
-                                bounds.min[0], bounds.min[1], bounds.min[2],
-                                bounds.max[0], bounds.max[1], bounds.max[2]);
+                  fmt::print(stderr, "!!! Point sent outside the target box !!!\n");
+                  fmt::print(stderr, "    {} {} {}\n", b->points[i][0], b->points[i][1], b->points[i][2]);
+                  fmt::print(stderr, "    {} {} {} - {} {} {}\n",
+                                          bounds.min[0], bounds.min[1], bounds.min[2],
+                                          bounds.max[0], bounds.max[1], bounds.max[2]);
               }
 #endif
           }
@@ -101,6 +101,7 @@ int main(int argc, char* argv[])
   int                       threads     = -1;
   int                       k           = 2;
   std::string               prefix      = "./DIY.XXXXXX";
+  std::string               log_level   = "info";
 
   Bounds domain;
   domain.min[0] = domain.min[1] = domain.min[2] = 0;
@@ -116,6 +117,7 @@ int main(int argc, char* argv[])
       >> Option('t', "thread",  threads,        "number of threads")
       >> Option('m', "memory",  mem_blocks,     "number of blocks to keep in memory")
       >> Option(     "prefix",  prefix,         "prefix for external storage")
+      >> Option('l', "log",     log_level,      "log level")
   ;
 
   ops
@@ -135,6 +137,8 @@ int main(int argc, char* argv[])
       }
       return 1;
   }
+
+  diy::create_logger(log_level);
 
   diy::FileStorage          storage(prefix);
   diy::Master               master(world,

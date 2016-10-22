@@ -10,6 +10,8 @@
 #include <diy/decomposition.hpp>
 #include <diy/assigner.hpp>
 
+#include <diy/fmt/format.h>
+
 using namespace std;
 
 typedef     diy::ContinuousBounds       Bounds;
@@ -77,7 +79,7 @@ void sum(Block* b,                                  // local block
 void get_tot_work(Block* b,                             // local block
                   const diy::Master::ProxyWithLink& cp) // communication proxy
 {
-    fprintf(stderr, "[%d] tot_work = %d\n", cp.gid(), b->tot_work);
+    fmt::print(stderr, "[{}] tot_work = {}\n", cp.gid(), b->tot_work);
 }
 
 //
@@ -139,7 +141,7 @@ int main(int argc, char* argv[])
 
     // print the result
     if (world.rank() == 0)
-        fprintf(stderr, "None of the blocks are done; tot_work will be > 0 for all blocks:\n");
+        fmt::print(stderr, "None of the blocks are done; tot_work will be > 0 for all blocks:\n");
     // printing all blocks in this example to show they have the same value
     master.foreach(&get_tot_work);           // callback function for each local block
 
@@ -147,15 +149,13 @@ int main(int argc, char* argv[])
     master.foreach(&set_some_done);
     diy::all_to_all(master, assigner, &sum, k);
     if (world.rank() == 0)
-        fprintf(stderr, "Some of the blocks are done, "
-                "but tot_work will still be > 0 for all blocks:\n");
+        fmt::print(stderr, "Some of the blocks are done, but tot_work will still be > 0 for all blocks:\n");
     master.foreach(&get_tot_work);
 
     // now set all blocks to be done, reduce again, and print the result
     master.foreach(&set_all_done);
     diy::all_to_all(master, assigner, &sum, k);
     if (world.rank() == 0)
-        fprintf(stderr, "Only now that every block is done will "
-                "tot_work be 0 for all blocks:\n");
+        fmt::print(stderr, "Only now that every block is done will tot_work be 0 for all blocks:\n");
     master.foreach(&get_tot_work);
 }

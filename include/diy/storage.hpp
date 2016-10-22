@@ -12,6 +12,7 @@
 
 #include "serialization.hpp"
 #include "thread.hpp"
+#include "log.hpp"
 
 namespace diy
 {
@@ -67,15 +68,16 @@ namespace diy
 
       virtual int   put(MemoryBuffer& bb)
       {
+        auto log = get_logger();
         std::string     filename;
         int fh = open_random(filename);
 
-        //fprintf(stdout, "FileStorage::put(): %s; buffer size: %lu\n", filename.c_str(), bb.size());
+        log->debug("FileStorage::put(): {}; buffer size: {}", filename, bb.size());
 
         size_t sz = bb.buffer.size();
         size_t written = write(fh, &bb.buffer[0], sz);
         if (written < sz || written == (size_t)-1)
-          fprintf(stderr, "Warning: could not write the full buffer to %s: written = %lu; size = %lu\n", filename.c_str(), written, sz);
+          log->warn("Could not write the full buffer to {}: written = {}; size = {}", filename, written, sz);
         fsync(fh);
         close(fh);
         bb.wipe();
@@ -85,7 +87,7 @@ namespace diy
         fseek(fp, 0L, SEEK_END);
         int fsz = ftell(fp);
         if (fsz != sz)
-            fprintf(stderr, "Warning: file size doesn't match the buffer size, %d vs %d\n", fsz, sz);
+            log->warn("file size doesn't match the buffer size, {} vs {}", fsz, sz);
         fclose(fp);
 #endif
 
@@ -110,7 +112,7 @@ namespace diy
       {
         FileRecord fr = extract_file_record(i);
 
-        //fprintf(stdout, "FileStorage::get(): %s\n", fr.name.c_str());
+        get_logger()->debug("FileStorage::get(): {}", fr.name);
 
         bb.buffer.reserve(fr.size + extra);
         bb.buffer.resize(fr.size);

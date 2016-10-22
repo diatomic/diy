@@ -21,6 +21,8 @@
 
 #include "detail/block_traits.hpp"
 
+#include "log.hpp"
+
 namespace diy
 {
   // Stores and manages blocks; initiates serialization and communication when necessary.
@@ -292,6 +294,9 @@ namespace diy
 
     private:
       fast_mutex            add_mutex_;
+
+    public:
+      std::shared_ptr<spd::logger>  log = get_logger();
   };
 
   struct Master::BaseCommand
@@ -359,7 +364,7 @@ struct diy::Master::ProcessBlock
 
   void    process()
   {
-    //fprintf(stderr, "Processing with thread: %d\n",  (int) this_thread::get_id());
+    master.log->debug("Processing with thread: {}",  this_thread::get_id());
 
     std::vector<int>      local;
     do
@@ -377,7 +382,7 @@ struct diy::Master::ProcessBlock
           local.push_back(i);
       }
 
-      //fprintf(stderr, "Processing block: %d\n", master.gid(i));
+      master.log->debug("Processing block: {}", master.gid(i));
 
       bool skip_block = true;
       for (size_t cmd = 0; cmd < master.commands_.size(); ++cmd)
@@ -457,7 +462,7 @@ void
 diy::Master::
 unload(int i)
 {
-  //fprintf(stdout, "Unloading block: %d\n", gid(i));
+  log->debug("Unloading block: {}", gid(i));
 
   blocks_.unload(i);
   unload_queues(i);
@@ -481,7 +486,7 @@ unload_incoming(int gid)
     QueueRecord& qr = it->second;
     if (queue_policy_->unload_incoming(*this, it->first, gid, qr.size))
     {
-        //fprintf(stderr, "Unloading queue: %d <- %d\n", gid, it->first);
+        log->debug("Unloading queue: {} <- {}", gid, it->first);
         qr.external = storage_->put(in_qrs.queues[it->first]);
     }
   }
@@ -507,7 +512,7 @@ unload_outgoing(int gid)
   }
   if (queue_policy_->unload_outgoing(*this, gid, out_queues_size - sizeof(size_t)))
   {
-      //fprintf(stderr, "Unloading outgoing queues: %d -> ...; size = %lu\n", gid, out_queues_size);
+      log->debug("Unloading outgoing queues: {} -> ...; size = {}\n", gid, out_queues_size);
       MemoryBuffer  bb;     bb.reserve(out_queues_size);
       diy::save(bb, count);
 
@@ -546,7 +551,7 @@ void
 diy::Master::
 load(int i)
 {
-  //fprintf(stdout, "Loading block: %d\n", gid(i));
+ log->debug("Loading block: {}", gid(i));
 
   blocks_.load(i);
   load_queues(i);
@@ -570,7 +575,7 @@ load_incoming(int gid)
     QueueRecord& qr = it->second;
     if (qr.external != -1)
     {
-        //fprintf(stderr, "Loading queue: %d <- %d\n", gid, it->first);
+        log->debug("Loading queue: {} <- {}", gid, it->first);
         storage_->get(qr.external, in_qrs.queues[it->first]);
         qr.external = -1;
     }
@@ -666,7 +671,7 @@ void
 diy::Master::
 execute()
 {
-  //fprintf(stderr, "Entered execute()\n");
+  log->debug("Entered execute()");
   //show_incoming_records();
 
   // touch the outgoing and incoming queues as well as collectives to make sure they exist
@@ -737,10 +742,7 @@ execute()
   incoming_.clear();
 
   if (limit() != -1 && in_memory() > limit())
-  {
-    fprintf(stderr, "Fatal: %d blocks in memory, with limit %d\n", in_memory(), limit());
-    std::abort();
-  }
+      throw std::runtime_error(fmt::format("Fatal: {} blocks in memory, with limit {}", in_memory(), limit()));
 
   // clear commands
   for (size_t i = 0; i < commands_.size(); ++i)
@@ -754,7 +756,7 @@ exchange()
 {
   execute();
 
-  //fprintf(stdout, "Starting exchange\n");
+  log->debug("Starting exchange");
 
   // make sure there is a queue for each neighbor
   for (int i = 0; i < (int)size(); ++i)
@@ -770,7 +772,7 @@ exchange()
   }
 
   flush();
-  //fprintf(stdout, "Finished exchange\n");
+  log->debug("Finished exchange");
 }
 
 /* Communicator */
@@ -788,8 +790,7 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
     {
       int to = it->first.gid;
 
-      //fprintf(stderr, "Processing local queue: %d <- %d\n", to, from);
-      //fprintf(stderr, "   size:    %lu\n",     it->second.size);
+      log->debug("Processing local queue: {} <- {} of size {}", to, from, it->second.size);
 
       QueueRecord& in_qr  = incoming_[to].records[from];
       bool in_external  = block(lid(to)) == 0;
@@ -822,19 +823,18 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
       int     to      = to_proc.gid;
       int     proc    = to_proc.proc;
 
-      //fprintf(stderr, "Processing queue: %d <- %d\n", to, from);
-      //fprintf(stderr, "   size:    %lu\n",     outgoing_[from].queues[to_proc].size());
+    log->debug("Processing queue:      {} <- {} of size {}", to, from, outgoing_[from].queues[to_proc].size());
 
       // There may be local outgoing queues that remained in memory
       if (proc == comm_.rank())     // sending to ourselves: simply swap buffers
       {
-        //fprintf(stderr, "Moving queue in-place: %d <- %d\n", to, from);
+        log->debug("Moving queue in-place: {} <- {}", to, from);
 
         QueueRecord& in_qr  = incoming_[to].records[from];
         bool in_external  = block(lid(to)) == 0;
         if (in_external)
         {
-          //fprintf(stderr, "Unloading outgoing directly as incoming: %d <- %d\n", to, from);
+          log->debug("Unloading outgoing directly as incoming: {} <- {}", to, from);
           MemoryBuffer& bb = it->second;
           in_qr.size = bb.size();
           if (queue_policy_->unload_incoming(*this, from, to, in_qr.size))
@@ -848,7 +848,7 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
           }
         } else        // !in_external
         {
-          //fprintf(stderr, "Swapping in memory: %d <- %d\n", to, from);
+          log->debug("Swapping in memory:    {} <- {}", to, from);
           MemoryBuffer& bb = incoming_[to].queues[from];
           bb.swap(it->second);
           bb.reset();
@@ -895,7 +895,7 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
         incoming_[to].queues[from].reset();     // buffer position = 0
     } else if (queue_policy_->unload_incoming(*this, from, to, size))
     {
-        //fprintf(stderr, "Directly unloading queue %d <- %d\n", to, from);
+        log->debug("Directly unloading queue {} <- {}", to, from);
         external = storage_->put(bb);           // unload directly
     }
     incoming_[to].records[from] = QueueRecord(size, external);
@@ -925,7 +925,7 @@ flush()
     else
         to_send.push_back(it->first);
   }
-  //fprintf(stderr, "to_send.size(): %lu\n", to_send.size());
+  log->debug("to_send.size(): {}", to_send.size());
 
   // XXX: we probably want a cleverer limit than block limit times average number of queues per block
   // XXX: with queues we could easily maintain a specific space limit
@@ -943,8 +943,8 @@ flush()
     time_type cur = get_time();
     if (cur - start > wait*1000)
     {
-        fprintf(stderr, "Waiting in flush [%d]: %lu - %d out of %d\n",
-                        comm_.rank(), inflight_size_, received_, expected_);
+        log->notice("Waiting in flush [{}]: {} - {} out of {}",
+                    comm_.rank(), inflight_size_, received_, expected_);
         wait *= 2;
     }
 #endif
@@ -952,7 +952,7 @@ flush()
 
   outgoing_.clear();
 
-  //fprintf(stderr, "Done in flush\n");
+  log->debug("Done in flush");
   //show_incoming_records();
 
   process_collectives();
@@ -1026,16 +1026,16 @@ show_incoming_records() const
     for (InQueueRecords::const_iterator cur = in_qrs.records.begin(); cur != in_qrs.records.end(); ++cur)
     {
       const QueueRecord& qr = cur->second;
-      fprintf(stderr, "%d <- %d: (size,external) = (%lu,%d)\n",
-                      it->first, cur->first,
-                      qr.size,
-                      qr.external);
+      log->info("{} <- {}: (size,external) = ({},{})",
+                it->first, cur->first,
+                qr.size,
+                qr.external);
     }
     for (IncomingQueues::const_iterator cur = in_qrs.queues.begin(); cur != in_qrs.queues.end(); ++cur)
     {
-      fprintf(stderr, "%d <- %d: queue.size() = %lu\n",
-                      it->first, cur->first,
-                      const_cast<IncomingQueuesRecords&>(in_qrs).queues[cur->first].size());
+      log->info("{} <- {}: queue.size() = {}",
+                it->first, cur->first,
+                const_cast<IncomingQueuesRecords&>(in_qrs).queues[cur->first].size());
       }
   }
 }

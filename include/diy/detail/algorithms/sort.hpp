@@ -26,9 +26,11 @@ struct SampleSort
 
     static void     dequeue_values(std::vector<T>& v, const ReduceProxy& rp, bool skip_self = true)
     {
+        auto log = get_logger();
+
         int k_in  = rp.in_link().size();
 
-        //printf("dequeue_values(): gid=%d, round=%d; v.size()=%lu\n", rp.gid(), rp.round(), v.size());
+        log->trace("dequeue_values(): gid={}, round={}; v.size()={}", rp.gid(), rp.round(), v.size());
 
         if (detail::is_default< Serialization<T> >::value)
         {
@@ -37,12 +39,12 @@ struct SampleSort
             size_t end = v.size();
             for (int i = 0; i < k_in; ++i)
             {
-                //printf("    incoming size from %d: %lu\n", rp.in_link().target(i).gid, sz);
+                log->trace("    incoming size from {}: {}", rp.in_link().target(i).gid, sz);
                 if (skip_self && rp.in_link().target(i).gid == rp.gid()) continue;
                 MemoryBuffer& in = rp.incoming(rp.in_link().target(i).gid);
                 sz += in.size() / sizeof(T);
             }
-            //printf("    incoming size: %lu\n", sz);
+            log->trace("    incoming size: {}", sz);
             v.resize(end + sz);
 
             for (int i = 0; i < k_in; ++i)
@@ -64,15 +66,11 @@ struct SampleSort
                 {
                     T x;
                     diy::load(in, x);
-#if __cplusplus > 199711L           // C++11
                     v.emplace_back(std::move(x));
-#else
-                    v.push_back(x);
-#endif
                 }
             }
         }
-        //printf("    v.size()=%lu\n", v.size());
+        log->trace("    v.size()={}", v.size());
     }
 
     ValuesVector    values;

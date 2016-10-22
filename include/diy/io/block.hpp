@@ -13,6 +13,7 @@
 #include "../assigner.hpp"
 #include "../master.hpp"
 #include "../storage.hpp"
+#include "../log.hpp"
 
 // Read and write collections of blocks using MPI-IO
 namespace diy
@@ -216,11 +217,11 @@ namespace io
         for (unsigned i = 0; i < gids.size(); ++i)
         {
             if (gids[i] != all_offset_counts[gids[i]].gid)
-                fprintf(stderr, "Warning: gids don't match in diy::io::read_blocks(), %d vs %d\n",
-                        gids[i], all_offset_counts[gids[i]].gid);
+                get_logger()->warn("gids don't match in diy::io::read_blocks(), {} vs {}",
+                                   gids[i], all_offset_counts[gids[i]].gid);
 
             offset_t offset = all_offset_counts[gids[i]].offset,
-                count  = all_offset_counts[gids[i]].count;
+                     count  = all_offset_counts[gids[i]].count;
             MemoryBuffer bb;
             bb.buffer.resize(count);
             f.read_at(offset, bb.buffer);
@@ -299,9 +300,7 @@ namespace split
     {
         const void* block = master.get(i);
 
-        char gid_str[50];
-        sprintf(gid_str, "%d", master.gid(i));
-        std::string filename = outfilename + '/' + gid_str;
+        std::string filename = fmt::format("{}/{}", outfilename, master.gid(i));
 
         ::diy::detail::FileBuffer bb(fopen(filename.c_str(), "w"));
 
@@ -354,9 +353,7 @@ namespace split
     // Read our blocks;
     for (unsigned i = 0; i < gids.size(); ++i)
     {
-        char gid_str[50];
-        sprintf(gid_str, "%d", gids[i]);
-        std::string filename = infilename + '/' + gid_str;
+        std::string filename = fmt::format("{}/{}", infilename, gids[i]);
 
         ::diy::detail::FileBuffer bb(fopen(filename.c_str(), "r"));
         Link* l = LinkFactory::load(bb);

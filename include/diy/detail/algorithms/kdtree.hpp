@@ -4,6 +4,7 @@
 #include <vector>
 #include <cassert>
 #include "../../partners/all-reduce.hpp"
+#include "../../log.hpp"
 
 namespace diy
 {
@@ -377,10 +378,7 @@ compute_local_histogram(Block* b, const diy::ReduceProxy& srp, int dim) const
         float x = (b->*points_)[i][dim];
         int loc = (x - link->core().min[dim]) / width;
         if (loc < 0)
-        {
-            std::cerr << loc << " " << x << " " << link->core().min[dim] << std::endl;
-            std::abort();
-        }
+            throw std::runtime_error(fmt::format("{} {} {}", loc, x, link->core().min[dim]));
         if (loc >= (int) bins_)
             loc = bins_ - 1;
         ++(histogram[loc]);
@@ -428,6 +426,8 @@ void
 diy::detail::KDTreePartition<Block,Point>::
 enqueue_exchange(Block* b, const diy::ReduceProxy& srp, int dim, const Histogram& histogram) const
 {
+    auto        log = get_logger();
+
     int         lid  = srp.master()->lid(srp.gid());
     RCLink*     link = static_cast<RCLink*>(srp.master()->link(lid));
 
@@ -440,7 +440,7 @@ enqueue_exchange(Block* b, const diy::ReduceProxy& srp, int dim, const Histogram
     size_t total = 0;
     for (size_t i = 0; i < histogram.size(); ++i)
         total += histogram[i];
-    //fprintf(stderr, "Histogram total: %lu\n", total);
+    log->trace("Histogram total: {}", total);
 
     size_t cur   = 0;
     float  width = (link->core().max[dim] - link->core().min[dim])/bins_;
@@ -454,7 +454,7 @@ enqueue_exchange(Block* b, const diy::ReduceProxy& srp, int dim, const Histogram
         }
         cur += histogram[i];
     }
-    //std::cout << "Found split: " << split << " (dim=" << dim << ") in " << link->core().min[dim] << " - " << link->core().max[dim] << std::endl;
+    log->trace("Found split: {} (dim={}) in {} - {}", split, dim, link->core().min[dim], link->core().max[dim]);
 
     // subset and enqueue
     std::vector< std::vector<Point> > out_points(srp.out_link().size());
@@ -500,11 +500,8 @@ dequeue_exchange(Block* b, const diy::ReduceProxy& srp, int dim) const
       for (size_t j = 0; j < in_points.size(); ++j)
       {
         if (in_points[j][dim] < link->core().min[dim] || in_points[j][dim] > link->core().max[dim])
-        {
-            fprintf(stderr, "Warning: dequeued %f outside [%f,%f] (%d)\n",
-                            in_points[j][dim], link->core().min[dim], link->core().max[dim], dim);
-            std::abort();
-        }
+            throw std::runtime_error(fmt::format("Dequeued {} outside [{},{}] ({})",
+                                     in_points[j][dim], link->core().min[dim], link->core().max[dim], dim));
         (b->*points_).push_back(in_points[j]);
       }
     }

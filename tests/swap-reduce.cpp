@@ -49,8 +49,8 @@ void redistribute(void* b_,                                 // local block
 
         std::vector<Block::Point>    in_points;
         srp.dequeue(nbr_gid, in_points);
-        fprintf(stderr, "[%d:%d] Received %d points from [%d]\n",
-                srp.gid(), round, (int) in_points.size(), nbr_gid);
+        fmt::print(stderr, "[{}:{}] Received {} points from [{}]\n",
+                   srp.gid(), round, (int) in_points.size(), nbr_gid);
         for (size_t j = 0; j < in_points.size(); ++j)
             b->points.push_back(in_points[j]);
     }
@@ -81,8 +81,8 @@ void redistribute(void* b_,                                 // local block
         else
         {
             srp.enqueue(srp.out_link().target(i), out_points[i]);
-            fprintf(stderr, "[%d] Sent %d points to [%d]\n",
-                    srp.gid(), (int) out_points[i].size(), srp.out_link().target(i).gid);
+            fmt::print(stderr, "[{}] Sent {} points to [{}]\n",
+                       srp.gid(), (int) out_points[i].size(), srp.out_link().target(i).gid);
         }
     }
 

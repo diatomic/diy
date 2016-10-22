@@ -97,28 +97,28 @@ void print_block(Block* b, const diy::Master::ProxyWithLink& cp, bool verbose)
 {
   RCLink*  link      = static_cast<RCLink*>(cp.link());
 
-  fprintf(stdout, "%d: [%f,%f,%f] - [%f,%f,%f] (%d neighbors): %lu points\n",
-                  cp.gid(),
-                  link->bounds().min[0], link->bounds().min[1], link->bounds().min[2],
-                  link->bounds().max[0], link->bounds().max[1], link->bounds().max[2],
-                  link->size(), b->points.size());
+  fmt::print("{}: [{},{},{}] - [{},{},{}] ({} neighbors): {} points\n",
+             cp.gid(),
+             link->bounds().min[0], link->bounds().min[1], link->bounds().min[2],
+             link->bounds().max[0], link->bounds().max[1], link->bounds().max[2],
+             link->size(), b->points.size());
 
   for (int i = 0; i < link->size(); ++i)
   {
-      fprintf(stdout, "  (%d,%d,(%d,%d,%d)):",
-                      link->target(i).gid, link->target(i).proc,
-                      link->direction(i)[0],
-                      link->direction(i)[1],
-                      link->direction(i)[2]);
+      fmt::print("  ({},{},({},{},{})):",
+                 link->target(i).gid, link->target(i).proc,
+                 link->direction(i)[0],
+                 link->direction(i)[1],
+                 link->direction(i)[2]);
       const Bounds& bounds = link->bounds(i);
-      fprintf(stdout, " [%f,%f,%f] - [%f,%f,%f]\n",
-              bounds.min[0], bounds.min[1], bounds.min[2],
-              bounds.max[0], bounds.max[1], bounds.max[2]);
+      fmt::print(" [{},{},{}] - [{},{},{}]\n",
+                 bounds.min[0], bounds.min[1], bounds.min[2],
+                 bounds.max[0], bounds.max[1], bounds.max[2]);
   }
 
   if (verbose)
     for (size_t i = 0; i < b->points.size(); ++i)
-      fprintf(stdout, "  %f %f %f\n", b->points[i][0], b->points[i][1], b->points[i][2]);
+      fmt::print("  {} {} {}\n", b->points[i][0], b->points[i][1], b->points[i][2]);
 }
 
 namespace diy

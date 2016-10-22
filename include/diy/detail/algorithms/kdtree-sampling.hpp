@@ -4,6 +4,7 @@
 #include <vector>
 #include <cassert>
 #include "../../partners/all-reduce.hpp"
+#include "../../log.hpp"
 
 // TODO: technically, what's done now is not a perfect subsample:
 //       we take the same number of samples from every block, in reality this number should be selected at random,
@@ -135,6 +136,7 @@ void
 diy::detail::KDTreeSamplingPartition<Block,Point>::
 update_links(Block* b, const diy::ReduceProxy& srp, int dim, int round, int rounds, bool wrap, const Bounds& domain) const
 {
+    auto        log  = get_logger();
     int         gid  = srp.gid();
     int         lid  = srp.master()->lid(gid);
     RCLink*     link = static_cast<RCLink*>(srp.master()->link(lid));
@@ -161,7 +163,7 @@ update_links(Block* b, const diy::ReduceProxy& srp, int dim, int round, int roun
                 dir[j] = -dir[j];
 
             int k = link_map[std::make_pair(in_gid, dir)];
-            //printf("%d %d %f -> %d\n", in_gid, dir, split, k);
+            log->trace("{} {} {} -> {}", in_gid, dir, split, k);
             splits[k] = split;
         }
     }
@@ -379,11 +381,8 @@ dequeue_exchange(Block* b, const diy::ReduceProxy& srp, int dim) const
       for (size_t j = 0; j < in_points.size(); ++j)
       {
         if (in_points[j][dim] < link->core().min[dim] || in_points[j][dim] > link->core().max[dim])
-        {
-            fprintf(stderr, "Warning: dequeued %f outside [%f,%f] (%d)\n",
-                            in_points[j][dim], link->core().min[dim], link->core().max[dim], dim);
-            std::abort();
-        }
+            throw std::runtime_error(fmt::format("Dequeued {} outside [{},{}] ({})",
+                                                 in_points[j][dim], link->core().min[dim], link->core().max[dim], dim));
         (b->*points_).push_back(in_points[j]);
       }
     }

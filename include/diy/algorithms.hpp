@@ -13,6 +13,8 @@
 #include "detail/algorithms/kdtree.hpp"
 #include "detail/algorithms/kdtree-sampling.hpp"
 
+#include "log.hpp"
+
 namespace diy
 {
     /**
@@ -80,10 +82,7 @@ namespace diy
                 bool                            wrap = false)//!< periodic boundaries in all dimensions
     {
         if (assigner.nblocks() & (assigner.nblocks() - 1))
-        {
-            fprintf(stderr, "KD-tree requires a number of blocks that's a power of 2, got %d\n", assigner.nblocks());
-            std::abort();
-        }
+            throw std::runtime_error(fmt::format("KD-tree requires a number of blocks that's a power of 2, got {}", assigner.nblocks()));
 
         typedef     diy::RegularContinuousLink      RCLink;
 
@@ -143,10 +142,7 @@ namespace diy
                 bool                            wrap = false)//!< periodic boundaries in all dimensions
     {
         if (assigner.nblocks() & (assigner.nblocks() - 1))
-        {
-            fprintf(stderr, "KD-tree requires a number of blocks that's a power of 2, got %d\n", assigner.nblocks());
-            std::abort();
-        }
+            throw std::runtime_error(fmt::format("KD-tree requires a number of blocks that's a power of 2, got {}", assigner.nblocks()));
 
         typedef     diy::RegularContinuousLink      RCLink;
 

@@ -94,7 +94,7 @@ void print_block(Block* b, const diy::Master::ProxyWithLink& cp, bool verbose)
 {
   RCLink*  link      = static_cast<RCLink*>(cp.link());
 
-  fprintf(stdout, "%d: [%f,%f,%f] - [%f,%f,%f] (%d neighbors): %lu points\n",
+  fmt::print("{}: [{},{},{}] - [{},{},{}] ({} neighbors): {} points\n",
                   cp.gid(),
                   link->bounds().min[0], link->bounds().min[1], link->bounds().min[2],
                   link->bounds().max[0], link->bounds().max[1], link->bounds().max[2],
@@ -102,20 +102,20 @@ void print_block(Block* b, const diy::Master::ProxyWithLink& cp, bool verbose)
 
   for (int i = 0; i < link->size(); ++i)
   {
-      fprintf(stdout, "  (%d,%d,(%d,%d,%d)):",
+      fmt::print("  ({},{},({},{},{})):",
                       link->target(i).gid, link->target(i).proc,
                       link->direction(i)[0],
                       link->direction(i)[1],
                       link->direction(i)[2]);
       const Bounds& bounds = link->bounds(i);
-      fprintf(stdout, " [%f,%f,%f] - [%f,%f,%f]\n",
+      fmt::print(" [{},{},{}] - [{},{},{}]\n",
               bounds.min[0], bounds.min[1], bounds.min[2],
               bounds.max[0], bounds.max[1], bounds.max[2]);
   }
 
   if (verbose)
     for (size_t i = 0; i < b->points.size(); ++i)
-      fprintf(stdout, "  %f %f %f\n", b->points[i][0], b->points[i][1], b->points[i][2]);
+      fmt::print("  {} {} {}\n", b->points[i][0], b->points[i][1], b->points[i][2]);
 }
 
 inline
@@ -158,7 +158,7 @@ void verify_block(Block* b, const diy::Master::ProxyWithLink& cp, bool wrap, con
   for (size_t i = 0; i < b->points.size(); ++i)
     for (unsigned j = 0; j < DIM; ++j)
       if (b->points[i][j] < link->bounds().min[j] || b->points[i][j] > link->bounds().max[j])
-        fprintf(stdout, "Warning: %f outside of [%f,%f] (%d)\n", b->points[i][j], link->bounds().min[j], link->bounds().max[j], j);
+        fmt::print("Warning: {} outside of [{},{}] ({})\n", b->points[i][j], link->bounds().min[j], link->bounds().max[j], j);
 
   // verify neighbor bounds
   for (int i = 0; i < link->size(); ++i)
@@ -166,13 +166,13 @@ void verify_block(Block* b, const diy::Master::ProxyWithLink& cp, bool wrap, con
       int nbr_gid = link->target(i).gid;
       if (link->bounds(i) != b->block_bounds[nbr_gid])
       {
-          fprintf(stderr, "Warning: bounds don't match %d -> %d\n", cp.gid(), link->target(i).gid);
-          fprintf(stderr, "  expected: [%f,%f,%f] - [%f,%f,%f]\n",
-                          link->bounds(i).min[0], link->bounds(i).min[1], link->bounds(i).min[2],
-                          link->bounds(i).max[0], link->bounds(i).max[1], link->bounds(i).max[2]);
-          fprintf(stderr, "  got:      [%f,%f,%f] - [%f,%f,%f]\n",
-                          b->block_bounds[nbr_gid].min[0], b->block_bounds[nbr_gid].min[1], b->block_bounds[nbr_gid].min[2],
-                          b->block_bounds[nbr_gid].max[0], b->block_bounds[nbr_gid].max[1], b->block_bounds[nbr_gid].max[2]);
+          fmt::print(stderr, "Warning: bounds don't match {} -> {}\n", cp.gid(), link->target(i).gid);
+          fmt::print(stderr, "  expected: [{},{},{}] - [{},{},{}]\n",
+                             link->bounds(i).min[0], link->bounds(i).min[1], link->bounds(i).min[2],
+                             link->bounds(i).max[0], link->bounds(i).max[1], link->bounds(i).max[2]);
+          fmt::print(stderr, "  got:      [{},{},{}] - [{},{},{}]\n",
+                             b->block_bounds[nbr_gid].min[0], b->block_bounds[nbr_gid].min[1], b->block_bounds[nbr_gid].min[2],
+                             b->block_bounds[nbr_gid].max[0], b->block_bounds[nbr_gid].max[1], b->block_bounds[nbr_gid].max[2]);
       }
   }
 
@@ -186,10 +186,10 @@ void verify_block(Block* b, const diy::Master::ProxyWithLink& cp, bool wrap, con
                  (link->wrap(i)[j] ==  1 && !(link->bounds().max[j] == domain.max[j] && link->bounds(i).min[j] == domain.min[j])))
                 continue;
 
-            fprintf(stderr, "Warning: wrap doesn't match:\n");
-            fprintf(stderr, "  [%d] -> %d: wrap = (%d,%d,%d), mismatch in %d\n",
-                            cp.gid(), link->target(i).gid,
-                            link->wrap(i)[0], link->wrap(i)[1], link->wrap(i)[2], j);
+            fmt::print(stderr, "Warning: wrap doesn't match:\n");
+            fmt::print(stderr, "  [{}] -> {}: wrap = ({},{},{}), mismatch in {}\n",
+                               cp.gid(), link->target(i).gid,
+                               link->wrap(i)[0], link->wrap(i)[1], link->wrap(i)[2], j);
           }
       }
 
@@ -199,7 +199,7 @@ void verify_block(Block* b, const diy::Master::ProxyWithLink& cp, bool wrap, con
       for (unsigned j = 0; j < DIM; ++j)
       {
           if (!intersects(link->bounds(), link->bounds(i), j, wrap, domain))
-              fprintf(stderr, "Warning: we don't intersect a block in the link: %d -> %d\n", cp.gid(), link->target(i).gid);
+              fmt::print(stderr, "Warning: we don't intersect a block in the link: {} -> {}\n", cp.gid(), link->target(i).gid);
       }
 
   // verify that we don't intersect anybody not in the link
@@ -221,7 +221,7 @@ void verify_block(Block* b, const diy::Master::ProxyWithLink& cp, bool wrap, con
                   break;
           }
           if (k == link->size())
-              fprintf(stderr, "Warning: we intersect a block not in the link: %d -/-> %d\n", cp.gid(), i);
+              fmt::print(stderr, "Warning: we intersect a block not in the link: {} -/-> {}\n", cp.gid(), i);
       }
   }
 }

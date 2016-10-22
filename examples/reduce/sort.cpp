@@ -213,10 +213,7 @@ void dequeue_exchange(void* b_, const diy::ReduceProxy& srp)
       for (size_t j = 0; j < in_values.size(); ++j)
       {
         if (in_values[j] < b->min)
-        {
-            std::cerr << "Warning: " << in_values[j] << " < min = " << b->min << std::endl;
-            std::abort();
-        }
+            throw std::runtime_error(fmt::format("{} < min = {}", in_values[j], b->min));
         b->values.push_back(in_values[j]);
       }
     }
@@ -345,7 +342,7 @@ int main(int argc, char* argv[])
     if (nblocks % world.size() != 0)
     {
       if (world.rank() == 0)
-        std::cerr << "Number of blocks must be divisible by the number of processes (for collective MPI-IO)\n";
+          fmt::print(stderr, "Number of blocks must be divisible by the number of processes (for collective MPI-IO)\n");
       return 1;
     }
 
@@ -360,7 +357,7 @@ int main(int argc, char* argv[])
     if (sz % (chunk_size * nblocks) != 0)
     {
       if (world.rank() == 0)
-        std::cerr << "Expected data size to align with the number of blocks and chunk size\n";
+          fmt::print(stderr, "Expected data size to align with the number of blocks and chunk size\n");
       return 1;
     }
 
@@ -404,12 +401,12 @@ int main(int argc, char* argv[])
 
   if (print)
   {
-    printf("Printing blocks\n");
+    fmt::print("Printing blocks\n");
     master.foreach([verbose](ValueBlock* b, const diy::Master::ProxyWithLink& cp) { b->print_block(cp, verbose); });
   }
   if (verify)
   {
-    printf("Verifying blocks\n");
+    fmt::print("Verifying blocks\n");
     master.foreach(&ValueBlock::verify_block);
 
     master.exchange();      // to process collectives

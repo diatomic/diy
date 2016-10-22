@@ -552,10 +552,7 @@ fill_divisions(std::vector<int>& divisions) const
         }
 
     if (nblocks % prod != 0)
-    {
-        fprintf(stderr, "Total number of blocks cannot be factored into provided divs\n");
-        return;
-    }
+        throw std::runtime_error("Total number of blocks cannot be factored into provided divs");
 
     if (c == (int) divisions.size())               // nothing to do; user provided all divs
         return;

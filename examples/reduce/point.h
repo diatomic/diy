@@ -4,17 +4,11 @@
 #include <vector>
 #include <cassert>
 #include <diy/types.hpp>
+#include <diy/log.hpp>
 
 // D-dimensional point
 template<unsigned D>
-struct SimplePoint
-{
-    float   coords[D];
-
-    float&  operator[](unsigned i)                          { assert(i < D); return coords[i]; }
-    float   operator[](unsigned i) const                    { assert(i < D); return coords[i]; }
-};
-
+using SimplePoint = diy::Point<float, D>;
 
 // block structure
 // the contents of a block are completely user-defined
@@ -76,22 +70,22 @@ PointBlock(const Bounds& bounds_):
             for (unsigned j = 0; j < DIM; ++j)
                 if (points[i][j] < box.min[j] || points[i][j] > box.max[j])
                 {
-                    fprintf(stderr, "!!! Point outside the box !!!\n");
-                    fprintf(stderr, "    %f %f %f\n", points[i][0], points[i][1], points[i][2]);
-                    fprintf(stderr, "    %f %f %f - %f %f %f\n",
-                            box.min[0], box.min[1], box.min[2],
-                            box.max[0], box.max[1], box.max[2]);
+                    fmt::print(stderr, "!!! Point outside the box !!!\n");
+                    fmt::print(stderr, "    {} {} {}\n", points[i][0], points[i][1], points[i][2]);
+                    fmt::print(stderr, "    {} {} {} - {} {} {}\n",
+                               box.min[0], box.min[1], box.min[2],
+                               box.max[0], box.max[1], box.max[2]);
                 }
     }
     // print block values
     void          print_block(const diy::Master::ProxyWithLink& cp,  // communication proxy
                               bool verbose)                          // amount of output
     {
-        fprintf(stdout, "[%d] Box:    %f %f %f -- %f %f %f\n",
+        fmt::print("[{}] Box:    {} {} {} -- {} {} {}\n",
                 cp.gid(),
                 box.min[0], box.min[1], box.min[2],
                 box.max[0], box.max[1], box.max[2]);
-        fprintf(stdout, "[%d] Bounds: %f %f %f -- %f %f %f\n",
+        fmt::print("[{}] Bounds: {} {} {} -- {} {} {}\n",
                 cp.gid(),
                 bounds.min[0], bounds.min[1], bounds.min[2],
                 bounds.max[0], bounds.max[1], bounds.max[2]);
@@ -99,14 +93,9 @@ PointBlock(const Bounds& bounds_):
         if (verbose)
         {
             for (size_t i = 0; i < points.size(); ++i)
-            {
-                fprintf(stdout, "  ");
-                for (unsigned j = 0; j < DIM; ++j)
-                    fprintf(stdout, "%f ", points[i][j]);
-                fprintf(stdout, "\n");
-            }
+                fmt::print("  {}\n", points[i]);
         } else
-            fprintf(stdout, "[%d] Points: %d\n", cp.gid(), (int) points.size());
+            fmt::print("[{}] Points: {}\n", cp.gid(), points.size());
     }
 
     // block data

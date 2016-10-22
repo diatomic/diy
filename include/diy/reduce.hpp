@@ -5,6 +5,7 @@
 #include "master.hpp"
 #include "assigner.hpp"
 #include "detail/block_traits.hpp"
+#include "log.hpp"
 
 namespace diy
 {
@@ -111,6 +112,8 @@ void reduce(Master&                    master,        //!< master object
             const Reduce&              reduce,        //!< reduction callback function
             const Skip&                skip)          //!< object determining whether a block should be skipped
 {
+  auto log = get_logger();
+
   int original_expected = master.expected();
 
   using Block = typename detail::block_traits<Reduce>::type;
@@ -118,7 +121,7 @@ void reduce(Master&                    master,        //!< master object
   unsigned round;
   for (round = 0; round < partners.rounds(); ++round)
   {
-    //fprintf(stderr, "== Round %d\n", round);
+    log->debug("Round {}", round);
     master.foreach(detail::ReductionFunctor<Block,Partners>(round, reduce, partners, assigner),
                    detail::SkipInactiveOr<Partners,Skip>(round, partners, skip));
     master.execute();
@@ -138,7 +141,7 @@ void reduce(Master&                    master,        //!< master object
     master.flush();
   }
   // final round
-  //fprintf(stderr, "== Round %d\n", round);
+  log->debug("Round {}", round);
   master.foreach(detail::ReductionFunctor<Block,Partners>(round, reduce, partners, assigner),
                  detail::SkipInactiveOr<Partners,Skip>(round, partners, skip));
 
