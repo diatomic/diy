@@ -51,7 +51,7 @@ namespace diy
       using Assigner::size;
       using Assigner::nblocks;
 
-      int   rank(int gid) const
+      int   rank(int gid) const override
       {
           int div = nblocks() / size();
           int mod = nblocks() % size();
@@ -65,7 +65,7 @@ namespace diy
           }
       }
       inline
-      void  local_gids(int rank, std::vector<int>& gids) const;
+      void  local_gids(int rank, std::vector<int>& gids) const override;
   };
 
   class RoundRobinAssigner: public Assigner
@@ -83,9 +83,9 @@ namespace diy
       using Assigner::size;
       using Assigner::nblocks;
 
-      int   rank(int gid) const                 { return gid % size(); }
+      int   rank(int gid) const override        { return gid % size(); }
       inline
-      void  local_gids(int rank, std::vector<int>& gids) const;
+      void  local_gids(int rank, std::vector<int>& gids) const override;
   };
 }
 

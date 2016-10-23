@@ -26,9 +26,9 @@ namespace diy
                           FileBuffer(FILE* file_): file(file_), head(0), tail(0)    {}
 
       // TODO: add error checking
-      virtual inline void save_binary(const char* x, size_t count)    { fwrite(x, 1, count, file); head += count; }
-      virtual inline void load_binary(char* x, size_t count)          { fread(x, 1, count, file); }
-      virtual inline void load_binary_back(char* x, size_t count)     { fseek(file, tail, SEEK_END); fread(x, 1, count, file); tail += count; fseek(file, head, SEEK_SET); }
+      virtual inline void save_binary(const char* x, size_t count) override   { fwrite(x, 1, count, file); head += count; }
+      virtual inline void load_binary(char* x, size_t count) override         { fread(x, 1, count, file); }
+      virtual inline void load_binary_back(char* x, size_t count) override    { fseek(file, tail, SEEK_END); fread(x, 1, count, file); tail += count; fseek(file, head, SEEK_SET); }
 
       size_t              size() const                                { return head; }
 
@@ -66,7 +66,7 @@ namespace diy
                       filename_templates_(filename_templates),
                       count_(0), current_size_(0), max_size_(0)         {}
 
-      virtual int   put(MemoryBuffer& bb)
+      virtual int   put(MemoryBuffer& bb) override
       {
         auto log = get_logger();
         std::string     filename;
@@ -94,7 +94,7 @@ namespace diy
         return make_file_record(filename, sz);
       }
 
-      virtual int    put(const void* x, detail::Save save)
+      virtual int    put(const void* x, detail::Save save) override
       {
         std::string     filename;
         int fh = open_random(filename);
@@ -108,7 +108,7 @@ namespace diy
         return make_file_record(filename, sz);
       }
 
-      virtual void   get(int i, MemoryBuffer& bb, size_t extra)
+      virtual void   get(int i, MemoryBuffer& bb, size_t extra) override
       {
         FileRecord fr = extract_file_record(i);
 
@@ -123,7 +123,7 @@ namespace diy
         remove_file(fr);
       }
 
-      virtual void   get(int i, void* x, detail::Load load)
+      virtual void   get(int i, void* x, detail::Load load) override
       {
         FileRecord fr = extract_file_record(i);
 
@@ -136,7 +136,7 @@ namespace diy
         remove_file(fr);
       }
 
-      virtual void  destroy(int i)
+      virtual void  destroy(int i) override
       {
         FileRecord      fr;
         {

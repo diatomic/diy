@@ -28,9 +28,9 @@ namespace diy
                         MemoryBuffer(size_t position_ = 0):
                           position(position_)                       {}
 
-    virtual inline void save_binary(const char* x, size_t count);   //!< copy `count` bytes from `x` into the buffer
-    virtual inline void load_binary(char* x, size_t count);         //!< copy `count` bytes into `x` from the buffer
-    virtual inline void load_binary_back(char* x, size_t count);    //!< copy `count` bytes into `x` from the back of the buffer
+    virtual inline void save_binary(const char* x, size_t count) override;   //!< copy `count` bytes from `x` into the buffer
+    virtual inline void load_binary(char* x, size_t count) override;         //!< copy `count` bytes into `x` from the buffer
+    virtual inline void load_binary_back(char* x, size_t count) override;    //!< copy `count` bytes into `x` from the back of the buffer
 
     void                clear()                                     { buffer.clear(); reset(); }
     void                wipe()                                      { std::vector<char>().swap(buffer); reset(); }
