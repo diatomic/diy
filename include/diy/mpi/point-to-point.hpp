@@ -33,8 +33,11 @@ namespace detail
     status operator()(MPI_Comm comm, int source, int tag, T& x) const
     {
       typedef       mpi_datatype<T>     Datatype;
-      status s(Datatype::datatype());
-      MPI_Recv(&x, 1, get_mpi_datatype<T>(), source, tag, comm, &s.s);
+      status s;
+      MPI_Recv((void*) Datatype::address(x),
+                Datatype::count(x),
+                Datatype::datatype(),
+                source, tag, comm, &s.s);
       return s;
     }
   };
