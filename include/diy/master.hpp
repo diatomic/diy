@@ -85,18 +85,28 @@ namespace diy
         size_t  size;
       };
 
-      struct InFlight
+      struct InFlightSend
       {
-        MemoryBuffer        message;
-        mpi::request        request;
+        std::shared_ptr<MemoryBuffer> message;
+        mpi::request                  request;
 
         // for debug purposes:
         int from, to;
       };
-      struct Collective;
-      struct tags       { enum { queue }; };
 
-      typedef           std::list<InFlight>                 InFlightList;
+      struct InFlightRecv
+      {
+        InFlightRecv() : from(-1), to(-1) {}
+
+        MemoryBuffer message;
+        int from, to;
+      };
+
+      struct Collective;
+      struct tags       { enum { queue, piece }; };
+
+      typedef           std::list<InFlightSend>             InFlightSendsList;
+      typedef           std::map<int, InFlightRecv>         InFlightRecvsMap;
       typedef           std::list<int>                      ToSendList;         // [gid]
       typedef           std::list<Collective>               CollectivesList;
       typedef           std::map<int, CollectivesList>      CollectivesMap;     // gid          -> [collectives]
@@ -155,7 +165,6 @@ namespace diy
                       storage_(storage),
                       // Communicator functionality
                       comm_(comm),
-                      inflight_size_(0),
                       expected_(0),
                       received_(0),
                       immediate_(true)
@@ -284,8 +293,8 @@ namespace diy
       mpi::communicator     comm_;
       IncomingQueuesMap     incoming_;
       OutgoingQueuesMap     outgoing_;
-      InFlightList          inflight_;
-      size_t                inflight_size_;
+      InFlightSendsList     inflight_sends_;
+      InFlightRecvsMap      inflight_recvs_;
       CollectivesMap        collectives_;
       int                   expected_;
       int                   received_;
@@ -775,13 +784,47 @@ exchange()
   log->debug("Finished exchange");
 }
 
+namespace diy
+{
+namespace detail
+{
+  template <typename T>
+  struct VectorWindow
+  {
+    T *begin;
+    size_t count;
+  };
+} // namespace detail
+
+namespace mpi
+{
+namespace detail
+{
+  template<typename T>  struct is_mpi_datatype< diy::detail::VectorWindow<T> > { typedef true_type type; };
+
+  template <typename T>
+  struct mpi_datatype< diy::detail::VectorWindow<T> >
+  {
+    typedef diy::detail::VectorWindow<T> VecWin;
+    static MPI_Datatype         datatype()                { return get_mpi_datatype<T>(); }
+    static const void*          address(const VecWin& x)  { return x.begin; }
+    static void*                address(VecWin& x)        { return x.begin; }
+    static int                  count(const VecWin& x)    { return static_cast<int>(x.count); }
+  };
+}
+} // namespace mpi::detail
+
+} // namespace diy
+
 /* Communicator */
 void
 diy::Master::
 comm_exchange(ToSendList& to_send, int out_queues_limit)
 {
+  static const size_t MAX_MPI_MESSAGE_COUNT = INT_MAX;
+
   // isend outgoing queues, up to the out_queues_limit
-  while(inflight_size_ < (size_t)out_queues_limit && !to_send.empty())
+  while(inflight_sends_.size() < (size_t)out_queues_limit && !to_send.empty())
   {
     int from = to_send.front();
 
@@ -860,13 +903,53 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
         continue;
       }
 
-      inflight_.push_back(InFlight()); ++inflight_size_;
-      inflight_.back().from = from;
-      inflight_.back().to   = to;
-      MemoryBuffer& bb = inflight_.back().message;
-      bb.swap(it->second);
-      diy::save(bb, std::make_pair(from, to));
-      inflight_.back().request = comm_.isend(proc, tags::queue, bb.buffer);
+      std::shared_ptr<MemoryBuffer> buffer = std::make_shared<MemoryBuffer>();
+      buffer->swap(it->second);
+
+      std::pair<int, int> tail = std::make_pair(from, to);
+      if (buffer->size() <= (MAX_MPI_MESSAGE_COUNT - sizeof(tail)))
+      {
+        diy::save(*buffer, tail);
+
+        inflight_sends_.emplace_back();
+        inflight_sends_.back().from = from;
+        inflight_sends_.back().to   = to;
+        inflight_sends_.back().request = comm_.isend(proc, tags::queue, buffer->buffer);
+        inflight_sends_.back().message = buffer;
+      }
+      else
+      {
+        int npieces = static_cast<int>((buffer->size() + MAX_MPI_MESSAGE_COUNT - 1)/MAX_MPI_MESSAGE_COUNT);
+
+        // first send the head
+        std::shared_ptr<MemoryBuffer> hb = std::make_shared<MemoryBuffer>();
+        diy::save(*hb, buffer->size());
+        diy::save(*hb, from);
+        diy::save(*hb, to);
+
+        inflight_sends_.emplace_back();
+        inflight_sends_.back().from = from;
+        inflight_sends_.back().to   = to;
+        inflight_sends_.back().request = comm_.isend(proc, tags::piece, hb->buffer);
+        inflight_sends_.back().message = hb;
+
+        // send the message pieces
+        size_t msg_buff_idx = 0;
+        for (int i = 0; i < npieces; ++i, msg_buff_idx += MAX_MPI_MESSAGE_COUNT)
+        {
+          int tag = (i == (npieces - 1)) ? tags::queue : tags::piece;
+
+          detail::VectorWindow<char> window;
+          window.begin = &buffer->buffer[msg_buff_idx];
+          window.count = std::min(MAX_MPI_MESSAGE_COUNT, buffer->size() - msg_buff_idx);
+
+          inflight_sends_.emplace_back();
+          inflight_sends_.back().from = from;
+          inflight_sends_.back().to   = to;
+          inflight_sends_.back().request = comm_.isend(proc, tag, window);
+          inflight_sends_.back().message = buffer;
+        }
+      }
     }
   }
 
@@ -874,35 +957,71 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
   while(nudge());
 
   // check incoming queues
-  mpi::optional<mpi::status>        ostatus = comm_.iprobe(mpi::any_source, tags::queue);
+  mpi::optional<mpi::status> ostatus = comm_.iprobe(mpi::any_source, mpi::any_tag);
   while(ostatus)
   {
-    MemoryBuffer bb;
-    comm_.recv(ostatus->source(), tags::queue, bb.buffer);
+    InFlightRecv &ir = inflight_recvs_[ostatus->source()];
+    int &from = ir.from, &to = ir.to;
 
-    std::pair<int,int> from_to;
-    diy::load_back(bb, from_to);
-    int from = from_to.first;
-    int to   = from_to.second;
-
-    int size     = bb.size();
-    int external = -1;
-
-    incoming_[to].queues[from] = MemoryBuffer();
-    if (block(lid(to)) != 0 || !queue_policy_->unload_incoming(*this, from, to, size))
+    if (from == -1) // uninitialized
     {
-        incoming_[to].queues[from].swap(bb);
-        incoming_[to].queues[from].reset();     // buffer position = 0
-    } else if (queue_policy_->unload_incoming(*this, from, to, size))
-    {
-        log->debug("Directly unloading queue {} <- {}", to, from);
-        external = storage_->put(bb);           // unload directly
+      MemoryBuffer bb;
+      comm_.recv(ostatus->source(), ostatus->tag(), bb.buffer);
+
+      if (ostatus->tag() == tags::piece)
+      {
+        size_t msg_size;
+        diy::load(bb, msg_size);
+        diy::load(bb, from);
+        diy::load(bb, to);
+
+        ir.message.buffer.reserve(msg_size);
+      }
+      else // tags::queue
+      {
+        std::pair<int,int> tail;
+        diy::load_back(bb, tail);
+
+        from = tail.first;
+        to   = tail.second;
+        ir.message.swap(bb);
+      }
     }
-    incoming_[to].records[from] = QueueRecord(size, external);
+    else
+    {
+      size_t start_idx = ir.message.buffer.size();
+      size_t count = ostatus->count<char>();
+      ir.message.buffer.resize(start_idx + count);
 
-    ++received_;
+      detail::VectorWindow<char> window;
+      window.begin = &ir.message.buffer[start_idx];
+      window.count = count;
 
-    ostatus = comm_.iprobe(mpi::any_source, tags::queue);
+      comm_.recv(ostatus->source(), ostatus->tag(), window);
+    }
+
+    if (ostatus->tag() == tags::queue)
+    {
+      size_t size  = ir.message.size();
+      int external = -1;
+
+      if (block(lid(to)) != 0 || !queue_policy_->unload_incoming(*this, from, to, size))
+      {
+        incoming_[to].queues[from].swap(ir.message);
+        incoming_[to].queues[from].reset();     // buffer position = 0
+      }
+      else if (queue_policy_->unload_incoming(*this, from, to, size))
+      {
+        log->debug("Directly unloading queue {} <- {}", to, from);
+        external = storage_->put(ir.message); // unload directly
+      }
+      incoming_[to].records[from] = QueueRecord(size, external);
+
+      ++received_;
+      ir = InFlightRecv(); // reset
+    }
+
+    ostatus = comm_.iprobe(mpi::any_source, mpi::any_tag);
   }
 }
 
@@ -944,11 +1063,11 @@ flush()
     if (cur - start > wait*1000)
     {
         log->notice("Waiting in flush [{}]: {} - {} out of {}",
-                    comm_.rank(), inflight_size_, received_, expected_);
+                    comm_.rank(), inflight_sends_.size(), received_, expected_);
         wait *= 2;
     }
 #endif
-  } while (!inflight_.empty() || received_ < expected_ || !to_send.empty());
+  } while (!inflight_sends_.empty() || received_ < expected_ || !to_send.empty());
 
   outgoing_.clear();
 
@@ -1002,15 +1121,15 @@ diy::Master::
 nudge()
 {
   bool success = false;
-  for (InFlightList::iterator it = inflight_.begin(); it != inflight_.end(); ++it)
+  for (InFlightSendsList::iterator it = inflight_sends_.begin(); it != inflight_sends_.end(); ++it)
   {
     mpi::optional<mpi::status> ostatus = it->request.test();
     if (ostatus)
     {
       success = true;
-      InFlightList::iterator rm = it;
+      InFlightSendsList::iterator rm = it;
       --it;
-      inflight_.erase(rm); --inflight_size_;
+      inflight_sends_.erase(rm);
     }
   }
   return success;
