@@ -9,6 +9,7 @@ add_executable              (kd-tree-test           kd-tree.cpp)
 target_link_libraries       (kd-tree-test           ${libraries})
 
 add_executable              (decomposer-test        decomposer.cpp)
+target_link_libraries       (decomposer-test        ${libraries})
 
 add_executable              (swap-reduce-test       swap-reduce.cpp)
 target_link_libraries       (swap-reduce-test       ${libraries})
