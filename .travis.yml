@@ -1,0 +1,41 @@
+language: cpp
+
+os:   linux
+dist: trusty
+sudo: required
+
+env:
+  global:
+    - HYDRA_LAUNCHER=fork
+  matrix:
+    - COMPILER=g++-5       MPI=mpich
+    - COMPILER=g++-5       MPI=openmpi
+    - COMPILER=clang++-3.7 MPI=mpich
+    - COMPILER=clang++-3.7 MPI=openmpi
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+      - llvm-toolchain-precise-3.7
+    packages:
+      - g++-5
+      - clang-3.7
+
+matrix:
+  include:
+    - os: osx
+      env: MPI=mpich
+    - os: osx
+      osx_image: xcode8
+      env: MPI=openmpi
+
+before_script:
+  - sh conf/ci/travis-ci/install-mpi.sh $MPI
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER ..
+  - make
+
+script:
+  - ctest --output-on-failure -E simple-test    # simple-test uses more memory than Travis-CI has to offer
