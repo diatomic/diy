@@ -22,6 +22,7 @@
 #include "detail/block_traits.hpp"
 
 #include "log.hpp"
+#include "stats.hpp"
 
 namespace diy
 {
@@ -306,6 +307,7 @@ namespace diy
 
     public:
       std::shared_ptr<spd::logger>  log = get_logger();
+      stats::Profiler               prof;
   };
 
   struct Master::BaseCommand
@@ -670,6 +672,7 @@ void
 diy::Master::
 foreach_(const Callback<Block>& f, const Skip& skip)
 {
+    auto scoped = prof.scoped("foreach");
     commands_.push_back(new Command<Block>(f, skip));
 
     if (immediate())
@@ -681,6 +684,7 @@ diy::Master::
 execute()
 {
   log->debug("Entered execute()");
+  auto scoped = prof.scoped("execute");
   //show_incoming_records();
 
   // touch the outgoing and incoming queues as well as collectives to make sure they exist
@@ -763,6 +767,7 @@ void
 diy::Master::
 exchange()
 {
+  auto scoped = prof.scoped("exchange");
   execute();
 
   log->debug("Starting exchange");
@@ -1075,7 +1080,9 @@ flush()
   //show_incoming_records();
 
   process_collectives();
+  prof << "barrier";
   comm_.barrier();
+  prof >> "barrier";
 
   received_ = 0;
 }
@@ -1084,6 +1091,8 @@ void
 diy::Master::
 process_collectives()
 {
+  auto scoped = prof.scoped("collectives");
+
   if (collectives_.empty())
       return;
 

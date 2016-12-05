@@ -168,4 +168,7 @@ int main(int argc, char* argv[])
 
     // save the results in diy format
     diy::io::write_blocks("blocks.out", world, master);
+
+    if (world.rank() == 0)
+        master.prof.output(std::cout);
 }
