@@ -3,6 +3,7 @@ cmake_minimum_required      (VERSION 3.0)
 
 option                      (threads            "Build DIY with threading"                   ON)
 option                      (log                "Build DIY with logging"                     OFF)
+option                      (profile            "Build DIY with profiling"                   OFF)
 
 # Default to Release
 if                          (NOT CMAKE_BUILD_TYPE)
@@ -20,7 +21,12 @@ endif                       ()
 if                          (log)
     add_definitions         (-DDIY_USE_SPDLOG)
     find_path               (SPDLOG_INCLUDE_DIR     spdlog/spdlog.h)
-    include_directories	    (${SPDLOG_INCLUDE_DIR})
+    include_directories     (${SPDLOG_INCLUDE_DIR})
+endif()
+
+# Profiling
+if                          (profile)
+    add_definitions         (-DDIY_PROFILE)
 endif()
 
 # C++11

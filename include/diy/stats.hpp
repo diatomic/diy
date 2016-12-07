@@ -12,6 +12,7 @@ namespace diy
 namespace stats
 {
 
+#if defined(DIY_PROFILE)
 struct Profiler
 {
     using   Clock = std::chrono::high_resolution_clock;
@@ -89,7 +90,25 @@ struct Profiler
         Time            start;
         EventsVector    events;
 };
+#else
+struct Profiler
+{
+    struct Scoped {};
 
+    void    reset_time()                                {}
+
+    void    operator<<(std::string)                     {}
+    void    operator>>(std::string)                     {}
+
+    void    enter(const std::string&)                   {}
+    void    exit(const std::string&)                    {}
+
+    void    output(std::ostream&)                       {}
+    void    clear()                                     {}
+
+    Scoped  scoped(std::string)                         { return Scoped(); }
+};
+#endif
 }
 }
 

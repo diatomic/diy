@@ -57,6 +57,9 @@ set_logger(Args... args)
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/null_sink.h>
 
+#include <spdlog/fmt/bundled/format.h>
+#include <spdlog/fmt/bundled/ostream.h>
+
 namespace diy
 {
 
