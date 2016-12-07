@@ -94,11 +94,13 @@ TEST_CASE_METHOD(SimpleFixture, "Send/Recv Test", "[simple]")
 
   // atleast one message needs to be >2GB to test for the case of multi-piece
   // messages
-  std::size_t sizes[11] = { 288, 128, 64, 32, 64, 32, 32, 64, 32, 32 };
+  static const std::size_t sizes[] = { 288, 128, 64, 32, 64, 32, 32, 64, 32, 32 };
+  static const int num_sizes = sizeof(sizes)/sizeof(sizes[0]);
+
   std::vector<std::size_t> block_sizes(nblocks);
   for (int i = 0; i < nblocks; ++i)
   {
-    block_sizes[i] = sizes[i%11];
+    block_sizes[i] = sizes[i%num_sizes];
   }
   std::shuffle(block_sizes.begin(), block_sizes.end(), std::default_random_engine(nblocks));
 
