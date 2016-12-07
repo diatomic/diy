@@ -86,21 +86,25 @@ namespace diy
         size_t  size;
       };
 
+      struct MessageInfo
+      {
+        int from, to;
+        int round;
+      };
+
       struct InFlightSend
       {
         std::shared_ptr<MemoryBuffer> message;
         mpi::request                  request;
 
         // for debug purposes:
-        int from, to;
+        MessageInfo info;
       };
 
       struct InFlightRecv
       {
-        InFlightRecv() : from(-1), to(-1) {}
-
         MemoryBuffer message;
-        int from, to;
+        MessageInfo info{ -1, -1, -1 };
       };
 
       struct Collective;
@@ -139,6 +143,13 @@ namespace diy
       typedef           std::map<int,     IncomingQueuesRecords>    IncomingQueuesMap;  //  gid         -> {  gid       -> queue }
       typedef           std::map<int,     OutgoingQueuesRecord>     OutgoingQueuesMap;  //  gid         -> { (gid,proc) -> queue }
 
+      struct IncomingRound
+      {
+        IncomingQueuesMap map;
+        int received{0};
+      };
+      typedef std::map<int, IncomingRound> IncomingRoundMap;
+
 
     public:
      /**
@@ -167,7 +178,7 @@ namespace diy
                       // Communicator functionality
                       comm_(comm),
                       expected_(0),
-                      received_(0),
+                      exchange_round_(-1),
                       immediate_(true)
                                                         {}
                     ~Master()                           { set_immediate(true); clear(); delete queue_policy_; }
@@ -252,10 +263,19 @@ namespace diy
 
     public:
       // Communicator functionality
-      IncomingQueues&   incoming(int gid)               { return incoming_[gid].queues; }
+      IncomingQueues&   incoming(int gid)               { return incoming_[exchange_round_].map[gid].queues; }
       OutgoingQueues&   outgoing(int gid)               { return outgoing_[gid].queues; }
       CollectivesList&  collectives(int gid)            { return collectives_[gid]; }
-      size_t            incoming_count(int gid) const   { IncomingQueuesMap::const_iterator it = incoming_.find(gid); if (it == incoming_.end()) return 0; return it->second.queues.size(); }
+      size_t            incoming_count(int gid) const
+      {
+        IncomingRoundMap::const_iterator round_it = incoming_.find(exchange_round_);
+        if (round_it == incoming_.end())
+          return 0;
+        IncomingQueuesMap::const_iterator queue_it = round_it->second.map.find(gid);
+        if (queue_it == round_it->second.map.end())
+          return 0;
+        return queue_it->second.queues.size();
+      }
       size_t            outgoing_count(int gid) const   { OutgoingQueuesMap::const_iterator it = outgoing_.find(gid); if (it == outgoing_.end()) return 0; return it->second.queues.size(); }
 
       void              set_expected(int expected)      { expected_ = expected; }
@@ -292,13 +312,13 @@ namespace diy
     private:
       // Communicator
       mpi::communicator     comm_;
-      IncomingQueuesMap     incoming_;
+      IncomingRoundMap      incoming_;
       OutgoingQueuesMap     outgoing_;
       InFlightSendsList     inflight_sends_;
       InFlightRecvsMap      inflight_recvs_;
       CollectivesMap        collectives_;
       int                   expected_;
-      int                   received_;
+      int                   exchange_round_;
       bool                  immediate_;
       Commands              commands_;
 
@@ -404,6 +424,8 @@ struct diy::Master::ProcessBlock
               break;
           }
       }
+
+      IncomingQueuesMap &current_incoming = master.incoming_[master.exchange_round_].map;
       if (skip_block)
       {
           if (master.block(i) == 0)
@@ -414,8 +436,8 @@ struct diy::Master::ProcessBlock
               master.commands_[cmd]->execute(0, master.proxy(i));  // 0 signals that we are skipping the block (even if it's loaded)
 
               // no longer need them, so get rid of them, rather than risk reloading
-              master.incoming_[master.gid(i)].queues.clear();
-              master.incoming_[master.gid(i)].records.clear();
+              current_incoming[master.gid(i)].queues.clear();
+              current_incoming[master.gid(i)].records.clear();
           }
 
           if (master.block(i) == 0)
@@ -437,8 +459,8 @@ struct diy::Master::ProcessBlock
               master.commands_[cmd]->execute(master.block(i), master.proxy(i));
 
               // no longer need them, so get rid of them
-              master.incoming_[master.gid(i)].queues.clear();
-              master.incoming_[master.gid(i)].records.clear();
+              current_incoming[master.gid(i)].queues.clear();
+              current_incoming[master.gid(i)].records.clear();
           }
       }
     } while(true);
@@ -491,14 +513,22 @@ void
 diy::Master::
 unload_incoming(int gid)
 {
-  IncomingQueuesRecords& in_qrs = incoming_[gid];
-  for (InQueueRecords::iterator it = in_qrs.records.begin(); it != in_qrs.records.end(); ++it)
+  for (IncomingRoundMap::iterator round_itr = incoming_.begin(); round_itr != incoming_.end(); ++round_itr)
   {
-    QueueRecord& qr = it->second;
-    if (queue_policy_->unload_incoming(*this, it->first, gid, qr.size))
+    IncomingQueuesMap::iterator qmap_itr = round_itr->second.map.find(gid);
+    if (qmap_itr == round_itr->second.map.end())
     {
+      continue;
+    }
+    IncomingQueuesRecords& in_qrs = qmap_itr->second;
+    for (InQueueRecords::iterator it = in_qrs.records.begin(); it != in_qrs.records.end(); ++it)
+    {
+      QueueRecord& qr = it->second;
+      if (queue_policy_->unload_incoming(*this, it->first, gid, qr.size))
+      {
         log->debug("Unloading queue: {} <- {}", gid, it->first);
         qr.external = storage_->put(in_qrs.queues[it->first]);
+      }
     }
   }
 }
@@ -580,7 +610,7 @@ void
 diy::Master::
 load_incoming(int gid)
 {
-  IncomingQueuesRecords& in_qrs = incoming_[gid];
+  IncomingQueuesRecords& in_qrs = incoming_[exchange_round_].map[gid];
   for (InQueueRecords::iterator it = in_qrs.records.begin(); it != in_qrs.records.end(); ++it)
   {
     QueueRecord& qr = it->second;
@@ -657,7 +687,7 @@ bool
 diy::Master::
 has_incoming(int i) const
 {
-  const IncomingQueuesRecords& in_qrs = const_cast<Master&>(*this).incoming_[gid(i)];
+  const IncomingQueuesRecords& in_qrs = const_cast<Master&>(*this).incoming_[exchange_round_].map[gid(i)];
   for (InQueueRecords::const_iterator it = in_qrs.records.begin(); it != in_qrs.records.end(); ++it)
   {
     const QueueRecord& qr = it->second;
@@ -752,7 +782,7 @@ execute()
   }
 
   // clear incoming queues
-  incoming_.clear();
+  incoming_[exchange_round_].map.clear();
 
   if (limit() != -1 && in_memory() > limit())
       throw std::runtime_error(fmt::format("Fatal: {} blocks in memory, with limit {}", in_memory(), limit()));
@@ -828,6 +858,7 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
 {
   static const size_t MAX_MPI_MESSAGE_COUNT = INT_MAX;
 
+  IncomingRound &current_incoming = incoming_[exchange_round_];
   // isend outgoing queues, up to the out_queues_limit
   while(inflight_sends_.size() < (size_t)out_queues_limit && !to_send.empty())
   {
@@ -840,7 +871,7 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
 
       log->debug("Processing local queue: {} <- {} of size {}", to, from, it->second.size);
 
-      QueueRecord& in_qr  = incoming_[to].records[from];
+      QueueRecord& in_qr  = current_incoming.map[to].records[from];
       bool in_external  = block(lid(to)) == 0;
 
       if (in_external)
@@ -854,9 +885,9 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
           MemoryBuffer bb;
           storage_->get(it->second.external, bb);
 
-          incoming_[to].queues[from].swap(bb);
+          current_incoming.map[to].queues[from].swap(bb);
       }
-      ++received_;
+      ++current_incoming.received;
     }
     outgoing_[from].external_local.clear();
 
@@ -871,14 +902,14 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
       int     to      = to_proc.gid;
       int     proc    = to_proc.proc;
 
-    log->debug("Processing queue:      {} <- {} of size {}", to, from, outgoing_[from].queues[to_proc].size());
+      log->debug("Processing queue:      {} <- {} of size {}", to, from, outgoing_[from].queues[to_proc].size());
 
       // There may be local outgoing queues that remained in memory
       if (proc == comm_.rank())     // sending to ourselves: simply swap buffers
       {
         log->debug("Moving queue in-place: {} <- {}", to, from);
 
-        QueueRecord& in_qr  = incoming_[to].records[from];
+        QueueRecord& in_qr  = current_incoming.map[to].records[from];
         bool in_external  = block(lid(to)) == 0;
         if (in_external)
         {
@@ -889,7 +920,7 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
             in_qr.external = storage_->put(bb);
           else
           {
-            MemoryBuffer& in_bb = incoming_[to].queues[from];
+            MemoryBuffer& in_bb = current_incoming.map[to].queues[from];
             in_bb.swap(bb);
             in_bb.reset();
             in_qr.external = -1;
@@ -897,28 +928,27 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
         } else        // !in_external
         {
           log->debug("Swapping in memory:    {} <- {}", to, from);
-          MemoryBuffer& bb = incoming_[to].queues[from];
+          MemoryBuffer& bb = current_incoming.map[to].queues[from];
           bb.swap(it->second);
           bb.reset();
           in_qr.size = bb.size();
           in_qr.external = -1;
         }
 
-        ++received_;
+        ++current_incoming.received;
         continue;
       }
 
       std::shared_ptr<MemoryBuffer> buffer = std::make_shared<MemoryBuffer>();
       buffer->swap(it->second);
 
-      std::pair<int, int> tail = std::make_pair(from, to);
-      if (buffer->size() <= (MAX_MPI_MESSAGE_COUNT - sizeof(tail)))
+      MessageInfo info{from, to, exchange_round_};
+      if (buffer->size() <= (MAX_MPI_MESSAGE_COUNT - sizeof(info)))
       {
-        diy::save(*buffer, tail);
+        diy::save(*buffer, info);
 
         inflight_sends_.emplace_back();
-        inflight_sends_.back().from = from;
-        inflight_sends_.back().to   = to;
+        inflight_sends_.back().info = info;
         inflight_sends_.back().request = comm_.isend(proc, tags::queue, buffer->buffer);
         inflight_sends_.back().message = buffer;
       }
@@ -929,12 +959,10 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
         // first send the head
         std::shared_ptr<MemoryBuffer> hb = std::make_shared<MemoryBuffer>();
         diy::save(*hb, buffer->size());
-        diy::save(*hb, from);
-        diy::save(*hb, to);
+        diy::save(*hb, info);
 
         inflight_sends_.emplace_back();
-        inflight_sends_.back().from = from;
-        inflight_sends_.back().to   = to;
+        inflight_sends_.back().info = info;
         inflight_sends_.back().request = comm_.isend(proc, tags::piece, hb->buffer);
         inflight_sends_.back().message = hb;
 
@@ -949,8 +977,7 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
           window.count = std::min(MAX_MPI_MESSAGE_COUNT, buffer->size() - msg_buff_idx);
 
           inflight_sends_.emplace_back();
-          inflight_sends_.back().from = from;
-          inflight_sends_.back().to   = to;
+          inflight_sends_.back().info = info;
           inflight_sends_.back().request = comm_.isend(proc, tag, window);
           inflight_sends_.back().message = buffer;
         }
@@ -966,9 +993,8 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
   while(ostatus)
   {
     InFlightRecv &ir = inflight_recvs_[ostatus->source()];
-    int &from = ir.from, &to = ir.to;
 
-    if (from == -1) // uninitialized
+    if (ir.info.from == -1) // uninitialized
     {
       MemoryBuffer bb;
       comm_.recv(ostatus->source(), ostatus->tag(), bb.buffer);
@@ -977,18 +1003,13 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
       {
         size_t msg_size;
         diy::load(bb, msg_size);
-        diy::load(bb, from);
-        diy::load(bb, to);
+        diy::load(bb, ir.info);
 
         ir.message.buffer.reserve(msg_size);
       }
       else // tags::queue
       {
-        std::pair<int,int> tail;
-        diy::load_back(bb, tail);
-
-        from = tail.first;
-        to   = tail.second;
+        diy::load_back(bb, ir.info);
         ir.message.swap(bb);
       }
     }
@@ -1008,21 +1029,28 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
     if (ostatus->tag() == tags::queue)
     {
       size_t size  = ir.message.size();
+      int from = ir.info.from;
+      int to = ir.info.to;
       int external = -1;
 
-      if (block(lid(to)) != 0 || !queue_policy_->unload_incoming(*this, from, to, size))
-      {
-        incoming_[to].queues[from].swap(ir.message);
-        incoming_[to].queues[from].reset();     // buffer position = 0
-      }
-      else if (queue_policy_->unload_incoming(*this, from, to, size))
+      assert(ir.info.round >= exchange_round_);
+      IncomingRound *in = &incoming_[ir.info.round];
+
+      bool unload_queue = ((ir.info.round == exchange_round_) ? (block(lid(to)) == 0) : (limit_ != -1)) &&
+                          queue_policy_->unload_incoming(*this, from, to, size);
+      if (unload_queue)
       {
         log->debug("Directly unloading queue {} <- {}", to, from);
         external = storage_->put(ir.message); // unload directly
       }
-      incoming_[to].records[from] = QueueRecord(size, external);
+      else
+      {
+        in->map[to].queues[from].swap(ir.message);
+        in->map[to].queues[from].reset();     // buffer position = 0
+      }
+      in->map[to].records[from] = QueueRecord(size, external);
 
-      ++received_;
+      ++(in->received);
       ir = InFlightRecv(); // reset
     }
 
@@ -1038,6 +1066,10 @@ flush()
   time_type start = get_time();
   unsigned wait = 1;
 #endif
+
+  // prepare for next round
+  incoming_.erase(exchange_round_);
+  ++exchange_round_;
 
   // make a list of outgoing queues to send (the ones in memory come first)
   ToSendList    to_send;
@@ -1068,11 +1100,11 @@ flush()
     if (cur - start > wait*1000)
     {
         log->notice("Waiting in flush [{}]: {} - {} out of {}",
-                    comm_.rank(), inflight_sends_.size(), received_, expected_);
+                    comm_.rank(), inflight_sends_.size(), incoming_[exchange_round_].received, expected_);
         wait *= 2;
     }
 #endif
-  } while (!inflight_sends_.empty() || received_ < expected_ || !to_send.empty());
+  } while (!inflight_sends_.empty() || incoming_[exchange_round_].received < expected_ || !to_send.empty());
 
   outgoing_.clear();
 
@@ -1080,11 +1112,6 @@ flush()
   //show_incoming_records();
 
   process_collectives();
-  prof << "barrier";
-  comm_.barrier();
-  prof >> "barrier";
-
-  received_ = 0;
 }
 
 void
@@ -1148,23 +1175,28 @@ void
 diy::Master::
 show_incoming_records() const
 {
-  for (IncomingQueuesMap::const_iterator it = incoming_.begin(); it != incoming_.end(); ++it)
+  for (IncomingRoundMap::const_iterator rounds_itr = incoming_.begin(); rounds_itr != incoming_.end(); ++rounds_itr)
   {
-    const IncomingQueuesRecords& in_qrs = it->second;
-    for (InQueueRecords::const_iterator cur = in_qrs.records.begin(); cur != in_qrs.records.end(); ++cur)
+    for (IncomingQueuesMap::const_iterator it = rounds_itr->second.map.begin(); it != rounds_itr->second.map.end(); ++it)
     {
-      const QueueRecord& qr = cur->second;
-      log->info("{} <- {}: (size,external) = ({},{})",
-                it->first, cur->first,
-                qr.size,
-                qr.external);
-    }
-    for (IncomingQueues::const_iterator cur = in_qrs.queues.begin(); cur != in_qrs.queues.end(); ++cur)
-    {
-      log->info("{} <- {}: queue.size() = {}",
-                it->first, cur->first,
-                const_cast<IncomingQueuesRecords&>(in_qrs).queues[cur->first].size());
+      const IncomingQueuesRecords& in_qrs = it->second;
+      for (InQueueRecords::const_iterator cur = in_qrs.records.begin(); cur != in_qrs.records.end(); ++cur)
+      {
+        const QueueRecord& qr = cur->second;
+        log->info("round: {}, {} <- {}: (size,external) = ({},{})",
+                  rounds_itr->first,
+                  it->first, cur->first,
+                  qr.size,
+                  qr.external);
       }
+      for (IncomingQueues::const_iterator cur = in_qrs.queues.begin(); cur != in_qrs.queues.end(); ++cur)
+      {
+        log->info("round: {}, {} <- {}: queue.size() = {}",
+                  rounds_itr->first,
+                  it->first, cur->first,
+                  const_cast<IncomingQueuesRecords&>(in_qrs).queues[cur->first].size());
+      }
+    }
   }
 }
 
