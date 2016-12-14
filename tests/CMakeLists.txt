@@ -14,6 +14,9 @@ target_link_libraries       (decomposer-test        ${libraries})
 add_executable              (swap-reduce-test       swap-reduce.cpp)
 target_link_libraries       (swap-reduce-test       ${libraries})
 
+add_executable              (merge-swap-reduce-test merge-swap-reduce.cpp)
+target_link_libraries       (merge-swap-reduce-test ${libraries})
+
 add_executable              (io-test                io.cpp)
 target_link_libraries       (io-test                ${libraries})
 
@@ -30,5 +33,7 @@ add_test                    (io-test                            io-test)
 
 add_test                    (swap-reduce-test                   scripts/swap-reduce.sh)
 add_test                    (swap-reduce-test-k4                scripts/swap-reduce.sh -k 4)
+
+add_test                    (merge-swap-reduce-test             scripts/merge-swap-reduce.sh ${MPIEXEC})
 
 add_test                    (simple-test                        scripts/simple.sh ${MPIEXEC})
