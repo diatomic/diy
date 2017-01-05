@@ -18,12 +18,9 @@ namespace spd
         template <typename... Args> void trace(const char* fmt, const Args&... args)    {}
         template <typename... Args> void debug(const char* fmt, const Args&... args)    {}
         template <typename... Args> void info(const char* fmt, const Args&... args)     {}
-        template <typename... Args> void notice(const char* fmt, const Args&... args)   {}
         template <typename... Args> void warn(const char* fmt, const Args&... args)     {}
         template <typename... Args> void error(const char* fmt, const Args&... args)    {}
         template <typename... Args> void critical(const char* fmt, const Args&... args) {}
-        template <typename... Args> void alert(const char* fmt, const Args&... args)    {}
-        template <typename... Args> void emerg(const char* fmt, const Args&... args)    {}
     };
 }
 
