@@ -9,9 +9,9 @@ int main(int argc, char** argv)
   mpi::environment  env(argc, argv);        // RAII
   mpi::communicator world;
 
-  if (world.size() < 2)
+  if (world.size() != 2)
   {
-    std::cout << "Need at least 2 processes" << std::endl;
+    std::cout << "Need exactly 2 processes" << std::endl;
     return 1;
   }
 
