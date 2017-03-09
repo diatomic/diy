@@ -30,9 +30,10 @@ The default (unspecialized) version of `diy::Serialization<T>` copies
 via `diy::BinaryBuffer::save_binary()` and `diy::BinaryBuffer::load_binary()`.
 This works out perfectly for plain old data (e.g., simple structs), but
 to save a more complicated type, one has to specialize
-`diy::Serialization<T>`. Specializations are already provided for
-`std::vector<T>`, `std::map<K,V>`, and `std::pair<T,U>`.
-As a result one can quickly add a specialization of one's own:
+`diy::Serialization<T>`. (Specializations are already provided for many of the STL types, for example,
+`std::vector<T>`, `std::map<K,V>`, `std::pair<T,U>`, `std::valarray<T>`, `std::string`, `std::set<T>`,
+`std::unordered_map<K,V>`, `std::unordered_set<T>`, `std::tuple<Args...>`.)
+As a result, one can quickly add a specialization of one's own:
 
 ~~~~{.cpp}
 struct Point
