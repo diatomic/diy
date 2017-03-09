@@ -84,6 +84,7 @@ Components
  - \ref Communication
  - \ref Callbacks
  - \ref Immediate
+ - \ref IO
  - \ref Examples
 
  - diy::Master
@@ -91,7 +92,6 @@ Components
  - diy::Assigner
  - diy::FileStorage
  - [MPI wrapper](\ref MPI) for convenience.
- - IO
 
 Download
 --------
