@@ -8,7 +8,6 @@ var searchData=
   ['incominground',['IncomingRound',['../structdiy_1_1_master_1_1_incoming_round.html',1,'diy::Master']]],
   ['inflightrecv',['InFlightRecv',['../structdiy_1_1_master_1_1_in_flight_recv.html',1,'diy::Master']]],
   ['inflightsend',['InFlightSend',['../structdiy_1_1_master_1_1_in_flight_send.html',1,'diy::Master']]],
-  ['initialization',['Initialization',['../group___initialization.html',1,'']]],
   ['interval',['interval',['../namespacediy.html#ad1fd3af6d561c31897636040e023a101',1,'diy']]],
   ['intformatspec',['IntFormatSpec',['../classfmt_1_1_int_format_spec.html',1,'fmt']]],
   ['inttraits',['IntTraits',['../structfmt_1_1internal_1_1_int_traits.html',1,'fmt::internal']]],
@@ -17,6 +16,5 @@ var searchData=
   ['irecv',['irecv',['../classdiy_1_1mpi_1_1communicator.html#ac8953e70e3bb38f820279f2e3c57e9ff',1,'diy::mpi::communicator']]],
   ['isend',['isend',['../classdiy_1_1mpi_1_1communicator.html#ac30151886b5c0927314e051ccac2a69b',1,'diy::mpi::communicator']]],
   ['immediate',['immediate',['../md_docs_detail_immediate.html',1,'']]],
-  ['initialization',['initialization',['../md_docs_detail_initialization.html',1,'']]],
   ['io',['io',['../md_docs_detail_io.html',1,'']]]
 ];

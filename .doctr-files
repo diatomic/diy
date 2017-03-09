@@ -197,9 +197,9 @@
 ./group___examples.html
 ./group___i_o.html
 ./group___immediate.html
-./group___initialization.html
 ./group___m_p_i.html
 ./group___serialization.html
+./group___tutorial.html
 ./hierarchy.html
 ./index.html
 ./io_2test-io_8cpp-example.html
@@ -215,10 +215,10 @@
 ./md_docs_detail_decomposition.html
 ./md_docs_detail_examples.html
 ./md_docs_detail_immediate.html
-./md_docs_detail_initialization.html
 ./md_docs_detail_io.html
 ./md_docs_detail_mpi.html
 ./md_docs_detail_serialization.html
+./md_docs_detail_tutorial.html
 ./merge_8hpp_source.html
 ./modules.html
 ./mpi_2collectives_8hpp_source.html
@@ -389,6 +389,8 @@
 ./search/groups_5.js
 ./search/groups_6.html
 ./search/groups_6.js
+./search/groups_7.html
+./search/groups_7.js
 ./search/mag_sel.png
 ./search/namespaces_0.html
 ./search/namespaces_0.js
@@ -407,6 +409,8 @@
 ./search/pages_5.js
 ./search/pages_6.html
 ./search/pages_6.js
+./search/pages_7.html
+./search/pages_7.js
 ./search/search.css
 ./search/search.js
 ./search/search_l.png

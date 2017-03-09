@@ -245,7 +245,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;</div>
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;</div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00164"></a><span class="lineno"><a class="line" href="group___initialization.html#ga41e082628686ec3e798171b20ccced63">  164</a></span>&#160;                    <a class="code" href="group___initialization.html#ga41e082628686ec3e798171b20ccced63">Master</a>(<a class="code" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a>    comm,          </div>
+<div class="line"><a name="l00164"></a><span class="lineno"><a class="line" href="classdiy_1_1_master.html#a41e082628686ec3e798171b20ccced63">  164</a></span>&#160;                    <a class="code" href="classdiy_1_1_master.html#a41e082628686ec3e798171b20ccced63">Master</a>(<a class="code" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a>    comm,          </div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;                           <span class="keywordtype">int</span>                  threads  = 1,  </div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;                           <span class="keywordtype">int</span>                  limit    = -1, </div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;                           CreateBlock          create   = 0,  </div>
@@ -418,7 +418,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;                f(f_), s(s_)                                                        {}</div>
 <div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;</div>
 <div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;      <span class="keywordtype">void</span>  execute(<span class="keywordtype">void</span>* b, <span class="keyword">const</span> ProxyWithLink&amp; cp)<span class="keyword"> const override                </span>{ f(static_cast&lt;Block*&gt;(b), cp); }</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;      <span class="keywordtype">bool</span>  skip(<span class="keywordtype">int</span> i, <span class="keyword">const</span> <a class="code" href="group___initialization.html#ga41e082628686ec3e798171b20ccced63">Master</a>&amp; m)<span class="keyword"> const override                             </span>{ <span class="keywordflow">return</span> s(i,m); }</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;      <span class="keywordtype">bool</span>  skip(<span class="keywordtype">int</span> i, <span class="keyword">const</span> <a class="code" href="classdiy_1_1_master.html#a41e082628686ec3e798171b20ccced63">Master</a>&amp; m)<span class="keyword"> const override                             </span>{ <span class="keywordflow">return</span> s(i,m); }</div>
 <div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;</div>
 <div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;      Callback&lt;Block&gt;   f;</div>
 <div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;      Skip              s;</div>
@@ -1299,9 +1299,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="structdiy_1_1lock__guard_html"><div class="ttname"><a href="structdiy_1_1lock__guard.html">diy::lock_guard</a></div><div class="ttdef"><b>Definition:</b> no-thread.hpp:27</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_skip_no_incoming_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_skip_no_incoming.html">diy::Master::SkipNoIncoming</a></div><div class="ttdef"><b>Definition:</b> master.hpp:353</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_queue_policy_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_queue_policy.html">diy::Master::QueuePolicy</a></div><div class="ttdef"><b>Definition:</b> master.hpp:72</div></div>
+<div class="ttc" id="classdiy_1_1_master_html_a41e082628686ec3e798171b20ccced63"><div class="ttname"><a href="classdiy_1_1_master.html#a41e082628686ec3e798171b20ccced63">diy::Master::Master</a></div><div class="ttdeci">Master(mpi::communicator comm, int threads=1, int limit=-1, CreateBlock create=0, DestroyBlock destroy=0, ExternalStorage *storage=0, SaveBlock save=0, LoadBlock load=0, QueuePolicy *q_policy=new QueueSizePolicy(4096))</div><div class="ttdoc">The main DIY object. </div><div class="ttdef"><b>Definition:</b> master.hpp:164</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_base_command_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_base_command.html">diy::Master::BaseCommand</a></div><div class="ttdef"><b>Definition:</b> master.hpp:333</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_command_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_command.html">diy::Master::Command</a></div><div class="ttdef"><b>Definition:</b> master.hpp:47</div></div>
-<div class="ttc" id="group___initialization_html_ga41e082628686ec3e798171b20ccced63"><div class="ttname"><a href="group___initialization.html#ga41e082628686ec3e798171b20ccced63">diy::Master::Master</a></div><div class="ttdeci">Master(mpi::communicator comm, int threads=1, int limit=-1, CreateBlock create=0, DestroyBlock destroy=0, ExternalStorage *storage=0, SaveBlock save=0, LoadBlock load=0, QueuePolicy *q_policy=new QueueSizePolicy(4096))</div><div class="ttdoc">The main DIY object. </div><div class="ttdef"><b>Definition:</b> master.hpp:164</div></div>
 <div class="ttc" id="classdiy_1_1_master_html_a78c622d124589e8e8be7fa7041a5f21c"><div class="ttname"><a href="classdiy_1_1_master.html#a78c622d124589e8e8be7fa7041a5f21c">diy::Master::communicator</a></div><div class="ttdeci">const mpi::communicator &amp; communicator() const </div><div class="ttdoc">return the MPI communicator </div><div class="ttdef"><b>Definition:</b> master.hpp:212</div></div>
 <div class="ttc" id="classdiy_1_1_master_html_a4e8f7b4f8af7041559385b54e82d0f1c"><div class="ttname"><a href="classdiy_1_1_master.html#a4e8f7b4f8af7041559385b54e82d0f1c">diy::Master::release</a></div><div class="ttdeci">void * release(int i)</div><div class="ttdoc">release ownership of the block </div><div class="ttdef"><b>Definition:</b> master.hpp:678</div></div>
 <div class="ttc" id="structdiy_1_1mpi_1_1request_html"><div class="ttname"><a href="structdiy_1_1mpi_1_1request.html">diy::mpi::request</a></div><div class="ttdef"><b>Definition:</b> request.hpp:5</div></div>
@@ -1321,7 +1321,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 9 2017 19:45:56 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Mar 9 2017 20:38:25 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
