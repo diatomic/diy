@@ -38,13 +38,13 @@ demonstrates how to decompose a regular grid into blocks and create links betwee
   blocks defined with an AddBlock functor (i.e.,
   the "long" form of the block creator) are decomposed by providing the block creator to the
   decomposer. This example shows how to set shared faces, ghost regions, and periodic
-  boundaries in the decomposition. It also shows both how to create a ```RegularDecomposer```
-  and call its ```decompose``` member function, as well as how to combine those two steps using
+  boundaries in the decomposition. It also shows both how to create a `RegularDecomposer`
+  and call its `decompose` member function, as well as how to combine those two steps using
   one helper function.
 
   - (*commented*) [regular-decomposer-short.cpp](\ref decomposition/regular-decomposer-short.cpp):
   blocks defined without the AddBlock functor or
-  the long form of the block create function (i.e., using a simple ```void * create()```
+  the long form of the block create function (i.e., using a simple `void * create()`
   function ("short form") can be decomposed just by providing the master object to the
   decomposer. This example shows how.
 

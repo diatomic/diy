@@ -78,7 +78,7 @@ More information about getting started creating blocks, assigning them to proces
 Components
 ----------
 
- - \ref Initialization
+ - \ref Tutorial
  - \ref Serialization
  - \ref Decomposition
  - \ref Communication
