@@ -2,5 +2,5 @@
 set -e
 doxygen
 pip3 install doctr
-doctr deploy
+doctr deploy --built-docs docs/html
 
