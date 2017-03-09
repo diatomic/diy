@@ -7,31 +7,14 @@ Example     {#decomposition-example}
 
 ~~~{.cpp}
 
-// block create function or AddBlock functor with
-// overloaded function call of the same signature
+// callback function signature
 void create(int gid,
             const Bounds& core,
             const Bounds& bounds,
             const Bounds& domain,
             const diy::Link& link);
 
-// --- or ---
-
-// functor to add blocks to master
-struct AddBlock
-{
-  void operator()(int gid,
-                  const Bounds& core,
-                  const Bounds& bounds,
-                  const Bounds& domain,
-                  const diy::Link& link)
-   const
-   {
-     ...
-   }
-}                                                   create;
-
-diy::Master(...)                                    master;
+diy::Master                                         master(...);
 
 // share_face is a vector of bools indicating whether faces are shared in each dimension
 // uninitialized values default to false
@@ -46,47 +29,20 @@ diy::RegularDecomposer<Bounds>::BoolVector          wrap;
 diy::RegularDecomposer<Bounds>::CoordinateVector    ghosts;
 
 
-// --- various ways to decompose a 3D domain follow (choose one) ---
-
-
-// use a helper function given the AddBlock functor or a
-// create function of the signature above
-diy::decompose(dim,
-               rank,
-               domain,
-               assigner,
-               create,
-               share_face,
-               wrap,
-               ghosts);
-
-// --- or ---
-
-// use a helper function given the master
-// for the "short form" of creating blocks, w/o the functor or signature above
-diy::decompose(dim,
-               rank,
-               domain,
-               assigner,
-               master,
-               share_face,
-               wrap,
-               ghosts);
-
-// --- or ---
+// --- various ways to decompose a domain follow ---
 
 // create a RegularDecomposer
 // allows access to all the methods in RegularDecomposer
 diy::RegularDecomposer<Bounds> decomposer(dim,
                                           domain,
                                           nblocks,
-                                          share_face,
-                                          wrap,
-                                          ghosts);
+                                          share_face,       // optional
+                                          wrap,             // optional
+                                          ghosts);          // optional
 
 // --- and ---
 
-// call the decomposer's decompose function given AddBlock or
+// call the decomposer's decompose function given
 // a create function of the signature above
 decomposer.decompose(world.rank(),
                      assigner,
@@ -94,8 +50,26 @@ decomposer.decompose(world.rank(),
 
 // --- or ---
 
+// call the decomposer's decompose function given a lambda
+decomposer.decompose(world.rank(),
+                     assigner,
+                     [&](int gid,                   // block global id
+                         const Bounds& core,        // block bounds without any ghost added
+                         const Bounds& bounds,      // block bounds including any ghost region added
+                         const Bounds& domain,      // global data bounds
+                         const RCLink& link)        // neighborhood
+                     {
+                         Block*          b   = new Block;             // possibly use custom initialization
+                         RGLink*         l   = new RGLink(link);
+                         int             lid = master.add(gid, b, l); // add block to the master (mandatory)
+
+                         // process any additional args here, load the data, etc.
+                     });
+
+// --- or ---
+
 // call the decomposer's decompose function given master only
-// (uses the master's AddBlock functor instead)
+// (add the block to master and do nothing else)
 decomposer.decompose(world.rank(),
                      assigner,
                      master);
