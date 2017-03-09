@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">DIY
-   &#160;<span id="projectnumber">2.0</span>
+   &#160;<span id="projectnumber">3.0</span>
    </div>
    <div id="projectbrief">data-parallel out-of-core C++ library</div>
   </td>
@@ -86,7 +86,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<p>Block I/O: DIY writes and reads blocks to and from storage in either collective or independent mode. The collective mode, which is the default, creates one file. Independent mode creates one file per process. These features should be confused with the temporary block I/O that DIY does in the course of shuffling blocks in and out of core while executing the block <code>foreach</code> functions. This happens behind the scenes and is not the subject of the I/O module.</p>
+<p>Block I/O: DIY writes and reads blocks to and from storage in either collective or independent mode. The collective mode, which is the default, creates one file. Independent mode creates one file per process. These features should not be confused with the temporary block I/O that DIY does in the course of shuffling blocks in and out of core while executing the block <code>foreach</code> functions. This happens behind the scenes and is not the subject of the I/O module.</p>
 <h2>Collective I/O </h2>
 <ul>
 <li><code><a class="el" href="group___i_o.html#ga33ca463272d91acec03e5386a1b80ecf" title="Write blocks to storage collectively in one shared file. ">diy::io::write_blocks()</a></code></li>
@@ -105,21 +105,22 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a class="code" href="classdiy_1_1_master.html">diy::Master</a>               master(world,</div>
 <div class="line">                                 num_threads,</div>
 <div class="line">                                 mem_blocks);</div>
-<div class="line"><a class="code" href="classdiy_1_1_contiguous_assigner.html">diy::ContiguousAssigner</a>   *assigner;</div>
-<div class="line"><span class="keywordflow">if</span> (write)</div>
-<div class="line">{</div>
-<div class="line">    <span class="comment">// the total number of blocks, tot_blocks, is set by user</span></div>
-<div class="line">    assigner = <span class="keyword">new</span> <a class="code" href="classdiy_1_1_contiguous_assigner.html">diy::ContiguousAssigner</a>(world.size(), tot_blocks);</div>
-<div class="line">    <span class="comment">// the block_save function is unnecessary if it was defined as part of master</span></div>
-<div class="line">    <a class="code" href="group___i_o.html#ga33ca463272d91acec03e5386a1b80ecf">diy::io::write_blocks</a>(filename, world, master, &amp;block_save);</div>
-<div class="line">}</div>
-<div class="line"><span class="keywordflow">else</span></div>
-<div class="line">{</div>
-<div class="line">    <span class="comment">// the number of blocks is -1 because it is determined by read_blocks()</span></div>
-<div class="line">    assigner = <span class="keyword">new</span> <a class="code" href="classdiy_1_1_contiguous_assigner.html">diy::ContiguousAssigner</a>(world.size(), -1);</div>
-<div class="line">    <span class="comment">// the block_load function is unnecessary if it was defined as part of master</span></div>
-<div class="line">    <a class="code" href="group___i_o.html#ga58ad86682cb639add4d3ef0b1806b0c0">diy::io::read_blocks</a>(filename, world, *assigner, master, &amp;block_load);</div>
-<div class="line">}</div>
+<div class="line"></div>
+<div class="line"></div>
+<div class="line"><span class="comment">// --- write ---</span></div>
+<div class="line"></div>
+<div class="line"><span class="comment">// the total number of blocks, tot_blocks, is set by user</span></div>
+<div class="line"><a class="code" href="classdiy_1_1_contiguous_assigner.html">diy::ContiguousAssigner</a> assigner(world.size(), tot_blocks);</div>
+<div class="line"><span class="comment">// the block_save function is unnecessary if it was defined as part of master</span></div>
+<div class="line"><a class="code" href="group___i_o.html#ga33ca463272d91acec03e5386a1b80ecf">diy::io::write_blocks</a>(filename, world, master, &amp;block_save);</div>
+<div class="line"></div>
+<div class="line"></div>
+<div class="line"><span class="comment">// --- read ---</span></div>
+<div class="line"></div>
+<div class="line"><span class="comment">// the number of blocks is -1 because it is determined by read_blocks()</span></div>
+<div class="line"><a class="code" href="classdiy_1_1_contiguous_assigner.html">diy::ContiguousAssigner</a> assigner(world.size(), -1);</div>
+<div class="line"><span class="comment">// the block_load function is unnecessary if it was defined as part of master</span></div>
+<div class="line"><a class="code" href="group___i_o.html#ga58ad86682cb639add4d3ef0b1806b0c0">diy::io::read_blocks</a>(filename, world, *assigner, master, &amp;block_load);</div>
 </div><!-- fragment --><p>In addition, the <a href="https://github.com/diatomic/diy2/tree/master/examples/io">examples/io directory</a> illustrates BOV (brick of values) and NumPy I/O, which is built on top of MPI-IO and MPI sub-array types. The <a class="el" href="io_2test-io_8cpp-example.html">test-io.cpp example</a> tests the readers and writers for BOV and NumPy. </p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -413,7 +414,7 @@ Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 9 2017 17:12:23 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Mar 9 2017 18:17:51 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

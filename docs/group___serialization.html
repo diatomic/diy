@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">DIY
-   &#160;<span id="projectnumber">2.0</span>
+   &#160;<span id="projectnumber">3.0</span>
    </div>
    <div id="projectbrief">data-parallel out-of-core C++ library</div>
   </td>
@@ -100,7 +100,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a>(bb, vec);</div>
 </div><!-- fragment --><p>The primary interface for serialization in DIY are <code><a class="el" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b" title="Saves x to bb by calling diy::Serialization&lt;T&gt;::save(bb,x). ">diy::save()</a></code> and <code><a class="el" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1" title="Loads x from bb by calling diy::Serialization&lt;T&gt;::load(bb,x). ">diy::load()</a></code>. They call the respective functions in the <code><a class="el" href="structdiy_1_1_serialization.html" title="Main interface to serialization, meant to be specialized for the types that require special handling...">diy::Serialization</a></code> class, explained below. Array versions of the functions optimize copying of arrays of binary data (but still do the right thing for customized types).</p>
 <h2>Customizing </h2>
-<p>The default (unspecialized) version of <code><a class="el" href="structdiy_1_1_serialization.html" title="Main interface to serialization, meant to be specialized for the types that require special handling...">diy::Serialization</a>&lt;T&gt;</code> copies <code>sizeof(T)</code> bytes from <code>&amp;x</code> to or from the <code><a class="el" href="structdiy_1_1_binary_buffer.html" title="A serialization buffer. ">diy::BinaryBuffer</a></code> via <code><a class="el" href="structdiy_1_1_binary_buffer.html#a9d0ab30fe4978c730176a52ccd142cc3" title="copy count bytes from x into the buffer ">diy::BinaryBuffer::save_binary()</a></code> and <code><a class="el" href="structdiy_1_1_binary_buffer.html#a53b5ba450ddf8b6e9b262c552b2ef673" title="copy count bytes into x from the buffer ">diy::BinaryBuffer::load_binary()</a></code>. This works out perfectly for plain old data (e.g., simple structs), but to save a more complicated type, one has to specialize <code><a class="el" href="structdiy_1_1_serialization.html" title="Main interface to serialization, meant to be specialized for the types that require special handling...">diy::Serialization</a>&lt;T&gt;</code>. Specializations are already provided for <code>std::vector&lt;T&gt;</code>, <code>std::map&lt;K,V&gt;</code>, and <code>std::pair&lt;T,U&gt;</code>. As a result one can quickly add a specialization of one's own:</p>
+<p>The default (unspecialized) version of <code><a class="el" href="structdiy_1_1_serialization.html" title="Main interface to serialization, meant to be specialized for the types that require special handling...">diy::Serialization</a>&lt;T&gt;</code> copies <code>sizeof(T)</code> bytes from <code>&amp;x</code> to or from the <code><a class="el" href="structdiy_1_1_binary_buffer.html" title="A serialization buffer. ">diy::BinaryBuffer</a></code> via <code><a class="el" href="structdiy_1_1_binary_buffer.html#a9d0ab30fe4978c730176a52ccd142cc3" title="copy count bytes from x into the buffer ">diy::BinaryBuffer::save_binary()</a></code> and <code><a class="el" href="structdiy_1_1_binary_buffer.html#a53b5ba450ddf8b6e9b262c552b2ef673" title="copy count bytes into x from the buffer ">diy::BinaryBuffer::load_binary()</a></code>. This works out perfectly for plain old data (e.g., simple structs), but to save a more complicated type, one has to specialize <code><a class="el" href="structdiy_1_1_serialization.html" title="Main interface to serialization, meant to be specialized for the types that require special handling...">diy::Serialization</a>&lt;T&gt;</code>. (Specializations are already provided for many of the STL types, for example, <code>std::vector&lt;T&gt;</code>, <code>std::map&lt;K,V&gt;</code>, <code>std::pair&lt;T,U&gt;</code>, <code>std::valarray&lt;T&gt;</code>, <code>std::string</code>, <code>std::set&lt;T&gt;</code>, <code>std::unordered_map&lt;K,V&gt;</code>, <code>std::unordered_set&lt;T&gt;</code>, <code>std::tuple&lt;Args...&gt;</code>.) As a result, one can quickly add a specialization of one's own:</p>
 <div class="fragment"><div class="line"><span class="keyword">struct </span>Point</div>
 <div class="line">{</div>
 <div class="line">    <span class="keywordtype">int</span>                 x, y;</div>
@@ -166,7 +166,7 @@ template&lt;class T &gt; </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 9 2017 17:12:23 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Mar 9 2017 18:17:51 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">DIY
-   &#160;<span id="projectnumber">2.0</span>
+   &#160;<span id="projectnumber">3.0</span>
    </div>
    <div id="projectbrief">data-parallel out-of-core C++ library</div>
   </td>
@@ -93,38 +93,31 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </ul>
 <p><code><a class="el" href="classdiy_1_1_master.html">diy::Master</a></code> owns the blocks, put into it using the <a class="el" href="classdiy_1_1_master.html#aeab2723bb0ecd4f7316b4805c1b53a61">add()</a> method. Its main two methods are foreach() and <a class="el" href="classdiy_1_1_master.html#a211ba9c61e9d2d4f318a27316625989c">exchange()</a>. foreach(f) calls back a function <code>f()</code> with every block. The function is responsible for performing computation and scheduling communication using <a class="el" href="structdiy_1_1_master_1_1_proxy.html#a05bcb6fd6968e054c0b2f818c6cd24de">enqueue()</a>/<a class="el" href="structdiy_1_1_master_1_1_proxy.html#ad7af65dcf357c32fe550b82a872d8692">dequeue()</a> operations. The actual communication is performed by <a class="el" href="classdiy_1_1_master.html#a211ba9c61e9d2d4f318a27316625989c">exchange()</a>.</p>
 <h2>Example </h2>
-<p>The callback functions <code>enqueue_block()</code> and <code>average()</code> in the example below are given the block pointer and a communication proxy for the message exchange between blocks. The callback functions typically enqueue or dequeue messages from the proxy. In this way, information can be received and sent during rounds of message exchange.</p>
+<p>The callback functions <code>enqueue_local()</code> and <code>average()</code> in the example below are given the block pointer and a communication proxy for the message exchange between blocks. The callback functions typically enqueue or dequeue messages from the proxy. In this way, information can be received and sent during rounds of message exchange.</p>
 <div class="fragment"><div class="line"><span class="comment">// --- main program --- //</span></div>
 <div class="line"></div>
 <div class="line"><span class="keyword">struct </span>Block { <span class="keywordtype">float</span> local, average; };             <span class="comment">// define your block structure</span></div>
 <div class="line"></div>
 <div class="line">Master master(world);                               <span class="comment">// world = MPI_Comm</span></div>
 <div class="line">...                                                 <span class="comment">// populate master with blocks</span></div>
-<div class="line">master.foreach&lt;Block&gt;(&amp;enqueue_local);              <span class="comment">// call enqueue_local() for each block</span></div>
+<div class="line">master.foreach(&amp;enqueue_local);                     <span class="comment">// call enqueue_local() for each block</span></div>
 <div class="line">master.exchange();                                  <span class="comment">// exchange enqueued data between blocks</span></div>
-<div class="line">master.foreach&lt;Block&gt;(&amp;average);                    <span class="comment">// call average() for each block</span></div>
+<div class="line">master.foreach(&amp;average);                           <span class="comment">// call average() for each block</span></div>
 <div class="line"></div>
 <div class="line"><span class="comment">// --- callback functions --- //</span></div>
 <div class="line"></div>
 <div class="line"><span class="comment">// enqueue block data prior to exchanging it</span></div>
-<div class="line"><span class="keywordtype">void</span> enqueue_local(Block* b,                        <span class="comment">// one block</span></div>
-<div class="line">                   <span class="keyword">const</span> Proxy&amp; cp,                 <span class="comment">// communication proxy</span></div>
-<div class="line">                                                    <span class="comment">// i.e., the neighbor blocks with which</span></div>
-<div class="line">                                                    <span class="comment">// this block communicates</span></div>
-<div class="line">                   <span class="keywordtype">void</span>* aux)                       <span class="comment">// user-defined additional arguments</span></div>
+<div class="line"><span class="keywordtype">void</span> enqueue_local(Block* b,                        <span class="comment">// current block</span></div>
+<div class="line">                   <span class="keyword">const</span> Proxy&amp; cp)                 <span class="comment">// communication proxy provides access to the neighbor blocks</span></div>
 <div class="line">{</div>
 <div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; cp.link()-&gt;size(); i++)  <span class="comment">// for all neighbor blocks</span></div>
-<div class="line">        cp.enqueue(cp.link()-&gt;target(i), b-&gt;local); <span class="comment">// enqueue the data to be sent</span></div>
-<div class="line">                                                    <span class="comment">// to this neighbor block in the next</span></div>
-<div class="line">                                                    <span class="comment">// exchange</span></div>
+<div class="line">        cp.enqueue(cp.link()-&gt;target(i), b-&gt;local); <span class="comment">// enqueue the data to be sent to this neighbor</span></div>
+<div class="line">                                                    <span class="comment">// block in the next exchange</span></div>
 <div class="line">}</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// use the received data after exchanging it, in this case compute its average</span></div>
-<div class="line"><span class="keywordtype">void</span> average(Block* b,                              <span class="comment">// one block</span></div>
-<div class="line">             <span class="keyword">const</span> Proxy&amp; cp,                       <span class="comment">// communication proxy</span></div>
-<div class="line">                                                    <span class="comment">// i.e., the neighbor blocks with which</span></div>
-<div class="line">                                                    <span class="comment">// this block communicates</span></div>
-<div class="line">             <span class="keywordtype">void</span>* aux)                             <span class="comment">// user-defined additional arguments</span></div>
+<div class="line"><span class="keywordtype">void</span> average(Block* b,                              <span class="comment">// current block</span></div>
+<div class="line">             <span class="keyword">const</span> Proxy&amp; cp)                       <span class="comment">// communication proxy provides access to the neighbor blocks</span></div>
 <div class="line">{</div>
 <div class="line">    <span class="keywordtype">float</span> x, average = 0;</div>
 <div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; cp.link()-&gt;size(); i++)  <span class="comment">// for all neighbor blocks</span></div>
@@ -145,13 +138,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li><a class="el" href="group___communication.html">Communication</a></li>
 <li>Callbacks</li>
 <li><a class="el" href="group___immediate.html">Immediate Mode</a></li>
+<li><a class="el" href="group___i_o.html">IO</a></li>
 <li><a class="el" href="group___examples.html">Examples</a></li>
 <li><a class="el" href="classdiy_1_1_master.html">diy::Master</a></li>
 <li>diy::Communicator</li>
 <li><a class="el" href="classdiy_1_1_assigner.html">diy::Assigner</a></li>
 <li><a class="el" href="classdiy_1_1_file_storage.html">diy::FileStorage</a></li>
 <li><a class="el" href="group___m_p_i.html">MPI wrapper</a> for convenience.</li>
-<li>IO</li>
 </ul>
 <h2>Download </h2>
 <p>DIY is <a href="http://github.com/diatomic/diy2">available on Github</a>, subject to a <a href="https://github.com/diatomic/diy2/blob/master/LICENSE.txt">variation of a 3-clause BSD license</a>. You can download the <a href="https://github.com/diatomic/diy2/archive/master.tar.gz">latest tarball</a>.</p>
@@ -161,7 +154,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 9 2017 17:12:23 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Mar 9 2017 18:17:52 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
