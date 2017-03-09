@@ -96,9 +96,9 @@ Components
 Download
 --------
 
-DIY is [available on Github](http://github.com/diatomic/diy2), subject to a [variation of a
-3-clause BSD license](https://github.com/diatomic/diy2/blob/master/LICENSE.txt).  You can
-download the [latest tarball](https://github.com/diatomic/diy2/archive/master.tar.gz).
+DIY is [available on Github](http://github.com/diatomic/diy), subject to a [variation of a
+3-clause BSD license](https://github.com/diatomic/diy/blob/master/LICENSE.txt).  You can
+download the [latest tarball](https://github.com/diatomic/diy/archive/master.tar.gz).
 
 \authors [Dmitriy Morozov](http://mrzv.org)
 \authors [Tom Peterka](http://www.mcs.anl.gov/~tpeterka/)

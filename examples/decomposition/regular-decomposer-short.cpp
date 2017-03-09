@@ -90,10 +90,6 @@ int main(int argc, char* argv[])
                                               ghosts);
     decomposer.decompose(rank, assigner, master);
 
-    // or combine the two lines above into the following helper function
-    // but the decomposer gets destroyed afterwards
-    // diy::decompose(3, rank, domain, assigner, master, share_face, wrap, ghosts);
-
     // display the decomposition
     master.foreach(&Block::show_link);
 }

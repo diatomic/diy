@@ -46,5 +46,5 @@ diy::ContiguousAssigner assigner(world.size(), -1);
 diy::io::read_blocks(filename, world, *assigner, master, &block_load);
 ~~~~
 
-In addition, the [examples/io directory](https://github.com/diatomic/diy2/tree/master/examples/io) illustrates BOV (brick of values) and NumPy I/O, which is built on top of MPI-IO and MPI sub-array types. The [test-io.cpp example](\ref io/test-io.cpp) tests the readers and writers for BOV and NumPy.
+In addition, the [examples/io directory](https://github.com/diatomic/diy/tree/master/examples/io) illustrates BOV (brick of values) and NumPy I/O, which is built on top of MPI-IO and MPI sub-array types. The [test-io.cpp example](\ref io/test-io.cpp) tests the readers and writers for BOV and NumPy.
 

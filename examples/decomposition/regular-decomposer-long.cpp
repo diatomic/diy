@@ -23,21 +23,21 @@ struct Block
 
     // the rest is optional
     void show_link(const diy::Master::ProxyWithLink& cp)
-        {
-            diy::RegularLink<Bounds>* link = static_cast<diy::RegularLink<Bounds>*>(cp.link());
-            std::cout << "Block (" << cp.gid() << "): "
-                      << link->core().min[0]   << ' ' << link->core().min[1]   << ' '
-                      << link->core().min[2] << " - "
-                      << link->core().max[0]   << ' ' << link->core().max[1]   << ' '
-                      << link->core().max[2] << " : "
-                      << link->bounds().min[0] << ' ' << link->bounds().min[1] << ' '
-                      << link->bounds().min[2] << " - "
-                      << link->bounds().max[0] << ' ' << link->bounds().max[1] << ' '
-                      << link->bounds().max[2] << " : "
-                      << link->size()   << ' ' //<< std::endl
-                      << std::dec
-                      << std::endl;
-        }
+    {
+        diy::RegularLink<Bounds>* link = static_cast<diy::RegularLink<Bounds>*>(cp.link());
+        std::cout << "Block (" << cp.gid() << "): "
+                  << link->core().min[0]   << ' ' << link->core().min[1]   << ' '
+                  << link->core().min[2] << " - "
+                  << link->core().max[0]   << ' ' << link->core().max[1]   << ' '
+                  << link->core().max[2] << " : "
+                  << link->bounds().min[0] << ' ' << link->bounds().min[1] << ' '
+                  << link->bounds().min[2] << " - "
+                  << link->bounds().max[0] << ' ' << link->bounds().max[1] << ' '
+                  << link->bounds().max[2] << " : "
+                  << link->size()   << ' ' //<< std::endl
+                  << std::dec
+                  << std::endl;
+    }
 };
 
 // diy::decompose needs to have a function defined to create a block
@@ -49,18 +49,8 @@ struct AddBlock
     AddBlock(diy::Master& master_) : master(master_) {}
 
     // this is the function that is needed for diy::decompose
-    void  operator()(int gid,                          // block global id
-                     const Bounds& core,               // block bounds without any ghost added
-                     const Bounds& bounds,             // block bounds including ghost region
-                     const Bounds& domain,             // global data bounds
-                     const RGLink& link)               // neighborhood
-        const
+    void  operator()        const
         {
-            Block*          b   = new Block();
-            RGLink*         l   = new RGLink(link);
-            diy::Master&    m   = const_cast<diy::Master&>(master);
-
-            m.add(gid, b, l);    // add block to the master (mandatory)
         }
 
     diy::Master&  master;
@@ -115,11 +105,18 @@ int main(int argc, char* argv[])
                                               share_face,
                                               wrap,
                                               ghosts);
-    decomposer.decompose(rank, assigner, addblock);
+    decomposer.decompose(rank, assigner,
+                         [&](int gid,                          // block global id
+                             const Bounds& core,               // block bounds without any ghost added
+                             const Bounds& bounds,             // block bounds including ghost region
+                             const Bounds& domain,             // global data bounds
+                             const RGLink& link)               // neighborhood
+                         {
+                             Block*          b   = new Block;
+                             RGLink*         l   = new RGLink(link);
 
-    // or combine the two lines above into the following helper function
-    // but the decomposer gets destroyed afterwards
-    // diy::decompose(3, rank, domain, assigner, addblock, share_face, wrap, ghosts);
+                             master.add(gid, b, l);    // add block to the master (mandatory)
+                         });
 
     // display the decomposition
     master.foreach(&Block::show_link);
