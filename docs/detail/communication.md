@@ -1,11 +1,22 @@
 \defgroup Communication
 
-DIY currently supports two communication patterns: neighborhood exchange and global reduction. Additional lightweight collectives can be executed over the communication proxy of the above patterns.
+DIY currently supports two communication patterns: neighborhood exchange and
+global reduction. Additional lightweight collectives can be executed over the
+communication proxy of the above patterns.
 
 Neighborhood Exchange
 ---------------------
 
-The basic building block of communication is the neighborhood. This is a local collection of edges in a communication graph from the current block to other blocks; information is exchanged over these edges. In DIY, the *communication proxy* is the object that encapsulates the neighborhood. The communication proxy includes the *link*, which is the collection of edges to the neighboring blocks. This size of the link is the number of edges. In the communication proxy, *link->target[i]* is the block connected to the ith edge. Edges can be added or removed dynamically. Data can be enqueued to and dequeued from any target in the link as desired, and then all enqueued data are exchanged over the link in one step.
+The basic building block of communication is the neighborhood. This is a local
+collection of edges in a communication graph from the current block to other
+blocks; information is exchanged over these edges. In DIY, the *communication
+proxy* is the object that encapsulates the neighborhood. The communication
+proxy includes the *link*, which is the collection of edges to the neighboring
+blocks. This size of the link is the number of edges. In the communication
+proxy, `link->target[i]` is the block connected to the i-th edge. Edges can be
+added or removed dynamically. Data can be enqueued to and dequeued from any
+target in the link as desired, and then all enqueued data are exchanged over
+the link in one step.
 
 Global Reduction
 ----------------
