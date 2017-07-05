@@ -1,0 +1,10 @@
+[fmt]
+source = gh://fmtlib/fmt
+rev = release
+collapse = True
+destination:
+    mkdir include/diy/fmt
+    mv fmt/format.cc include/diy/fmt
+    mv fmt/ostream.cc include/diy/fmt
+    mv fmt/format.h include/diy/fmt
+    mv fmt/ostream.h include/diy/fmt
