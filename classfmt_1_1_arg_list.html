@@ -94,6 +94,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#friends">Friends</a> &#124;
 <a href="classfmt_1_1_arg_list-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -105,9 +106,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:aaeb0b59824c58bee8a8ee1b8c59daf9e"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom">{ <b>MAX_PACKED_ARGS</b> = 16
+<tr class="memitem:adafdf4d6cfb593b0790ea9376fa65cf1"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom">{ <b>MAX_PACKED_ARGS</b> = 16
  }</td></tr>
-<tr class="separator:aaeb0b59824c58bee8a8ee1b8c59daf9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:adafdf4d6cfb593b0790ea9376fa65cf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -117,8 +118,17 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae811ca8034f8c88fe612e0d23ae810fe"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae811ca8034f8c88fe612e0d23ae810fe"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>ArgList</b> (ULongLong types, const <a class="el" href="structfmt_1_1internal_1_1_arg.html">internal::Arg</a> *args)</td></tr>
 <tr class="separator:ae811ca8034f8c88fe612e0d23ae810fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afbcc461ef699df883a54c7cbdc5c0490"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afbcc461ef699df883a54c7cbdc5c0490"></a>
+uint64_t&#160;</td><td class="memItemRight" valign="bottom"><b>types</b> () const </td></tr>
+<tr class="separator:afbcc461ef699df883a54c7cbdc5c0490"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad2c2672388e003aa70d9c948ac8140cd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structfmt_1_1internal_1_1_arg.html">internal::Arg</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfmt_1_1_arg_list.html#ad2c2672388e003aa70d9c948ac8140cd">operator[]</a> (unsigned index) const </td></tr>
 <tr class="separator:ad2c2672388e003aa70d9c948ac8140cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:ad7ec3e226a554316c63c84e293d6981a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad7ec3e226a554316c63c84e293d6981a"></a>
+static internal::Arg::Type&#160;</td><td class="memItemRight" valign="bottom"><b>type</b> (uint64_t types, unsigned index)</td></tr>
+<tr class="separator:ad7ec3e226a554316c63c84e293d6981a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -161,7 +171,7 @@ template&lt;typename Char &gt; </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 5 2017 18:43:31 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jul 5 2017 19:01:45 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

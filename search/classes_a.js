@@ -1,6 +1,7 @@
 var searchData=
 [
   ['namedarg',['NamedArg',['../structfmt_1_1internal_1_1_named_arg.html',1,'fmt::internal']]],
+  ['namedargwithtype',['NamedArgWithType',['../structfmt_1_1internal_1_1_named_arg_with_type.html',1,'fmt::internal']]],
   ['neverskip',['NeverSkip',['../structdiy_1_1_master_1_1_never_skip.html',1,'diy::Master']]],
   ['not',['Not',['../structfmt_1_1internal_1_1_not.html',1,'fmt::internal']]],
   ['not_3c_20false_20_3e',['Not&lt; false &gt;',['../structfmt_1_1internal_1_1_not_3_01false_01_4.html',1,'fmt::internal']]],

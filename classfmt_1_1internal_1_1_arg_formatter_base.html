@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>DIY: fmt::internal::ArgFormatterBase&lt; Impl, Char &gt; Class Template Reference</title>
+<title>DIY: fmt::internal::ArgFormatterBase&lt; Impl, Char, Spec &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -92,55 +92,62 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="classfmt_1_1internal_1_1_arg_formatter_base-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">fmt::internal::ArgFormatterBase&lt; Impl, Char &gt; Class Template Reference</div>  </div>
+<div class="title">fmt::internal::ArgFormatterBase&lt; Impl, Char, Spec &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="dynheader">
-Inheritance diagram for fmt::internal::ArgFormatterBase&lt; Impl, Char &gt;:</div>
+Inheritance diagram for fmt::internal::ArgFormatterBase&lt; Impl, Char, Spec &gt;:</div>
 <div class="dyncontent">
  <div class="center">
-  <img src="classfmt_1_1internal_1_1_arg_formatter_base.png" usemap="#fmt::internal::ArgFormatterBase&lt; Impl, Char &gt;_map" alt=""/>
-  <map id="fmt::internal::ArgFormatterBase&lt; Impl, Char &gt;_map" name="fmt::internal::ArgFormatterBase&lt; Impl, Char &gt;_map">
-<area href="classfmt_1_1_arg_visitor.html" alt="fmt::ArgVisitor&lt; Impl, void &gt;" shape="rect" coords="0,0,268,24"/>
-<area href="classfmt_1_1_basic_arg_formatter.html" alt="fmt::BasicArgFormatter&lt; Impl, Char &gt;" shape="rect" coords="0,112,268,136"/>
+  <img src="classfmt_1_1internal_1_1_arg_formatter_base.png" usemap="#fmt::internal::ArgFormatterBase&lt; Impl, Char, Spec &gt;_map" alt=""/>
+  <map id="fmt::internal::ArgFormatterBase&lt; Impl, Char, Spec &gt;_map" name="fmt::internal::ArgFormatterBase&lt; Impl, Char, Spec &gt;_map">
+<area href="classfmt_1_1_arg_visitor.html" alt="fmt::ArgVisitor&lt; Impl, void &gt;" shape="rect" coords="0,0,306,24"/>
+<area href="classfmt_1_1_basic_arg_formatter.html" alt="fmt::BasicArgFormatter&lt; Impl, Char, Spec &gt;" shape="rect" coords="0,112,306,136"/>
 </map>
  </div></div>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a0fd6ccb9f098f2c1ecf7352e622b8a3c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0fd6ccb9f098f2c1ecf7352e622b8a3c"></a>
+typedef Spec&#160;</td><td class="memItemRight" valign="bottom"><b>SpecType</b></td></tr>
+<tr class="separator:a0fd6ccb9f098f2c1ecf7352e622b8a3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a67f48acedb2ba3f243150c41f964252b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a67f48acedb2ba3f243150c41f964252b"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>ArgFormatterBase</b> (<a class="el" href="classfmt_1_1_basic_writer.html">BasicWriter</a>&lt; Char &gt; &amp;w, <a class="el" href="structfmt_1_1_format_spec.html">FormatSpec</a> &amp;s)</td></tr>
-<tr class="separator:a67f48acedb2ba3f243150c41f964252b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae6f9ce1fa7940ebda3ac594a45edd32d"><td class="memTemplParams" colspan="2"><a class="anchor" id="ae6f9ce1fa7940ebda3ac594a45edd32d"></a>
+<tr class="memitem:ae34df5d9a1b81de0faaaff0d0cda8378"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae34df5d9a1b81de0faaaff0d0cda8378"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>ArgFormatterBase</b> (<a class="el" href="classfmt_1_1_basic_writer.html">BasicWriter</a>&lt; Char &gt; &amp;w, Spec &amp;s)</td></tr>
+<tr class="separator:ae34df5d9a1b81de0faaaff0d0cda8378"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a3488a81a1f53a238cec53e9371cd5d"><td class="memTemplParams" colspan="2"><a class="anchor" id="a9a3488a81a1f53a238cec53e9371cd5d"></a>
 template&lt;typename T &gt; </td></tr>
-<tr class="memitem:ae6f9ce1fa7940ebda3ac594a45edd32d"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>visit_any_int</b> (T value)</td></tr>
-<tr class="separator:ae6f9ce1fa7940ebda3ac594a45edd32d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a670214e1773c9c86002be07c043566dd"><td class="memTemplParams" colspan="2"><a class="anchor" id="a670214e1773c9c86002be07c043566dd"></a>
+<tr class="memitem:a9a3488a81a1f53a238cec53e9371cd5d"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>visit_any_int</b> (T value)</td></tr>
+<tr class="separator:a9a3488a81a1f53a238cec53e9371cd5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25ac04725f69069342a33ac4a3bc9123"><td class="memTemplParams" colspan="2"><a class="anchor" id="a25ac04725f69069342a33ac4a3bc9123"></a>
 template&lt;typename T &gt; </td></tr>
-<tr class="memitem:a670214e1773c9c86002be07c043566dd"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>visit_any_double</b> (T value)</td></tr>
-<tr class="separator:a670214e1773c9c86002be07c043566dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a379b2f30d3e0526c88be65f8a2b596be"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a379b2f30d3e0526c88be65f8a2b596be"></a>
+<tr class="memitem:a25ac04725f69069342a33ac4a3bc9123"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>visit_any_double</b> (T value)</td></tr>
+<tr class="separator:a25ac04725f69069342a33ac4a3bc9123"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d9180d383cbc9c182fd75570cd24cc1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9d9180d383cbc9c182fd75570cd24cc1"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>visit_bool</b> (bool value)</td></tr>
-<tr class="separator:a379b2f30d3e0526c88be65f8a2b596be"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab85eb2158c9d48c847706de26f35460c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab85eb2158c9d48c847706de26f35460c"></a>
+<tr class="separator:a9d9180d383cbc9c182fd75570cd24cc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab436a9ebf30e3a9588977ae6bb18851f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab436a9ebf30e3a9588977ae6bb18851f"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>visit_char</b> (int value)</td></tr>
-<tr class="separator:ab85eb2158c9d48c847706de26f35460c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a35e5c4d1580f7eec032661f9823c0cad"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a35e5c4d1580f7eec032661f9823c0cad"></a>
+<tr class="separator:ab436a9ebf30e3a9588977ae6bb18851f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6cccb0f544fda41d9a4064567b5dd346"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6cccb0f544fda41d9a4064567b5dd346"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>visit_cstring</b> (const char *value)</td></tr>
-<tr class="separator:a35e5c4d1580f7eec032661f9823c0cad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a937a7808ebf21736498e32abba6a0046"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a937a7808ebf21736498e32abba6a0046"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>visit_string</b> (<a class="el" href="structfmt_1_1internal_1_1_value_1_1_string_value.html">Arg::StringValue</a>&lt; char &gt; value)</td></tr>
-<tr class="separator:a937a7808ebf21736498e32abba6a0046"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad3469bff1ffe51395d9f8f0e0824ff2c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad3469bff1ffe51395d9f8f0e0824ff2c"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>visit_wstring</b> (<a class="el" href="structfmt_1_1internal_1_1_value_1_1_string_value.html">Arg::StringValue</a>&lt; Char &gt; value)</td></tr>
-<tr class="separator:ad3469bff1ffe51395d9f8f0e0824ff2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5c11af21a3e1249b78ef87c968572ef5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5c11af21a3e1249b78ef87c968572ef5"></a>
+<tr class="separator:a6cccb0f544fda41d9a4064567b5dd346"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e18cb76d4c082fe41da3db27dd07645"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3e18cb76d4c082fe41da3db27dd07645"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>visit_string</b> (<a class="el" href="structfmt_1_1internal_1_1_value_1_1_string_value.html">internal::Arg::StringValue</a>&lt; char &gt; value)</td></tr>
+<tr class="separator:a3e18cb76d4c082fe41da3db27dd07645"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c2555c6bc1a561dd148d751101a86d1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2c2555c6bc1a561dd148d751101a86d1"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>visit_wstring</b> (<a class="el" href="structfmt_1_1internal_1_1_value_1_1_string_value.html">internal::Arg::StringValue</a>&lt; Char &gt; value)</td></tr>
+<tr class="separator:a2c2555c6bc1a561dd148d751101a86d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a59ebb69285bb854e910c65cd7bb93bfd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a59ebb69285bb854e910c65cd7bb93bfd"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>visit_pointer</b> (const void *value)</td></tr>
-<tr class="separator:a5c11af21a3e1249b78ef87c968572ef5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a59ebb69285bb854e910c65cd7bb93bfd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classfmt_1_1_arg_visitor"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classfmt_1_1_arg_visitor')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classfmt_1_1_arg_visitor.html">fmt::ArgVisitor&lt; Impl, void &gt;</a></td></tr>
 <tr class="memitem:a130090f53213407548d93d8ee2801738 inherit pub_methods_classfmt_1_1_arg_visitor"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a130090f53213407548d93d8ee2801738"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>report_unhandled_arg</b> ()</td></tr>
@@ -183,18 +190,18 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>visit_unhandled_arg</
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a042c1243143197b04c5b4d77a89a4fb5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a042c1243143197b04c5b4d77a89a4fb5"></a>
+<tr class="memitem:aaced928d2622520ec0dbc4b0139ad3bf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaced928d2622520ec0dbc4b0139ad3bf"></a>
 <a class="el" href="classfmt_1_1_basic_writer.html">BasicWriter</a>&lt; Char &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>writer</b> ()</td></tr>
-<tr class="separator:a042c1243143197b04c5b4d77a89a4fb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acdd3bb185f7b444a60faf98fa9806ed4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acdd3bb185f7b444a60faf98fa9806ed4"></a>
-<a class="el" href="structfmt_1_1_format_spec.html">FormatSpec</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>spec</b> ()</td></tr>
-<tr class="separator:acdd3bb185f7b444a60faf98fa9806ed4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a002d52aca6bc9a70d7eb62c037ffadc4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a002d52aca6bc9a70d7eb62c037ffadc4"></a>
+<tr class="separator:aaced928d2622520ec0dbc4b0139ad3bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1bce0126bdd162bf80224a497fe86879"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1bce0126bdd162bf80224a497fe86879"></a>
+Spec &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>spec</b> ()</td></tr>
+<tr class="separator:a1bce0126bdd162bf80224a497fe86879"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2be1aa38da2c16b884fa157e9e5ed26f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2be1aa38da2c16b884fa157e9e5ed26f"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> (bool value)</td></tr>
-<tr class="separator:a002d52aca6bc9a70d7eb62c037ffadc4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a706cd6067d51bfa07d5e6c577e0843"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1a706cd6067d51bfa07d5e6c577e0843"></a>
+<tr class="separator:a2be1aa38da2c16b884fa157e9e5ed26f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8a208b8a37d6990019f12cdb95aa16bd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8a208b8a37d6990019f12cdb95aa16bd"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> (const char *value)</td></tr>
-<tr class="separator:a1a706cd6067d51bfa07d5e6c577e0843"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a8a208b8a37d6990019f12cdb95aa16bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>include/diy/fmt/<a class="el" href="format_8h_source.html">format.h</a></li>
@@ -202,7 +209,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> (const char
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 5 2017 18:43:32 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jul 5 2017 19:01:46 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

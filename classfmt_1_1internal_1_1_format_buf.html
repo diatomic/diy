@@ -93,6 +93,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="classfmt_1_1internal_1_1_format_buf-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">fmt::internal::FormatBuf&lt; Char &gt; Class Template Reference</div>  </div>
@@ -112,12 +113,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:adcbde95f2bfaffd93ec7f39ae5636bfb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adcbde95f2bfaffd93ec7f39ae5636bfb"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>FormatBuf</b> (<a class="el" href="classfmt_1_1_buffer.html">Buffer</a>&lt; Char &gt; &amp;buffer)</td></tr>
 <tr class="separator:adcbde95f2bfaffd93ec7f39ae5636bfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af5f472241b45d828a8d40cea7694c95c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af5f472241b45d828a8d40cea7694c95c"></a>
-int_type&#160;</td><td class="memItemRight" valign="bottom"><b>overflow</b> (int_type ch=traits_type::eof())</td></tr>
-<tr class="separator:af5f472241b45d828a8d40cea7694c95c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a37d9219b491e9f05f22334b60cf41c5f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a37d9219b491e9f05f22334b60cf41c5f"></a>
-size_t&#160;</td><td class="memItemRight" valign="bottom"><b>size</b> () const </td></tr>
-<tr class="separator:a37d9219b491e9f05f22334b60cf41c5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:a3babe02721074cb129e88132146fac3b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3babe02721074cb129e88132146fac3b"></a>
+int_type&#160;</td><td class="memItemRight" valign="bottom"><b>overflow</b> (int_type ch=traits_type::eof()) FMT_OVERRIDE</td></tr>
+<tr class="separator:a3babe02721074cb129e88132146fac3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae6c8b6a295bbc00aaeb8daaa12395d26"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae6c8b6a295bbc00aaeb8daaa12395d26"></a>
+std::streamsize&#160;</td><td class="memItemRight" valign="bottom"><b>xsputn</b> (const Char *s, std::streamsize count) FMT_OVERRIDE</td></tr>
+<tr class="separator:ae6c8b6a295bbc00aaeb8daaa12395d26"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>include/diy/fmt/<a class="el" href="ostream_8h_source.html">ostream.h</a></li>
@@ -125,7 +129,7 @@ size_t&#160;</td><td class="memItemRight" valign="bottom"><b>size</b> () const <
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 5 2017 18:43:32 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jul 5 2017 19:01:46 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

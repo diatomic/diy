@@ -6,6 +6,6 @@ var searchData=
   ['gidoffsetcount',['GidOffsetCount',['../structdiy_1_1io_1_1detail_1_1_gid_offset_count.html',1,'diy::io::detail']]],
   ['grid',['Grid',['../structdiy_1_1_grid.html',1,'diy']]],
   ['gridref',['GridRef',['../structdiy_1_1_grid_ref.html',1,'diy']]],
-  ['grow',['grow',['../classfmt_1_1_buffer.html#abdc7aaf5813aa07008b3d715969a7e19',1,'fmt::Buffer::grow()'],['../classfmt_1_1internal_1_1_memory_buffer.html#a7f7ca74572d97e0d0345d112d85d44a4',1,'fmt::internal::MemoryBuffer::grow()'],['../classfmt_1_1internal_1_1_fixed_buffer.html#a5572fdba3a6a9044b2bd881f931d9368',1,'fmt::internal::FixedBuffer::grow()']]],
+  ['grow',['grow',['../classfmt_1_1_buffer.html#abdc7aaf5813aa07008b3d715969a7e19',1,'fmt::Buffer::grow()'],['../classfmt_1_1internal_1_1_memory_buffer.html#a6ecee679d5caf3345f8ffae92b7ca702',1,'fmt::internal::MemoryBuffer::grow()'],['../classfmt_1_1internal_1_1_fixed_buffer.html#a2d2fd6e0870b146688b9a5d2763d840b',1,'fmt::internal::FixedBuffer::grow()']]],
   ['growth_5fmultiplier',['growth_multiplier',['../structdiy_1_1_memory_buffer.html#a5e2f70569226e09b8a0ca3c8319d93bc',1,'diy::MemoryBuffer']]]
 ];

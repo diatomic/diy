@@ -2,7 +2,7 @@ var searchData=
 [
   ['basecommand',['BaseCommand',['../structdiy_1_1_master_1_1_base_command.html',1,'diy::Master']]],
   ['basicargformatter',['BasicArgFormatter',['../classfmt_1_1_basic_arg_formatter.html',1,'fmt']]],
-  ['basicargformatter_3c_20argformatter_3c_20char_20_3e_2c_20char_20_3e',['BasicArgFormatter&lt; ArgFormatter&lt; Char &gt;, Char &gt;',['../classfmt_1_1_basic_arg_formatter.html',1,'fmt']]],
+  ['basicargformatter_3c_20argformatter_3c_20char_20_3e_2c_20char_2c_20formatspec_20_3e',['BasicArgFormatter&lt; ArgFormatter&lt; Char &gt;, Char, FormatSpec &gt;',['../classfmt_1_1_basic_arg_formatter.html',1,'fmt']]],
   ['basicarraywriter',['BasicArrayWriter',['../classfmt_1_1_basic_array_writer.html',1,'fmt']]],
   ['basicchartraits',['BasicCharTraits',['../classfmt_1_1internal_1_1_basic_char_traits.html',1,'fmt::internal']]],
   ['basicchartraits_3c_20char_20_3e',['BasicCharTraits&lt; char &gt;',['../classfmt_1_1internal_1_1_basic_char_traits.html',1,'fmt::internal']]],
@@ -13,6 +13,7 @@ var searchData=
   ['basicformatter_3c_20char_2c_20argformatter_3c_20char_20_3e_20_3e',['BasicFormatter&lt; Char, ArgFormatter&lt; Char &gt; &gt;',['../classfmt_1_1_basic_formatter.html',1,'fmt']]],
   ['basicformatter_3c_20char_2c_20impl_20_3e',['BasicFormatter&lt; Char, Impl &gt;',['../classfmt_1_1_basic_formatter.html',1,'fmt']]],
   ['basicmemorywriter',['BasicMemoryWriter',['../classfmt_1_1_basic_memory_writer.html',1,'fmt']]],
+  ['basicprintfargformatter',['BasicPrintfArgFormatter',['../classfmt_1_1_basic_printf_arg_formatter.html',1,'fmt']]],
   ['basicstringref',['BasicStringRef',['../classfmt_1_1_basic_string_ref.html',1,'fmt']]],
   ['basicstringref_3c_20char_20_3e',['BasicStringRef&lt; char &gt;',['../classfmt_1_1_basic_string_ref.html',1,'fmt']]],
   ['basicwriter',['BasicWriter',['../classfmt_1_1_basic_writer.html',1,'fmt']]],

@@ -105,8 +105,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ad79244507bdc1213e0dc6c505cf265f2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfmt_1_1_basic_c_string_ref.html#ad79244507bdc1213e0dc6c505cf265f2">BasicCStringRef</a> (const Char *s)</td></tr>
 <tr class="separator:ad79244507bdc1213e0dc6c505cf265f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab460855d19c769773de532296f9f13f9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfmt_1_1_basic_c_string_ref.html#ab460855d19c769773de532296f9f13f9">BasicCStringRef</a> (const std::basic_string&lt; Char &gt; &amp;s)</td></tr>
-<tr class="separator:ab460855d19c769773de532296f9f13f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7caaa44a192e0184031d60c2a71bd12"><td class="memTemplParams" colspan="2">template&lt;typename Allocator &gt; </td></tr>
+<tr class="memitem:aa7caaa44a192e0184031d60c2a71bd12"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfmt_1_1_basic_c_string_ref.html#aa7caaa44a192e0184031d60c2a71bd12">BasicCStringRef</a> (const std::basic_string&lt; Char, std::char_traits&lt; Char &gt;, Allocator &gt; &amp;s)</td></tr>
+<tr class="separator:aa7caaa44a192e0184031d60c2a71bd12"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae3bafa845b53339b20c4f5edb4f635f9"><td class="memItemLeft" align="right" valign="top">const Char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfmt_1_1_basic_c_string_ref.html#ae3bafa845b53339b20c4f5edb4f635f9">c_str</a> () const </td></tr>
 <tr class="separator:ae3bafa845b53339b20c4f5edb4f635f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -114,7 +115,7 @@ Public Member Functions</h2></td></tr>
 <div class="textblock"><h3>template&lt;typename Char&gt;<br/>
 class fmt::BasicCStringRef&lt; Char &gt;</h3>
 
-<p>A reference to a null terminated string. It can be constructed from a C string or <code>std::string</code>.</p>
+<p>A reference to a null terminated string. It can be constructed from a C string or <code>std::basic_string</code>.</p>
 <p>You can use one of the following typedefs for common character types:</p>
 <p>+----------&mdash;+-----------------------&mdash;+ | Type | Definition | +=============+==========================+ | CStringRef | BasicCStringRef&lt;char&gt; | +----------&mdash;+-----------------------&mdash;+ | WCStringRef | BasicCStringRef&lt;wchar_t&gt; | +----------&mdash;+-----------------------&mdash;+</p>
 <p>This class is most useful as a parameter type to allow passing different types of strings to a function, for example::</p>
@@ -148,11 +149,13 @@ template&lt;typename Char&gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="ab460855d19c769773de532296f9f13f9"></a>
+<a class="anchor" id="aa7caaa44a192e0184031d60c2a71bd12"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename Char&gt; </div>
+<div class="memtemplate">
+template&lt;typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -160,7 +163,7 @@ template&lt;typename Char&gt; </div>
         <tr>
           <td class="memname"><a class="el" href="classfmt_1_1_basic_c_string_ref.html">fmt::BasicCStringRef</a>&lt; Char &gt;::<a class="el" href="classfmt_1_1_basic_c_string_ref.html">BasicCStringRef</a> </td>
           <td>(</td>
-          <td class="paramtype">const std::basic_string&lt; Char &gt; &amp;&#160;</td>
+          <td class="paramtype">const std::basic_string&lt; Char, std::char_traits&lt; Char &gt;, Allocator &gt; &amp;&#160;</td>
           <td class="paramname"><em>s</em></td><td>)</td>
           <td></td>
         </tr>
@@ -171,7 +174,7 @@ template&lt;typename Char&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Constructs a string reference from an <code>std::string</code> object.  </p>
+<p>Constructs a string reference from a <code>std::basic_string</code> object.  </p>
 
 </div>
 </div>
@@ -208,7 +211,7 @@ template&lt;typename Char&gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 5 2017 18:43:31 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jul 5 2017 19:01:45 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

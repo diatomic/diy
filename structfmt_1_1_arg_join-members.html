@@ -87,29 +87,25 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><b>fmt</b></li><li class="navelem"><b>internal</b></li><li class="navelem"><a class="el" href="classfmt_1_1internal_1_1_printf_formatter.html">PrintfFormatter</a></li>  </ul>
+<li class="navelem"><b>fmt</b></li><li class="navelem"><a class="el" href="structfmt_1_1_arg_join.html">ArgJoin</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="headertitle">
-<div class="title">fmt::internal::PrintfFormatter&lt; Char &gt; Member List</div>  </div>
+<div class="title">fmt::ArgJoin&lt; Char, It &gt; Member List</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>This is the complete list of members for <a class="el" href="classfmt_1_1internal_1_1_printf_formatter.html">fmt::internal::PrintfFormatter&lt; Char &gt;</a>, including all inherited members.</p>
+<p>This is the complete list of members for <a class="el" href="structfmt_1_1_arg_join.html">fmt::ArgJoin&lt; Char, It &gt;</a>, including all inherited members.</p>
 <table class="directory">
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>args</b>() const  (defined in <a class="el" href="classfmt_1_1internal_1_1_formatter_base.html">fmt::internal::FormatterBase</a>)</td><td class="entry"><a class="el" href="classfmt_1_1internal_1_1_formatter_base.html">fmt::internal::FormatterBase</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">private</span></td></tr>
-  <tr bgcolor="#f0f0f0"><td class="entry"><b>check_no_auto_index</b>(const char *&amp;error) (defined in <a class="el" href="classfmt_1_1internal_1_1_formatter_base.html">fmt::internal::FormatterBase</a>)</td><td class="entry"><a class="el" href="classfmt_1_1internal_1_1_formatter_base.html">fmt::internal::FormatterBase</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">private</span></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>format</b>(BasicWriter&lt; Char &gt; &amp;writer, BasicCStringRef&lt; Char &gt; format_str) (defined in <a class="el" href="classfmt_1_1internal_1_1_printf_formatter.html">fmt::internal::PrintfFormatter&lt; Char &gt;</a>)</td><td class="entry"><a class="el" href="classfmt_1_1internal_1_1_printf_formatter.html">fmt::internal::PrintfFormatter&lt; Char &gt;</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0"><td class="entry"><b>FormatterBase</b>(const ArgList &amp;args) (defined in <a class="el" href="classfmt_1_1internal_1_1_formatter_base.html">fmt::internal::FormatterBase</a>)</td><td class="entry"><a class="el" href="classfmt_1_1internal_1_1_formatter_base.html">fmt::internal::FormatterBase</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">explicit</span><span class="mlabel">private</span></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>get_arg</b>(unsigned arg_index, const char *&amp;error) (defined in <a class="el" href="classfmt_1_1internal_1_1_formatter_base.html">fmt::internal::FormatterBase</a>)</td><td class="entry"><a class="el" href="classfmt_1_1internal_1_1_formatter_base.html">fmt::internal::FormatterBase</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">private</span></td></tr>
-  <tr bgcolor="#f0f0f0"><td class="entry"><b>next_arg</b>(const char *&amp;error) (defined in <a class="el" href="classfmt_1_1internal_1_1_formatter_base.html">fmt::internal::FormatterBase</a>)</td><td class="entry"><a class="el" href="classfmt_1_1internal_1_1_formatter_base.html">fmt::internal::FormatterBase</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">private</span></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>PrintfFormatter</b>(const ArgList &amp;args) (defined in <a class="el" href="classfmt_1_1internal_1_1_printf_formatter.html">fmt::internal::PrintfFormatter&lt; Char &gt;</a>)</td><td class="entry"><a class="el" href="classfmt_1_1internal_1_1_printf_formatter.html">fmt::internal::PrintfFormatter&lt; Char &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">explicit</span></td></tr>
-  <tr bgcolor="#f0f0f0"><td class="entry"><b>write</b>(BasicWriter&lt; Char &gt; &amp;w, const Char *start, const Char *end) (defined in <a class="el" href="classfmt_1_1internal_1_1_formatter_base.html">fmt::internal::FormatterBase</a>)</td><td class="entry"><a class="el" href="classfmt_1_1internal_1_1_formatter_base.html">fmt::internal::FormatterBase</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">private</span></td></tr>
+  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>ArgJoin</b>(It first, It last, const BasicCStringRef&lt; Char &gt; &amp;sep) (defined in <a class="el" href="structfmt_1_1_arg_join.html">fmt::ArgJoin&lt; Char, It &gt;</a>)</td><td class="entry"><a class="el" href="structfmt_1_1_arg_join.html">fmt::ArgJoin&lt; Char, It &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr bgcolor="#f0f0f0"><td class="entry"><b>first</b> (defined in <a class="el" href="structfmt_1_1_arg_join.html">fmt::ArgJoin&lt; Char, It &gt;</a>)</td><td class="entry"><a class="el" href="structfmt_1_1_arg_join.html">fmt::ArgJoin&lt; Char, It &gt;</a></td><td class="entry"></td></tr>
+  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>last</b> (defined in <a class="el" href="structfmt_1_1_arg_join.html">fmt::ArgJoin&lt; Char, It &gt;</a>)</td><td class="entry"><a class="el" href="structfmt_1_1_arg_join.html">fmt::ArgJoin&lt; Char, It &gt;</a></td><td class="entry"></td></tr>
+  <tr bgcolor="#f0f0f0"><td class="entry"><b>sep</b> (defined in <a class="el" href="structfmt_1_1_arg_join.html">fmt::ArgJoin&lt; Char, It &gt;</a>)</td><td class="entry"><a class="el" href="structfmt_1_1_arg_join.html">fmt::ArgJoin&lt; Char, It &gt;</a></td><td class="entry"></td></tr>
 </table></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 5 2017 18:43:32 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jul 5 2017 19:01:46 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

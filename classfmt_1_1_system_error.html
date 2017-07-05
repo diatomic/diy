@@ -131,6 +131,13 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:a705a49ba6ef5e06dced3b845bdc7330a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a705a49ba6ef5e06dced3b845bdc7330a"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>error_code_</b></td></tr>
 <tr class="separator:a705a49ba6ef5e06dced3b845bdc7330a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pro_methods_classfmt_1_1internal_1_1_runtime_error"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classfmt_1_1internal_1_1_runtime_error')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classfmt_1_1internal_1_1_runtime_error.html">fmt::internal::RuntimeError</a></td></tr>
+<tr class="memitem:aa830d89c5682852c4e77cfbcb999557e inherit pro_methods_classfmt_1_1internal_1_1_runtime_error"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa830d89c5682852c4e77cfbcb999557e"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>RuntimeError</b> (const <a class="el" href="classfmt_1_1internal_1_1_runtime_error.html">RuntimeError</a> &amp;rerr)</td></tr>
+<tr class="separator:aa830d89c5682852c4e77cfbcb999557e inherit pro_methods_classfmt_1_1internal_1_1_runtime_error"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An error returned by an operating system or a language runtime, for example a file opening error. </p>
@@ -166,9 +173,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>error_code_</b></td></
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Constructs a :class:<code><a class="el" href="classfmt_1_1_system_error.html">fmt::SystemError</a></code> object with the description of the form</p>
-<p>.. parsed-literal:: &lt;message&gt;*: *&lt;system-message&gt;*</p>
-<p>where *&lt;message&gt;* is the formatted message and *&lt;system-message&gt;* is the system message corresponding to the error code. error_code* is a system error code as given by <code>errno</code>. If <em>error_code</em> is not a valid error code such as -1, the system message may look like "Unknown error -1" and is platform-dependent.</p>
+<p>Constructs a :class:<code><a class="el" href="classfmt_1_1_system_error.html">fmt::SystemError</a></code> object with a description formatted with <code>fmt::format_system_error</code>. <em>message</em> and additional arguments passed into the constructor are formatted similarly to <code>fmt::format</code>.</p>
 <p>Example**::</p>
 <p>This throws a <a class="el" href="classfmt_1_1_system_error.html">SystemError</a> with the description cannot open file 'madeup': No such file or directory or similar (system message may vary). const char *filename = "madeup"; std::FILE *file = std::fopen(filename, "r"); if (!file) throw <a class="el" href="classfmt_1_1_system_error.html">fmt::SystemError</a>(errno, "cannot open file '{}'", filename);  </p>
 
@@ -181,7 +186,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>error_code_</b></td></
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 5 2017 18:43:32 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jul 5 2017 19:01:46 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
