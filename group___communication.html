@@ -89,7 +89,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>DIY currently supports two communication patterns: neighborhood exchange and global reduction. Additional lightweight collectives can be executed over the communication proxy of the above patterns.</p>
 <h2>Neighborhood Exchange </h2>
-<p>The basic building block of communication is the neighborhood. This is a local collection of edges in a communication graph from the current block to other blocks; information is exchanged over these edges. In DIY, the <em>communication proxy</em> is the object that encapsulates the neighborhood. The communication proxy includes the <em>link</em>, which is the collection of edges to the neighboring blocks. This size of the link is the number of edges. In the communication proxy, <em>link-&gt;target[i]</em> is the block connected to the ith edge. Edges can be added or removed dynamically. Data can be enqueued to and dequeued from any target in the link as desired, and then all enqueued data are exchanged over the link in one step.</p>
+<p>The basic building block of communication is the neighborhood. This is a local collection of edges in a communication graph from the current block to other blocks; information is exchanged over these edges. In DIY, the <em>communication proxy</em> is the object that encapsulates the neighborhood. The communication proxy includes the <em>link</em>, which is the collection of edges to the neighboring blocks. This size of the link is the number of edges. In the communication proxy, <code>link-&gt;target[i]</code> is the block connected to the i-th edge. Edges can be added or removed dynamically. Data can be enqueued to and dequeued from any target in the link as desired, and then all enqueued data are exchanged over the link in one step.</p>
 <h2>Global Reduction </h2>
 <p>DIY supports general reductions to implement complex global operations over blocks. These reductions are general-purpose (any global communication pattern can be implemented); they operate over blocks, which cycle in and out of core as necessary; the operations are (multi-)threaded automatically using the same mechanism as foreach(). Although any global communication can be expressed using the reduction mechanism, all the reductions included in DIY operate in rounds over a k-ary reduction tree. The value of k used in each round can vary, but if it's fixed, the number of rounds is log_k(nblocks).</p>
 <p>The following patterns are currently available.</p>
@@ -423,7 +423,7 @@ template&lt;class Reduce , class Partners &gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 9 2017 20:38:25 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jul 5 2017 18:43:31 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
