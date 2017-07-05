@@ -40,22 +40,6 @@ struct Block
     }
 };
 
-// diy::decompose needs to have a function defined to create a block
-// with the arguments (gid, core, bounds, domain, link)
-// here, it is wrapped in an object (functor) to add blocks with an overloaded () operator
-// it could have also been written as a standalone function
-struct AddBlock
-{
-    AddBlock(diy::Master& master_) : master(master_) {}
-
-    // this is the function that is needed for diy::decompose
-    void  operator()        const
-        {
-        }
-
-    diy::Master&  master;
-};
-
 int main(int argc, char* argv[])
 {
     diy::mpi::environment     env(argc, argv);         // diy equivalent of MPI_Init
@@ -76,7 +60,6 @@ int main(int argc, char* argv[])
                        -1,                             // all blocks in memory
                        &Block::create,
                        &Block::destroy);
-    AddBlock     addblock(master);                     // object for adding new blocks to master
 
     // share_face is an n-dim (size 3 in this example) vector of bools
     // indicating whether faces are shared in each dimension
