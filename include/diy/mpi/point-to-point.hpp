@@ -62,7 +62,7 @@ namespace detail
 
       MPI_Probe(source, tag, comm, &s.s);
       x.resize(s.count<U>());
-      MPI_Recv(&x[0], x.size(), get_mpi_datatype<U>(), source, tag, comm, &s.s);
+      MPI_Recv(&x[0], static_cast<int>(x.size()), get_mpi_datatype<U>(), source, tag, comm, &s.s);
       return s;
 #else
       (void) comm; (void) source; (void) tag; (void) x;

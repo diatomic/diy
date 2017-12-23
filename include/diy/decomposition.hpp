@@ -407,7 +407,7 @@ void
 diy::RegularDecomposer<Bounds>::
 gid_to_coords(int gid, DivisionsVector& coords, const DivisionsVector& divisions)
 {
-  int dim = divisions.size();
+  int dim = static_cast<int>(divisions.size());
   for (int i = 0; i < dim; ++i)
   {
     coords.push_back(gid % divisions[i]);
@@ -421,7 +421,7 @@ diy::RegularDecomposer<Bounds>::
 coords_to_gid(const DivisionsVector& coords, const DivisionsVector& divisions)
 {
   int gid = 0;
-  for (int i = coords.size() - 1; i >= 0; --i)
+  for (int i = static_cast<int>(coords.size()) - 1; i >= 0; --i)
   {
     gid *= divisions[i];
     gid += coords[i];
