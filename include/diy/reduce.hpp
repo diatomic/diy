@@ -95,7 +95,7 @@ namespace detail
 
   struct ReduceNeverSkip
   {
-    bool operator()(int round, int lid, const Master& master) const  { return false; }
+    bool operator()(int, int, const Master&) const  { return false; }
   };
 }
 

@@ -42,7 +42,7 @@ namespace detail
     static MPI_Datatype         datatype()              { return get_mpi_datatype<T>(); }
     static const void*          address(const T& x)     { return &x; }
     static void*                address(T& x)           { return &x; }
-    static int                  count(const T& x)       { return 1; }
+    static int                  count(const T&)         { return 1; }
   };
 
   template<class U>
