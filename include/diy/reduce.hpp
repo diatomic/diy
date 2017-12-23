@@ -133,7 +133,7 @@ void reduce(Master&                    master,        //!< master object
       {
         std::vector<int> incoming_gids;
         partners.incoming(round + 1, master.gid(i), incoming_gids, master);
-        expected += incoming_gids.size();
+        expected += static_cast<int>(incoming_gids.size());
         master.incoming(master.gid(i)).clear();
       }
     }

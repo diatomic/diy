@@ -53,7 +53,7 @@ namespace detail
     static MPI_Datatype         datatype()              { return get_mpi_datatype<U>(); }
     static const void*          address(const VecU& x)  { return &x[0]; }
     static void*                address(VecU& x)        { return &x[0]; }
-    static int                  count(const VecU& x)    { return x.size(); }
+    static int                  count(const VecU& x)    { return static_cast<int>(x.size()); }
   };
 
 }

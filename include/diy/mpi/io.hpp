@@ -120,7 +120,7 @@ read_at(offset o, char* buffer, size_t size)
 {
 #ifndef DIY_NO_MPI
   status s;
-  MPI_File_read_at(fh, o, buffer, size, detail::get_mpi_datatype<char>(), &s.s);
+  MPI_File_read_at(fh, o, buffer, static_cast<int>(size), detail::get_mpi_datatype<char>(), &s.s);
 #else
   DIY_UNSUPPORTED_MPI_CALL(MPI_File_read_at);
 #endif
@@ -140,7 +140,7 @@ read_at_all(offset o, char* buffer, size_t size)
 {
 #ifndef DIY_NO_MPI
   status s;
-  MPI_File_read_at_all(fh, o, buffer, size, detail::get_mpi_datatype<char>(), &s.s);
+  MPI_File_read_at_all(fh, o, buffer, static_cast<int>(size), detail::get_mpi_datatype<char>(), &s.s);
 #else
   (void) o; (void) buffer; (void) size;
   DIY_UNSUPPORTED_MPI_CALL(MPI_File_read_at_all);
@@ -161,7 +161,7 @@ write_at(offset o, const char* buffer, size_t size)
 {
 #ifndef DIY_NO_MPI
   status s;
-  MPI_File_write_at(fh, o, (void *)buffer, size, detail::get_mpi_datatype<char>(), &s.s);
+  MPI_File_write_at(fh, o, (void *)buffer, static_cast<int>(size), detail::get_mpi_datatype<char>(), &s.s);
 #else
   (void) o; (void) buffer; (void) size;
   DIY_UNSUPPORTED_MPI_CALL(MPI_File_write_at);
@@ -182,7 +182,7 @@ write_at_all(offset o, const char* buffer, size_t size)
 {
 #ifndef DIY_NO_MPI
   status s;
-  MPI_File_write_at_all(fh, o, (void *)buffer, size, detail::get_mpi_datatype<char>(), &s.s);
+  MPI_File_write_at_all(fh, o, (void *)buffer, static_cast<int>(size), detail::get_mpi_datatype<char>(), &s.s);
 #else
   (void) o; (void) buffer; (void) size;
   DIY_UNSUPPORTED_MPI_CALL(MPI_File_write_at_all);
