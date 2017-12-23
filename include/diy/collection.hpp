@@ -81,7 +81,7 @@ clear()
 {
   if (own())
     for (size_t i = 0; i < size(); ++i)
-      destroy(i);
+      destroy(static_cast<int>(i));
   elements_.clear();
   external_.clear();
   *in_memory_.access() = 0;
