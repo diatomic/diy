@@ -703,6 +703,8 @@ diy::Master::
 foreach_(const Callback<Block>& f, const Skip& skip)
 {
     auto scoped = prof.scoped("foreach");
+    DIY_UNUSED(scoped);
+
     commands_.push_back(new Command<Block>(f, skip));
 
     if (immediate())
@@ -715,6 +717,7 @@ execute()
 {
   log->debug("Entered execute()");
   auto scoped = prof.scoped("execute");
+  DIY_UNUSED(scoped);
   //show_incoming_records();
 
   // touch the outgoing and incoming queues as well as collectives to make sure they exist
@@ -798,6 +801,8 @@ diy::Master::
 exchange()
 {
   auto scoped = prof.scoped("exchange");
+  DIY_UNUSED(scoped);
+
   execute();
 
   log->debug("Starting exchange");
@@ -1119,6 +1124,7 @@ diy::Master::
 process_collectives()
 {
   auto scoped = prof.scoped("collectives");
+  DIY_UNUSED(scoped);
 
   if (collectives_.empty())
       return;
