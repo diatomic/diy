@@ -230,7 +230,7 @@ namespace diy
       ProxyWithLink proxy(int i) const;
 
       //! return the number of local blocks
-      unsigned      size() const                        { return blocks_.size(); }
+      unsigned int  size() const                        { return static_cast<unsigned int>(blocks_.size()); }
       void*         create() const                      { return blocks_.create(); }
 
       // accessors
@@ -666,7 +666,7 @@ add(int gid, void* b, Link* l)
   links_.push_back(l);
   gids_.push_back(gid);
 
-  int lid = gids_.size() - 1;
+  int lid = static_cast<int>(gids_.size()) - 1;
   lids_[gid] = lid;
   add_expected(l->size_unique()); // NB: at every iteration we expect a message from each unique neighbor
 
@@ -1087,9 +1087,9 @@ flush()
   // XXX: with queues we could easily maintain a specific space limit
   int out_queues_limit;
   if (limit_ == -1 || size() == 0)
-    out_queues_limit = to_send.size();
+    out_queues_limit = static_cast<int>(to_send.size());
   else
-    out_queues_limit = std::max((size_t) 1, to_send.size()/size()*limit_);      // average number of queues per block * in-memory block limit
+    out_queues_limit = static_cast<int>(std::max((size_t) 1, to_send.size()/size()*limit_));      // average number of queues per block * in-memory block limit
 
   do
   {

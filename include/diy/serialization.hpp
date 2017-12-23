@@ -413,7 +413,10 @@ diy::MemoryBuffer::
 save_binary(const char* x, size_t count)
 {
   if (position + count > buffer.capacity())
-    buffer.reserve((position + count) * growth_multiplier());           // if we have to grow, grow geometrically
+  {
+    double newsize = static_cast<double>(position + count) * growth_multiplier();  // if we have to grow, grow geometrically
+    buffer.reserve(static_cast<size_t>(newsize));
+  }
 
   if (position + count > buffer.size())
     buffer.resize(position + count);

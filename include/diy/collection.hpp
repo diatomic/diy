@@ -39,7 +39,7 @@ namespace diy
       const CInt&   in_memory() const               { return in_memory_; }
       inline void   clear();
 
-      int           add(Element e)                  { elements_.push_back(e); external_.push_back(-1); ++(*in_memory_.access()); return elements_.size() - 1; }
+      int           add(Element e)                  { elements_.push_back(e); external_.push_back(-1); ++(*in_memory_.access()); return static_cast<int>(elements_.size()) - 1; }
       void*         release(int i)                  { void* e = get(i); elements_[i] = 0; return e; }
 
       void*         find(int i) const               { return elements_[i]; }                        // possibly returns 0, if the element is unloaded
