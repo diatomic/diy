@@ -10,6 +10,9 @@ Linux)
     openmpi) set -x;
       sudo apt-get install -y -q openmpi-bin libopenmpi-dev
       ;;
+    none)
+      echo "MPI (none)"
+      ;;
     *)
       echo "Unknown MPI implementation:" $1
       exit 1
