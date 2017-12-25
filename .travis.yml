@@ -14,6 +14,8 @@ env:
     - COMPILER=g++-5       MPI=openmpi
     - COMPILER=clang++-3.7 MPI=mpich
     - COMPILER=clang++-3.7 MPI=openmpi
+    - COMPILER=g++-5       MPI=none
+    - COMPILER=clang++-3.7 MPI=none
     - BUILD_DOCS=1
 
 addons:
@@ -41,7 +43,11 @@ before_script:
         sh conf/ci/travis-ci/install-mpi.sh $MPI;
         mkdir build;
         cd build;
-        cmake -DCMAKE_CXX_COMPILER=$COMPILER ..;
+        if [[ "$MPI" == "none" ]]; then
+            cmake -DCMAKE_CXX_COMPILER=$COMPILER -Dmpi=OFF ..;
+        else
+            cmake -DCMAKE_CXX_COMPILER=$COMPILER ..;
+        fi;
         make;
     fi
 
