@@ -29,11 +29,19 @@ add_test                    (kd-tree-test-sampling-exponential  scripts/kd-tree.
 
 add_test                    (decomposer-test                    decomposer-test)
 
-add_test                    (io-test                            io-test)
+if                          (mpi)
+    # currently, I/O is only supported when built with MPI support.
+    add_test                (io-test                            io-test)
+endif                       (mpi)
 
 add_test                    (swap-reduce-test                   scripts/swap-reduce.sh)
 add_test                    (swap-reduce-test-k4                scripts/swap-reduce.sh -k 4)
 
-add_test                    (merge-swap-reduce-test             scripts/merge-swap-reduce.sh ${MPIEXEC})
+if                          (mpi)
+    set                     (mpiexec_argument ${MPIEXEC})
+else                        (mpi)
+    set                     (mpiexec_argument)
+endif                       (mpi)
 
-add_test                    (simple-test                        scripts/simple.sh ${MPIEXEC})
+add_test                    (merge-swap-reduce-test             scripts/merge-swap-reduce.sh ${mpiexec_argument})
+add_test                    (simple-test                        scripts/simple.sh ${mpiexec_argument})
