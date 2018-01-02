@@ -30,9 +30,11 @@ matrix:
   include:
     - os: osx
       env: MPI=mpich
+      language: generic
     - os: osx
       osx_image: xcode8
       env: MPI=openmpi
+      language: generic
 
 before_script:
   - if [[ -z $BUILD_DOCS ]]; then
