@@ -1,4 +1,5 @@
-language: cpp
+language: python
+python: 3.5
 
 os:   linux
 dist: trusty
@@ -23,16 +24,17 @@ addons:
     packages:
       - g++-5
       - clang-3.7
-      - python3
       - doxygen
 
 matrix:
   include:
     - os: osx
       env: MPI=mpich
+      language: cpp
     - os: osx
       osx_image: xcode8
       env: MPI=openmpi
+      language: cpp
 
 before_script:
   - if [[ -z $BUILD_DOCS ]]; then
