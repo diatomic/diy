@@ -101,7 +101,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;  {</div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    <span class="keyword">public</span>:</div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;                <a class="code" href="classdiy_1_1mpi_1_1communicator.html">communicator</a>(MPI_Comm comm = MPI_COMM_WORLD):</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;                  comm_(comm)                       { MPI_Comm_rank(comm_, &amp;rank_); MPI_Comm_size(comm_, &amp;size_); }</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;                  comm_(comm), rank_(0), size_(1)   { <span class="keywordflow">if</span> (comm != MPI_COMM_NULL) { MPI_Comm_rank(comm_, &amp;rank_); MPI_Comm_size(comm_, &amp;size_); } }</div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;      <span class="keywordtype">int</span>       rank()<span class="keyword"> const                        </span>{ <span class="keywordflow">return</span> rank_; }</div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;      <span class="keywordtype">int</span>       size()<span class="keyword"> const                        </span>{ <span class="keywordflow">return</span> size_; }</div>
@@ -167,7 +167,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 5 2017 19:01:44 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jan 3 2018 02:34:19 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
