@@ -100,8 +100,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00008"></a><span class="lineno"><a class="line" href="classdiy_1_1mpi_1_1communicator.html">    8</a></span>&#160;  <span class="keyword">class </span><a class="code" href="classdiy_1_1mpi_1_1communicator.html">communicator</a></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;  {</div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;                <a class="code" href="classdiy_1_1mpi_1_1communicator.html">communicator</a>(MPI_Comm comm = MPI_COMM_WORLD):</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;                  comm_(comm), rank_(0), size_(1)   { <span class="keywordflow">if</span> (comm != MPI_COMM_NULL) { MPI_Comm_rank(comm_, &amp;rank_); MPI_Comm_size(comm_, &amp;size_); } }</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;                <span class="keyword">inline</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;                <a class="code" href="classdiy_1_1mpi_1_1communicator.html">communicator</a>(MPI_Comm comm = MPI_COMM_WORLD);</div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;      <span class="keywordtype">int</span>       rank()<span class="keyword"> const                        </span>{ <span class="keywordflow">return</span> rank_; }</div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;      <span class="keywordtype">int</span>       size()<span class="keyword"> const                        </span>{ <span class="keywordflow">return</span> size_; }</div>
@@ -123,51 +123,94 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;      <span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
 <div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="classdiy_1_1mpi_1_1communicator.html#ac8953e70e3bb38f820279f2e3c57e9ff">   38</a></span>&#160;      <a class="code" href="structdiy_1_1mpi_1_1request.html">request</a>   <a class="code" href="classdiy_1_1mpi_1_1communicator.html#ac8953e70e3bb38f820279f2e3c57e9ff">irecv</a>(<span class="keywordtype">int</span> source, <span class="keywordtype">int</span> tag, T&amp; x)<span class="keyword"> const      </span>{ <span class="keywordflow">return</span> detail::irecv&lt;T&gt;()(comm_, source, tag, x); }</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
-<div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="classdiy_1_1mpi_1_1communicator.html#ae52f4b371cb62394770aa1e7605cbabb">   41</a></span>&#160;      <a class="code" href="structdiy_1_1mpi_1_1status.html">status</a>    <a class="code" href="classdiy_1_1mpi_1_1communicator.html#ae52f4b371cb62394770aa1e7605cbabb">probe</a>(<span class="keywordtype">int</span> source, <span class="keywordtype">int</span> tag)<span class="keyword"> const            </span>{ <a class="code" href="structdiy_1_1mpi_1_1status.html">status</a> s; MPI_Probe(source, tag, comm_, &amp;s.s); <span class="keywordflow">return</span> s; }</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;      <span class="keyword">inline</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      <a class="code" href="structdiy_1_1mpi_1_1optional.html">optional&lt;status&gt;</a></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;                <a class="code" href="classdiy_1_1mpi_1_1communicator.html#a985ffab378f21b2b5f70a4cc1ddb3dc9">iprobe</a>(<span class="keywordtype">int</span> source, <span class="keywordtype">int</span> tag) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
-<div class="line"><a name="l00049"></a><span class="lineno"><a class="line" href="classdiy_1_1mpi_1_1communicator.html#adbc7ea9a65ef0e8e52875511e72aa643">   49</a></span>&#160;      <span class="keywordtype">void</span>      <a class="code" href="classdiy_1_1mpi_1_1communicator.html#adbc7ea9a65ef0e8e52875511e72aa643">barrier</a>()<span class="keyword"> const                             </span>{ MPI_Barrier(comm_); }</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;                <span class="keyword">operator</span> MPI_Comm()<span class="keyword"> const                   </span>{ <span class="keywordflow">return</span> comm_; }</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;      <span class="keyword">inline</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      <a class="code" href="structdiy_1_1mpi_1_1status.html">status</a>    <a class="code" href="classdiy_1_1mpi_1_1communicator.html#aedd24dd693fc544b3742ff613f4621ec">probe</a>(<span class="keywordtype">int</span> source, <span class="keywordtype">int</span> tag) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      <span class="keyword">inline</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;      <a class="code" href="structdiy_1_1mpi_1_1optional.html">optional&lt;status&gt;</a></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;                <a class="code" href="classdiy_1_1mpi_1_1communicator.html#a985ffab378f21b2b5f70a4cc1ddb3dc9">iprobe</a>(<span class="keywordtype">int</span> source, <span class="keywordtype">int</span> tag) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;      <span class="keyword">inline</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;      <span class="keywordtype">void</span>      <a class="code" href="classdiy_1_1mpi_1_1communicator.html#adbc7ea9a65ef0e8e52875511e72aa643">barrier</a>() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;      MPI_Comm  comm_;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;      <span class="keywordtype">int</span>       rank_;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      <span class="keywordtype">int</span>       size_;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  };</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;}</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;}</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<a class="code" href="structdiy_1_1mpi_1_1optional.html">diy::mpi::optional&lt;diy::mpi::status&gt;</a></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<a class="code" href="classdiy_1_1mpi_1_1communicator.html#a985ffab378f21b2b5f70a4cc1ddb3dc9">diy::mpi::communicator::</a></div>
-<div class="line"><a name="l00063"></a><span class="lineno"><a class="line" href="classdiy_1_1mpi_1_1communicator.html#a985ffab378f21b2b5f70a4cc1ddb3dc9">   63</a></span>&#160;<a class="code" href="classdiy_1_1mpi_1_1communicator.html#a985ffab378f21b2b5f70a4cc1ddb3dc9">iprobe</a>(<span class="keywordtype">int</span> source, <span class="keywordtype">int</span> tag)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  <a class="code" href="structdiy_1_1mpi_1_1status.html">status</a> s;</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  <span class="keywordtype">int</span> flag;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  MPI_Iprobe(source, tag, comm_, &amp;flag, &amp;s.s);</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  <span class="keywordflow">if</span> (flag)</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keywordflow">return</span> s;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="structdiy_1_1mpi_1_1optional.html">optional&lt;status&gt;</a>();</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;}</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;                <span class="keyword">operator</span> MPI_Comm()<span class="keyword"> const                   </span>{ <span class="keywordflow">return</span> comm_; }</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      MPI_Comm  comm_;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      <span class="keywordtype">int</span>       rank_;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;      <span class="keywordtype">int</span>       size_;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  };</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;}</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;}</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;diy::mpi::communicator::</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;communicator(MPI_Comm comm)</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;:comm_(comm), rank_(0), size_(1)</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;{</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">#ifndef DIY_NO_MPI</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor"></span>  <span class="keywordflow">if</span> (comm != MPI_COMM_NULL)</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  {</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    MPI_Comm_rank(comm_, &amp;rank_);</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    MPI_Comm_size(comm_, &amp;size_);</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  }</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="preprocessor"></span>}</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<a class="code" href="structdiy_1_1mpi_1_1status.html">diy::mpi::status</a></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<a class="code" href="classdiy_1_1mpi_1_1communicator.html#aedd24dd693fc544b3742ff613f4621ec">diy::mpi::communicator::</a></div>
+<div class="line"><a name="l00078"></a><span class="lineno"><a class="line" href="classdiy_1_1mpi_1_1communicator.html#aedd24dd693fc544b3742ff613f4621ec">   78</a></span>&#160;<a class="code" href="classdiy_1_1mpi_1_1communicator.html#aedd24dd693fc544b3742ff613f4621ec">probe</a>(<span class="keywordtype">int</span> source, <span class="keywordtype">int</span> tag)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  (void) source;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  (void) tag;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="preprocessor">#ifndef DIY_NO_MPI</span></div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="preprocessor"></span>  <a class="code" href="structdiy_1_1mpi_1_1status.html">status</a> s;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  MPI_Probe(source, tag, comm_, &amp;s.s);</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  <span class="keywordflow">return</span> s;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="preprocessor"></span>  DIY_UNSUPPORTED_MPI_CALL(MPI_Probe);</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="preprocessor"></span>}</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<a class="code" href="structdiy_1_1mpi_1_1optional.html">diy::mpi::optional&lt;diy::mpi::status&gt;</a></div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<a class="code" href="classdiy_1_1mpi_1_1communicator.html#a985ffab378f21b2b5f70a4cc1ddb3dc9">diy::mpi::communicator::</a></div>
+<div class="line"><a name="l00094"></a><span class="lineno"><a class="line" href="classdiy_1_1mpi_1_1communicator.html#a985ffab378f21b2b5f70a4cc1ddb3dc9">   94</a></span>&#160;<a class="code" href="classdiy_1_1mpi_1_1communicator.html#a985ffab378f21b2b5f70a4cc1ddb3dc9">iprobe</a>(<span class="keywordtype">int</span> source, <span class="keywordtype">int</span> tag)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  (void) source;</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  (void) tag;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="preprocessor">#ifndef DIY_NO_MPI</span></div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="preprocessor"></span>  <a class="code" href="structdiy_1_1mpi_1_1status.html">status</a> s;</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  <span class="keywordtype">int</span> flag;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  MPI_Iprobe(source, tag, comm_, &amp;flag, &amp;s.s);</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  <span class="keywordflow">if</span> (flag)</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <span class="keywordflow">return</span> s;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="preprocessor"></span>  <span class="keywordflow">return</span> <a class="code" href="structdiy_1_1mpi_1_1optional.html">optional&lt;status&gt;</a>();</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;}</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="keywordtype">void</span></div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<a class="code" href="classdiy_1_1mpi_1_1communicator.html#adbc7ea9a65ef0e8e52875511e72aa643">diy::mpi::communicator::</a></div>
+<div class="line"><a name="l00110"></a><span class="lineno"><a class="line" href="classdiy_1_1mpi_1_1communicator.html#adbc7ea9a65ef0e8e52875511e72aa643">  110</a></span>&#160;<a class="code" href="classdiy_1_1mpi_1_1communicator.html#adbc7ea9a65ef0e8e52875511e72aa643">barrier</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="preprocessor">#ifndef DIY_NO_MPI</span></div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="preprocessor"></span>  MPI_Barrier(comm_);</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="preprocessor"></span>}</div>
 <div class="ttc" id="classdiy_1_1mpi_1_1communicator_html_ac30151886b5c0927314e051ccac2a69b"><div class="ttname"><a href="classdiy_1_1mpi_1_1communicator.html#ac30151886b5c0927314e051ccac2a69b">diy::mpi::communicator::isend</a></div><div class="ttdeci">request isend(int dest, int tag, const T &amp;x) const </div><div class="ttdoc">Non-blocking version of send(). </div><div class="ttdef"><b>Definition:</b> communicator.hpp:33</div></div>
+<div class="ttc" id="classdiy_1_1mpi_1_1communicator_html_aedd24dd693fc544b3742ff613f4621ec"><div class="ttname"><a href="classdiy_1_1mpi_1_1communicator.html#aedd24dd693fc544b3742ff613f4621ec">diy::mpi::communicator::probe</a></div><div class="ttdeci">status probe(int source, int tag) const </div><div class="ttdoc">probe </div><div class="ttdef"><b>Definition:</b> communicator.hpp:78</div></div>
 <div class="ttc" id="classdiy_1_1mpi_1_1communicator_html"><div class="ttname"><a href="classdiy_1_1mpi_1_1communicator.html">diy::mpi::communicator</a></div><div class="ttdoc">Simple wrapper around MPI_Comm. </div><div class="ttdef"><b>Definition:</b> communicator.hpp:8</div></div>
 <div class="ttc" id="classdiy_1_1mpi_1_1communicator_html_ac8953e70e3bb38f820279f2e3c57e9ff"><div class="ttname"><a href="classdiy_1_1mpi_1_1communicator.html#ac8953e70e3bb38f820279f2e3c57e9ff">diy::mpi::communicator::irecv</a></div><div class="ttdeci">request irecv(int source, int tag, T &amp;x) const </div><div class="ttdoc">Non-blocking version of recv(). If T is an std::vector&lt;...&gt;, its size must be big enough to accomodat...</div><div class="ttdef"><b>Definition:</b> communicator.hpp:38</div></div>
-<div class="ttc" id="classdiy_1_1mpi_1_1communicator_html_adbc7ea9a65ef0e8e52875511e72aa643"><div class="ttname"><a href="classdiy_1_1mpi_1_1communicator.html#adbc7ea9a65ef0e8e52875511e72aa643">diy::mpi::communicator::barrier</a></div><div class="ttdeci">void barrier() const </div><div class="ttdoc">barrier </div><div class="ttdef"><b>Definition:</b> communicator.hpp:49</div></div>
+<div class="ttc" id="classdiy_1_1mpi_1_1communicator_html_adbc7ea9a65ef0e8e52875511e72aa643"><div class="ttname"><a href="classdiy_1_1mpi_1_1communicator.html#adbc7ea9a65ef0e8e52875511e72aa643">diy::mpi::communicator::barrier</a></div><div class="ttdeci">void barrier() const </div><div class="ttdoc">barrier </div><div class="ttdef"><b>Definition:</b> communicator.hpp:110</div></div>
 <div class="ttc" id="structdiy_1_1mpi_1_1status_html"><div class="ttname"><a href="structdiy_1_1mpi_1_1status.html">diy::mpi::status</a></div><div class="ttdef"><b>Definition:</b> status.hpp:5</div></div>
 <div class="ttc" id="classdiy_1_1mpi_1_1communicator_html_a49d6b9d40158decf77b6b2f9b866779d"><div class="ttname"><a href="classdiy_1_1mpi_1_1communicator.html#a49d6b9d40158decf77b6b2f9b866779d">diy::mpi::communicator::recv</a></div><div class="ttdeci">status recv(int source, int tag, T &amp;x) const </div><div class="ttdoc">Receive x from dest using tag (blocking). If T is an std::vector&lt;...&gt;, recv will resize it to fit exa...</div><div class="ttdef"><b>Definition:</b> communicator.hpp:29</div></div>
-<div class="ttc" id="classdiy_1_1mpi_1_1communicator_html_a985ffab378f21b2b5f70a4cc1ddb3dc9"><div class="ttname"><a href="classdiy_1_1mpi_1_1communicator.html#a985ffab378f21b2b5f70a4cc1ddb3dc9">diy::mpi::communicator::iprobe</a></div><div class="ttdeci">optional&lt; status &gt; iprobe(int source, int tag) const </div><div class="ttdoc">iprobe </div><div class="ttdef"><b>Definition:</b> communicator.hpp:63</div></div>
+<div class="ttc" id="classdiy_1_1mpi_1_1communicator_html_a985ffab378f21b2b5f70a4cc1ddb3dc9"><div class="ttname"><a href="classdiy_1_1mpi_1_1communicator.html#a985ffab378f21b2b5f70a4cc1ddb3dc9">diy::mpi::communicator::iprobe</a></div><div class="ttdeci">optional&lt; status &gt; iprobe(int source, int tag) const </div><div class="ttdoc">iprobe </div><div class="ttdef"><b>Definition:</b> communicator.hpp:94</div></div>
 <div class="ttc" id="structdiy_1_1mpi_1_1optional_html"><div class="ttname"><a href="structdiy_1_1mpi_1_1optional.html">diy::mpi::optional</a></div><div class="ttdef"><b>Definition:</b> optional.hpp:6</div></div>
 <div class="ttc" id="structdiy_1_1mpi_1_1request_html"><div class="ttname"><a href="structdiy_1_1mpi_1_1request.html">diy::mpi::request</a></div><div class="ttdef"><b>Definition:</b> request.hpp:5</div></div>
 <div class="ttc" id="classdiy_1_1mpi_1_1communicator_html_ac5f9c84d379538d3d2d1468df26963dc"><div class="ttname"><a href="classdiy_1_1mpi_1_1communicator.html#ac5f9c84d379538d3d2d1468df26963dc">diy::mpi::communicator::send</a></div><div class="ttdeci">void send(int dest, int tag, const T &amp;x) const </div><div class="ttdoc">Send x to processor dest using tag (blocking). </div><div class="ttdef"><b>Definition:</b> communicator.hpp:24</div></div>
-<div class="ttc" id="classdiy_1_1mpi_1_1communicator_html_ae52f4b371cb62394770aa1e7605cbabb"><div class="ttname"><a href="classdiy_1_1mpi_1_1communicator.html#ae52f4b371cb62394770aa1e7605cbabb">diy::mpi::communicator::probe</a></div><div class="ttdeci">status probe(int source, int tag) const </div><div class="ttdoc">probe </div><div class="ttdef"><b>Definition:</b> communicator.hpp:41</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jan 3 2018 02:34:19 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jan 4 2018 23:08:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

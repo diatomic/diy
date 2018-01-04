@@ -228,6 +228,7 @@
 ./nav_f.png
 ./nav_g.png
 ./nav_h.png
+./no-mpi_8hpp_source.html
 ./no-thread_8hpp_source.html
 ./numpy_8hpp_source.html
 ./open.png
@@ -425,6 +426,8 @@
 ./stats_8hpp_source.html
 ./status_8hpp_source.html
 ./storage_8hpp_source.html
+./struct_m_p_i___status-members.html
+./struct_m_p_i___status.html
 ./structdiy_1_1_binary_buffer-members.html
 ./structdiy_1_1_binary_buffer.html
 ./structdiy_1_1_binary_buffer.png
