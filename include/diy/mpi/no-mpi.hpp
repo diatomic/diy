@@ -1,6 +1,8 @@
 #ifndef DIY_MPI_NO_MPI_HPP
 #define DIY_MPI_NO_MPI_HPP
 
+#include <stdexcept> // std::runtime_error
+
 
 static const int MPI_SUCCESS = 0;
 static const int MPI_ANY_SOURCE = -1;
