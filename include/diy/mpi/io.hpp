@@ -1,6 +1,8 @@
 #ifndef DIY_MPI_IO_HPP
 #define DIY_MPI_IO_HPP
 
+#include <diy/constants.h>
+
 #include <vector>
 #include <string>
 
@@ -74,7 +76,8 @@ file(const communicator& comm, const std::string& filename, int mode)
 #ifndef DIY_NO_MPI
   MPI_File_open(comm, const_cast<char*>(filename.c_str()), mode, MPI_INFO_NULL, &fh);
 #else
-  (void) filename; (void) mode;
+  DIY_UNUSED(filename);
+  DIY_UNUSED(mode);
   DIY_UNSUPPORTED_MPI_CALL(MPI_File_open);
 #endif
 }
@@ -109,7 +112,7 @@ resize(diy::mpi::io::offset size)
 #ifndef DIY_NO_MPI
   MPI_File_set_size(fh, size);
 #else
-  (void) size;
+  DIY_UNUSED(size);
   DIY_UNSUPPORTED_MPI_CALL(MPI_File_set_size);
 #endif
 }
@@ -122,6 +125,9 @@ read_at(offset o, char* buffer, size_t size)
   status s;
   MPI_File_read_at(fh, o, buffer, static_cast<int>(size), detail::get_mpi_datatype<char>(), &s.s);
 #else
+  DIY_UNUSED(o);
+  DIY_UNUSED(buffer);
+  DIY_UNUSED(size);
   DIY_UNSUPPORTED_MPI_CALL(MPI_File_read_at);
 #endif
 }
@@ -142,7 +148,9 @@ read_at_all(offset o, char* buffer, size_t size)
   status s;
   MPI_File_read_at_all(fh, o, buffer, static_cast<int>(size), detail::get_mpi_datatype<char>(), &s.s);
 #else
-  (void) o; (void) buffer; (void) size;
+  DIY_UNUSED(o);
+  DIY_UNUSED(buffer);
+  DIY_UNUSED(size);
   DIY_UNSUPPORTED_MPI_CALL(MPI_File_read_at_all);
 #endif
 }
@@ -163,7 +171,9 @@ write_at(offset o, const char* buffer, size_t size)
   status s;
   MPI_File_write_at(fh, o, (void *)buffer, static_cast<int>(size), detail::get_mpi_datatype<char>(), &s.s);
 #else
-  (void) o; (void) buffer; (void) size;
+  DIY_UNUSED(o);
+  DIY_UNUSED(buffer);
+  DIY_UNUSED(size);
   DIY_UNSUPPORTED_MPI_CALL(MPI_File_write_at);
 #endif
 }
@@ -184,7 +194,9 @@ write_at_all(offset o, const char* buffer, size_t size)
   status s;
   MPI_File_write_at_all(fh, o, (void *)buffer, static_cast<int>(size), detail::get_mpi_datatype<char>(), &s.s);
 #else
-  (void) o; (void) buffer; (void) size;
+  DIY_UNUSED(o);
+  DIY_UNUSED(buffer);
+  DIY_UNUSED(size);
   DIY_UNSUPPORTED_MPI_CALL(MPI_File_write_at_all);
 #endif
 }
