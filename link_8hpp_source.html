@@ -111,7 +111,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    <span class="keyword">public</span>:</div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;      <span class="keyword">virtual</span>   ~<a class="code" href="classdiy_1_1_link.html">Link</a>()                             {}  <span class="comment">// need to be able to delete derived classes</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;      <span class="keywordtype">int</span>       size()<span class="keyword"> const                        </span>{ <span class="keywordflow">return</span> neighbors_.size(); }</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;      <span class="keywordtype">int</span>       size()<span class="keyword"> const                        </span>{ <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(neighbors_.size()); }</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;      <span class="keyword">inline</span></div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;      <span class="keywordtype">int</span>       size_unique() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;      <a class="code" href="structdiy_1_1_block_i_d.html">BlockID</a>   target(<span class="keywordtype">int</span> i)<span class="keyword"> const                 </span>{ <span class="keywordflow">return</span> neighbors_[i]; }</div>
@@ -295,7 +295,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;<span class="keyword"></span>{</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    std::vector&lt;BlockID&gt; tmp(neighbors_.begin(), neighbors_.end());</div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    <a class="code" href="group___algorithms.html#gad7301f5d7bb62b79ca679affdf874ace">std::sort</a>(tmp.begin(), tmp.end());</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    <span class="keywordflow">return</span> std::unique(tmp.begin(), tmp.end()) - tmp.begin();</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(std::unique(tmp.begin(), tmp.end()) - tmp.begin());</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;}</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;</div>
 <div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> Bounds&gt;</div>
@@ -326,7 +326,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 4 2018 23:08:35 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Jan 5 2018 17:26:29 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

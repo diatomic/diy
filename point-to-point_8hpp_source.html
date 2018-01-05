@@ -156,7 +156,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      MPI_Probe(source, tag, comm, &amp;s.s);</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;      x.resize(s.count&lt;U&gt;());</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;      MPI_Recv(&amp;x[0], x.size(), get_mpi_datatype&lt;U&gt;(), source, tag, comm, &amp;s.s);</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;      MPI_Recv(&amp;x[0], static_cast&lt;int&gt;(x.size()), get_mpi_datatype&lt;U&gt;(), source, tag, comm, &amp;s.s);</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;      <span class="keywordflow">return</span> s;</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">#else</span></div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor"></span>      (void) comm; (void) source; (void) tag; (void) x;</div>
@@ -218,7 +218,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 4 2018 23:08:35 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Jan 5 2018 17:26:29 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

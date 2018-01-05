@@ -133,7 +133,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;      <span class="keyword">const</span> <a class="code" href="classdiy_1_1critical__resource.html">CInt</a>&amp;   in_memory()<span class="keyword"> const               </span>{ <span class="keywordflow">return</span> in_memory_; }</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;      <span class="keyword">inline</span> <span class="keywordtype">void</span>   clear();</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      <span class="keywordtype">int</span>           add(Element e)                  { elements_.push_back(e); external_.push_back(-1); ++(*in_memory_.access()); <span class="keywordflow">return</span> elements_.size() - 1; }</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      <span class="keywordtype">int</span>           add(Element e)                  { elements_.push_back(e); external_.push_back(-1); ++(*in_memory_.access()); <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(elements_.size()) - 1; }</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      <span class="keywordtype">void</span>*         release(<span class="keywordtype">int</span> i)                  { <span class="keywordtype">void</span>* e = <span class="keyword">get</span>(i); elements_[i] = 0; <span class="keywordflow">return</span> e; }</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      <span class="keywordtype">void</span>*         find(<span class="keywordtype">int</span> i)<span class="keyword"> const               </span>{ <span class="keywordflow">return</span> elements_[i]; }                        <span class="comment">// possibly returns 0, if the element is unloaded</span></div>
@@ -175,7 +175,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;{</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  <span class="keywordflow">if</span> (own())</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; size(); ++i)</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;      destroy(i);</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;      destroy(static_cast&lt;int&gt;(i));</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  elements_.clear();</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  external_.clear();</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  *in_memory_.access() = 0;</div>
@@ -220,7 +220,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 4 2018 23:08:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Jan 5 2018 17:26:28 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

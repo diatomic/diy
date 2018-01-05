@@ -179,7 +179,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  <span class="keyword">struct </span>ReduceNeverSkip</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  {</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="keywordtype">bool</span> operator()(<span class="keywordtype">int</span> round, <span class="keywordtype">int</span> lid, <span class="keyword">const</span> Master&amp; master)<span class="keyword"> const  </span>{ <span class="keywordflow">return</span> <span class="keyword">false</span>; }</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="keywordtype">bool</span> operator()(<span class="keywordtype">int</span>, <span class="keywordtype">int</span>, <span class="keyword">const</span> Master&amp;)<span class="keyword"> const  </span>{ <span class="keywordflow">return</span> <span class="keyword">false</span>; }</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  };</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;}</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;</div>
@@ -205,13 +205,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    master.execute();</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;</div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="keywordtype">int</span> expected = 0;</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; master.<a class="code" href="classdiy_1_1_master.html#afd41d766a657a7b5e3aa6eb2ed141ecd">size</a>(); ++i)</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; master.<a class="code" href="classdiy_1_1_master.html#acf5ddc5dbd765ce578571aa90c238b45">size</a>(); ++i)</div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    {</div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;      <span class="keywordflow">if</span> (partners.active(round + 1, master.<a class="code" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>(i), master))</div>
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;      {</div>
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        std::vector&lt;int&gt; incoming_gids;</div>
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;        partners.incoming(round + 1, master.<a class="code" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>(i), incoming_gids, master);</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        expected += incoming_gids.size();</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        expected += <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(incoming_gids.size());</div>
 <div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;        master.incoming(master.<a class="code" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>(i)).clear();</div>
 <div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;      }</div>
 <div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    }</div>
@@ -293,6 +293,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="classdiy_1_1_assigner_html_a61ea8499c8c28934f94e18e635e06436"><div class="ttname"><a href="classdiy_1_1_assigner.html#a61ea8499c8c28934f94e18e635e06436">diy::Assigner::nblocks</a></div><div class="ttdeci">int nblocks() const </div><div class="ttdoc">returns the total number of global blocks </div><div class="ttdef"><b>Definition:</b> assigner.hpp:26</div></div>
 <div class="ttc" id="classdiy_1_1_master_html_a20e686efa0c9389b4ed943277ccfffbc"><div class="ttname"><a href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">diy::Master::gid</a></div><div class="ttdeci">int gid(int i) const </div><div class="ttdoc">return gid of the i-th block </div><div class="ttdef"><b>Definition:</b> master.hpp:219</div></div>
 <div class="ttc" id="group___communication_html_ga4254d5b9c3e97e5d5d73dd019023257f"><div class="ttname"><a href="group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f">diy::reduce</a></div><div class="ttdeci">void reduce(Master &amp;master, const Assigner &amp;assigner, const Partners &amp;partners, const Reduce &amp;reduce, const Skip &amp;skip)</div><div class="ttdoc">Implementation of the reduce communication pattern (includes swap-reduce, merge-reduce, and any other global communication). </div><div class="ttdef"><b>Definition:</b> reduce.hpp:109</div></div>
+<div class="ttc" id="classdiy_1_1_master_html_acf5ddc5dbd765ce578571aa90c238b45"><div class="ttname"><a href="classdiy_1_1_master.html#acf5ddc5dbd765ce578571aa90c238b45">diy::Master::size</a></div><div class="ttdeci">unsigned int size() const </div><div class="ttdoc">return the number of local blocks </div><div class="ttdef"><b>Definition:</b> master.hpp:233</div></div>
 <div class="ttc" id="classdiy_1_1_assigner_html_a272d33bcc94394f39880603084b55f38"><div class="ttname"><a href="classdiy_1_1_assigner.html#a272d33bcc94394f39880603084b55f38">diy::Assigner::rank</a></div><div class="ttdeci">virtual int rank(int gid) const =0</div><div class="ttdoc">returns the process rank of the block with global id gid (need not be local) </div></div>
 <div class="ttc" id="structdiy_1_1_reduce_proxy_html_a670b1f74a12b1dc0f43645cd4fa9f2ed"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html#a670b1f74a12b1dc0f43645cd4fa9f2ed">diy::ReduceProxy::set_round</a></div><div class="ttdeci">void set_round(unsigned r)</div><div class="ttdoc">advanced: change current round number </div><div class="ttdef"><b>Definition:</b> reduce.hpp:77</div></div>
 <div class="ttc" id="classdiy_1_1_assigner_html"><div class="ttname"><a href="classdiy_1_1_assigner.html">diy::Assigner</a></div><div class="ttdef"><b>Definition:</b> assigner.hpp:11</div></div>
@@ -305,11 +306,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="structdiy_1_1_reduce_proxy_html_a6ae6c22da66bea79cbf2702a5d51fe2b"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html#a6ae6c22da66bea79cbf2702a5d51fe2b">diy::ReduceProxy::block</a></div><div class="ttdeci">void * block() const </div><div class="ttdoc">returns pointer to block </div><div class="ttdef"><b>Definition:</b> reduce.hpp:64</div></div>
 <div class="ttc" id="structdiy_1_1_reduce_proxy_html_ab340a062e8e96bfb7428186e6f3046a8"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html#ab340a062e8e96bfb7428186e6f3046a8">diy::ReduceProxy::nblocks</a></div><div class="ttdeci">int nblocks() const </div><div class="ttdoc">returns total number of blocks </div><div class="ttdef"><b>Definition:</b> reduce.hpp:72</div></div>
 <div class="ttc" id="structdiy_1_1_reduce_proxy_html_ab3cba8511e114ecfd3e84a25f30f6bd9"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html#ab3cba8511e114ecfd3e84a25f30f6bd9">diy::ReduceProxy::assigner</a></div><div class="ttdeci">const Assigner &amp; assigner() const </div><div class="ttdoc">returns the assigner </div><div class="ttdef"><b>Definition:</b> reduce.hpp:74</div></div>
-<div class="ttc" id="classdiy_1_1_master_html_afd41d766a657a7b5e3aa6eb2ed141ecd"><div class="ttname"><a href="classdiy_1_1_master.html#afd41d766a657a7b5e3aa6eb2ed141ecd">diy::Master::size</a></div><div class="ttdeci">unsigned size() const </div><div class="ttdoc">return the number of local blocks </div><div class="ttdef"><b>Definition:</b> master.hpp:233</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 4 2018 23:08:35 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Jan 5 2018 17:26:29 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

@@ -437,7 +437,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;<a class="code" href="structdiy_1_1_regular_decomposer.html">diy::RegularDecomposer&lt;Bounds&gt;::</a></div>
 <div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;<a class="code" href="structdiy_1_1_regular_decomposer.html">gid_to_coords</a>(<span class="keywordtype">int</span> gid, DivisionsVector&amp; coords, <span class="keyword">const</span> DivisionsVector&amp; divisions)</div>
 <div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;{</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;  <span class="keywordtype">int</span> dim = divisions.size();</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;  <span class="keywordtype">int</span> dim = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(divisions.size());</div>
 <div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; dim; ++i)</div>
 <div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;  {</div>
 <div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;    coords.push_back(gid % divisions[i]);</div>
@@ -451,7 +451,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;<a class="code" href="structdiy_1_1_regular_decomposer.html">coords_to_gid</a>(<span class="keyword">const</span> DivisionsVector&amp; coords, <span class="keyword">const</span> DivisionsVector&amp; divisions)</div>
 <div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;{</div>
 <div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;  <span class="keywordtype">int</span> gid = 0;</div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = coords.size() - 1; i &gt;= 0; --i)</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = static_cast&lt;int&gt;(coords.size()) - 1; i &gt;= 0; --i)</div>
 <div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;  {</div>
 <div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;    gid *= divisions[i];</div>
 <div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;    gid += coords[i];</div>
@@ -759,7 +759,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 4 2018 23:08:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Jan 5 2018 17:26:28 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

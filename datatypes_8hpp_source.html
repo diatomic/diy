@@ -136,7 +136,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keyword">static</span> MPI_Datatype         datatype()              { <span class="keywordflow">return</span> get_mpi_datatype&lt;T&gt;(); }</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">void</span>*          address(<span class="keyword">const</span> T&amp; x)     { <span class="keywordflow">return</span> &amp;x; }</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span>*                address(T&amp; x)           { <span class="keywordflow">return</span> &amp;x; }</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">int</span>                  count(<span class="keyword">const</span> T&amp; x)       { <span class="keywordflow">return</span> 1; }</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">int</span>                  count(<span class="keyword">const</span> T&amp;)         { <span class="keywordflow">return</span> 1; }</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  };</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">class</span> U&gt;</div>
@@ -147,7 +147,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keyword">static</span> MPI_Datatype         datatype()              { <span class="keywordflow">return</span> get_mpi_datatype&lt;U&gt;(); }</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">void</span>*          address(<span class="keyword">const</span> VecU&amp; x)  { <span class="keywordflow">return</span> &amp;x[0]; }</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span>*                address(VecU&amp; x)        { <span class="keywordflow">return</span> &amp;x[0]; }</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">int</span>                  count(<span class="keyword">const</span> VecU&amp; x)    { <span class="keywordflow">return</span> x.size(); }</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">int</span>                  count(<span class="keyword">const</span> VecU&amp; x)    { <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(x.size()); }</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  };</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;}</div>
@@ -158,7 +158,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 4 2018 23:08:35 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Jan 5 2018 17:26:29 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

@@ -166,7 +166,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        <span class="keyword">typedef</span>     <a class="code" href="classdiy_1_1_regular_link.html">diy::RegularContinuousLink</a>      RCLink;</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; master.<a class="code" href="classdiy_1_1_master.html#afd41d766a657a7b5e3aa6eb2ed141ecd">size</a>(); ++i)</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; master.<a class="code" href="classdiy_1_1_master.html#acf5ddc5dbd765ce578571aa90c238b45">size</a>(); ++i)</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        {</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;            RCLink* link   = <span class="keyword">static_cast&lt;</span>RCLink*<span class="keyword">&gt;</span>(master.link(i));</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;            *link = RCLink(dim, domain, domain);</div>
@@ -202,7 +202,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;        <span class="comment">// update master.expected to match the links</span></div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        <span class="keywordtype">int</span> expected = 0;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; master.<a class="code" href="classdiy_1_1_master.html#afd41d766a657a7b5e3aa6eb2ed141ecd">size</a>(); ++i)</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; master.<a class="code" href="classdiy_1_1_master.html#acf5ddc5dbd765ce578571aa90c238b45">size</a>(); ++i)</div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;            expected += master.link(i)-&gt;size_unique();</div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;        master.set_expected(expected);</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    }</div>
@@ -222,7 +222,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;</div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        <span class="keyword">typedef</span>     <a class="code" href="classdiy_1_1_regular_link.html">diy::RegularContinuousLink</a>      RCLink;</div>
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; master.<a class="code" href="classdiy_1_1_master.html#afd41d766a657a7b5e3aa6eb2ed141ecd">size</a>(); ++i)</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; master.<a class="code" href="classdiy_1_1_master.html#acf5ddc5dbd765ce578571aa90c238b45">size</a>(); ++i)</div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        {</div>
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;            RCLink* link   = <span class="keyword">static_cast&lt;</span>RCLink*<span class="keyword">&gt;</span>(master.link(i));</div>
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;            *link = RCLink(dim, domain, domain);</div>
@@ -258,7 +258,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;</div>
 <div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;        <span class="comment">// update master.expected to match the links</span></div>
 <div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        <span class="keywordtype">int</span> expected = 0;</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; master.<a class="code" href="classdiy_1_1_master.html#afd41d766a657a7b5e3aa6eb2ed141ecd">size</a>(); ++i)</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; master.<a class="code" href="classdiy_1_1_master.html#acf5ddc5dbd765ce578571aa90c238b45">size</a>(); ++i)</div>
 <div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;            expected += master.link(i)-&gt;size_unique();</div>
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;        master.set_expected(expected);</div>
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    }</div>
@@ -271,6 +271,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="structdiy_1_1_regular_decomposer_html"><div class="ttname"><a href="structdiy_1_1_regular_decomposer.html">diy::RegularDecomposer</a></div><div class="ttdoc">Decomposes a regular (discrete or continuous) domain into even blocks; creates Links with Bounds alon...</div><div class="ttdef"><b>Definition:</b> decomposition.hpp:75</div></div>
 <div class="ttc" id="classdiy_1_1_master_html_a20e686efa0c9389b4ed943277ccfffbc"><div class="ttname"><a href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">diy::Master::gid</a></div><div class="ttdeci">int gid(int i) const </div><div class="ttdoc">return gid of the i-th block </div><div class="ttdef"><b>Definition:</b> master.hpp:219</div></div>
 <div class="ttc" id="group___communication_html_ga4254d5b9c3e97e5d5d73dd019023257f"><div class="ttname"><a href="group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f">diy::reduce</a></div><div class="ttdeci">void reduce(Master &amp;master, const Assigner &amp;assigner, const Partners &amp;partners, const Reduce &amp;reduce, const Skip &amp;skip)</div><div class="ttdoc">Implementation of the reduce communication pattern (includes swap-reduce, merge-reduce, and any other global communication). </div><div class="ttdef"><b>Definition:</b> reduce.hpp:109</div></div>
+<div class="ttc" id="classdiy_1_1_master_html_acf5ddc5dbd765ce578571aa90c238b45"><div class="ttname"><a href="classdiy_1_1_master.html#acf5ddc5dbd765ce578571aa90c238b45">diy::Master::size</a></div><div class="ttdeci">unsigned int size() const </div><div class="ttdoc">return the number of local blocks </div><div class="ttdef"><b>Definition:</b> master.hpp:233</div></div>
 <div class="ttc" id="group___communication_html_ga3dfb1bdb9c078d9f18fc6953295a0208"><div class="ttname"><a href="group___communication.html#ga3dfb1bdb9c078d9f18fc6953295a0208">diy::all_to_all</a></div><div class="ttdeci">void all_to_all(Master &amp;master, const Assigner &amp;assigner, const Op &amp;op, int k=2)</div><div class="ttdoc">all to all reduction </div><div class="ttdef"><b>Definition:</b> reduce-operations.hpp:18</div></div>
 <div class="ttc" id="classdiy_1_1_assigner_html"><div class="ttname"><a href="classdiy_1_1_assigner.html">diy::Assigner</a></div><div class="ttdef"><b>Definition:</b> assigner.hpp:11</div></div>
 <div class="ttc" id="classdiy_1_1_master_html"><div class="ttname"><a href="classdiy_1_1_master.html">diy::Master</a></div><div class="ttdef"><b>Definition:</b> master.hpp:35</div></div>
@@ -280,13 +281,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="classdiy_1_1_master_html_a78c622d124589e8e8be7fa7041a5f21c"><div class="ttname"><a href="classdiy_1_1_master.html#a78c622d124589e8e8be7fa7041a5f21c">diy::Master::communicator</a></div><div class="ttdeci">const mpi::communicator &amp; communicator() const </div><div class="ttdoc">return the MPI communicator </div><div class="ttdef"><b>Definition:</b> master.hpp:212</div></div>
 <div class="ttc" id="namespacediy_html_ad1fd3af6d561c31897636040e023a101"><div class="ttname"><a href="namespacediy.html#ad1fd3af6d561c31897636040e023a101">diy::interval</a></div><div class="ttdeci">diy::DiscreteBounds interval(int from, int to)</div><div class="ttdoc">Helper to create a 1-dimensional discrete domain with the specified extents. </div><div class="ttdef"><b>Definition:</b> types.hpp:28</div></div>
 <div class="ttc" id="structdiy_1_1_direction_html"><div class="ttname"><a href="structdiy_1_1_direction.html">diy::Direction</a></div><div class="ttdef"><b>Definition:</b> types.hpp:30</div></div>
-<div class="ttc" id="classdiy_1_1_master_html_afd41d766a657a7b5e3aa6eb2ed141ecd"><div class="ttname"><a href="classdiy_1_1_master.html#afd41d766a657a7b5e3aa6eb2ed141ecd">diy::Master::size</a></div><div class="ttdeci">unsigned size() const </div><div class="ttdoc">return the number of local blocks </div><div class="ttdef"><b>Definition:</b> master.hpp:233</div></div>
 <div class="ttc" id="structdiy_1_1_regular_swap_partners_html"><div class="ttname"><a href="structdiy_1_1_regular_swap_partners.html">diy::RegularSwapPartners</a></div><div class="ttdoc">Partners for swap-reduce. </div><div class="ttdef"><b>Definition:</b> swap.hpp:16</div></div>
 <div class="ttc" id="group___algorithms_html_gad7301f5d7bb62b79ca679affdf874ace"><div class="ttname"><a href="group___algorithms.html#gad7301f5d7bb62b79ca679affdf874ace">diy::sort</a></div><div class="ttdeci">void sort(Master &amp;master, const Assigner &amp;assigner, std::vector&lt; T &gt; Block::*values, std::vector&lt; T &gt; Block::*samples, size_t num_samples, const Cmp &amp;cmp, int k=2, bool samples_only=false)</div><div class="ttdoc">sample sort values of each block, store the boundaries between blocks in samples </div><div class="ttdef"><b>Definition:</b> algorithms.hpp:25</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 4 2018 23:08:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Jan 5 2018 17:26:28 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
