@@ -314,13 +314,13 @@ decompose(int rank, const Assigner& assigner, const Creator& create)
     while (!all(offsets, 1))
     {
       // next offset
-      int i;
-      for (i = 0; i < dim; ++i)
-        if (offsets[i] == 1)
-          offsets[i] = -1;
+      int j;
+      for (j = 0; j < dim; ++j)
+        if (offsets[j] == 1)
+          offsets[j] = -1;
         else
           break;
-      ++offsets[i];
+      ++offsets[j];
 
       if (all(offsets, 0)) continue;      // skip ourselves
 
