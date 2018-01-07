@@ -5,15 +5,12 @@
 #include <algorithm>
 #include <stdexcept>
 
-#include <unistd.h>
-#include <sys/stat.h>
-#include <dirent.h>
-
 #include "../mpi.hpp"
 #include "../assigner.hpp"
 #include "../master.hpp"
 #include "../storage.hpp"
 #include "../log.hpp"
+#include "utils.hpp"
 
 // Read and write collections of blocks using MPI-IO
 namespace diy
@@ -89,7 +86,7 @@ namespace io
 
     // truncate the file
     if (comm.rank() == 0)
-        truncate(outfilename.c_str(), 0);
+        diy::io::utils::truncate(outfilename.c_str(), 0);
 
     mpi::io::file f(comm, outfilename, mpi::io::file::wronly | mpi::io::file::create);
 
@@ -278,13 +275,11 @@ namespace split
     size_t size = 0;
     if (comm.rank() == 0)
     {
-        struct stat s;
-        if (stat(outfilename.c_str(), &s) == 0)
-        {
-            if (S_ISDIR(s.st_mode))
-                proceed = true;
-        } else if (mkdir(outfilename.c_str(), 0755) == 0)
-            proceed = true;
+        if (diy::io::utils::is_directory(outfilename))
+          proceed = true;
+        else if (diy::io::utils::make_directory(outfilename))
+          proceed = true;
+
         mpi::broadcast(comm, proceed, 0);
         mpi::reduce(comm, (size_t) master.size(), size, 0, std::plus<size_t>());
     } else
