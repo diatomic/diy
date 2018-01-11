@@ -1,5 +1,5 @@
 project                     (DIY)
-cmake_minimum_required      (VERSION 3.0)
+cmake_minimum_required      (VERSION 3.1)
 
 option                      (threads            "Build DIY with threading"                   ON)
 option                      (log                "Build DIY with logging"                     OFF)
@@ -31,7 +31,8 @@ if                          (profile)
 endif()
 
 # C++11
-set                         (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set                         (CMAKE_CXX_STANDARD 11)
+set                         (CMAKE_CXX_COMPILE_FEATURES cxx_constexpr cxx_rvalue_references)
 
 if                          (NOT mpi)
     add_definitions         (-DDIY_NO_MPI)
