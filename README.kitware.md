@@ -5,3 +5,4 @@ includes changes made primarily to the build system to allow it to be embedded
 into another source tree.
 
   * Add attributes to pass commit checks within VTK.
+  * Add a CMake file to install headers into VTK's install tree.
