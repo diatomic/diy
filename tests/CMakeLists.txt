@@ -23,25 +23,66 @@ target_link_libraries       (io-test                ${libraries})
 add_executable              (simple-test            simple.cpp)
 target_link_libraries       (simple-test            ${libraries})
 
-add_test                    (kd-tree-test                       scripts/kd-tree.sh)
-add_test                    (kd-tree-test-sampling              scripts/kd-tree.sh -s)
-add_test                    (kd-tree-test-sampling-exponential  scripts/kd-tree.sh -s -e)
+foreach                     (b 2 4 8 64)
+    add_test                (NAME kd-tree-test-b${b}
+                             COMMAND kd-tree-test -b ${b}
+                            )
+    add_test                (NAME kd-tree-test-sampling-b${b}
+                             COMMAND kd-tree-test -s -b ${b}
+                            )
+    add_test                (NAME kd-tree-test-sampling-exponential-b${b}
+                             COMMAND kd-tree-test -s -e -b ${b}
+                            )
+endforeach                  ()
 
-add_test                    (decomposer-test                    decomposer-test)
+add_test                    (NAME decomposer-test
+                             COMMAND decomposer-test
+                            )
 
 if                          (mpi)
     # currently, I/O is only supported when built with MPI support.
-    add_test                (io-test                            io-test)
+    add_test                (NAME io-test
+                             COMMAND io-test
+                            )
 endif                       (mpi)
 
-add_test                    (swap-reduce-test                   scripts/swap-reduce.sh)
-add_test                    (swap-reduce-test-k4                scripts/swap-reduce.sh -k 4)
+foreach                     (b 2 4 8 9 12 24 36 44 48 56 64)
+    add_test                (NAME swap-reduce-test-b${b}
+                             COMMAND swap-reduce-test -b ${b}
+                            )
+    add_test                (NAME swap-reduce-test-k4-b${b}
+                             COMMAND swap-reduce-test -k 4 -b ${b}
+                            )
+endforeach                  ()
 
-if                          (mpi)
-    set                     (mpiexec_argument ${MPIEXEC})
-else                        (mpi)
-    set                     (mpiexec_argument)
-endif                       (mpi)
 
-add_test                    (merge-swap-reduce-test             scripts/merge-swap-reduce.sh ${mpiexec_argument})
-add_test                    (simple-test                        scripts/simple.sh ${mpiexec_argument})
+if                          (mpi AND MPIEXEC)
+  set                       (maxp 3)
+  if                        (APPLE)
+      set                   (maxp 2)
+  endif()
+  foreach                   (p RANGE 1 ${maxp})
+      foreach               (b 2 4 8 9 12 24 36 44 48 56 64)
+          add_test          (NAME merge-swap-reduce-test-p${p}-b${b}
+                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:merge-swap-reduce-test> -b ${b}
+                            )
+      endforeach            (b)
+  endforeach                (p)
+  foreach                   (p 2 3)
+      math                  (EXPR b "${p} + 1")
+      add_test              (NAME simple-test-p${p}-b${b}
+                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:simple-test> -b ${b}
+                            )
+  endforeach                (p)
+else                        (mpi AND MPIEXEC)
+  foreach                   (b 2 4 8 9 12 24 36 44 48 56 64)
+      add_test              (NAME merge-swap-reduce-test-nompi-b${b}
+                             COMMAND merge-swap-reduce-test -b ${b}
+                            )
+  endforeach                (b)
+  foreach                   (b 3 4)
+      add_test              (NAME simple-test-nompi-b${b}
+                             COMMAND simple-test -b ${b}
+                            )
+  endforeach                (b)
+endif                       (mpi AND MPIEXEC)
