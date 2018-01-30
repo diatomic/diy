@@ -1,7 +1,9 @@
 project                     (DIY)
 cmake_minimum_required      (VERSION 3.1)
 
-option                      (threads            "Build DIY with threading"                   ON)
+include(CMakeDependentOption)
+
+cmake_dependent_option      (threads            "Build DIY with threading"                   ON "NOT WIN32" OFF)
 option                      (log                "Build DIY with logging"                     OFF)
 option                      (profile            "Build DIY with profiling"                   OFF)
 option                      (mpi                "Build DIY with mpi"                         ON)
