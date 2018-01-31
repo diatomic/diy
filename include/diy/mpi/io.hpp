@@ -1,7 +1,7 @@
 #ifndef DIY_MPI_IO_HPP
 #define DIY_MPI_IO_HPP
 
-#include <diy/constants.h>
+#include "../constants.h"
 
 #include <vector>
 #include <string>
