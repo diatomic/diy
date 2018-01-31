@@ -1163,15 +1163,17 @@ diy::Master::
 nudge()
 {
   bool success = false;
-  for (InFlightSendsList::iterator it = inflight_sends_.begin(); it != inflight_sends_.end(); ++it)
+  for (InFlightSendsList::iterator it = inflight_sends_.begin(); it != inflight_sends_.end();)
   {
     mpi::optional<mpi::status> ostatus = it->request.test();
     if (ostatus)
     {
       success = true;
-      InFlightSendsList::iterator rm = it;
-      --it;
-      inflight_sends_.erase(rm);
+      it = inflight_sends_.erase(it);
+    }
+    else
+    {
+      ++it;
     }
   }
   return success;
