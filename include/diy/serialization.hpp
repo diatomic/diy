@@ -186,7 +186,8 @@ namespace diy
     {
       size_t s = v.size();
       diy::save(bb, s);
-      diy::save(bb, &v[0], v.size());
+      if (s > 0)
+        diy::save(bb, &v[0], v.size());
     }
 
     static void         load(BinaryBuffer& bb, Vector& v)
@@ -194,7 +195,8 @@ namespace diy
       size_t s;
       diy::load(bb, s);
       v.resize(s);
-      diy::load(bb, &v[0], s);
+      if (s > 0)
+        diy::load(bb, &v[0], s);
     }
   };
 
@@ -207,7 +209,8 @@ namespace diy
     {
       size_t s = v.size();
       diy::save(bb, s);
-      diy::save(bb, &v[0], v.size());
+      if (s > 0)
+        diy::save(bb, &v[0], v.size());
     }
 
     static void         load(BinaryBuffer& bb, ValArray& v)
@@ -215,7 +218,8 @@ namespace diy
       size_t s;
       diy::load(bb, s);
       v.resize(s);
-      diy::load(bb, &v[0], s);
+      if (s > 0)
+        diy::load(bb, &v[0], s);
     }
   };
 
