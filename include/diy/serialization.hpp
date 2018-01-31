@@ -421,7 +421,7 @@ save_binary(const char* x, size_t count)
   if (position + count > buffer.size())
     buffer.resize(position + count);
 
-  std::copy(x, x + count, &buffer[position]);
+  std::copy_n(x, count, &buffer[position]);
   position += count;
 }
 
@@ -429,7 +429,7 @@ void
 diy::MemoryBuffer::
 load_binary(char* x, size_t count)
 {
-  std::copy(&buffer[position], &buffer[position + count], x);
+  std::copy_n(&buffer[position], count, x);
   position += count;
 }
 
@@ -437,7 +437,7 @@ void
 diy::MemoryBuffer::
 load_binary_back(char* x, size_t count)
 {
-  std::copy(&buffer[buffer.size() - count], &buffer[buffer.size()], x);
+  std::copy_n(&buffer[buffer.size() - count], count, x);
   buffer.resize(buffer.size() - count);
 }
 
@@ -451,7 +451,7 @@ copy(MemoryBuffer& from, MemoryBuffer& to)
 
   size_t total = sizeof(size_t) + sz;
   to.buffer.resize(to.position + total);
-  std::copy(&from.buffer[from.position], &from.buffer[from.position + total], &to.buffer[to.position]);
+  std::copy_n(&from.buffer[from.position], total, &to.buffer[to.position]);
   to.position += total;
   from.position += total;
 }
