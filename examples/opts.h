@@ -229,8 +229,8 @@ Option(const std::string& l, T& var,
 // Present
 struct PresentContainer: public BasicOption
 {
-                PresentContainer(char s, const std::string& l, const std::string& help):
-                    BasicOption(s,l,"","",help)           {}
+                PresentContainer(char s_, const std::string& l_, const std::string& help_):
+                    BasicOption(s_,l_,"","",help_)        {}
 };
 
 inline

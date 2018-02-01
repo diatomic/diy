@@ -155,8 +155,8 @@ int main(int argc, char* argv[])
         Block* b = new Block;                // create a new block
         // assign some values for the block
         // in this example, simply based on the block global id
-        for (unsigned i = 0; i < 3; ++i)
-            b->values.push_back(gid * 3 + i);
+        for (unsigned j = 0; j < 3; ++j)
+            b->values.push_back(gid * 3 + j);
 
         master.add(gid, b, link);            // add the current local block to the master
     }
