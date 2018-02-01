@@ -23,16 +23,16 @@ namespace diy
       typedef       detail::Load                                Load;
 
     public:
-                    Collection(Create               create,
-                               Destroy              destroy,
-                               ExternalStorage*     storage,
-                               Save                 save,
-                               Load                 load):
-                        create_(create),
-                        destroy_(destroy),
-                        storage_(storage),
-                        save_(save),
-                        load_(load),
+                    Collection(Create               create__,
+                               Destroy              destroy__,
+                               ExternalStorage*     storage__,
+                               Save                 save__,
+                               Load                 load__):
+                        create_(create__),
+                        destroy_(destroy__),
+                        storage_(storage__),
+                        save_(save__),
+                        load_(load__),
                         in_memory_(0)               {}
 
       size_t        size() const                    { return elements_.size(); }

@@ -129,8 +129,8 @@ void receive_histogram(void* b_, const diy::ReduceProxy& srp, Histogram& histogr
         srp.dequeue(nbr_gid, hist);
         if (histogram.size() < hist.size())
             histogram.resize(hist.size());
-        for (size_t i = 0; i < hist.size(); ++i)
-            histogram[i] += hist[i];
+        for (size_t j = 0; j < hist.size(); ++j)
+            histogram[j] += hist[j];
     }
 }
 
@@ -380,14 +380,14 @@ int main(int argc, char* argv[])
       block_bounds.max[0] = (gid + 1) * (block_size / chunk_size) - 1;
 
       reader.read(block_bounds, &b->values[0], true, chunk_size);
-      Value min = *std::min_element(b->values.begin(), b->values.end());
-      Value max = *std::max_element(b->values.begin(), b->values.end());
+      Value block_min = *std::min_element(b->values.begin(), b->values.end());
+      Value block_max = *std::max_element(b->values.begin(), b->values.end());
 
       master.add(gid, b, l);
 
       // post collectives to match the external data setting
-      master.proxy(i).all_reduce(min, diy::mpi::minimum<Value>());
-      master.proxy(i).all_reduce(max, diy::mpi::maximum<Value>());
+      master.proxy(i).all_reduce(block_min, diy::mpi::minimum<Value>());
+      master.proxy(i).all_reduce(block_max, diy::mpi::maximum<Value>());
     }
     if (world.rank() == 0)
       std::cout << "Array loaded" << std::endl;
