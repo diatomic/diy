@@ -1237,57 +1237,59 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l01163"></a><span class="lineno"> 1163</span>&#160;nudge()</div>
 <div class="line"><a name="l01164"></a><span class="lineno"> 1164</span>&#160;{</div>
 <div class="line"><a name="l01165"></a><span class="lineno"> 1165</span>&#160;  <span class="keywordtype">bool</span> success = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l01166"></a><span class="lineno"> 1166</span>&#160;  <span class="keywordflow">for</span> (InFlightSendsList::iterator it = inflight_sends_.begin(); it != inflight_sends_.end(); ++it)</div>
+<div class="line"><a name="l01166"></a><span class="lineno"> 1166</span>&#160;  <span class="keywordflow">for</span> (InFlightSendsList::iterator it = inflight_sends_.begin(); it != inflight_sends_.end();)</div>
 <div class="line"><a name="l01167"></a><span class="lineno"> 1167</span>&#160;  {</div>
 <div class="line"><a name="l01168"></a><span class="lineno"> 1168</span>&#160;    mpi::optional&lt;mpi::status&gt; ostatus = it-&gt;request.test();</div>
 <div class="line"><a name="l01169"></a><span class="lineno"> 1169</span>&#160;    <span class="keywordflow">if</span> (ostatus)</div>
 <div class="line"><a name="l01170"></a><span class="lineno"> 1170</span>&#160;    {</div>
 <div class="line"><a name="l01171"></a><span class="lineno"> 1171</span>&#160;      success = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l01172"></a><span class="lineno"> 1172</span>&#160;      InFlightSendsList::iterator rm = it;</div>
-<div class="line"><a name="l01173"></a><span class="lineno"> 1173</span>&#160;      --it;</div>
-<div class="line"><a name="l01174"></a><span class="lineno"> 1174</span>&#160;      inflight_sends_.erase(rm);</div>
-<div class="line"><a name="l01175"></a><span class="lineno"> 1175</span>&#160;    }</div>
-<div class="line"><a name="l01176"></a><span class="lineno"> 1176</span>&#160;  }</div>
-<div class="line"><a name="l01177"></a><span class="lineno"> 1177</span>&#160;  <span class="keywordflow">return</span> success;</div>
-<div class="line"><a name="l01178"></a><span class="lineno"> 1178</span>&#160;}</div>
-<div class="line"><a name="l01179"></a><span class="lineno"> 1179</span>&#160;</div>
-<div class="line"><a name="l01180"></a><span class="lineno"> 1180</span>&#160;<span class="keywordtype">void</span></div>
-<div class="line"><a name="l01181"></a><span class="lineno"> 1181</span>&#160;diy::Master::</div>
-<div class="line"><a name="l01182"></a><span class="lineno"> 1182</span>&#160;show_incoming_records()<span class="keyword"> const</span></div>
-<div class="line"><a name="l01183"></a><span class="lineno"> 1183</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l01184"></a><span class="lineno"> 1184</span>&#160;  <span class="keywordflow">for</span> (IncomingRoundMap::const_iterator rounds_itr = incoming_.begin(); rounds_itr != incoming_.end(); ++rounds_itr)</div>
-<div class="line"><a name="l01185"></a><span class="lineno"> 1185</span>&#160;  {</div>
-<div class="line"><a name="l01186"></a><span class="lineno"> 1186</span>&#160;    <span class="keywordflow">for</span> (IncomingQueuesMap::const_iterator it = rounds_itr-&gt;second.map.begin(); it != rounds_itr-&gt;second.map.end(); ++it)</div>
-<div class="line"><a name="l01187"></a><span class="lineno"> 1187</span>&#160;    {</div>
-<div class="line"><a name="l01188"></a><span class="lineno"> 1188</span>&#160;      <span class="keyword">const</span> IncomingQueuesRecords&amp; in_qrs = it-&gt;second;</div>
-<div class="line"><a name="l01189"></a><span class="lineno"> 1189</span>&#160;      <span class="keywordflow">for</span> (InQueueRecords::const_iterator cur = in_qrs.records.begin(); cur != in_qrs.records.end(); ++cur)</div>
-<div class="line"><a name="l01190"></a><span class="lineno"> 1190</span>&#160;      {</div>
-<div class="line"><a name="l01191"></a><span class="lineno"> 1191</span>&#160;        <span class="keyword">const</span> QueueRecord&amp; qr = cur-&gt;second;</div>
-<div class="line"><a name="l01192"></a><span class="lineno"> 1192</span>&#160;        log-&gt;info(<span class="stringliteral">&quot;round: {}, {} &lt;- {}: (size,external) = ({},{})&quot;</span>,</div>
-<div class="line"><a name="l01193"></a><span class="lineno"> 1193</span>&#160;                  rounds_itr-&gt;first,</div>
-<div class="line"><a name="l01194"></a><span class="lineno"> 1194</span>&#160;                  it-&gt;first, cur-&gt;first,</div>
-<div class="line"><a name="l01195"></a><span class="lineno"> 1195</span>&#160;                  qr.size,</div>
-<div class="line"><a name="l01196"></a><span class="lineno"> 1196</span>&#160;                  qr.external);</div>
-<div class="line"><a name="l01197"></a><span class="lineno"> 1197</span>&#160;      }</div>
-<div class="line"><a name="l01198"></a><span class="lineno"> 1198</span>&#160;      <span class="keywordflow">for</span> (IncomingQueues::const_iterator cur = in_qrs.queues.begin(); cur != in_qrs.queues.end(); ++cur)</div>
-<div class="line"><a name="l01199"></a><span class="lineno"> 1199</span>&#160;      {</div>
-<div class="line"><a name="l01200"></a><span class="lineno"> 1200</span>&#160;        log-&gt;info(<span class="stringliteral">&quot;round: {}, {} &lt;- {}: queue.size() = {}&quot;</span>,</div>
-<div class="line"><a name="l01201"></a><span class="lineno"> 1201</span>&#160;                  rounds_itr-&gt;first,</div>
-<div class="line"><a name="l01202"></a><span class="lineno"> 1202</span>&#160;                  it-&gt;first, cur-&gt;first,</div>
-<div class="line"><a name="l01203"></a><span class="lineno"> 1203</span>&#160;                  const_cast&lt;IncomingQueuesRecords&amp;&gt;(in_qrs).queues[cur-&gt;first].size());</div>
-<div class="line"><a name="l01204"></a><span class="lineno"> 1204</span>&#160;      }</div>
-<div class="line"><a name="l01205"></a><span class="lineno"> 1205</span>&#160;    }</div>
-<div class="line"><a name="l01206"></a><span class="lineno"> 1206</span>&#160;  }</div>
-<div class="line"><a name="l01207"></a><span class="lineno"> 1207</span>&#160;}</div>
-<div class="line"><a name="l01208"></a><span class="lineno"> 1208</span>&#160;</div>
-<div class="line"><a name="l01209"></a><span class="lineno"> 1209</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l01172"></a><span class="lineno"> 1172</span>&#160;      it = inflight_sends_.erase(it);</div>
+<div class="line"><a name="l01173"></a><span class="lineno"> 1173</span>&#160;    }</div>
+<div class="line"><a name="l01174"></a><span class="lineno"> 1174</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01175"></a><span class="lineno"> 1175</span>&#160;    {</div>
+<div class="line"><a name="l01176"></a><span class="lineno"> 1176</span>&#160;      ++it;</div>
+<div class="line"><a name="l01177"></a><span class="lineno"> 1177</span>&#160;    }</div>
+<div class="line"><a name="l01178"></a><span class="lineno"> 1178</span>&#160;  }</div>
+<div class="line"><a name="l01179"></a><span class="lineno"> 1179</span>&#160;  <span class="keywordflow">return</span> success;</div>
+<div class="line"><a name="l01180"></a><span class="lineno"> 1180</span>&#160;}</div>
+<div class="line"><a name="l01181"></a><span class="lineno"> 1181</span>&#160;</div>
+<div class="line"><a name="l01182"></a><span class="lineno"> 1182</span>&#160;<span class="keywordtype">void</span></div>
+<div class="line"><a name="l01183"></a><span class="lineno"> 1183</span>&#160;diy::Master::</div>
+<div class="line"><a name="l01184"></a><span class="lineno"> 1184</span>&#160;show_incoming_records()<span class="keyword"> const</span></div>
+<div class="line"><a name="l01185"></a><span class="lineno"> 1185</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l01186"></a><span class="lineno"> 1186</span>&#160;  <span class="keywordflow">for</span> (IncomingRoundMap::const_iterator rounds_itr = incoming_.begin(); rounds_itr != incoming_.end(); ++rounds_itr)</div>
+<div class="line"><a name="l01187"></a><span class="lineno"> 1187</span>&#160;  {</div>
+<div class="line"><a name="l01188"></a><span class="lineno"> 1188</span>&#160;    <span class="keywordflow">for</span> (IncomingQueuesMap::const_iterator it = rounds_itr-&gt;second.map.begin(); it != rounds_itr-&gt;second.map.end(); ++it)</div>
+<div class="line"><a name="l01189"></a><span class="lineno"> 1189</span>&#160;    {</div>
+<div class="line"><a name="l01190"></a><span class="lineno"> 1190</span>&#160;      <span class="keyword">const</span> IncomingQueuesRecords&amp; in_qrs = it-&gt;second;</div>
+<div class="line"><a name="l01191"></a><span class="lineno"> 1191</span>&#160;      <span class="keywordflow">for</span> (InQueueRecords::const_iterator cur = in_qrs.records.begin(); cur != in_qrs.records.end(); ++cur)</div>
+<div class="line"><a name="l01192"></a><span class="lineno"> 1192</span>&#160;      {</div>
+<div class="line"><a name="l01193"></a><span class="lineno"> 1193</span>&#160;        <span class="keyword">const</span> QueueRecord&amp; qr = cur-&gt;second;</div>
+<div class="line"><a name="l01194"></a><span class="lineno"> 1194</span>&#160;        log-&gt;info(<span class="stringliteral">&quot;round: {}, {} &lt;- {}: (size,external) = ({},{})&quot;</span>,</div>
+<div class="line"><a name="l01195"></a><span class="lineno"> 1195</span>&#160;                  rounds_itr-&gt;first,</div>
+<div class="line"><a name="l01196"></a><span class="lineno"> 1196</span>&#160;                  it-&gt;first, cur-&gt;first,</div>
+<div class="line"><a name="l01197"></a><span class="lineno"> 1197</span>&#160;                  qr.size,</div>
+<div class="line"><a name="l01198"></a><span class="lineno"> 1198</span>&#160;                  qr.external);</div>
+<div class="line"><a name="l01199"></a><span class="lineno"> 1199</span>&#160;      }</div>
+<div class="line"><a name="l01200"></a><span class="lineno"> 1200</span>&#160;      <span class="keywordflow">for</span> (IncomingQueues::const_iterator cur = in_qrs.queues.begin(); cur != in_qrs.queues.end(); ++cur)</div>
+<div class="line"><a name="l01201"></a><span class="lineno"> 1201</span>&#160;      {</div>
+<div class="line"><a name="l01202"></a><span class="lineno"> 1202</span>&#160;        log-&gt;info(<span class="stringliteral">&quot;round: {}, {} &lt;- {}: queue.size() = {}&quot;</span>,</div>
+<div class="line"><a name="l01203"></a><span class="lineno"> 1203</span>&#160;                  rounds_itr-&gt;first,</div>
+<div class="line"><a name="l01204"></a><span class="lineno"> 1204</span>&#160;                  it-&gt;first, cur-&gt;first,</div>
+<div class="line"><a name="l01205"></a><span class="lineno"> 1205</span>&#160;                  const_cast&lt;IncomingQueuesRecords&amp;&gt;(in_qrs).queues[cur-&gt;first].size());</div>
+<div class="line"><a name="l01206"></a><span class="lineno"> 1206</span>&#160;      }</div>
+<div class="line"><a name="l01207"></a><span class="lineno"> 1207</span>&#160;    }</div>
+<div class="line"><a name="l01208"></a><span class="lineno"> 1208</span>&#160;  }</div>
+<div class="line"><a name="l01209"></a><span class="lineno"> 1209</span>&#160;}</div>
+<div class="line"><a name="l01210"></a><span class="lineno"> 1210</span>&#160;</div>
+<div class="line"><a name="l01211"></a><span class="lineno"> 1211</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_queue_record_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_queue_record.html">diy::Master::QueueRecord</a></div><div class="ttdef"><b>Definition:</b> master.hpp:120</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_in_flight_send_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_in_flight_send.html">diy::Master::InFlightSend</a></div><div class="ttdef"><b>Definition:</b> master.hpp:95</div></div>
 <div class="ttc" id="group___serialization_html_gae54f4c5c6740fcf7627009bdcfe02aa1"><div class="ttname"><a href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a></div><div class="ttdeci">void load(BinaryBuffer &amp;bb, T &amp;x)</div><div class="ttdoc">Loads x from bb by calling diy::Serialization&lt;T&gt;::load(bb,x). </div><div class="ttdef"><b>Definition:</b> serialization.hpp:106</div></div>
 <div class="ttc" id="group___serialization_html_ga33accb25f133567d216ebd3bee44595b"><div class="ttname"><a href="group___serialization.html#ga33accb25f133567d216ebd3bee44595b">diy::load_back</a></div><div class="ttdeci">void load_back(BinaryBuffer &amp;bb, T &amp;x)</div><div class="ttdoc">Supports only binary data copying (meant for simple footers). </div><div class="ttdef"><b>Definition:</b> serialization.hpp:120</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_collective_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_collective.html">diy::Master::Collective</a></div><div class="ttdef"><b>Definition:</b> master.hpp:356</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_incoming_round_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_incoming_round.html">diy::Master::IncomingRound</a></div><div class="ttdef"><b>Definition:</b> master.hpp:146</div></div>
-<div class="ttc" id="classdiy_1_1_external_storage_html"><div class="ttname"><a href="classdiy_1_1_external_storage.html">diy::ExternalStorage</a></div><div class="ttdef"><b>Definition:</b> storage.hpp:41</div></div>
+<div class="ttc" id="classdiy_1_1_external_storage_html"><div class="ttname"><a href="classdiy_1_1_external_storage.html">diy::ExternalStorage</a></div><div class="ttdef"><b>Definition:</b> storage.hpp:38</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_proxy_with_link_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_proxy_with_link.html">diy::Master::ProxyWithLink</a></div><div class="ttdef"><b>Definition:</b> proxy.hpp:134</div></div>
 <div class="ttc" id="group___serialization_html_gafaac9aa4ccdc04930f612ca20341fc9b"><div class="ttname"><a href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">diy::save</a></div><div class="ttdeci">void save(BinaryBuffer &amp;bb, const T &amp;x)</div><div class="ttdoc">Saves x to bb by calling diy::Serialization&lt;T&gt;::save(bb,x). </div><div class="ttdef"><b>Definition:</b> serialization.hpp:102</div></div>
 <div class="ttc" id="classdiy_1_1_master_html_a20e686efa0c9389b4ed943277ccfffbc"><div class="ttname"><a href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">diy::Master::gid</a></div><div class="ttdeci">int gid(int i) const </div><div class="ttdoc">return gid of the i-th block </div><div class="ttdef"><b>Definition:</b> master.hpp:219</div></div>
@@ -1327,7 +1329,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Feb 1 2018 22:47:59 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Feb 2 2018 18:29:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
