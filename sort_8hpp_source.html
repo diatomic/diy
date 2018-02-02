@@ -145,10 +145,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;            {</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;                <span class="keywordflow">if</span> (skip_self &amp;&amp; rp.in_link().target(i).gid == rp.gid()) <span class="keywordflow">continue</span>;</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;                MemoryBuffer&amp; in = rp.incoming(rp.in_link().target(i).gid);</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;                <span class="keywordtype">size_t</span> sz = in.size() / <span class="keyword">sizeof</span>(T);</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;                <span class="keywordtype">size_t</span> incoming_sz = in.size() / <span class="keyword">sizeof</span>(T);</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;                T* bg = (T*) &amp;in.buffer[0];</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;                std::copy(bg, bg + sz, &amp;v[end]);</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;                end += sz;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;                std::copy(bg, bg + incoming_sz, &amp;v[end]);</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;                end += incoming_sz;</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;            }</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        } <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        {</div>
@@ -261,7 +261,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Feb 2 2018 20:20:23 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Feb 2 2018 20:50:48 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

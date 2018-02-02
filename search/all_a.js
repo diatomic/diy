@@ -4,7 +4,7 @@ var searchData=
   ['makeunsigned',['MakeUnsigned',['../structfmt_1_1internal_1_1_make_unsigned.html',1,'fmt::internal']]],
   ['makevalue',['MakeValue',['../classfmt_1_1internal_1_1_make_value.html',1,'fmt::internal']]],
   ['master',['Master',['../classdiy_1_1_master.html',1,'diy']]],
-  ['master',['Master',['../classdiy_1_1_master.html#a41e082628686ec3e798171b20ccced63',1,'diy::Master']]],
+  ['master',['Master',['../classdiy_1_1_master.html#a98a6bfb3c8d359aa1021e109b745d0cd',1,'diy::Master']]],
   ['maximum',['maximum',['../structdiy_1_1mpi_1_1maximum.html',1,'diy::mpi']]],
   ['mpi',['mpi',['../md_docs_detail_mpi.html',1,'']]],
   ['memorybuffer',['MemoryBuffer',['../classfmt_1_1internal_1_1_memory_buffer.html',1,'fmt::internal']]],

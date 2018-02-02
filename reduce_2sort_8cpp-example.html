@@ -214,8 +214,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">        srp.<a name="a14"></a><a class="code" href="structdiy_1_1_master_1_1_proxy.html#ad7af65dcf357c32fe550b82a872d8692">dequeue</a>(nbr_gid, hist);</div>
 <div class="line">        <span class="keywordflow">if</span> (histogram.size() &lt; hist.size())</div>
 <div class="line">            histogram.resize(hist.size());</div>
-<div class="line">        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; hist.size(); ++i)</div>
-<div class="line">            histogram[i] += hist[i];</div>
+<div class="line">        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 0; j &lt; hist.size(); ++j)</div>
+<div class="line">            histogram[j] += hist[j];</div>
 <div class="line">    }</div>
 <div class="line">}</div>
 <div class="line"></div>
@@ -465,14 +465,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">      block_bounds.<a name="a35"></a>max[0] = (gid + 1) * (block_size / chunk_size) - 1;</div>
 <div class="line"></div>
 <div class="line">      reader.read(block_bounds, &amp;b-&gt;values[0], <span class="keyword">true</span>, chunk_size);</div>
-<div class="line">      Value min = *std::min_element(b-&gt;values.begin(), b-&gt;values.end());</div>
-<div class="line">      Value max = *std::max_element(b-&gt;values.begin(), b-&gt;values.end());</div>
+<div class="line">      Value block_min = *std::min_element(b-&gt;values.begin(), b-&gt;values.end());</div>
+<div class="line">      Value block_max = *std::max_element(b-&gt;values.begin(), b-&gt;values.end());</div>
 <div class="line"></div>
 <div class="line">      master.<a class="code" href="classdiy_1_1_master.html#aeab2723bb0ecd4f7316b4805c1b53a61">add</a>(gid, b, l);</div>
 <div class="line"></div>
 <div class="line">      <span class="comment">// post collectives to match the external data setting</span></div>
-<div class="line">      master.proxy(i).<a class="code" href="group___communication.html#gabce4381d1244875967dc3d127227bd45">all_reduce</a>(min, <a class="code" href="structdiy_1_1mpi_1_1minimum.html">diy::mpi::minimum&lt;Value&gt;</a>());</div>
-<div class="line">      master.proxy(i).<a class="code" href="group___communication.html#gabce4381d1244875967dc3d127227bd45">all_reduce</a>(max, <a class="code" href="structdiy_1_1mpi_1_1maximum.html">diy::mpi::maximum&lt;Value&gt;</a>());</div>
+<div class="line">      master.proxy(i).<a class="code" href="group___communication.html#gabce4381d1244875967dc3d127227bd45">all_reduce</a>(block_min, <a class="code" href="structdiy_1_1mpi_1_1minimum.html">diy::mpi::minimum&lt;Value&gt;</a>());</div>
+<div class="line">      master.proxy(i).<a class="code" href="group___communication.html#gabce4381d1244875967dc3d127227bd45">all_reduce</a>(block_max, <a class="code" href="structdiy_1_1mpi_1_1maximum.html">diy::mpi::maximum&lt;Value&gt;</a>());</div>
 <div class="line">    }</div>
 <div class="line">    <span class="keywordflow">if</span> (world.rank() == 0)</div>
 <div class="line">      std::cout &lt;&lt; <span class="stringliteral">&quot;Array loaded&quot;</span> &lt;&lt; std::endl;</div>
@@ -511,7 +511,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Feb 2 2018 20:20:23 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Feb 2 2018 20:50:48 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
