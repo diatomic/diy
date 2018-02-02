@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
                          [&](int gid,                          // block global id
                              const Bounds& core,               // block bounds without any ghost added
                              const Bounds& bounds,             // block bounds including ghost region
-                             const Bounds& domain,             // global data bounds
+                             const Bounds&,                    // global data bounds
                              const RGLink& link)               // neighborhood
                          {
                              Block*          b   = new Block;
