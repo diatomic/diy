@@ -12,9 +12,12 @@ env:
   matrix:
     - COMPILER=g++-5   MPI=mpich
     - COMPILER=g++-5   MPI=openmpi
+    - COMPILER=g++-7   MPI=mpich
+    - COMPILER=g++-7   MPI=openmpi
     - COMPILER=clang++ MPI=mpich
     - COMPILER=clang++ MPI=openmpi
     - COMPILER=g++-5   MPI=none
+    - COMPILER=g++-7   MPI=none
     - COMPILER=clang++ MPI=none
     - BUILD_DOCS=1
 
@@ -24,6 +27,7 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-5
+      - g++-7
       - doxygen
 
 matrix:
