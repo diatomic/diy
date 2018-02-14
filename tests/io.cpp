@@ -1,4 +1,4 @@
-#define CATCH_CONFIG_MAIN
+#define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
 
 #include <diy/io/bov.hpp>
@@ -16,7 +16,6 @@ int restored_data[4][3];
 
 TEST_CASE("Test BOV", "[io]")
 {
-    diy::mpi::environment  env;
     diy::mpi::communicator world;
 
     SECTION("test BOV io")
@@ -48,3 +47,10 @@ TEST_CASE("Test BOV", "[io]")
     }
 }
 
+int main()
+{
+  diy::mpi::environment env;
+
+  Catch::Session session;
+  return session.run();
+}
