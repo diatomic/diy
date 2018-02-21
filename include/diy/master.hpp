@@ -920,7 +920,7 @@ rcomm_exchange(ToSendList& to_send, int out_queues_limit)
         send_outgoing_queues(to_send, out_queues_limit, current_incoming, true);
 
         // kick requests
-        while (nudge());                            // TODO: use nudge, or loop over test instead? (nudge removes items from inflight_sends)
+        nudge();
 
         check_incoming_queues(true);
         if (ibarr_act)
@@ -930,19 +930,10 @@ rcomm_exchange(ToSendList& to_send, int out_queues_limit)
         }
         else
         {
-            // TODO: is the the right test for all queues have been processed (including out-of-core) ?
-            if (to_send.empty())
+            if (to_send.empty() && inflight_sends_.empty())
             {
-                // check if all sends completed
-                InFlightSendsList::iterator it;
-                for (it = inflight_sends_.begin(); it != inflight_sends_.end(); it++)
-                    if (!it->request.test())
-                        break;
-                if (it == inflight_sends_.end())        // if all sends completeda all queues processed, enter ibarrier
-                {
-                    ibarr_req = comm_.ibarrier();
-                    ibarr_act = true;
-                }
+                ibarr_req = comm_.ibarrier();
+                ibarr_act = true;
             }
         }
     }                                                 // while !done
