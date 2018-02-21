@@ -73,21 +73,25 @@ void remote_enq(
 
 // dequeue remote data
 // there is still a link, but exchange(remote = true) exchanged messages from any block
-void remote_deq(Block* b, const diy::Master::ProxyWithLink& cp)
+void remote_deq(Block*                              b,
+                const diy::Master::ProxyWithLink&   cp,
+                int                                 nblocks)       // only need nblocks for testing
 {
     std::vector<int> incoming_gids;
     cp.incoming(incoming_gids);
+    int received = 0;
     for (size_t i = 0; i < incoming_gids.size(); i++)
         if (cp.incoming(incoming_gids[i]).size())
         {
+            ++received;
             int recvd_data;
             cp.dequeue(incoming_gids[i], recvd_data);
             fmt::print(stderr, "Remote dequeue: gid {} received value {} from gid {}\n",
                     cp.gid(), recvd_data, incoming_gids[i]);
             CHECK(recvd_data == incoming_gids[i]);
-            //TODO: need more robust checks:
-            // were all the remote messages received?
+            CHECK((recvd_data + 2) % nblocks == cp.gid());
         }
+    CHECK(received == 1);
 }
 
 struct RexchangeFixture
@@ -159,7 +163,8 @@ TEST_CASE_METHOD(RexchangeFixture, "Remote exchange test", "[rexchange]")
                 { remote_enq(b, cp, assigner); });
         bool remote = true;
         master.exchange(remote);
-        master.foreach(&remote_deq);
+        master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
+                { remote_deq(b, cp, assigner.nblocks()); });
     }
 
     if (world.rank() == 0)
