@@ -20,8 +20,8 @@ namespace diy
       int       size() const                        { return static_cast<int>(neighbors_.size()); }
       inline
       int       size_unique() const;
-      BlockID   target(int i) const                 { return neighbors_[i]; }
-      BlockID&  target(int i)                       { return neighbors_[i]; }
+      BlockID   target(int i) const                 { return neighbors_[static_cast<size_t>(i)]; }
+      BlockID&  target(int i)                       { return neighbors_[static_cast<size_t>(i)]; }
       inline
       int       find(int gid) const;
 
