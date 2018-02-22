@@ -188,7 +188,7 @@ int
 diy::Link::
 find(int gid) const
 {
-    for (unsigned i = 0; i < (unsigned)size(); ++i)
+    for (int i = 0; i < size(); ++i)
   {
     if (target(i).gid == gid)
       return i;
