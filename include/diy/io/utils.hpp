@@ -60,7 +60,7 @@ namespace utils
       _close(fd);
     }
 #else
-    ::truncate(filename.c_str(), length);
+    ::truncate(filename.c_str(), static_cast<off_t>(length));
 #endif
   }
 
