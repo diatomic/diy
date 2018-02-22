@@ -91,7 +91,7 @@ namespace utils
     _close(fd);
 #else
     fsync(fd);
-    close(fd);
+    ::close(fd);
 #endif
   }
 
