@@ -186,7 +186,7 @@ namespace diy
         else
         {
             // pick a template at random (very basic load balancing mechanism)
-            filename  = filename_templates_[std::rand() % filename_templates_.size()].c_str();
+            filename  = filename_templates_[static_cast<size_t>(std::rand()) % filename_templates_.size()].c_str();
         }
         int fh = diy::io::utils::mkstemp(filename);
         return fh;
