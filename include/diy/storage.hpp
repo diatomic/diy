@@ -73,11 +73,13 @@ namespace diy
 
         size_t sz = bb.buffer.size();
 #if defined(_WIN32)
-        size_t written = _write(fh, &bb.buffer[0], static_cast<unsigned int>(sz));
+        using r_type = int;
+        r_type written = _write(fh, &bb.buffer[0], static_cast<unsigned int>(sz));
 #else
-        size_t written = write(fh, &bb.buffer[0], sz);
+        using r_type = ssize_t;
+        r_type written = write(fh, &bb.buffer[0], sz);
 #endif
-        if (written < sz || written == (size_t)-1)
+        if (written < static_cast<r_type>(sz) || written == r_type(-1))
           log->warn("Could not write the full buffer to {}: written = {}; size = {}", filename, written, sz);
         io::utils::close(fh);
         bb.wipe();
