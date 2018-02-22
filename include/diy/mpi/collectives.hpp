@@ -1,5 +1,6 @@
 #include <vector>
 
+#include "../constants.h" // for DIY_UNUSED.
 #include "operations.hpp"
 
 namespace diy
@@ -20,6 +21,10 @@ namespace mpi
       MPI_Bcast(Datatype::address(x),
                 Datatype::count(x),
                 Datatype::datatype(), root, comm);
+#else
+      DIY_UNUSED(comm);
+      DIY_UNUSED(x);
+      DIY_UNUSED(root);
 #endif
     }
 
@@ -36,6 +41,10 @@ namespace mpi
       MPI_Bcast(Datatype::address(x[0]),
                 elem_size * x.size(),
                 Datatype::datatype(), root, comm);
+#else
+      DIY_UNUSED(comm);
+      DIY_UNUSED(x);
+      DIY_UNUSED(root);
 #endif
     }
 
@@ -48,7 +57,9 @@ namespace mpi
                  Datatype::datatype(), root, comm, &r.r);
       return r;
 #else
-      (void)x; (void)root;
+      DIY_UNUSED(comm);
+      DIY_UNUSED(x);
+      DIY_UNUSED(root);
       DIY_UNSUPPORTED_MPI_CALL(MPI_Ibcast);
 #endif
     }
@@ -65,7 +76,8 @@ namespace mpi
                  Datatype::datatype(),
                  root, comm);
 #else
-      (void) root;
+      DIY_UNUSED(comm);
+      DIY_UNUSED(root);
       out[0] = in;
 #endif
     }
@@ -100,7 +112,8 @@ namespace mpi
               out[i].push_back(buffer[cur++]);
       }
 #else
-      (void) comm; (void) root;
+      DIY_UNUSED(comm);
+      DIY_UNUSED(root);
       out.resize(1);
       out[0] = in;
 #endif
@@ -117,6 +130,9 @@ namespace mpi
                  Datatype::datatype(),
                  root, comm);
 #else
+      DIY_UNUSED(comm);
+      DIY_UNUSED(in);
+      DIY_UNUSED(root);
       DIY_UNSUPPORTED_MPI_CALL("MPI_Gather");
 #endif
     }
@@ -134,6 +150,9 @@ namespace mpi
                   Datatype::datatype(),
                   root, comm);
 #else
+      DIY_UNUSED(comm);
+      DIY_UNUSED(in);
+      DIY_UNUSED(root);
       DIY_UNSUPPORTED_MPI_CALL("MPI_Gatherv");
 #endif
     }
@@ -150,6 +169,7 @@ namespace mpi
                     Datatype::datatype(),
                     comm);
 #else
+      DIY_UNUSED(comm);
       out[0] = in;
 #endif
     }
@@ -184,7 +204,7 @@ namespace mpi
               out[i].push_back(buffer[cur++]);
       }
 #else
-      (void) comm;
+      DIY_UNUSED(comm);
       out.resize(1);
       out[0] = in;
 #endif
@@ -200,12 +220,13 @@ namespace mpi
                  detail::mpi_op<Op>::get(),
                  root, comm);
 #else
-      (void) comm; (void) root;
+      DIY_UNUSED(comm);
+      DIY_UNUSED(root);
       out = in;
 #endif
     }
 
-    static void reduce(const communicator& comm, const T& in, int root, const Op& op)
+    static void reduce(const communicator& comm, const T& in, int root, const Op&)
     {
 #ifndef DIY_NO_MPI
       MPI_Reduce(Datatype::address(const_cast<T&>(in)),
@@ -215,6 +236,9 @@ namespace mpi
                  detail::mpi_op<Op>::get(),
                  root, comm);
 #else
+      DIY_UNUSED(comm);
+      DIY_UNUSED(in);
+      DIY_UNUSED(root);
       DIY_UNSUPPORTED_MPI_CALL("MPI_Reduce");
 #endif
     }
@@ -229,7 +253,7 @@ namespace mpi
                     detail::mpi_op<Op>::get(),
                     comm);
 #else
-      (void) comm;
+      DIY_UNUSED(comm);
       out = in;
 #endif
     }
@@ -246,6 +270,7 @@ namespace mpi
                     detail::mpi_op<Op>::get(),
                     comm);
 #else
+      DIY_UNUSED(comm);
       out = in;
 #endif
     }
@@ -260,7 +285,7 @@ namespace mpi
                detail::mpi_op<Op>::get(),
                comm);
 #else
-      (void) comm;
+      DIY_UNUSED(comm);
       out = in;
 #endif
     }
@@ -278,7 +303,8 @@ namespace mpi
                    Datatype::datatype(),
                    comm);
 #else
-      (void) comm; (void) n;
+      DIY_UNUSED(comm);
+      DIY_UNUSED(n);
       out = in;
 #endif
     }
