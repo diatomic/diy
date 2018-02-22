@@ -13,6 +13,8 @@
 #include <cstdlib>      // mkstemp() on Linux
 #include <sys/stat.h>
 
+#include "../constants.h" // for DIY_UNUSED
+
 namespace diy
 {
 namespace io
@@ -99,6 +101,8 @@ namespace utils
   {
 #if !defined(_WIN32)
     fsync(fd);
+#else
+    DIY_UNUSED(fd);
 #endif
   }
 
