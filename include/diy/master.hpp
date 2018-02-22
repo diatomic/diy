@@ -384,11 +384,11 @@ namespace diy
 struct diy::Master::ProcessBlock
 {
           ProcessBlock(Master&                    master_,
-                       const std::deque<int>&     blocks_,
+                       const std::deque<int>&     blocks__,
                        int                        local_limit_,
                        critical_resource<int>&    idx_):
               master(master_),
-              blocks(blocks_),
+              blocks(blocks__),
               local_limit(local_limit_),
               idx(idx_)
           {}
