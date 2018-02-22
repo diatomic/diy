@@ -173,7 +173,7 @@ namespace diy
                       blocks_(create_, destroy_, storage, save, load_),
                       queue_policy_(q_policy),
                       limit_(limit),
-                      threads_(threads == -1 ? thread::hardware_concurrency() : threads),
+                      threads_(threads == -1 ? static_cast<int>(thread::hardware_concurrency()) : threads),
                       storage_(storage),
                       // Communicator functionality
                       comm_(comm),
