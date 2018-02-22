@@ -55,9 +55,7 @@ namespace mpi
 
     static void gather(const communicator& comm, const T& in, std::vector<T>& out, int root)
     {
-      size_t s  = comm.size();
-             s *= Datatype::count(in);
-      out.resize(s);
+      out.resize(comm.size());
 #ifndef DIY_NO_MPI
       MPI_Gather(Datatype::address(const_cast<T&>(in)),
                  Datatype::count(in),
@@ -142,9 +140,7 @@ namespace mpi
 
     static void all_gather(const communicator& comm, const T& in, std::vector<T>& out)
     {
-      size_t s  = comm.size();
-             s *= Datatype::count(in);
-      out.resize(s);
+      out.resize(comm.size());
 #ifndef DIY_NO_MPI
       MPI_Allgather(Datatype::address(const_cast<T&>(in)),
                     Datatype::count(in),
