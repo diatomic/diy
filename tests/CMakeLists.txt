@@ -19,6 +19,9 @@ target_link_libraries       (io-test                ${libraries})
 add_executable              (simple-test            simple.cpp)
 target_link_libraries       (simple-test            ${libraries})
 
+add_executable              (mpi-collectives-test   mpi-collectives.cpp)
+target_link_libraries       (mpi-collectives-test   ${libraries})
+
 foreach                     (b 2 4 8 64)
     add_test                (NAME kd-tree-test-b${b}
                              COMMAND kd-tree-test -b ${b}
@@ -53,10 +56,19 @@ endforeach                  ()
 
 
 if                          (mpi AND MPIEXEC)
+
   set                       (maxp 3)
   if                        (APPLE)
       set                   (maxp 2)
   endif()
+
+  # mpi collectives test only makes sense when built with MPI support
+  foreach                   (p RANGE 1 ${maxp})
+      add_test              (NAME mpi-collectives-test-p${p}
+                            COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:mpi-collectives-test>
+                            )
+  endforeach                (p)
+
   foreach                   (p RANGE 1 ${maxp})
       foreach               (b 2 4 8 9 12 24 36 44 48 56 64)
           add_test          (NAME merge-swap-reduce-test-p${p}-b${b}
@@ -64,21 +76,26 @@ if                          (mpi AND MPIEXEC)
                             )
       endforeach            (b)
   endforeach                (p)
+
   foreach                   (p 2 3)
       math                  (EXPR b "${p} + 1")
       add_test              (NAME simple-test-p${p}-b${b}
                              COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:simple-test> -b ${b}
                             )
   endforeach                (p)
+
 else                        (mpi AND MPIEXEC)
+
   foreach                   (b 2 4 8 9 12 24 36 44 48 56 64)
       add_test              (NAME merge-swap-reduce-test-nompi-b${b}
                              COMMAND merge-swap-reduce-test -b ${b}
                             )
   endforeach                (b)
+
   foreach                   (b 3 4)
       add_test              (NAME simple-test-nompi-b${b}
                              COMMAND simple-test -b ${b}
                             )
   endforeach                (b)
+
 endif                       (mpi AND MPIEXEC)
