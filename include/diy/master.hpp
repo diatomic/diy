@@ -1127,7 +1127,7 @@ check_incoming_queues(bool remote)
 
         // unload message
 
-        if (remote || (!remote && ostatus->tag() == tags::queue))
+        if (ostatus->tag() == tags::queue)
         {
             size_t size  = ir.message.size();
             int from = ir.info.from;
