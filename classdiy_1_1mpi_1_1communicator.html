@@ -106,9 +106,21 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a62eadb40ad886a32786a2638192d8be5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a62eadb40ad886a32786a2638192d8be5"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>communicator</b> (MPI_Comm comm=MPI_COMM_WORLD)</td></tr>
-<tr class="separator:a62eadb40ad886a32786a2638192d8be5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a83dfb0e328b7eee36ce2411c74d9f2d1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a83dfb0e328b7eee36ce2411c74d9f2d1"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>communicator</b> (MPI_Comm comm=MPI_COMM_WORLD, bool owner=false)</td></tr>
+<tr class="separator:a83dfb0e328b7eee36ce2411c74d9f2d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb83f3344ce61a1a1de2b1bf74f50ae4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afb83f3344ce61a1a1de2b1bf74f50ae4"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>communicator</b> (const <a class="el" href="classdiy_1_1mpi_1_1communicator.html">communicator</a> &amp;other)</td></tr>
+<tr class="separator:afb83f3344ce61a1a1de2b1bf74f50ae4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada5e61a456f8f58bb351270130f1f681"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ada5e61a456f8f58bb351270130f1f681"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>communicator</b> (<a class="el" href="classdiy_1_1mpi_1_1communicator.html">communicator</a> &amp;&amp;other)</td></tr>
+<tr class="separator:ada5e61a456f8f58bb351270130f1f681"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad71471dab85e4e38998571f0add5ea0b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad71471dab85e4e38998571f0add5ea0b"></a>
+<a class="el" href="classdiy_1_1mpi_1_1communicator.html">communicator</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classdiy_1_1mpi_1_1communicator.html">communicator</a> &amp;other)</td></tr>
+<tr class="separator:ad71471dab85e4e38998571f0add5ea0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae192503662c85323f61959eea105ddaf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae192503662c85323f61959eea105ddaf"></a>
+<a class="el" href="classdiy_1_1mpi_1_1communicator.html">communicator</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="classdiy_1_1mpi_1_1communicator.html">communicator</a> &amp;&amp;other)</td></tr>
+<tr class="separator:ae192503662c85323f61959eea105ddaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afe377a3e0f738cf1487c1a6ab055fcad"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afe377a3e0f738cf1487c1a6ab055fcad"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>rank</b> () const </td></tr>
 <tr class="separator:afe377a3e0f738cf1487c1a6ab055fcad"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -150,6 +162,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a33dc34d6d78e84d009b96dcace12de46"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a33dc34d6d78e84d009b96dcace12de46"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>operator MPI_Comm</b> () const </td></tr>
 <tr class="separator:a33dc34d6d78e84d009b96dcace12de46"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae70d3de7299c172254852f1b0b133eed"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae70d3de7299c172254852f1b0b133eed"></a>
+<a class="el" href="classdiy_1_1mpi_1_1communicator.html">communicator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1mpi_1_1communicator.html#ae70d3de7299c172254852f1b0b133eed">split</a> (int color, int key=0) const </td></tr>
+<tr class="memdesc:ae70d3de7299c172254852f1b0b133eed"><td class="mdescLeft">&#160;</td><td class="mdescRight">split When keys are the same, the ties are broken by the rank in the original comm. <br/></td></tr>
+<tr class="separator:ae70d3de7299c172254852f1b0b133eed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Simple wrapper around <code>MPI_Comm</code>. </p>
@@ -160,7 +176,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Feb 22 2018 22:42:52 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Feb 23 2018 20:18:14 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
