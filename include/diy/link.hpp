@@ -77,8 +77,8 @@ namespace diy
       typedef   std::vector<Direction>              DirVec;
 
     public:
-                RegularLink(int dim, const Bounds& core, const Bounds& bounds):
-                  dim_(dim), core_(core), bounds_(bounds)            {}
+                RegularLink(int dim, const Bounds& core, const Bounds& bounds__):
+                  dim_(dim), core_(core), bounds_(bounds__) {}
 
       // dimension
       int       dimension() const                       { return dim_; }
@@ -99,7 +99,7 @@ namespace diy
       const Bounds& bounds() const                      { return bounds_; }
       Bounds&       bounds()                            { return bounds_; }
       const Bounds& bounds(int i) const                 { return nbr_bounds_[i]; }
-      void          add_bounds(const Bounds& bounds)    { nbr_bounds_.push_back(bounds); }
+      void          add_bounds(const Bounds& bounds__)  { nbr_bounds_.push_back(bounds__); }
 
       void      swap(RegularLink& other)                { Link::swap(other); dir_map_.swap(other.dir_map_); dir_vec_.swap(other.dir_vec_); nbr_bounds_.swap(other.nbr_bounds_); std::swap(dim_, other.dim_); wrap_.swap(other.wrap_); std::swap(core_, other.core_); std::swap(bounds_, other.bounds_); }
 

@@ -15,10 +15,10 @@ namespace diy
       * \ingroup Assignment
       * \brief Manages how blocks are assigned to processes
       */
-                    Assigner(int size,     //!< total number of processes
+                    Assigner(int size__,     //!< total number of processes
                              int nblocks__   //!< total (global) number of blocks
                              ):
-                      size_(size), nblocks_(nblocks__)  {}
+                      size_(size__), nblocks_(nblocks__)  {}
 
       //! returns the total number of process ranks
       int           size() const                        { return size_; }
@@ -75,10 +75,10 @@ namespace diy
       * \ingroup Assignment
       * \brief Assigns blocks to processes in cyclic or round-robin gid (block global id) order
       */
-            RoundRobinAssigner(int size,     //!< total number of processes
+            RoundRobinAssigner(int size__,   //!< total number of processes
                                int nblocks__ //!< total (global) number of blocks
                                ):
-              Assigner(size, nblocks__)         {}
+              Assigner(size__, nblocks__)         {}
 
       using Assigner::size;
       using Assigner::nblocks;

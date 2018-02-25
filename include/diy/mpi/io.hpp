@@ -189,15 +189,15 @@ write_at(offset o, const std::vector<T>& data)
 
 void
 diy::mpi::io::file::
-write_at_all(offset o, const char* buffer, size_t size)
+write_at_all(offset o, const char* buffer, size_t size_)
 {
 #ifndef DIY_NO_MPI
   status s;
-  MPI_File_write_at_all(fh, o, (void *)buffer, static_cast<int>(size), detail::get_mpi_datatype<char>(), &s.s);
+  MPI_File_write_at_all(fh, o, (void *)buffer, static_cast<int>(size_), detail::get_mpi_datatype<char>(), &s.s);
 #else
   DIY_UNUSED(o);
   DIY_UNUSED(buffer);
-  DIY_UNUSED(size);
+  DIY_UNUSED(size_);
   DIY_UNSUPPORTED_MPI_CALL(MPI_File_write_at_all);
 #endif
 }
