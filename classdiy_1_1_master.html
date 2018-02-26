@@ -218,9 +218,9 @@ typedef std::map&lt; int, <br class="typebreak"/>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a98a6bfb3c8d359aa1021e109b745d0cd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1_master.html#a98a6bfb3c8d359aa1021e109b745d0cd">Master</a> (<a class="el" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a> comm, int threads=1, int limit=-1, CreateBlock create_=0, DestroyBlock destroy_=0, <a class="el" href="classdiy_1_1_external_storage.html">ExternalStorage</a> *storage=0, SaveBlock <a class="el" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>=0, LoadBlock load_=0, <a class="el" href="structdiy_1_1_master_1_1_queue_policy.html">QueuePolicy</a> *q_policy=new <a class="el" href="structdiy_1_1_master_1_1_queue_size_policy.html">QueueSizePolicy</a>(4096))</td></tr>
-<tr class="memdesc:a98a6bfb3c8d359aa1021e109b745d0cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">The main DIY object.  <a href="#a98a6bfb3c8d359aa1021e109b745d0cd">More...</a><br/></td></tr>
-<tr class="separator:a98a6bfb3c8d359aa1021e109b745d0cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a57dc152e96dba39554399cf63e7b4fc9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1_master.html#a57dc152e96dba39554399cf63e7b4fc9">Master</a> (<a class="el" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a> comm, int threads__=1, int limit__=-1, CreateBlock create_=0, DestroyBlock destroy_=0, <a class="el" href="classdiy_1_1_external_storage.html">ExternalStorage</a> *storage=0, SaveBlock <a class="el" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>=0, LoadBlock load_=0, <a class="el" href="structdiy_1_1_master_1_1_queue_policy.html">QueuePolicy</a> *q_policy=new <a class="el" href="structdiy_1_1_master_1_1_queue_size_policy.html">QueueSizePolicy</a>(4096))</td></tr>
+<tr class="memdesc:a57dc152e96dba39554399cf63e7b4fc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">The main DIY object.  <a href="#a57dc152e96dba39554399cf63e7b4fc9">More...</a><br/></td></tr>
+<tr class="separator:a57dc152e96dba39554399cf63e7b4fc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0877a8d314a8cacc519264d10ef07b52"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0877a8d314a8cacc519264d10ef07b52"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>clear</b> ()</td></tr>
 <tr class="separator:a0877a8d314a8cacc519264d10ef07b52"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -296,14 +296,14 @@ void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a> (int i) const </td></tr>
 <tr class="memdesc:a20e686efa0c9389b4ed943277ccfffbc"><td class="mdescLeft">&#160;</td><td class="mdescRight">return gid of the <code>i</code>-th block <br/></td></tr>
 <tr class="separator:a20e686efa0c9389b4ed943277ccfffbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5f5c513ee845c1cac0c3c4daf31762ac"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5f5c513ee845c1cac0c3c4daf31762ac"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1_master.html#a5f5c513ee845c1cac0c3c4daf31762ac">lid</a> (int <a class="el" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>) const </td></tr>
-<tr class="memdesc:a5f5c513ee845c1cac0c3c4daf31762ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the local id of the local block with global id gid, or -1 if not local <br/></td></tr>
-<tr class="separator:a5f5c513ee845c1cac0c3c4daf31762ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a14b0c7fc215e53ed655e44186a18dc42"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a14b0c7fc215e53ed655e44186a18dc42"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1_master.html#a14b0c7fc215e53ed655e44186a18dc42">local</a> (int <a class="el" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>) const </td></tr>
-<tr class="memdesc:a14b0c7fc215e53ed655e44186a18dc42"><td class="mdescLeft">&#160;</td><td class="mdescRight">whether the block with global id gid is local <br/></td></tr>
-<tr class="separator:a14b0c7fc215e53ed655e44186a18dc42"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87bc338b26092730c23983ee40104230"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a87bc338b26092730c23983ee40104230"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1_master.html#a87bc338b26092730c23983ee40104230">lid</a> (int gid__) const </td></tr>
+<tr class="memdesc:a87bc338b26092730c23983ee40104230"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the local id of the local block with global id gid, or -1 if not local <br/></td></tr>
+<tr class="separator:a87bc338b26092730c23983ee40104230"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a076f054751e66766169feadf1e592489"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a076f054751e66766169feadf1e592489"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1_master.html#a076f054751e66766169feadf1e592489">local</a> (int gid__) const </td></tr>
+<tr class="memdesc:a076f054751e66766169feadf1e592489"><td class="mdescLeft">&#160;</td><td class="mdescRight">whether the block with global id gid is local <br/></td></tr>
+<tr class="separator:a076f054751e66766169feadf1e592489"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a211ba9c61e9d2d4f318a27316625989c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a211ba9c61e9d2d4f318a27316625989c"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1_master.html#a211ba9c61e9d2d4f318a27316625989c">exchange</a> ()</td></tr>
 <tr class="memdesc:a211ba9c61e9d2d4f318a27316625989c"><td class="mdescLeft">&#160;</td><td class="mdescRight">exchange the queues between all the blocks (collective operation) <br/></td></tr>
@@ -330,9 +330,9 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>threads</b> () const <
 <tr class="memitem:a01e95272f52357f5a237e1d670896b1b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a01e95272f52357f5a237e1d670896b1b"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>in_memory</b> () const </td></tr>
 <tr class="separator:a01e95272f52357f5a237e1d670896b1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0c4bf0be781da1a26060b733d6b5ee43"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0c4bf0be781da1a26060b733d6b5ee43"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>set_threads</b> (int threads)</td></tr>
-<tr class="separator:a0c4bf0be781da1a26060b733d6b5ee43"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a713ab6b08bd5dcde17e8fef01a6538"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4a713ab6b08bd5dcde17e8fef01a6538"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>set_threads</b> (int threads__)</td></tr>
+<tr class="separator:a4a713ab6b08bd5dcde17e8fef01a6538"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a274c3489727496d21c3d16394a3bfb91"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a274c3489727496d21c3d16394a3bfb91"></a>
 CreateBlock&#160;</td><td class="memItemRight" valign="bottom"><b>creator</b> () const </td></tr>
 <tr class="separator:a274c3489727496d21c3d16394a3bfb91"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -363,21 +363,21 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>immediate</b> () cons
 <tr class="memitem:afef14a8401b2d7057c5f551008061519"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afef14a8401b2d7057c5f551008061519"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>set_immediate</b> (bool i)</td></tr>
 <tr class="separator:afef14a8401b2d7057c5f551008061519"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac4173b996aa1013b03a5a7a6dfee2024"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac4173b996aa1013b03a5a7a6dfee2024"></a>
-IncomingQueues &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>incoming</b> (int <a class="el" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>)</td></tr>
-<tr class="separator:ac4173b996aa1013b03a5a7a6dfee2024"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3b36b74c8071d8bf3b4c3a00ec6fe618"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3b36b74c8071d8bf3b4c3a00ec6fe618"></a>
-OutgoingQueues &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>outgoing</b> (int <a class="el" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>)</td></tr>
-<tr class="separator:a3b36b74c8071d8bf3b4c3a00ec6fe618"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae574ddcb40d0c1c8834d4e064cbc3103"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae574ddcb40d0c1c8834d4e064cbc3103"></a>
-CollectivesList &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>collectives</b> (int <a class="el" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>)</td></tr>
-<tr class="separator:ae574ddcb40d0c1c8834d4e064cbc3103"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad1f6c7ebad9e943f60c60174d9048054"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad1f6c7ebad9e943f60c60174d9048054"></a>
-size_t&#160;</td><td class="memItemRight" valign="bottom"><b>incoming_count</b> (int <a class="el" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>) const </td></tr>
-<tr class="separator:ad1f6c7ebad9e943f60c60174d9048054"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8c6b070277a0aae71c540eba1a741a64"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8c6b070277a0aae71c540eba1a741a64"></a>
-size_t&#160;</td><td class="memItemRight" valign="bottom"><b>outgoing_count</b> (int <a class="el" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>) const </td></tr>
-<tr class="separator:a8c6b070277a0aae71c540eba1a741a64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5aa9938ed6729d0f7f993d144169aa7f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5aa9938ed6729d0f7f993d144169aa7f"></a>
+IncomingQueues &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>incoming</b> (int gid__)</td></tr>
+<tr class="separator:a5aa9938ed6729d0f7f993d144169aa7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af6d5b92c120c79ef6a3858190035ea92"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af6d5b92c120c79ef6a3858190035ea92"></a>
+OutgoingQueues &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>outgoing</b> (int gid__)</td></tr>
+<tr class="separator:af6d5b92c120c79ef6a3858190035ea92"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4168f31f788378ee8c8087b1958d63ce"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4168f31f788378ee8c8087b1958d63ce"></a>
+CollectivesList &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>collectives</b> (int gid__)</td></tr>
+<tr class="separator:a4168f31f788378ee8c8087b1958d63ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad771091c40b9e3b1114c0bc03d2c20ec"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad771091c40b9e3b1114c0bc03d2c20ec"></a>
+size_t&#160;</td><td class="memItemRight" valign="bottom"><b>incoming_count</b> (int gid__) const </td></tr>
+<tr class="separator:ad771091c40b9e3b1114c0bc03d2c20ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab1d590a924a2837e5f265ffddcb3e2e1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab1d590a924a2837e5f265ffddcb3e2e1"></a>
+size_t&#160;</td><td class="memItemRight" valign="bottom"><b>outgoing_count</b> (int gid__) const </td></tr>
+<tr class="separator:ab1d590a924a2837e5f265ffddcb3e2e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4efe4b8ff4034a262de645315437ca40"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4efe4b8ff4034a262de645315437ca40"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>set_expected</b> (int expected)</td></tr>
 <tr class="separator:a4efe4b8ff4034a262de645315437ca40"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -387,9 +387,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>add_expected</b> (int
 <tr class="memitem:ad5c4d1e87c1ad7bda97b7f2d80ee2028"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad5c4d1e87c1ad7bda97b7f2d80ee2028"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>expected</b> () const </td></tr>
 <tr class="separator:ad5c4d1e87c1ad7bda97b7f2d80ee2028"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3d679a388e57037ec57abf29c76746c4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3d679a388e57037ec57abf29c76746c4"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>replace_link</b> (int i, <a class="el" href="classdiy_1_1_link.html">Link</a> *link)</td></tr>
-<tr class="separator:a3d679a388e57037ec57abf29c76746c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae8f53748ce728307234c6cf55aa903a5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae8f53748ce728307234c6cf55aa903a5"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>replace_link</b> (int i, <a class="el" href="classdiy_1_1_link.html">Link</a> *link__)</td></tr>
+<tr class="separator:ae8f53748ce728307234c6cf55aa903a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeef9b42d31921179c35f43588807fe7d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aeef9b42d31921179c35f43588807fe7d"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>flush</b> ()</td></tr>
 <tr class="separator:aeef9b42d31921179c35f43588807fe7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -406,7 +406,7 @@ std::shared_ptr&lt; <a class="el" href="structdiy_1_1spd_1_1logger.html">spd::lo
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><dl><dt><b>Examples: </b></dt><dd><a class="el" href="decomposition_2regular-decomposer-long_8cpp-example.html#_a13">decomposition/regular-decomposer-long.cpp</a>, <a class="el" href="decomposition_2regular-decomposer-short_8cpp-example.html#_a13">decomposition/regular-decomposer-short.cpp</a>, <a class="el" href="decomposition_2test-direct-master_8cpp-example.html#_a13">decomposition/test-direct-master.cpp</a>, <a class="el" href="reduce_2all-done_8cpp-example.html#_a19">reduce/all-done.cpp</a>, <a class="el" href="reduce_2all-to-all_8cpp-example.html#_a21">reduce/all-to-all.cpp</a>, <a class="el" href="reduce_2kd-tree_8cpp-example.html#_a30">reduce/kd-tree.cpp</a>, <a class="el" href="reduce_2merge-reduce_8cpp-example.html#_a5">reduce/merge-reduce.cpp</a>, <a class="el" href="reduce_2sample-sort_8cpp-example.html#_a8">reduce/sample-sort.cpp</a>, <a class="el" href="reduce_2sort_8cpp-example.html#_a2">reduce/sort.cpp</a>, <a class="el" href="reduce_2swap-reduce_8cpp-example.html#_a20">reduce/swap-reduce.cpp</a>, <a class="el" href="simple_2read-blocks_8cpp-example.html#_a9">simple/read-blocks.cpp</a>, <a class="el" href="simple_2simple_8cpp-example.html#_a15">simple/simple.cpp</a>, and <a class="el" href="simple_2until-done_8cpp-example.html#_a10">simple/until-done.cpp</a>.</dd>
 </dl></div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a98a6bfb3c8d359aa1021e109b745d0cd"></a>
+<a class="anchor" id="a57dc152e96dba39554399cf63e7b4fc9"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -423,13 +423,13 @@ std::shared_ptr&lt; <a class="el" href="structdiy_1_1spd_1_1logger.html">spd::lo
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>threads</em> = <code>1</code>, </td>
+          <td class="paramname"><em>threads__</em> = <code>1</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>limit</em> = <code>-1</code>, </td>
+          <td class="paramname"><em>limit__</em> = <code>-1</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -485,8 +485,8 @@ std::shared_ptr&lt; <a class="el" href="structdiy_1_1spd_1_1logger.html">spd::lo
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">comm</td><td>communicator </td></tr>
-    <tr><td class="paramname">threads</td><td>number of threads DIY can use </td></tr>
-    <tr><td class="paramname">limit</td><td>number of blocks to store in memory </td></tr>
+    <tr><td class="paramname">threads__</td><td>number of threads DIY can use </td></tr>
+    <tr><td class="paramname">limit__</td><td>number of blocks to store in memory </td></tr>
     <tr><td class="paramname">create_</td><td>block create function; master manages creation if create != 0 </td></tr>
     <tr><td class="paramname">destroy_</td><td>block destroy function; master manages destruction if destroy != 0 </td></tr>
     <tr><td class="paramname">storage</td><td>storage object (path, method, etc.) for storing temporary blocks being shuffled in/out of core </td></tr>
@@ -532,7 +532,7 @@ std::shared_ptr&lt; <a class="el" href="structdiy_1_1spd_1_1logger.html">spd::lo
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Feb 23 2018 20:18:14 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 26 2018 17:51:37 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

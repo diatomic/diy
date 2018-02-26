@@ -116,7 +116,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &amp;cclock);</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    clock_get_time(cclock, &amp;ts);</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    mach_port_deallocate(mach_task_self(), cclock);</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="keywordflow">return</span> ts.tv_sec*1000 + ts.tv_nsec/1000000;</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="keywordflow">return</span> ts.tv_sec*1000 + <span class="keyword">static_cast&lt;</span><span class="keywordtype">unsigned</span> <span class="keywordtype">int</span><span class="keyword">&gt;</span>(ts.tv_nsec/1000000);</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#elif defined(_WIN32)</span></div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor"></span>    <span class="comment">// SOURCE: http://stackoverflow.com/questions/5404277/porting-clock-gettime-to-windows</span></div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    __int64 wintime;</div>
@@ -138,7 +138,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Feb 23 2018 20:18:14 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 26 2018 17:51:37 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

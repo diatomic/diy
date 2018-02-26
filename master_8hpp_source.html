@@ -245,9 +245,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;</div>
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;</div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00164"></a><span class="lineno"><a class="line" href="classdiy_1_1_master.html#a98a6bfb3c8d359aa1021e109b745d0cd">  164</a></span>&#160;                    <a class="code" href="classdiy_1_1_master.html#a98a6bfb3c8d359aa1021e109b745d0cd">Master</a>(<a class="code" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a>    comm,          </div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;                           <span class="keywordtype">int</span>                  threads   = 1,  </div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;                           <span class="keywordtype">int</span>                  limit     = -1, </div>
+<div class="line"><a name="l00164"></a><span class="lineno"><a class="line" href="classdiy_1_1_master.html#a57dc152e96dba39554399cf63e7b4fc9">  164</a></span>&#160;                    <a class="code" href="classdiy_1_1_master.html#a57dc152e96dba39554399cf63e7b4fc9">Master</a>(<a class="code" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a>    comm,          </div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;                           <span class="keywordtype">int</span>                  threads__ = 1,  </div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;                           <span class="keywordtype">int</span>                  limit__   = -1, </div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;                           CreateBlock          create_   = 0,  </div>
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;                           DestroyBlock         destroy_  = 0,  </div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;                           <a class="code" href="classdiy_1_1_external_storage.html">ExternalStorage</a>*     storage   = 0,  </div>
@@ -256,8 +256,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;                           <a class="code" href="structdiy_1_1_master_1_1_queue_policy.html">QueuePolicy</a>*         q_policy  = <span class="keyword">new</span> <a class="code" href="structdiy_1_1_master_1_1_queue_size_policy.html">QueueSizePolicy</a>(4096)): </div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;                      blocks_(create_, destroy_, storage, <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>, load_),</div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;                      queue_policy_(q_policy),</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;                      limit_(limit),</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;                      threads_(threads == -1 ? <a class="code" href="structdiy_1_1thread.html">thread</a>::hardware_concurrency() : threads),</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;                      limit_(limit__),</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;                      threads_(threads__ == -1 ? static_cast&lt;int&gt;(<a class="code" href="structdiy_1_1thread.html">thread</a>::hardware_concurrency()) : threads__),</div>
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;                      storage_(storage),</div>
 <div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;                      <span class="comment">// Communicator functionality</span></div>
 <div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;                      comm_(comm),</div>
@@ -296,8 +296,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;</div>
 <div class="line"><a name="l00217"></a><span class="lineno"><a class="line" href="classdiy_1_1_master.html#a97a88f274e2b86738171a2c852027729">  217</a></span>&#160;      <span class="keywordtype">void</span>*         <span class="keyword">get</span>(<span class="keywordtype">int</span> i)                          { <span class="keywordflow">return</span> blocks_.get(i); }</div>
 <div class="line"><a name="l00219"></a><span class="lineno"><a class="line" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">  219</a></span>&#160;      <span class="keywordtype">int</span>           <a class="code" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>(<span class="keywordtype">int</span> i)<span class="keyword"> const                    </span>{ <span class="keywordflow">return</span> gids_[i]; }</div>
-<div class="line"><a name="l00221"></a><span class="lineno"><a class="line" href="classdiy_1_1_master.html#a5f5c513ee845c1cac0c3c4daf31762ac">  221</a></span>&#160;      <span class="keywordtype">int</span>           <a class="code" href="classdiy_1_1_master.html#a5f5c513ee845c1cac0c3c4daf31762ac">lid</a>(<span class="keywordtype">int</span> <a class="code" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>)<span class="keyword"> const                  </span>{ <span class="keywordflow">return</span> <a class="code" href="classdiy_1_1_master.html#a14b0c7fc215e53ed655e44186a18dc42">local</a>(gid) ?  lids_.find(gid)-&gt;second : -1; }</div>
-<div class="line"><a name="l00223"></a><span class="lineno"><a class="line" href="classdiy_1_1_master.html#a14b0c7fc215e53ed655e44186a18dc42">  223</a></span>&#160;      <span class="keywordtype">bool</span>          <a class="code" href="classdiy_1_1_master.html#a14b0c7fc215e53ed655e44186a18dc42">local</a>(<span class="keywordtype">int</span> <a class="code" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>)<span class="keyword"> const                </span>{ <span class="keywordflow">return</span> lids_.find(gid) != lids_.end(); }</div>
+<div class="line"><a name="l00221"></a><span class="lineno"><a class="line" href="classdiy_1_1_master.html#a87bc338b26092730c23983ee40104230">  221</a></span>&#160;      <span class="keywordtype">int</span>           <a class="code" href="classdiy_1_1_master.html#a87bc338b26092730c23983ee40104230">lid</a>(<span class="keywordtype">int</span> gid__)<span class="keyword"> const                </span>{ <span class="keywordflow">return</span> <a class="code" href="classdiy_1_1_master.html#a076f054751e66766169feadf1e592489">local</a>(gid__) ?  lids_.find(gid__)-&gt;second : -1; }</div>
+<div class="line"><a name="l00223"></a><span class="lineno"><a class="line" href="classdiy_1_1_master.html#a076f054751e66766169feadf1e592489">  223</a></span>&#160;      <span class="keywordtype">bool</span>          <a class="code" href="classdiy_1_1_master.html#a076f054751e66766169feadf1e592489">local</a>(<span class="keywordtype">int</span> gid__)<span class="keyword"> const              </span>{ <span class="keywordflow">return</span> lids_.find(gid__) != lids_.end(); }</div>
 <div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;</div>
 <div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;      <span class="keyword">inline</span> <span class="keywordtype">void</span>   <a class="code" href="classdiy_1_1_master.html#a211ba9c61e9d2d4f318a27316625989c">exchange</a>();</div>
 <div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;      <span class="keyword">inline</span> <span class="keywordtype">void</span>   process_collectives();</div>
@@ -313,7 +313,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;      <span class="keywordtype">int</span>           threads()<span class="keyword"> const                     </span>{ <span class="keywordflow">return</span> threads_; }</div>
 <div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;      <span class="keywordtype">int</span>           in_memory()<span class="keyword"> const                   </span>{ <span class="keywordflow">return</span> *blocks_.in_memory().const_access(); }</div>
 <div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;      <span class="keywordtype">void</span>          set_threads(<span class="keywordtype">int</span> threads)            { threads_ = threads; }</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;      <span class="keywordtype">void</span>          set_threads(<span class="keywordtype">int</span> threads__)          { threads_ = threads__; }</div>
 <div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;</div>
 <div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;      CreateBlock   creator()<span class="keyword"> const                     </span>{ <span class="keywordflow">return</span> blocks_.creator(); }</div>
 <div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;      DestroyBlock  destroyer()<span class="keyword"> const                   </span>{ <span class="keywordflow">return</span> blocks_.destroyer(); }</div>
@@ -337,25 +337,25 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;</div>
 <div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    <span class="keyword">public</span>:</div>
 <div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;      <span class="comment">// Communicator functionality</span></div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;      IncomingQueues&amp;   incoming(<span class="keywordtype">int</span> <a class="code" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>)               { <span class="keywordflow">return</span> incoming_[exchange_round_].map[<a class="code" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>].queues; }</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;      OutgoingQueues&amp;   outgoing(<span class="keywordtype">int</span> <a class="code" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>)               { <span class="keywordflow">return</span> outgoing_[<a class="code" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>].queues; }</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;      CollectivesList&amp;  collectives(<span class="keywordtype">int</span> <a class="code" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>)            { <span class="keywordflow">return</span> collectives_[<a class="code" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>]; }</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;      <span class="keywordtype">size_t</span>            incoming_count(<span class="keywordtype">int</span> <a class="code" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;      IncomingQueues&amp;   incoming(<span class="keywordtype">int</span> gid__)             { <span class="keywordflow">return</span> incoming_[exchange_round_].map[gid__].queues; }</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;      OutgoingQueues&amp;   outgoing(<span class="keywordtype">int</span> gid__)             { <span class="keywordflow">return</span> outgoing_[gid__].queues; }</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;      CollectivesList&amp;  collectives(<span class="keywordtype">int</span> gid__)          { <span class="keywordflow">return</span> collectives_[gid__]; }</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;      <span class="keywordtype">size_t</span>            incoming_count(<span class="keywordtype">int</span> gid__)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;<span class="keyword">      </span>{</div>
 <div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;        IncomingRoundMap::const_iterator round_it = incoming_.find(exchange_round_);</div>
 <div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;        <span class="keywordflow">if</span> (round_it == incoming_.end())</div>
 <div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;          <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;        IncomingQueuesMap::const_iterator queue_it = round_it-&gt;second.map.find(gid);</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;        IncomingQueuesMap::const_iterator queue_it = round_it-&gt;second.map.find(gid__);</div>
 <div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;        <span class="keywordflow">if</span> (queue_it == round_it-&gt;second.map.end())</div>
 <div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;          <span class="keywordflow">return</span> 0;</div>
 <div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;        <span class="keywordflow">return</span> queue_it-&gt;second.queues.size();</div>
 <div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;      }</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;      <span class="keywordtype">size_t</span>            outgoing_count(<span class="keywordtype">int</span> gid)<span class="keyword"> const   </span>{ OutgoingQueuesMap::const_iterator it = outgoing_.find(gid); <span class="keywordflow">if</span> (it == outgoing_.end()) <span class="keywordflow">return</span> 0; <span class="keywordflow">return</span> it-&gt;second.queues.size(); }</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;      <span class="keywordtype">size_t</span>            outgoing_count(<span class="keywordtype">int</span> gid__)<span class="keyword"> const </span>{ OutgoingQueuesMap::const_iterator it = outgoing_.find(gid__); <span class="keywordflow">if</span> (it == outgoing_.end()) <span class="keywordflow">return</span> 0; <span class="keywordflow">return</span> it-&gt;second.queues.size(); }</div>
 <div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;</div>
 <div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;      <span class="keywordtype">void</span>              set_expected(<span class="keywordtype">int</span> expected)      { expected_ = expected; }</div>
 <div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;      <span class="keywordtype">void</span>              add_expected(<span class="keywordtype">int</span> i)             { expected_ += i; }</div>
 <div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;      <span class="keywordtype">int</span>               expected()<span class="keyword"> const                </span>{ <span class="keywordflow">return</span> expected_; }</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;      <span class="keywordtype">void</span>              replace_link(<span class="keywordtype">int</span> i, Link* link) { expected_ -= links_[i]-&gt;size_unique(); <span class="keyword">delete</span> links_[i]; links_[i] = link; expected_ += links_[i]-&gt;size_unique(); }</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;      <span class="keywordtype">void</span>              replace_link(<span class="keywordtype">int</span> i, Link* link__) { expected_ -= links_[i]-&gt;size_unique(); <span class="keyword">delete</span> links_[i]; links_[i] = link__; expected_ += links_[i]-&gt;size_unique(); }</div>
 <div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;</div>
 <div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    <span class="keyword">public</span>:</div>
 <div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;      <span class="comment">// Communicator functionality</span></div>
@@ -418,7 +418,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;                f(f_), s(s_)                                                        {}</div>
 <div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;</div>
 <div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;      <span class="keywordtype">void</span>  execute(<span class="keywordtype">void</span>* b, <span class="keyword">const</span> ProxyWithLink&amp; cp)<span class="keyword"> const override                </span>{ f(static_cast&lt;Block*&gt;(b), cp); }</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;      <span class="keywordtype">bool</span>  skip(<span class="keywordtype">int</span> i, <span class="keyword">const</span> <a class="code" href="classdiy_1_1_master.html#a98a6bfb3c8d359aa1021e109b745d0cd">Master</a>&amp; m)<span class="keyword"> const override                             </span>{ <span class="keywordflow">return</span> s(i,m); }</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;      <span class="keywordtype">bool</span>  skip(<span class="keywordtype">int</span> i, <span class="keyword">const</span> <a class="code" href="classdiy_1_1_master.html#a57dc152e96dba39554399cf63e7b4fc9">Master</a>&amp; m)<span class="keyword"> const override                             </span>{ <span class="keywordflow">return</span> s(i,m); }</div>
 <div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;</div>
 <div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;      Callback&lt;Block&gt;   f;</div>
 <div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;      Skip              s;</div>
@@ -458,11 +458,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00384"></a><span class="lineno"><a class="line" href="structdiy_1_1_master_1_1_process_block.html">  384</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structdiy_1_1_master_1_1_process_block.html">diy::Master::ProcessBlock</a></div>
 <div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;{</div>
 <div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;          <a class="code" href="structdiy_1_1_master_1_1_process_block.html">ProcessBlock</a>(<a class="code" href="classdiy_1_1_master.html">Master</a>&amp;                    master_,</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;                       <span class="keyword">const</span> std::deque&lt;int&gt;&amp;     blocks_,</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;                       <span class="keyword">const</span> std::deque&lt;int&gt;&amp;     blocks__,</div>
 <div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;                       <span class="keywordtype">int</span>                        local_limit_,</div>
 <div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;                       <a class="code" href="classdiy_1_1critical__resource.html">critical_resource&lt;int&gt;</a>&amp;    idx_):</div>
 <div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;              master(master_),</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;              blocks(blocks_),</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;              blocks(blocks__),</div>
 <div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;              local_limit(local_limit_),</div>
 <div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;              idx(idx_)</div>
 <div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;          {}</div>
@@ -471,7 +471,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;  {</div>
 <div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;    master.log-&gt;debug(<span class="stringliteral">&quot;Processing with thread: {}&quot;</span>,  this_thread::get_id());</div>
 <div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;    std::vector&lt;int&gt;      <a class="code" href="classdiy_1_1_master.html#a14b0c7fc215e53ed655e44186a18dc42">local</a>;</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;    std::vector&lt;int&gt;      <a class="code" href="classdiy_1_1_master.html#a076f054751e66766169feadf1e592489">local</a>;</div>
 <div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;    <span class="keywordflow">do</span></div>
 <div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;    {</div>
 <div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;      <span class="keywordtype">int</span> cur = (*idx.access())++;</div>
@@ -585,11 +585,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;</div>
 <div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;<span class="keywordtype">void</span></div>
 <div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;diy::Master::</div>
-<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;unload_incoming(<span class="keywordtype">int</span> gid)</div>
+<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;unload_incoming(<span class="keywordtype">int</span> gid__)</div>
 <div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;{</div>
 <div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;  <span class="keywordflow">for</span> (IncomingRoundMap::iterator round_itr = incoming_.begin(); round_itr != incoming_.end(); ++round_itr)</div>
 <div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;  {</div>
-<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;    IncomingQueuesMap::iterator qmap_itr = round_itr-&gt;second.map.find(gid);</div>
+<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;    IncomingQueuesMap::iterator qmap_itr = round_itr-&gt;second.map.find(gid__);</div>
 <div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;    <span class="keywordflow">if</span> (qmap_itr == round_itr-&gt;second.map.end())</div>
 <div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;    {</div>
 <div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;      <span class="keywordflow">continue</span>;</div>
@@ -598,9 +598,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;    <span class="keywordflow">for</span> (InQueueRecords::iterator it = in_qrs.records.begin(); it != in_qrs.records.end(); ++it)</div>
 <div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;    {</div>
 <div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;      QueueRecord&amp; qr = it-&gt;second;</div>
-<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;      <span class="keywordflow">if</span> (queue_policy_-&gt;unload_incoming(*<span class="keyword">this</span>, it-&gt;first, gid, qr.size))</div>
+<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;      <span class="keywordflow">if</span> (queue_policy_-&gt;unload_incoming(*<span class="keyword">this</span>, it-&gt;first, gid__, qr.size))</div>
 <div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;      {</div>
-<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;        log-&gt;debug(<span class="stringliteral">&quot;Unloading queue: {} &lt;- {}&quot;</span>, gid, it-&gt;first);</div>
+<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;        log-&gt;debug(<span class="stringliteral">&quot;Unloading queue: {} &lt;- {}&quot;</span>, gid__, it-&gt;first);</div>
 <div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;        qr.external = storage_-&gt;put(in_qrs.queues[it-&gt;first]);</div>
 <div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;      }</div>
 <div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;    }</div>
@@ -609,9 +609,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;</div>
 <div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;<span class="keywordtype">void</span></div>
 <div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;diy::Master::</div>
-<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;unload_outgoing(<span class="keywordtype">int</span> gid)</div>
+<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;unload_outgoing(<span class="keywordtype">int</span> gid__)</div>
 <div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;{</div>
-<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;  OutgoingQueuesRecord&amp; out_qr = outgoing_[gid];</div>
+<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;  OutgoingQueuesRecord&amp; out_qr = outgoing_[gid__];</div>
 <div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;</div>
 <div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;  <span class="keywordtype">size_t</span> out_queues_size = <span class="keyword">sizeof</span>(size_t);   <span class="comment">// map size</span></div>
 <div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;  <span class="keywordtype">size_t</span> count = 0;</div>
@@ -625,9 +625,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;    out_queues_size += it-&gt;second.size();   <span class="comment">// buffer contents</span></div>
 <div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;    ++count;</div>
 <div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;  }</div>
-<div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;  <span class="keywordflow">if</span> (queue_policy_-&gt;unload_outgoing(*<span class="keyword">this</span>, gid, out_queues_size - <span class="keyword">sizeof</span>(<span class="keywordtype">size_t</span>)))</div>
+<div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;  <span class="keywordflow">if</span> (queue_policy_-&gt;unload_outgoing(*<span class="keyword">this</span>, gid__, out_queues_size - <span class="keyword">sizeof</span>(<span class="keywordtype">size_t</span>)))</div>
 <div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;  {</div>
-<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;      log-&gt;debug(<span class="stringliteral">&quot;Unloading outgoing queues: {} -&gt; ...; size = {}\n&quot;</span>, gid, out_queues_size);</div>
+<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;      log-&gt;debug(<span class="stringliteral">&quot;Unloading outgoing queues: {} -&gt; ...; size = {}\n&quot;</span>, gid__, out_queues_size);</div>
 <div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;      MemoryBuffer  bb;     bb.reserve(out_queues_size);</div>
 <div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;      <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">diy::save</a>(bb, count);</div>
 <div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;</div>
@@ -636,7 +636,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;        <span class="keywordflow">if</span> (it-&gt;first.proc == comm_.rank())</div>
 <div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;        {</div>
 <div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;          <span class="comment">// treat as incoming</span></div>
-<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;          <span class="keywordflow">if</span> (queue_policy_-&gt;unload_incoming(*<span class="keyword">this</span>, gid, it-&gt;first.gid, it-&gt;second.size()))</div>
+<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;          <span class="keywordflow">if</span> (queue_policy_-&gt;unload_incoming(*<span class="keyword">this</span>, gid__, it-&gt;first.gid, it-&gt;second.size()))</div>
 <div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;          {</div>
 <div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;            QueueRecord&amp; qr = out_qr.external_local[it-&gt;first];</div>
 <div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;            qr.size = it-&gt;second.size();</div>
@@ -682,15 +682,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;</div>
 <div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;<span class="keywordtype">void</span></div>
 <div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;diy::Master::</div>
-<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;load_incoming(<span class="keywordtype">int</span> gid)</div>
+<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;load_incoming(<span class="keywordtype">int</span> gid__)</div>
 <div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;{</div>
-<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;  IncomingQueuesRecords&amp; in_qrs = incoming_[exchange_round_].map[gid];</div>
+<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;  IncomingQueuesRecords&amp; in_qrs = incoming_[exchange_round_].map[gid__];</div>
 <div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;  <span class="keywordflow">for</span> (InQueueRecords::iterator it = in_qrs.records.begin(); it != in_qrs.records.end(); ++it)</div>
 <div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;  {</div>
 <div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;    QueueRecord&amp; qr = it-&gt;second;</div>
 <div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;    <span class="keywordflow">if</span> (qr.external != -1)</div>
 <div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;    {</div>
-<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;        log-&gt;debug(<span class="stringliteral">&quot;Loading queue: {} &lt;- {}&quot;</span>, gid, it-&gt;first);</div>
+<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;        log-&gt;debug(<span class="stringliteral">&quot;Loading queue: {} &lt;- {}&quot;</span>, gid__, it-&gt;first);</div>
 <div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;        storage_-&gt;get(qr.external, in_qrs.queues[it-&gt;first]);</div>
 <div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;        qr.external = -1;</div>
 <div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;    }</div>
@@ -699,11 +699,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;</div>
 <div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;<span class="keywordtype">void</span></div>
 <div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;diy::Master::</div>
-<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;load_outgoing(<span class="keywordtype">int</span> gid)</div>
+<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;load_outgoing(<span class="keywordtype">int</span> gid__)</div>
 <div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;{</div>
 <div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;  <span class="comment">// TODO: we could adjust this mechanism to read directly from storage,</span></div>
 <div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;  <span class="comment">//       bypassing an intermediate MemoryBuffer</span></div>
-<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;  OutgoingQueuesRecord&amp; out_qr = outgoing_[gid];</div>
+<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;  OutgoingQueuesRecord&amp; out_qr = outgoing_[gid__];</div>
 <div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;  <span class="keywordflow">if</span> (out_qr.external != -1)</div>
 <div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;  {</div>
 <div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;    MemoryBuffer bb;</div>
@@ -729,7 +729,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;</div>
 <div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;<span class="keywordtype">int</span></div>
 <div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;<a class="code" href="classdiy_1_1_master.html#aeab2723bb0ecd4f7316b4805c1b53a61">diy::Master::</a></div>
-<div class="line"><a name="l00658"></a><span class="lineno"><a class="line" href="classdiy_1_1_master.html#aeab2723bb0ecd4f7316b4805c1b53a61">  658</a></span>&#160;<a class="code" href="classdiy_1_1_master.html#aeab2723bb0ecd4f7316b4805c1b53a61">add</a>(<span class="keywordtype">int</span> gid, <span class="keywordtype">void</span>* b, <a class="code" href="classdiy_1_1_link.html">Link</a>* l)</div>
+<div class="line"><a name="l00658"></a><span class="lineno"><a class="line" href="classdiy_1_1_master.html#aeab2723bb0ecd4f7316b4805c1b53a61">  658</a></span>&#160;<a class="code" href="classdiy_1_1_master.html#aeab2723bb0ecd4f7316b4805c1b53a61">add</a>(<span class="keywordtype">int</span> gid__, <span class="keywordtype">void</span>* b, <a class="code" href="classdiy_1_1_link.html">Link</a>* l)</div>
 <div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;{</div>
 <div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;  <span class="keywordflow">if</span> (*blocks_.in_memory().const_access() == limit_)</div>
 <div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;    unload_all();</div>
@@ -738,13 +738,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;</div>
 <div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;  blocks_.add(b);</div>
 <div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;  links_.push_back(l);</div>
-<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;  gids_.push_back(gid);</div>
+<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;  gids_.push_back(gid__);</div>
 <div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;</div>
-<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;  <span class="keywordtype">int</span> lid = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(gids_.size()) - 1;</div>
-<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;  lids_[gid] = lid;</div>
+<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;  <span class="keywordtype">int</span> lid__ = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(gids_.size()) - 1;</div>
+<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;  lids_[gid__] = lid__;</div>
 <div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;  add_expected(l-&gt;size_unique()); <span class="comment">// NB: at every iteration we expect a message from each unique neighbor</span></div>
 <div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;</div>
-<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;  <span class="keywordflow">return</span> lid;</div>
+<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;  <span class="keywordflow">return</span> lid__;</div>
 <div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;}</div>
 <div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;</div>
 <div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;<span class="keywordtype">void</span>*</div>
@@ -1295,6 +1295,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="classdiy_1_1_master_html_a20e686efa0c9389b4ed943277ccfffbc"><div class="ttname"><a href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">diy::Master::gid</a></div><div class="ttdeci">int gid(int i) const </div><div class="ttdoc">return gid of the i-th block </div><div class="ttdef"><b>Definition:</b> master.hpp:219</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_process_block_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_process_block.html">diy::Master::ProcessBlock</a></div><div class="ttdef"><b>Definition:</b> master.hpp:384</div></div>
 <div class="ttc" id="classdiy_1_1_master_html_acf5ddc5dbd765ce578571aa90c238b45"><div class="ttname"><a href="classdiy_1_1_master.html#acf5ddc5dbd765ce578571aa90c238b45">diy::Master::size</a></div><div class="ttdeci">unsigned int size() const </div><div class="ttdoc">return the number of local blocks </div><div class="ttdef"><b>Definition:</b> master.hpp:233</div></div>
+<div class="ttc" id="classdiy_1_1_master_html_a87bc338b26092730c23983ee40104230"><div class="ttname"><a href="classdiy_1_1_master.html#a87bc338b26092730c23983ee40104230">diy::Master::lid</a></div><div class="ttdeci">int lid(int gid__) const </div><div class="ttdoc">return the local id of the local block with global id gid, or -1 if not local </div><div class="ttdef"><b>Definition:</b> master.hpp:221</div></div>
+<div class="ttc" id="classdiy_1_1_master_html_a57dc152e96dba39554399cf63e7b4fc9"><div class="ttname"><a href="classdiy_1_1_master.html#a57dc152e96dba39554399cf63e7b4fc9">diy::Master::Master</a></div><div class="ttdeci">Master(mpi::communicator comm, int threads__=1, int limit__=-1, CreateBlock create_=0, DestroyBlock destroy_=0, ExternalStorage *storage=0, SaveBlock save=0, LoadBlock load_=0, QueuePolicy *q_policy=new QueueSizePolicy(4096))</div><div class="ttdoc">The main DIY object. </div><div class="ttdef"><b>Definition:</b> master.hpp:164</div></div>
 <div class="ttc" id="classdiy_1_1_master_html_a5f80b0b60be6e6028907131985437dee"><div class="ttname"><a href="classdiy_1_1_master.html#a5f80b0b60be6e6028907131985437dee">diy::Master::foreach_</a></div><div class="ttdeci">void foreach_(const Callback&lt; Block &gt; &amp;f, const Skip &amp;s=NeverSkip())</div><div class="ttdoc">call f with every block </div><div class="ttdef"><b>Definition:</b> master.hpp:703</div></div>
 <div class="ttc" id="namespacediy_html_a861d8601719a75414c57d6aa6a99e0fc"><div class="ttname"><a href="namespacediy.html#a861d8601719a75414c57d6aa6a99e0fc">diy::in</a></div><div class="ttdeci">void in(const RegularLink&lt; Bounds &gt; &amp;link, const Point &amp;p, OutIter out, const Bounds &amp;domain)</div><div class="ttdoc">Finds the neighbor(s) containing the target point. </div><div class="ttdef"><b>Definition:</b> pick.hpp:102</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_binder_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_binder.html">diy::Master::Binder</a></div><div class="ttdef"><b>Definition:</b> master.hpp:41</div></div>
@@ -1306,7 +1308,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="structdiy_1_1_master_1_1_proxy_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_proxy.html">diy::Master::Proxy</a></div><div class="ttdoc">Communication proxy, used for enqueueing and dequeueing items for future exchange. </div><div class="ttdef"><b>Definition:</b> proxy.hpp:8</div></div>
 <div class="ttc" id="structdiy_1_1_memory_buffer_html"><div class="ttname"><a href="structdiy_1_1_memory_buffer.html">diy::MemoryBuffer</a></div><div class="ttdef"><b>Definition:</b> serialization.hpp:26</div></div>
 <div class="ttc" id="structdiy_1_1lock__guard_html"><div class="ttname"><a href="structdiy_1_1lock__guard.html">diy::lock_guard</a></div><div class="ttdef"><b>Definition:</b> no-thread.hpp:27</div></div>
-<div class="ttc" id="classdiy_1_1_master_html_a98a6bfb3c8d359aa1021e109b745d0cd"><div class="ttname"><a href="classdiy_1_1_master.html#a98a6bfb3c8d359aa1021e109b745d0cd">diy::Master::Master</a></div><div class="ttdeci">Master(mpi::communicator comm, int threads=1, int limit=-1, CreateBlock create_=0, DestroyBlock destroy_=0, ExternalStorage *storage=0, SaveBlock save=0, LoadBlock load_=0, QueuePolicy *q_policy=new QueueSizePolicy(4096))</div><div class="ttdoc">The main DIY object. </div><div class="ttdef"><b>Definition:</b> master.hpp:164</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_skip_no_incoming_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_skip_no_incoming.html">diy::Master::SkipNoIncoming</a></div><div class="ttdef"><b>Definition:</b> master.hpp:353</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_queue_policy_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_queue_policy.html">diy::Master::QueuePolicy</a></div><div class="ttdef"><b>Definition:</b> master.hpp:72</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_base_command_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_base_command.html">diy::Master::BaseCommand</a></div><div class="ttdef"><b>Definition:</b> master.hpp:333</div></div>
@@ -1316,7 +1317,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="structdiy_1_1mpi_1_1request_html"><div class="ttname"><a href="structdiy_1_1mpi_1_1request.html">diy::mpi::request</a></div><div class="ttdef"><b>Definition:</b> request.hpp:5</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_outgoing_queues_record_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_outgoing_queues_record.html">diy::Master::OutgoingQueuesRecord</a></div><div class="ttdef"><b>Definition:</b> master.hpp:136</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_never_skip_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_never_skip.html">diy::Master::NeverSkip</a></div><div class="ttdef"><b>Definition:</b> master.hpp:55</div></div>
-<div class="ttc" id="classdiy_1_1_master_html_a14b0c7fc215e53ed655e44186a18dc42"><div class="ttname"><a href="classdiy_1_1_master.html#a14b0c7fc215e53ed655e44186a18dc42">diy::Master::local</a></div><div class="ttdeci">bool local(int gid) const </div><div class="ttdoc">whether the block with global id gid is local </div><div class="ttdef"><b>Definition:</b> master.hpp:223</div></div>
+<div class="ttc" id="classdiy_1_1_master_html_a076f054751e66766169feadf1e592489"><div class="ttname"><a href="classdiy_1_1_master.html#a076f054751e66766169feadf1e592489">diy::Master::local</a></div><div class="ttdeci">bool local(int gid__) const </div><div class="ttdoc">whether the block with global id gid is local </div><div class="ttdef"><b>Definition:</b> master.hpp:223</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_message_info_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_message_info.html">diy::Master::MessageInfo</a></div><div class="ttdef"><b>Definition:</b> master.hpp:89</div></div>
 <div class="ttc" id="classdiy_1_1_master_html_a211ba9c61e9d2d4f318a27316625989c"><div class="ttname"><a href="classdiy_1_1_master.html#a211ba9c61e9d2d4f318a27316625989c">diy::Master::exchange</a></div><div class="ttdeci">void exchange()</div><div class="ttdoc">exchange the queues between all the blocks (collective operation) </div><div class="ttdef"><b>Definition:</b> master.hpp:801</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_in_flight_recv_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_in_flight_recv.html">diy::Master::InFlightRecv</a></div><div class="ttdef"><b>Definition:</b> master.hpp:104</div></div>
@@ -1324,12 +1325,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="structdiy_1_1_master_1_1_incoming_queues_records_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_incoming_queues_records.html">diy::Master::IncomingQueuesRecords</a></div><div class="ttdef"><b>Definition:</b> master.hpp:131</div></div>
 <div class="ttc" id="classdiy_1_1_master_html_a6aee1cc87a2760bdc89d7e5fa62a2f6e"><div class="ttname"><a href="classdiy_1_1_master.html#a6aee1cc87a2760bdc89d7e5fa62a2f6e">diy::Master::communicator</a></div><div class="ttdeci">mpi::communicator &amp; communicator()</div><div class="ttdoc">return the MPI communicator </div><div class="ttdef"><b>Definition:</b> master.hpp:214</div></div>
 <div class="ttc" id="structdiy_1_1thread_html"><div class="ttname"><a href="structdiy_1_1thread.html">diy::thread</a></div><div class="ttdef"><b>Definition:</b> no-thread.hpp:9</div></div>
-<div class="ttc" id="classdiy_1_1_master_html_a5f5c513ee845c1cac0c3c4daf31762ac"><div class="ttname"><a href="classdiy_1_1_master.html#a5f5c513ee845c1cac0c3c4daf31762ac">diy::Master::lid</a></div><div class="ttdeci">int lid(int gid) const </div><div class="ttdoc">return the local id of the local block with global id gid, or -1 if not local </div><div class="ttdef"><b>Definition:</b> master.hpp:221</div></div>
 <div class="ttc" id="classdiy_1_1critical__resource_html"><div class="ttname"><a href="classdiy_1_1critical__resource.html">diy::critical_resource&lt; int &gt;</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Feb 23 2018 20:18:14 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 26 2018 17:51:37 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

@@ -24,7 +24,7 @@ var searchData=
   ['argvisitor',['ArgVisitor',['../classfmt_1_1_arg_visitor.html',1,'fmt']]],
   ['argvisitor_3c_20argformatter_3c_20char_20_3e_2c_20void_20_3e',['ArgVisitor&lt; ArgFormatter&lt; Char &gt;, void &gt;',['../classfmt_1_1_arg_visitor.html',1,'fmt']]],
   ['argvisitor_3c_20impl_2c_20void_20_3e',['ArgVisitor&lt; Impl, void &gt;',['../classfmt_1_1_arg_visitor.html',1,'fmt']]],
-  ['assigner',['assigner',['../structdiy_1_1_reduce_proxy.html#ab3cba8511e114ecfd3e84a25f30f6bd9',1,'diy::ReduceProxy::assigner()'],['../classdiy_1_1_assigner.html#a0755324ae2441ad6eb0c2722fe389c84',1,'diy::Assigner::Assigner()']]],
+  ['assigner',['assigner',['../structdiy_1_1_reduce_proxy.html#ab3cba8511e114ecfd3e84a25f30f6bd9',1,'diy::ReduceProxy::assigner()'],['../classdiy_1_1_assigner.html#afbce9fc4ffb176dbf7575058779511a2',1,'diy::Assigner::Assigner()']]],
   ['assigner',['Assigner',['../classdiy_1_1_assigner.html',1,'diy']]],
   ['algorithms',['algorithms',['../md_docs_detail_algorithms.html',1,'']]]
 ];

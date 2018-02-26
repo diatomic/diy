@@ -122,10 +122,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
 <div class="line"><a name="l00030"></a><span class="lineno"><a class="line" href="structdiy_1_1_direction.html">   30</a></span>&#160;    <span class="keyword">struct </span><a class="code" href="structdiy_1_1_direction.html">Direction</a>: <span class="keyword">public</span> <a class="code" href="classdiy_1_1_point.html">Point</a>&lt;int,DIY_MAX_DIM&gt;</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    {</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;              <a class="code" href="structdiy_1_1_direction.html">Direction</a>()                 { <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; DIY_MAX_DIM; ++i) (*<span class="keyword">this</span>)[i] = 0; }</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;              <a class="code" href="structdiy_1_1_direction.html">Direction</a>()                 { <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; DIY_MAX_DIM; ++i) (*<span class="keyword">this</span>)[i] = 0; }</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;              <a class="code" href="structdiy_1_1_direction.html">Direction</a>(<span class="keywordtype">int</span> dir)</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;      {</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;          <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; DIY_MAX_DIM; ++i) (*<span class="keyword">this</span>)[i] = 0;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;          <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; DIY_MAX_DIM; ++i) (*<span class="keyword">this</span>)[i] = 0;</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;          <span class="keywordflow">if</span> (dir &amp; DIY_X0) (*this)[0] -= 1;</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;          <span class="keywordflow">if</span> (dir &amp; DIY_X1) (*this)[0] += 1;</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;          <span class="keywordflow">if</span> (dir &amp; DIY_Y0) (*this)[1] -= 1;</div>
@@ -139,7 +139,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;      <span class="keywordtype">bool</span></div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;      operator==(<span class="keyword">const</span> <a class="code" href="structdiy_1_1_direction.html">diy::Direction</a>&amp; y)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="keyword">      </span>{</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; DIY_MAX_DIM; ++i)</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; DIY_MAX_DIM; ++i)</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;            <span class="keywordflow">if</span> ((*<span class="keyword">this</span>)[i] != y[i]) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;      }</div>
@@ -148,7 +148,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;      <span class="keywordtype">bool</span></div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      operator&lt;(<span class="keyword">const</span> <a class="code" href="structdiy_1_1_direction.html">diy::Direction</a>&amp; y)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="keyword">      </span>{</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; DIY_MAX_DIM; ++i)</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; DIY_MAX_DIM; ++i)</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        {</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;            <span class="keywordflow">if</span> ((*<span class="keyword">this</span>)[i] &lt; y[i]) <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;            <span class="keywordflow">if</span> ((*<span class="keyword">this</span>)[i] &gt; y[i]) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
@@ -185,7 +185,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Feb 23 2018 20:18:14 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 26 2018 17:51:37 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

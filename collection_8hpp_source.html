@@ -134,9 +134,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;      <span class="keyword">inline</span> <span class="keywordtype">void</span>   clear();</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      <span class="keywordtype">int</span>           add(Element e)                  { elements_.push_back(e); external_.push_back(-1); ++(*in_memory_.access()); <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(elements_.size()) - 1; }</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      <span class="keywordtype">void</span>*         release(<span class="keywordtype">int</span> i)                  { <span class="keywordtype">void</span>* e = <span class="keyword">get</span>(i); elements_[i] = 0; <span class="keywordflow">return</span> e; }</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      <span class="keywordtype">void</span>*         release(<span class="keywordtype">int</span> i)                  { <span class="keywordtype">void</span>* e = <span class="keyword">get</span>(i); elements_[<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(i)] = 0; <span class="keywordflow">return</span> e; }</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      <span class="keywordtype">void</span>*         find(<span class="keywordtype">int</span> i)<span class="keyword"> const               </span>{ <span class="keywordflow">return</span> elements_[i]; }                        <span class="comment">// possibly returns 0, if the element is unloaded</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      <span class="keywordtype">void</span>*         find(<span class="keywordtype">int</span> i)<span class="keyword"> const               </span>{ <span class="keywordflow">return</span> elements_[<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(i)]; }                        <span class="comment">// possibly returns 0, if the element is unloaded</span></div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;      <span class="keywordtype">void</span>*         <span class="keyword">get</span>(<span class="keywordtype">int</span> i)                      { <span class="keywordflow">if</span> (!find(i)) load(i); <span class="keywordflow">return</span> find(i); }      <span class="comment">// loads the element first, and then returns its address</span></div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;      <span class="keywordtype">int</span>           available()<span class="keyword"> const               </span>{ <span class="keywordtype">int</span> i = 0; <span class="keywordflow">for</span> (; i &lt; (int)size(); ++i) <span class="keywordflow">if</span> (find(i) != 0) <span class="keywordflow">break</span>; <span class="keywordflow">return</span> i; }</div>
@@ -150,7 +150,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      Save          saver()<span class="keyword"> const                   </span>{ <span class="keywordflow">return</span> save_; }</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;      <span class="keywordtype">void</span>*         create()<span class="keyword"> const                  </span>{ <span class="keywordflow">return</span> create_(); }</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;      <span class="keywordtype">void</span>          destroy(<span class="keywordtype">int</span> i)                  { <span class="keywordflow">if</span> (find(i)) { destroy_(find(i)); elements_[i] = 0; } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (external_[i] != -1) storage_-&gt;destroy(external_[i]); }</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;      <span class="keywordtype">void</span>          destroy(<span class="keywordtype">int</span> i)                  { <span class="keywordflow">if</span> (find(i)) { destroy_(find(i)); elements_[<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(i)] = 0; } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (external_[static_cast&lt;size_t&gt;(i)] != -1) storage_-&gt;destroy(external_[static_cast&lt;size_t&gt;(i)]); }</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;      <span class="keywordtype">bool</span>          own()<span class="keyword"> const                     </span>{ <span class="keywordflow">return</span> destroy_ != 0; }</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;</div>
@@ -189,10 +189,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;  <span class="keywordtype">void</span>* e = find(i);</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  <span class="comment">//save_(e, bb);</span></div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  <span class="comment">//external_[i] = storage_-&gt;put(bb);</span></div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  external_[i] = storage_-&gt;put(e, save_);</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  external_[<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(i)] = storage_-&gt;put(e, save_);</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  destroy_(e);</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  elements_[i] = 0;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  elements_[<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(i)] = 0;</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  --(*in_memory_.access());</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;}</div>
@@ -205,9 +205,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  <span class="comment">//storage_-&gt;get(external_[i], bb);</span></div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  <span class="keywordtype">void</span>* e = create_();</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  <span class="comment">//load_(e, bb);</span></div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  storage_-&gt;get(external_[i], e, load_);</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  elements_[i] = e;</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  external_[i] = -1;</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  storage_-&gt;get(external_[static_cast&lt;size_t&gt;(i)], e, load_);</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  elements_[<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(i)] = e;</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  external_[<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(i)] = -1;</div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  ++(*in_memory_.access());</div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;}</div>
@@ -219,7 +219,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Feb 23 2018 20:18:13 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 26 2018 17:51:37 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

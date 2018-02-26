@@ -15,6 +15,6 @@ var searchData=
   ['reserve',['reserve',['../classfmt_1_1_buffer.html#a7f46a3ce8d86abe35904f6654bd4ea1e',1,'fmt::Buffer']]],
   ['resize',['resize',['../classfmt_1_1_buffer.html#a20f893164dc20e8ea8c77810d4ea8d59',1,'fmt::Buffer']]],
   ['round',['round',['../structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375',1,'diy::ReduceProxy']]],
-  ['roundrobinassigner',['RoundRobinAssigner',['../classdiy_1_1_round_robin_assigner.html#a9b7e6bc1421748367a9970846568af1f',1,'diy::RoundRobinAssigner']]],
+  ['roundrobinassigner',['RoundRobinAssigner',['../classdiy_1_1_round_robin_assigner.html#a98a8609438fda857b732f72ad40dfaa5',1,'diy::RoundRobinAssigner']]],
   ['rounds',['rounds',['../structdiy_1_1_regular_all_reduce_partners.html#a2e293d418aa252920321004e2461097e',1,'diy::RegularAllReducePartners::rounds()'],['../structdiy_1_1_regular_broadcast_partners.html#a51402d889b532bef77c2d5f29ebaed5f',1,'diy::RegularBroadcastPartners::rounds()']]]
 ];

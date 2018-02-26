@@ -114,8 +114,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;      <span class="keywordtype">int</span>       size()<span class="keyword"> const                        </span>{ <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(neighbors_.size()); }</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;      <span class="keyword">inline</span></div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;      <span class="keywordtype">int</span>       size_unique() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;      <a class="code" href="structdiy_1_1_block_i_d.html">BlockID</a>   target(<span class="keywordtype">int</span> i)<span class="keyword"> const                 </span>{ <span class="keywordflow">return</span> neighbors_[i]; }</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;      <a class="code" href="structdiy_1_1_block_i_d.html">BlockID</a>&amp;  target(<span class="keywordtype">int</span> i)                       { <span class="keywordflow">return</span> neighbors_[i]; }</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;      <a class="code" href="structdiy_1_1_block_i_d.html">BlockID</a>   target(<span class="keywordtype">int</span> i)<span class="keyword"> const                 </span>{ <span class="keywordflow">return</span> neighbors_[<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(i)]; }</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;      <a class="code" href="structdiy_1_1_block_i_d.html">BlockID</a>&amp;  target(<span class="keywordtype">int</span> i)                       { <span class="keywordflow">return</span> neighbors_[<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(i)]; }</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;      <span class="keyword">inline</span></div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;      <span class="keywordtype">int</span>       find(<span class="keywordtype">int</span> gid) <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;</div>
@@ -171,8 +171,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;      <span class="keyword">typedef</span>   std::vector&lt;Direction&gt;              DirVec;</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;                <a class="code" href="classdiy_1_1_regular_link.html">RegularLink</a>(<span class="keywordtype">int</span> dim, <span class="keyword">const</span> <a class="code" href="structdiy_1_1_bounds.html">Bounds</a>&amp; core, <span class="keyword">const</span> <a class="code" href="structdiy_1_1_bounds.html">Bounds</a>&amp; bounds):</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;                  dim_(dim), core_(core), bounds_(bounds)            {}</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;                <a class="code" href="classdiy_1_1_regular_link.html">RegularLink</a>(<span class="keywordtype">int</span> dim, <span class="keyword">const</span> <a class="code" href="structdiy_1_1_bounds.html">Bounds</a>&amp; core__, <span class="keyword">const</span> <a class="code" href="structdiy_1_1_bounds.html">Bounds</a>&amp; bounds__):</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;                  dim_(dim), core_(core__), bounds_(bounds__) {}</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;      <span class="comment">// dimension</span></div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;      <span class="keywordtype">int</span>       dimension()<span class="keyword"> const                       </span>{ <span class="keywordflow">return</span> dim_; }</div>
@@ -193,7 +193,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;      <span class="keyword">const</span> Bounds&amp; bounds()<span class="keyword"> const                      </span>{ <span class="keywordflow">return</span> bounds_; }</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;      Bounds&amp;       bounds()                            { <span class="keywordflow">return</span> bounds_; }</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;      <span class="keyword">const</span> Bounds&amp; bounds(<span class="keywordtype">int</span> i)<span class="keyword"> const                 </span>{ <span class="keywordflow">return</span> nbr_bounds_[i]; }</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;      <span class="keywordtype">void</span>          add_bounds(<span class="keyword">const</span> Bounds&amp; bounds)    { nbr_bounds_.push_back(bounds); }</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;      <span class="keywordtype">void</span>          add_bounds(<span class="keyword">const</span> Bounds&amp; bounds__)  { nbr_bounds_.push_back(bounds__); }</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;      <span class="keywordtype">void</span>      swap(RegularLink&amp; other)                { Link::swap(other); dir_map_.swap(other.dir_map_); dir_vec_.swap(other.dir_vec_); nbr_bounds_.swap(other.nbr_bounds_); std::swap(dim_, other.dim_); wrap_.swap(other.wrap_); std::swap(core_, other.core_); std::swap(bounds_, other.bounds_); }</div>
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;</div>
@@ -282,7 +282,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;diy::Link::</div>
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;find(<span class="keywordtype">int</span> gid)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; (unsigned)size(); ++i)</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; size(); ++i)</div>
 <div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;  {</div>
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    <span class="keywordflow">if</span> (target(i).gid == gid)</div>
 <div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;      <span class="keywordflow">return</span> i;</div>
@@ -326,7 +326,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Feb 23 2018 20:18:13 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 26 2018 17:51:37 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

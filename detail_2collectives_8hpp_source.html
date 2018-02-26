@@ -133,9 +133,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;            x_(x)                                   {}</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordtype">void</span>  init()                                    {}</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordtype">void</span>  update(<span class="keyword">const</span> CollectiveOp&amp; other)         {}</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordtype">void</span>  global(<span class="keyword">const</span> mpi::communicator&amp; comm)     {}</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordtype">void</span>  copy_from(<span class="keyword">const</span> CollectiveOp&amp; other)      {}</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordtype">void</span>  update(<span class="keyword">const</span> CollectiveOp&amp;)               {}</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordtype">void</span>  global(<span class="keyword">const</span> mpi::communicator&amp;)          {}</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordtype">void</span>  copy_from(<span class="keyword">const</span> CollectiveOp&amp;)            {}</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordtype">void</span>  result_out(<span class="keywordtype">void</span>* dest)<span class="keyword"> const              </span>{ *<span class="keyword">reinterpret_cast&lt;</span>T*<span class="keyword">&gt;</span>(dest) = x_; }</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keyword">private</span>:</div>
@@ -146,11 +146,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;}</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="group___m_p_i_html_ga44987b4d3a2fbc6b22f458617a445dc5"><div class="ttname"><a href="group___m_p_i.html#ga44987b4d3a2fbc6b22f458617a445dc5">diy::mpi::all_reduce</a></div><div class="ttdeci">void all_reduce(const communicator &amp;comm, const T &amp;in, T &amp;out, const Op &amp;op)</div><div class="ttdoc">all_reduce </div><div class="ttdef"><b>Definition:</b> collectives.hpp:370</div></div>
+<div class="ttc" id="group___m_p_i_html_ga44987b4d3a2fbc6b22f458617a445dc5"><div class="ttname"><a href="group___m_p_i.html#ga44987b4d3a2fbc6b22f458617a445dc5">diy::mpi::all_reduce</a></div><div class="ttdeci">void all_reduce(const communicator &amp;comm, const T &amp;in, T &amp;out, const Op &amp;op)</div><div class="ttdoc">all_reduce </div><div class="ttdef"><b>Definition:</b> collectives.hpp:396</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Feb 23 2018 20:18:13 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 26 2018 17:51:37 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
