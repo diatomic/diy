@@ -22,6 +22,9 @@ target_link_libraries       (simple-test            ${libraries})
 add_executable              (mpi-collectives-test   mpi-collectives.cpp)
 target_link_libraries       (mpi-collectives-test   ${libraries})
 
+add_executable              (rexchange-test         rexchange.cpp)
+target_link_libraries       (rexchange-test         ${libraries})
+
 foreach                     (b 2 4 8 64)
     add_test                (NAME kd-tree-test-b${b}
                              COMMAND kd-tree-test -b ${b}
@@ -54,7 +57,6 @@ foreach                     (b 2 4 8 9 12 24 36 44 48 56 64)
                             )
 endforeach                  ()
 
-
 if                          (mpi AND MPIEXEC)
 
   set                       (maxp 3)
@@ -84,6 +86,20 @@ if                          (mpi AND MPIEXEC)
                             )
   endforeach                (p)
 
+  foreach                   (p RANGE 1 ${maxp})
+      foreach               (b 2 4 8 9 12 24 36)
+          add_test          (NAME rexchange-test-p${p}-b${b}
+                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:rexchange-test> -b ${b}
+                            )
+          add_test          (NAME rexchange-test-p${p}-m1-b${b}
+                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:rexchange-test> -m 1 -b ${b}
+                            )
+          add_test          (NAME rexchange-test-p${p}-t2-b${b}
+                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:rexchange-test> -t 2 -b ${b}
+                            )
+      endforeach            (b)
+  endforeach                (p)
+
 else                        (mpi AND MPIEXEC)
 
   foreach                   (b 2 4 8 9 12 24 36 44 48 56 64)
@@ -95,6 +111,18 @@ else                        (mpi AND MPIEXEC)
   foreach                   (b 3 4)
       add_test              (NAME simple-test-nompi-b${b}
                              COMMAND simple-test -b ${b}
+                            )
+  endforeach                (b)
+
+  foreach                   (b 2 4 8 9 12 24 36)
+      add_test              (NAME rexchange-test-nompi-b${b}
+                             COMMAND rexchange-test -b ${b}
+                            )
+      add_test              (NAME rexchange-test-nompi-m1-b${b}
+                             COMMAND rexchange-test -m 1 -b ${b}
+                            )
+      add_test              (NAME rexchange-test-nompi-t2-b${b}
+                             COMMAND rexchange-test -t 2 -b ${b}
                             )
   endforeach                (b)
 
