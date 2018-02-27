@@ -84,7 +84,7 @@ namespace mpi
 
 diy::mpi::communicator::
 communicator(MPI_Comm comm, bool owner):
-    comm_(comm), owner_(owner), rank_(0), size_(1)
+    comm_(comm), rank_(0), size_(1), owner_(owner)
 {
 #ifndef DIY_NO_MPI
   if (comm != MPI_COMM_NULL)
