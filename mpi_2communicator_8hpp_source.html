@@ -165,7 +165,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;diy::mpi::communicator::</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;communicator(MPI_Comm comm, <span class="keywordtype">bool</span> owner):</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    comm_(comm), owner_(owner), rank_(0), size_(1)</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    comm_(comm), rank_(0), size_(1), owner_(owner)</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;{</div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="preprocessor">#ifndef DIY_NO_MPI</span></div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="preprocessor"></span>  <span class="keywordflow">if</span> (comm != MPI_COMM_NULL)</div>
@@ -253,7 +253,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Feb 26 2018 17:51:37 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 27 2018 15:34:44 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
