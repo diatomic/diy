@@ -82,6 +82,7 @@ if                          (mpi AND MPIEXEC)
       add_test              (NAME simple-test-p${p}-b${b}
                              COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:simple-test> -b ${b}
                             )
+      set_tests_properties  (simple-test-p${p}-b${b} PROPERTIES TIMEOUT 300)
   endforeach                (p)
 
 else                        (mpi AND MPIEXEC)
@@ -96,6 +97,7 @@ else                        (mpi AND MPIEXEC)
       add_test              (NAME simple-test-nompi-b${b}
                              COMMAND simple-test -b ${b}
                             )
+      set_tests_properties  (simple-test-nompi-b${b} PROPERTIES TIMEOUT 300)
   endforeach                (b)
 
 endif                       (mpi AND MPIEXEC)
