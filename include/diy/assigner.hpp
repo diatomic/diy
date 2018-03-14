@@ -26,8 +26,6 @@ namespace diy
       int           nblocks() const                     { return nblocks_; }
       //! sets the total number of global blocks
       void          set_nblocks(int nblocks__)          { nblocks_ = nblocks__; }
-      //! gets the local gids for a given process rank
-      virtual void  local_gids(int rank, std::vector<int>& gids) const   =0;
       //! returns the process rank of the block with global id gid (need not be local)
       virtual int   rank(int gid) const     =0;
 
@@ -36,20 +34,30 @@ namespace diy
       int           nblocks_;   // total number of blocks
   };
 
-  class ContiguousAssigner: public Assigner
+  class StaticAssigner: public Assigner
+  {
+    public:
+     /**
+      * \ingroup Assignment
+      * \brief Intermediate type to express assignment that cannot change; adds `local_gids` query method
+      */
+      using Assigner::Assigner;
+
+      //! gets the local gids for a given process rank
+      virtual void  local_gids(int rank, std::vector<int>& gids) const   =0;
+  };
+
+  class ContiguousAssigner: public StaticAssigner
   {
     public:
      /**
       * \ingroup Assignment
       * \brief Assigns blocks to processes in contiguous gid (block global id) order
       */
-            ContiguousAssigner(int size__,   //!< total number of processes
-                               int nblocks__ //!< total (global) number of blocks
-                               ):
-              Assigner(size__, nblocks__)      {}
+      using StaticAssigner::StaticAssigner;
 
-      using Assigner::size;
-      using Assigner::nblocks;
+      using StaticAssigner::size;
+      using StaticAssigner::nblocks;
 
       int   rank(int gid) const override
       {
@@ -68,20 +76,17 @@ namespace diy
       void  local_gids(int rank, std::vector<int>& gids) const override;
   };
 
-  class RoundRobinAssigner: public Assigner
+  class RoundRobinAssigner: public StaticAssigner
   {
     public:
      /**
       * \ingroup Assignment
       * \brief Assigns blocks to processes in cyclic or round-robin gid (block global id) order
       */
-            RoundRobinAssigner(int size__,   //!< total number of processes
-                               int nblocks__ //!< total (global) number of blocks
-                               ):
-              Assigner(size__, nblocks__)         {}
+      using StaticAssigner::StaticAssigner;
 
-      using Assigner::size;
-      using Assigner::nblocks;
+      using StaticAssigner::size;
+      using StaticAssigner::nblocks;
 
       int   rank(int gid) const override        { return gid % size(); }
       inline
