@@ -55,9 +55,39 @@ namespace detail
     static void*                address(VecU& x)        { return &x[0]; }
     static int                  count(const VecU& x)    { return static_cast<int>(x.size()) * mpi_datatype<U>::count(x[0]); }
   };
+} // detail
 
+template<class U>
+static MPI_Datatype datatype(const U&)
+{
+    using Datatype = detail::mpi_datatype<U>;
+    return Datatype::datatype();
 }
+
+template<class U>
+static void* address(const U& x)
+{
+    using Datatype = detail::mpi_datatype<U>;
+    return const_cast<void*>(Datatype::address(x));
 }
+
+template<class U>
+static void* address(U& x)
+{
+    using Datatype = detail::mpi_datatype<U>;
+    return Datatype::address(x);
 }
+
+template<class U>
+static int count(const U& x)
+{
+    using Datatype = detail::mpi_datatype<U>;
+    return Datatype::count(x);
+}
+
+
+
+} // mpi
+} // diy
 
 #endif

@@ -13,34 +13,6 @@ namespace mpi
   template<class T, class Op>
   struct Collectives
   {
-    template<class U>
-    static MPI_Datatype datatype(const U&)
-    {
-        using Datatype = detail::mpi_datatype<U>;
-        return Datatype::datatype();
-    }
-
-    template<class U>
-    static void* address(const U& x)
-    {
-        using Datatype = detail::mpi_datatype<U>;
-        return const_cast<void*>(Datatype::address(x));
-    }
-
-    template<class U>
-    static void* address(U& x)
-    {
-        using Datatype = detail::mpi_datatype<U>;
-        return Datatype::address(x);
-    }
-
-    template<class U>
-    static int count(const U& x)
-    {
-        using Datatype = detail::mpi_datatype<U>;
-        return Datatype::count(x);
-    }
-
     static void broadcast(const communicator& comm, T& x, int root)
     {
 #ifndef DIY_NO_MPI

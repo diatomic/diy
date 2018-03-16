@@ -84,14 +84,10 @@ put(const T& x, int rank, unsigned offset)
         buffer_[offset] = x;
     else
     {
-        using Datatype = detail::mpi_datatype<T>;
-        MPI_Put((void*) Datatype::address(x),
-                Datatype::count(x),
-                Datatype::datatype(),
+        MPI_Put(address(x), count(x), datatype(x),
                 rank,
                 offset,
-                Datatype::count(x),
-                Datatype::datatype(),
+                count(x), datatype(x),
                 window_);
     }
 #else
@@ -110,14 +106,10 @@ put(const std::vector<T>& x, int rank, unsigned offset)
             buffer_[offset + i] = x[i];
     else
     {
-        using Datatype = detail::mpi_datatype<T>;
-        MPI_Put((void*) Datatype::address(x),
-                Datatype::count(x),
-                Datatype::datatype(),
+        MPI_Put(address(x), count(x), datatype(x),
                 rank,
                 offset,
-                Datatype::count(x),
-                Datatype::datatype(),
+                count(x), datatype(x),
                 window_);
     }
 #else
@@ -136,14 +128,10 @@ get(T& x, int rank, unsigned offset)
         x = buffer_[offset];
     else
     {
-        using Datatype = detail::mpi_datatype<T>;
-        MPI_Get((void*) Datatype::address(x),
-                Datatype::count(x),
-                Datatype::datatype(),
+        MPI_Get(address(x), count(x), datatype(x),
                 rank,
                 offset,
-                Datatype::count(x),
-                Datatype::datatype(),
+                count(x), datatype(x),
                 window_);
     }
 #else
@@ -162,14 +150,10 @@ get(std::vector<T>& x, int rank, unsigned offset)
             x[i] = buffer_[offset + i];
     else
     {
-        using Datatype = detail::mpi_datatype<T>;
-        MPI_Get((void*) Datatype::address(x),
-                Datatype::count(x),
-                Datatype::datatype(),
+        MPI_Get(address(x), count(x), datatype(x),
                 rank,
                 offset,
-                Datatype::count(x),
-                Datatype::datatype(),
+                count(x), datatype(x),
                 window_);
     }
 #else
@@ -233,8 +217,7 @@ diy::mpi::window<T>::
 fetch_and_op(const T* origin, T* result, int rank, unsigned offset, MPI_Op op)
 {
 #ifndef DIY_NO_MPI
-    using Datatype = detail::mpi_datatype<T>;
-    MPI_Fetch_and_op(origin, result, Datatype::datatype(), rank, offset, op, window_);
+    MPI_Fetch_and_op(origin, result, datatype(*origin), rank, offset, op, window_);
 #else
     DIY_UNSUPPORTED_MPI_CALL(MPI_Fetch_and_op);
 #endif
