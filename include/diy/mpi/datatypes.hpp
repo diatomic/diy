@@ -50,10 +50,10 @@ namespace detail
   {
     typedef     std::vector<U>      VecU;
 
-    static MPI_Datatype         datatype()              { return get_mpi_datatype<U>(); }
+    static MPI_Datatype         datatype()              { return mpi_datatype<U>::datatype(); }
     static const void*          address(const VecU& x)  { return &x[0]; }
     static void*                address(VecU& x)        { return &x[0]; }
-    static int                  count(const VecU& x)    { return static_cast<int>(x.size()); }
+    static int                  count(const VecU& x)    { return static_cast<int>(x.size()) * mpi_datatype<U>::count(x[0]); }
   };
 
 }

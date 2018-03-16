@@ -6,7 +6,6 @@
 #define     CATCH_CONFIG_RUNNER
 #include    "catch.hpp"
 
-namespace mpi = diy::mpi;
 using namespace std;
 
 struct Elem
@@ -36,6 +35,8 @@ namespace detail
 }
 }
 }
+
+namespace mpi = diy::mpi;
 
 struct SimpleFixture
 {
