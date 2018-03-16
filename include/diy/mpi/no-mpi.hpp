@@ -80,6 +80,7 @@ static const int MPI_MODE_NOSTORE       = 1;
 static const int MPI_MODE_NOPUT         = 2;
 static const int MPI_MODE_NOPRECEDE     = 4;
 static const int MPI_MODE_NOSUCCEED     = 8;
+static const int MPI_MODE_NOCHECK       = 16;
 
 /* window lock types */
 static const int MPI_LOCK_SHARED        = 1;

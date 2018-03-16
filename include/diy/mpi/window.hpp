@@ -42,6 +42,8 @@ namespace mpi
             inline void fetch(T& result, int rank, unsigned offset);
             inline void replace(const T& value, int rank, unsigned offset);
 
+            inline void sync();
+
             inline void flush(int rank);
             inline void flush_all();
             inline void flush_local(int rank);
@@ -256,6 +258,16 @@ replace(const T& value, int rank, unsigned offset)
     }
 #else
     buffer_[offset] = value;
+#endif
+}
+
+template<class T>
+void
+diy::mpi::window<T>::
+sync()
+{
+#ifndef DIY_NO_MPI
+    MPI_Win_sync(window_);
 #endif
 }
 
