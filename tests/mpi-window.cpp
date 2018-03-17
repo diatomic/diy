@@ -26,11 +26,12 @@ TEST_CASE_METHOD(SimpleFixture, "MPI Window Test", "[mpi-window]")
 
     // put the values
     int target_rank = (rank + 2) % world.size();
+    std::vector<int> out(width);
     for (int i = 0; i < width; ++i)
     {
-        int x = target_rank * width + i;
-        window.put(x, target_rank, i);
-        //window.replace(x, target_rank, i);
+        out[i] = target_rank * width + i;
+        window.put(out[i], target_rank, i);
+        //window.replace(out[i], target_rank, i);
     }
     window.flush(target_rank);
 

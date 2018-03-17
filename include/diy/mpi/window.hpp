@@ -18,7 +18,7 @@ namespace mpi
 
             // moving is Ok
             window(window&&)      = default;
-            window& operator=(window&&) = delete;
+            window& operator=(window&&) = default;
 
             // cannot copy because of the buffer_
             window(const window&) = delete;
@@ -82,16 +82,11 @@ diy::mpi::window<T>::
 put(const T& x, int rank, unsigned offset)
 {
 #ifndef DIY_NO_MPI
-    if (rank == rank_)
-        buffer_[offset] = x;
-    else
-    {
-        MPI_Put(address(x), count(x), datatype(x),
-                rank,
-                offset,
-                count(x), datatype(x),
-                window_);
-    }
+    MPI_Put(address(x), count(x), datatype(x),
+            rank,
+            offset,
+            count(x), datatype(x),
+            window_);
 #else
     buffer_[offset] = x;
 #endif
@@ -103,17 +98,11 @@ diy::mpi::window<T>::
 put(const std::vector<T>& x, int rank, unsigned offset)
 {
 #ifndef DIY_NO_MPI
-    if (rank == rank_)
-        for (size_t i = 0; i < x.size(); ++i)
-            buffer_[offset + i] = x[i];
-    else
-    {
-        MPI_Put(address(x), count(x), datatype(x),
-                rank,
-                offset,
-                count(x), datatype(x),
-                window_);
-    }
+    MPI_Put(address(x), count(x), datatype(x),
+            rank,
+            offset,
+            count(x), datatype(x),
+            window_);
 #else
     for (size_t i = 0; i < x.size(); ++i)
         buffer_[offset + i] = x[i];
@@ -126,16 +115,11 @@ diy::mpi::window<T>::
 get(T& x, int rank, unsigned offset)
 {
 #ifndef DIY_NO_MPI
-    if (rank == rank_)
-        x = buffer_[offset];
-    else
-    {
-        MPI_Get(address(x), count(x), datatype(x),
-                rank,
-                offset,
-                count(x), datatype(x),
-                window_);
-    }
+    MPI_Get(address(x), count(x), datatype(x),
+            rank,
+            offset,
+            count(x), datatype(x),
+            window_);
 #else
     x = buffer_[offset];
 #endif
@@ -147,17 +131,11 @@ diy::mpi::window<T>::
 get(std::vector<T>& x, int rank, unsigned offset)
 {
 #ifndef DIY_NO_MPI
-    if (rank == rank_)
-        for (size_t i = 0; i < x.size(); ++i)
-            x[i] = buffer_[offset + i];
-    else
-    {
-        MPI_Get(address(x), count(x), datatype(x),
-                rank,
-                offset,
-                count(x), datatype(x),
-                window_);
-    }
+    MPI_Get(address(x), count(x), datatype(x),
+            rank,
+            offset,
+            count(x), datatype(x),
+            window_);
 #else
     for (size_t i = 0; i < x.size(); ++i)
         x[i] = buffer_[offset + i];
@@ -231,13 +209,8 @@ diy::mpi::window<T>::
 fetch(T& result, int rank, unsigned offset)
 {
 #ifndef DIY_NO_MPI
-    if (rank == rank_)
-        result = buffer_[offset];
-    else
-    {
-        T unused;
-        fetch_and_op(&unused, &result, rank, offset, MPI_NO_OP);
-    }
+    T unused;
+    fetch_and_op(&unused, &result, rank, offset, MPI_NO_OP);
 #else
     result = buffer_[offset];
 #endif
@@ -249,13 +222,8 @@ diy::mpi::window<T>::
 replace(const T& value, int rank, unsigned offset)
 {
 #ifndef DIY_NO_MPI
-    if (rank == rank_)
-        buffer_[offset] = value;
-    else
-    {
-        T unused;
-        fetch_and_op(&value, &unused, rank, offset, MPI_REPLACE);
-    }
+    T unused;
+    fetch_and_op(&value, &unused, rank, offset, MPI_REPLACE);
 #else
     buffer_[offset] = value;
 #endif

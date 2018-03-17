@@ -25,6 +25,9 @@ target_link_libraries       (mpi-collectives-test   ${libraries})
 add_executable              (mpi-window-test        mpi-window.cpp)
 target_link_libraries       (mpi-window-test        ${libraries})
 
+add_executable              (dynamic-assigner-test  dynamic-assigner.cpp)
+target_link_libraries       (dynamic-assigner-test  ${libraries})
+
 foreach                     (b 2 4 8 64)
     add_test                (NAME kd-tree-test-b${b}
                              COMMAND kd-tree-test -b ${b}
@@ -79,6 +82,12 @@ if                          (mpi AND MPIEXEC)
   endforeach                (p)
 
   foreach                   (p RANGE 1 ${maxp})
+      add_test              (NAME dynamic-assigner-test-p${p}
+                            COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:dynamic-assigner-test>
+                            )
+  endforeach                (p)
+
+  foreach                   (p RANGE 1 ${maxp})
       foreach               (b 2 4 8 9 12 24 36 44 48 56 64)
           add_test          (NAME merge-swap-reduce-test-p${p}-b${b}
                              COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:merge-swap-reduce-test> -b ${b}
@@ -95,6 +104,10 @@ if                          (mpi AND MPIEXEC)
   endforeach                (p)
 
 else                        (mpi AND MPIEXEC)
+
+  add_test                  (NAME dynamic-assigner-test-p${p}
+                            COMMAND dynamic-assigner-test
+                            )
 
   add_test                  (NAME mpi-window-test-p${p}
                             COMMAND mpi-window-test
