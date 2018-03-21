@@ -75,6 +75,9 @@ static const int MPI_MODE_EXCL            =  64;
 static const int MPI_MODE_APPEND          = 128;
 static const int MPI_MODE_SEQUENTIAL      = 256;
 
+/* define window type */
+using MPI_Win = int;
+
 /* window fence assertions */
 static const int MPI_MODE_NOSTORE       = 1;
 static const int MPI_MODE_NOPUT         = 2;
