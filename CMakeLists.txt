@@ -60,6 +60,9 @@ if                          (mpi)
     include_directories     (SYSTEM ${MPI_INCLUDE_PATH})
 endif                       (mpi)
 
+# enable testing and CDash dashboard submission
 enable_testing              ()
+include                     (CTest)
+
 add_subdirectory            (examples)
 add_subdirectory            (tests)
