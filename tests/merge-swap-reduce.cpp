@@ -276,6 +276,8 @@ int main(int argc, char* argv[])
 
     Catch::Session session;
 
+    std::string log_level = "info";
+
     // get command line arguments
     using namespace opts;
     Options ops(argc, argv);
@@ -286,6 +288,7 @@ int main(int argc, char* argv[])
         >> Option('t', "thread",  MergeSwapReduceFixture::threads,        "number of threads")
         >> Option('m', "memory",  MergeSwapReduceFixture::mem_blocks,     "number of blocks to keep in memory")
         >> Option(     "prefix",  MergeSwapReduceFixture::prefix,         "prefix for external storage")
+        >> Option('l', "log",     log_level,                              "log level")
         ;
     bool  verbose = ops >> Present('v', "verbose", "print the block contents");
     if (ops >> Present('h', "help", "show help"))
@@ -298,6 +301,8 @@ int main(int argc, char* argv[])
         }
         return 1;
     }
+
+    auto log = diy::create_logger(log_level);
 
     return session.run();
 }
