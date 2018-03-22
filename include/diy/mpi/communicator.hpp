@@ -174,5 +174,10 @@ ibarrier() const
     request r_;
     MPI_Ibarrier(comm_, &r_.r);
     return r_;
+#else
+    // this is not the ideal fix; in principle we should just return a status
+    // that tests true, but this requires redesigning some parts of our no-mpi
+    // handling
+    DIY_UNSUPPORTED_MPI_CALL(MPI_Ibarrier);
 #endif
 }

@@ -813,6 +813,12 @@ exchange(bool remote)
 
   log->debug("Starting exchange");
 
+#ifdef DIY_NO_MPI
+  // remote doesn't need to do anything special if there is no mpi, but we also
+  // can't just use it because of the ibarrier
+  remote = false;
+#endif
+
   // make sure there is a queue for each neighbor
   if (!remote)
   {
