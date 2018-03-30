@@ -3,10 +3,11 @@ cmake_minimum_required      (VERSION 3.1)
 
 include(CMakeDependentOption)
 
-cmake_dependent_option      (threads            "Build DIY with threading"                   ON "NOT WIN32" OFF)
-option                      (log                "Build DIY with logging"                     OFF)
-option                      (profile            "Build DIY with profiling"                   OFF)
-option                      (mpi                "Build DIY with mpi"                         ON)
+cmake_dependent_option      (threads            "Build DIY with threading"                                  ON "NOT WIN32" OFF)
+option                      (log                "Build DIY with logging"                                    OFF)
+option                      (profile            "Build DIY with profiling"                                  OFF)
+option                      (mpi                "Build DIY with mpi"                                        ON)
+option                      (wrapped_mpi        "MPI compiler wrapper requires no further MPI libraries"    OFF)
 
 # Default to Release
 if                          (NOT CMAKE_BUILD_TYPE)
@@ -36,14 +37,18 @@ endif()
 set                         (CMAKE_CXX_STANDARD 11)
 set                         (CMAKE_CXX_COMPILE_FEATURES cxx_constexpr cxx_rvalue_references)
 
+# MPI
 if                          (NOT mpi)
     add_definitions         (-DDIY_NO_MPI)
 else                        (NOT mpi)
-    find_package                (MPI REQUIRED)
-    set                         (mpi_libraries              ${MPI_C_LIBRARIES} ${MPI_CXX_LIBRARIES})
-    set                         (libraries ${libraries}     ${mpi_libraries})
+    if                      (NOT wrapped_mpi)
+        find_package        (MPI REQUIRED)
+        set                 (mpi_libraries              ${MPI_C_LIBRARIES} ${MPI_CXX_LIBRARIES})
+        set                 (libraries ${libraries}     ${mpi_libraries})
+    endif                   (NOT wrapped_mpi)
 endif                       (NOT mpi)
 
+# Threads
 if                          (NOT threads)
     add_definitions         (-DDIY_NO_THREADS)
 else                        (NOT threads)
