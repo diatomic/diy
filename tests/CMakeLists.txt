@@ -10,6 +10,9 @@ target_link_libraries       (kd-tree-test           ${libraries})
 
 add_executable              (decomposer-test        decomposer.cpp)
 
+add_executable              (partners-test        partners.cpp)
+target_link_libraries       (partners-test        ${libraries})
+
 add_executable              (swap-reduce-test       swap-reduce.cpp)
 target_link_libraries       (swap-reduce-test       ${libraries})
 
@@ -21,6 +24,8 @@ add_test                    (kd-tree-test-sampling              scripts/kd-tree.
 add_test                    (kd-tree-test-sampling-exponential  scripts/kd-tree.sh -s -e)
 
 add_test                    (decomposer-test                    decomposer-test)
+
+add_test                    (partners-test                      partners-test)
 
 add_test                    (io-test                            io-test)
 
