@@ -7,6 +7,9 @@ target_link_libraries       (kd-tree-test           ${libraries})
 add_executable              (decomposer-test        decomposer.cpp)
 target_link_libraries       (decomposer-test        ${libraries})
 
+add_executable              (partners-test        partners.cpp)
+target_link_libraries       (partners-test        ${libraries})
+
 add_executable              (swap-reduce-test       swap-reduce.cpp)
 target_link_libraries       (swap-reduce-test       ${libraries})
 
@@ -42,6 +45,10 @@ endforeach                  ()
 
 add_test                    (NAME decomposer-test
                              COMMAND decomposer-test
+                            )
+
+add_test                    (NAME partners-test
+                             COMMAND partners-test
                             )
 
 if                          (mpi)
