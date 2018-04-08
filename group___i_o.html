@@ -90,12 +90,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <h2>Collective I/O </h2>
 <ul>
 <li><code><a class="el" href="group___i_o.html#ga33ca463272d91acec03e5386a1b80ecf" title="Write blocks to storage collectively in one shared file. ">diy::io::write_blocks()</a></code></li>
-<li><code><a class="el" href="group___i_o.html#ga58ad86682cb639add4d3ef0b1806b0c0" title="Read blocks from storage collectively from one shared file. ">diy::io::read_blocks()</a></code></li>
+<li><code><a class="el" href="group___i_o.html#ga7ecff62ad7c013211233a33425b49952" title="Read blocks from storage collectively from one shared file. ">diy::io::read_blocks()</a></code></li>
 </ul>
 <h2>Independent I/O </h2>
 <ul>
 <li><code><a class="el" href="group___i_o.html#ga33ca463272d91acec03e5386a1b80ecf" title="Write blocks to storage collectively in one shared file. ">diy::io::split::write_blocks()</a></code></li>
-<li><code><a class="el" href="group___i_o.html#ga58ad86682cb639add4d3ef0b1806b0c0" title="Read blocks from storage collectively from one shared file. ">diy::io::split::read_blocks()</a></code></li>
+<li><code><a class="el" href="group___i_o.html#ga7ecff62ad7c013211233a33425b49952" title="Read blocks from storage collectively from one shared file. ">diy::io::split::read_blocks()</a></code></li>
 </ul>
 <p>An example (of collective I/O) is below: </p>
 <div class="fragment"><div class="line"><span class="keywordtype">int</span> mem_blocks = -1;</div>
@@ -120,7 +120,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><span class="comment">// the number of blocks is -1 because it is determined by read_blocks()</span></div>
 <div class="line"><a class="code" href="classdiy_1_1_contiguous_assigner.html">diy::ContiguousAssigner</a> assigner(world.size(), -1);</div>
 <div class="line"><span class="comment">// the block_load function is unnecessary if it was defined as part of master</span></div>
-<div class="line"><a class="code" href="group___i_o.html#ga58ad86682cb639add4d3ef0b1806b0c0">diy::io::read_blocks</a>(filename, world, *assigner, master, &amp;block_load);</div>
+<div class="line"><a class="code" href="group___i_o.html#ga7ecff62ad7c013211233a33425b49952">diy::io::read_blocks</a>(filename, world, *assigner, master, &amp;block_load);</div>
 </div><!-- fragment --><p>In addition, the <a href="https://github.com/diatomic/diy/tree/master/examples/io">examples/io directory</a> illustrates BOV (brick of values) and NumPy I/O, which is built on top of MPI-IO and MPI sub-array types. The <a class="el" href="io_2test-io_8cpp-example.html">test-io.cpp example</a> tests the readers and writers for BOV and NumPy. </p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -128,18 +128,18 @@ Functions</h2></td></tr>
 <tr class="memitem:ga33ca463272d91acec03e5386a1b80ecf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___i_o.html#ga33ca463272d91acec03e5386a1b80ecf">diy::io::write_blocks</a> (const std::string &amp;outfilename, const mpi::communicator &amp;comm, Master &amp;master, const MemoryBuffer &amp;extra=MemoryBuffer(), Master::SaveBlock save=0)</td></tr>
 <tr class="memdesc:ga33ca463272d91acec03e5386a1b80ecf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write blocks to storage collectively in one shared file.  <a href="#ga33ca463272d91acec03e5386a1b80ecf">More...</a><br/></td></tr>
 <tr class="separator:ga33ca463272d91acec03e5386a1b80ecf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga58ad86682cb639add4d3ef0b1806b0c0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___i_o.html#ga58ad86682cb639add4d3ef0b1806b0c0">diy::io::read_blocks</a> (const std::string &amp;infilename, const mpi::communicator &amp;comm, Assigner &amp;assigner, Master &amp;master, MemoryBuffer &amp;extra, Master::LoadBlock load=0)</td></tr>
-<tr class="memdesc:ga58ad86682cb639add4d3ef0b1806b0c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read blocks from storage collectively from one shared file.  <a href="#ga58ad86682cb639add4d3ef0b1806b0c0">More...</a><br/></td></tr>
-<tr class="separator:ga58ad86682cb639add4d3ef0b1806b0c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga7ecff62ad7c013211233a33425b49952"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___i_o.html#ga7ecff62ad7c013211233a33425b49952">diy::io::read_blocks</a> (const std::string &amp;infilename, const mpi::communicator &amp;comm, StaticAssigner &amp;assigner, Master &amp;master, MemoryBuffer &amp;extra, Master::LoadBlock load=0)</td></tr>
+<tr class="memdesc:ga7ecff62ad7c013211233a33425b49952"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read blocks from storage collectively from one shared file.  <a href="#ga7ecff62ad7c013211233a33425b49952">More...</a><br/></td></tr>
+<tr class="separator:ga7ecff62ad7c013211233a33425b49952"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga89b32ee9be0f8de92f6bcb7a096b7f58"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___i_o.html#ga89b32ee9be0f8de92f6bcb7a096b7f58">diy::io::split::write_blocks</a> (const std::string &amp;outfilename, const mpi::communicator &amp;comm, Master &amp;master, const MemoryBuffer &amp;extra=MemoryBuffer(), Master::SaveBlock save=0)</td></tr>
 <tr class="memdesc:ga89b32ee9be0f8de92f6bcb7a096b7f58"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write blocks to storage independently in one file per process.  <a href="#ga89b32ee9be0f8de92f6bcb7a096b7f58">More...</a><br/></td></tr>
 <tr class="separator:ga89b32ee9be0f8de92f6bcb7a096b7f58"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gae1028f6aa9f522e8fd57859c81bbc466"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___i_o.html#gae1028f6aa9f522e8fd57859c81bbc466">diy::io::split::read_blocks</a> (const std::string &amp;infilename, const mpi::communicator &amp;comm, Assigner &amp;assigner, Master &amp;master, MemoryBuffer &amp;extra, Master::LoadBlock load=0)</td></tr>
-<tr class="memdesc:gae1028f6aa9f522e8fd57859c81bbc466"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read blocks from storage independently from one file per process.  <a href="#gae1028f6aa9f522e8fd57859c81bbc466">More...</a><br/></td></tr>
-<tr class="separator:gae1028f6aa9f522e8fd57859c81bbc466"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga2ae9d9ae783821c026b06e6f17941b1f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___i_o.html#ga2ae9d9ae783821c026b06e6f17941b1f">diy::io::split::read_blocks</a> (const std::string &amp;infilename, const mpi::communicator &amp;comm, StaticAssigner &amp;assigner, Master &amp;master, MemoryBuffer &amp;extra, Master::LoadBlock load=0)</td></tr>
+<tr class="memdesc:ga2ae9d9ae783821c026b06e6f17941b1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read blocks from storage independently from one file per process.  <a href="#ga2ae9d9ae783821c026b06e6f17941b1f">More...</a><br/></td></tr>
+<tr class="separator:ga2ae9d9ae783821c026b06e6f17941b1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="ga58ad86682cb639add4d3ef0b1806b0c0"></a>
+<a class="anchor" id="ga7ecff62ad7c013211233a33425b49952"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -161,7 +161,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Assigner &amp;&#160;</td>
+          <td class="paramtype">StaticAssigner &amp;&#160;</td>
           <td class="paramname"><em>assigner</em>, </td>
         </tr>
         <tr>
@@ -211,7 +211,7 @@ Functions</h2></td></tr>
 </dl>
 </div>
 </div>
-<a class="anchor" id="gae1028f6aa9f522e8fd57859c81bbc466"></a>
+<a class="anchor" id="ga2ae9d9ae783821c026b06e6f17941b1f"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -233,7 +233,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Assigner &amp;&#160;</td>
+          <td class="paramtype">StaticAssigner &amp;&#160;</td>
           <td class="paramname"><em>assigner</em>, </td>
         </tr>
         <tr>
@@ -414,7 +414,7 @@ Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Feb 27 2018 15:34:45 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Apr 8 2018 16:17:48 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

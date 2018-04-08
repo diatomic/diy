@@ -104,8 +104,10 @@ Inheritance diagram for diy::Assigner:</div>
  <div class="center">
   <img src="classdiy_1_1_assigner.png" usemap="#diy::Assigner_map" alt=""/>
   <map id="diy::Assigner_map" name="diy::Assigner_map">
-<area href="classdiy_1_1_contiguous_assigner.html" alt="diy::ContiguousAssigner" shape="rect" coords="0,56,153,80"/>
-<area href="classdiy_1_1_round_robin_assigner.html" alt="diy::RoundRobinAssigner" shape="rect" coords="163,56,316,80"/>
+<area href="classdiy_1_1_dynamic_assigner.html" alt="diy::DynamicAssigner" shape="rect" coords="0,56,153,80"/>
+<area href="classdiy_1_1_static_assigner.html" alt="diy::StaticAssigner" shape="rect" coords="163,56,316,80"/>
+<area href="classdiy_1_1_contiguous_assigner.html" alt="diy::ContiguousAssigner" shape="rect" coords="81,112,234,136"/>
+<area href="classdiy_1_1_round_robin_assigner.html" alt="diy::RoundRobinAssigner" shape="rect" coords="244,112,397,136"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -122,18 +124,18 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
 int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1_assigner.html#a61ea8499c8c28934f94e18e635e06436">nblocks</a> () const </td></tr>
 <tr class="memdesc:a61ea8499c8c28934f94e18e635e06436"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the total number of global blocks <br/></td></tr>
 <tr class="separator:a61ea8499c8c28934f94e18e635e06436"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afe5a01101ea746754dc1d872bc38807d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afe5a01101ea746754dc1d872bc38807d"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1_assigner.html#afe5a01101ea746754dc1d872bc38807d">set_nblocks</a> (int nblocks__)</td></tr>
-<tr class="memdesc:afe5a01101ea746754dc1d872bc38807d"><td class="mdescLeft">&#160;</td><td class="mdescRight">sets the total number of global blocks <br/></td></tr>
-<tr class="separator:afe5a01101ea746754dc1d872bc38807d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a08785c292ae854385892389ad8a8877d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a08785c292ae854385892389ad8a8877d"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1_assigner.html#a08785c292ae854385892389ad8a8877d">local_gids</a> (int <a class="el" href="classdiy_1_1_assigner.html#a272d33bcc94394f39880603084b55f38">rank</a>, std::vector&lt; int &gt; &amp;gids) const =0</td></tr>
-<tr class="memdesc:a08785c292ae854385892389ad8a8877d"><td class="mdescLeft">&#160;</td><td class="mdescRight">gets the local gids for a given process rank <br/></td></tr>
-<tr class="separator:a08785c292ae854385892389ad8a8877d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5f5881d0b9bb7b982c1edf5fa89aaeed"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5f5881d0b9bb7b982c1edf5fa89aaeed"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1_assigner.html#a5f5881d0b9bb7b982c1edf5fa89aaeed">set_nblocks</a> (int nblocks__)</td></tr>
+<tr class="memdesc:a5f5881d0b9bb7b982c1edf5fa89aaeed"><td class="mdescLeft">&#160;</td><td class="mdescRight">sets the total number of global blocks <br/></td></tr>
+<tr class="separator:a5f5881d0b9bb7b982c1edf5fa89aaeed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a272d33bcc94394f39880603084b55f38"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a272d33bcc94394f39880603084b55f38"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1_assigner.html#a272d33bcc94394f39880603084b55f38">rank</a> (int gid) const =0</td></tr>
 <tr class="memdesc:a272d33bcc94394f39880603084b55f38"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the process rank of the block with global id gid (need not be local) <br/></td></tr>
 <tr class="separator:a272d33bcc94394f39880603084b55f38"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c1b2c98e8ce46ae3a03ed090c2547d2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5c1b2c98e8ce46ae3a03ed090c2547d2"></a>
+virtual std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1_assigner.html#a5c1b2c98e8ce46ae3a03ed090c2547d2">ranks</a> (const std::vector&lt; int &gt; &amp;gids) const </td></tr>
+<tr class="memdesc:a5c1b2c98e8ce46ae3a03ed090c2547d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">batch lookup; returns the process ranks of the blocks with global id in the vector gids <br/></td></tr>
+<tr class="separator:a5c1b2c98e8ce46ae3a03ed090c2547d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="afbce9fc4ffb176dbf7575058779511a2"></a>
@@ -185,7 +187,7 @@ virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Feb 27 2018 15:34:45 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Apr 8 2018 16:17:48 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

@@ -105,7 +105,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </ul>
 </li>
 <li><a href="https://github.com/diatomic/diy/tree/master/examples/io">I/O</a>: illustrates BOV (brick of values) and NumPy I/O, both built on top of MPI-IO and MPI sub-array types.<ul>
-<li><a class="el" href="io_2test-io_8cpp-example.html">test-io.cpp</a>: tests the readers and writers for BOV and NumPy. The reader would typically be called from the <code>create</code> callback passed to <a class="el" href="group___decomposition.html#ga28dd3929d15d695bc73ed743dbbfef4e" title="Decomposes the domain into a prescribed pattern of blocks. ">diy::decompose</a> and tell the reader to read a specific block of data that the decomposer chose. Blocks can read data collectively if the number of blocks on each processor is the same. Same goes for the writers. The writer would typically be called from the <code>foreach</code> callback for each block.</li>
+<li><a class="el" href="io_2test-io_8cpp-example.html">test-io.cpp</a>: tests the readers and writers for BOV and NumPy. The reader would typically be called from the <code>create</code> callback passed to <a class="el" href="group___decomposition.html#gada52dd59060aac8b76281bec95e5f099" title="Decomposes the domain into a prescribed pattern of blocks. ">diy::decompose</a> and tell the reader to read a specific block of data that the decomposer chose. Blocks can read data collectively if the number of blocks on each processor is the same. Same goes for the writers. The writer would typically be called from the <code>foreach</code> callback for each block.</li>
 </ul>
 </li>
 <li><a href="https://github.com/diatomic/diy/tree/master/examples/reduce">Reduction</a>: DIY supports general reductions to implement more complex global operations than the collective one-liners. These reductions are general-purpose (any global communication pattern can be implemented); they operate over blocks, which cycle in and out of core as necessary; the operations are (multi-)threaded automatically using the same mechanism as foreach(). Although any global communication can be expressed using the reduction mechanism, all the reductions included in DIY operate in rounds over a k-ary reduction tree. The value of k used in each round can vary, but if it's fixed, the number of rounds is log_k(nblocks).<ul>
@@ -135,7 +135,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Feb 27 2018 15:34:45 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Apr 8 2018 16:17:48 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

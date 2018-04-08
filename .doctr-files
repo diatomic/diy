@@ -17,6 +17,9 @@
 ./classdiy_1_1_contiguous_assigner-members.html
 ./classdiy_1_1_contiguous_assigner.html
 ./classdiy_1_1_contiguous_assigner.png
+./classdiy_1_1_dynamic_assigner-members.html
+./classdiy_1_1_dynamic_assigner.html
+./classdiy_1_1_dynamic_assigner.png
 ./classdiy_1_1_external_storage-members.html
 ./classdiy_1_1_external_storage.html
 ./classdiy_1_1_external_storage.png
@@ -37,6 +40,9 @@
 ./classdiy_1_1_round_robin_assigner-members.html
 ./classdiy_1_1_round_robin_assigner.html
 ./classdiy_1_1_round_robin_assigner.png
+./classdiy_1_1_static_assigner-members.html
+./classdiy_1_1_static_assigner.html
+./classdiy_1_1_static_assigner.png
 ./classdiy_1_1critical__resource-members.html
 ./classdiy_1_1critical__resource.html
 ./classdiy_1_1io_1_1_b_o_v-members.html
@@ -49,6 +55,8 @@
 ./classdiy_1_1mpi_1_1communicator.html
 ./classdiy_1_1mpi_1_1io_1_1file-members.html
 ./classdiy_1_1mpi_1_1io_1_1file.html
+./classdiy_1_1mpi_1_1window-members.html
+./classdiy_1_1mpi_1_1window.html
 ./classdiy_1_1resource__accessor-members.html
 ./classdiy_1_1resource__accessor.html
 ./classes.html
@@ -685,3 +693,4 @@
 ./types_8hpp_source.html
 ./utils_8hpp_source.html
 ./vertices_8hpp_source.html
+./window_8hpp_source.html

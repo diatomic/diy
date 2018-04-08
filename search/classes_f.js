@@ -16,6 +16,7 @@ var searchData=
   ['signchecker',['SignChecker',['../structfmt_1_1internal_1_1_sign_checker.html',1,'fmt::internal']]],
   ['signchecker_3c_20false_20_3e',['SignChecker&lt; false &gt;',['../structfmt_1_1internal_1_1_sign_checker_3_01false_01_4.html',1,'fmt::internal']]],
   ['skipnoincoming',['SkipNoIncoming',['../structdiy_1_1_master_1_1_skip_no_incoming.html',1,'diy::Master']]],
+  ['staticassigner',['StaticAssigner',['../classdiy_1_1_static_assigner.html',1,'diy']]],
   ['status',['status',['../structdiy_1_1mpi_1_1status.html',1,'diy::mpi']]],
   ['strformatspec',['StrFormatSpec',['../classfmt_1_1_str_format_spec.html',1,'fmt']]],
   ['stringvalue',['StringValue',['../structfmt_1_1internal_1_1_value_1_1_string_value.html',1,'fmt::internal::Value']]],
