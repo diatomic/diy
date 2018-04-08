@@ -10,15 +10,6 @@ env:
     - HYDRA_LAUNCHER=fork
     - secure: "tyStcaj+p8Ix1Ze2Hb4NdosUaUP/4LW0GHpz2YkybELSzx9/RS6dRUGzJUj7dmIPKE839trVBjjt1+/e+i5HvUumLX0TCUodpunu5kUb0f/hajsKCJKP78DcBsQZUWed/oeFrxFd8VYwp6gVO3jDqJrnQKwx/7w3OfV1jWF8ryHd2m4CKXi7YNoMxsPSAWWW22CxMc39sdU5GPIf1MP5pjuXW2LZDl7urz1LxmlQ3g+POkAipI38h3BU3M8MvLHfUJ7DJuJwPogUWy50Q535qQ9Gm1ekzkfi/mp610MfTVe/lpWsKIpkQXgrkOvLNN5mwVbPV5uEToKiW1vsd7GLO/ymnqIhphqW5LefktfGiEEaUWeTEEFliV+4Auig+pqWL0l8BwU28iMsFOjws5gUupYrirU0J5lbBWTGA4wnqY2bbarVAggKmbFGyiQjQR/8NkWUpCxMXyyMEn11S6a8jvb4ZcdTGJMAHEGKSpjqgcv6S+yBU05KLQHXgKiqawAYc/VH2ssnZNiXWpgbOOsdu7rR+dkoZK1Yh1FMvv4Vvk3SLkvhJZssT7UevFXqOIJngH35fmXD3SQkB0KVLnD8ZTNa4tmOlXForb1SiV5JhGQ47OAZJNVatljqvsIogB1JCLiutmb0z/henTleqALpSxvCiZyyNdlm/i9bsIaUnKs="
   matrix:
-    #- COMPILER=g++-5   MPI=mpich
-    #- COMPILER=g++-5   MPI=openmpi
-    #- COMPILER=g++-7   MPI=mpich
-    #- COMPILER=g++-7   MPI=openmpi
-    #- COMPILER=clang++ MPI=mpich
-    #- COMPILER=clang++ MPI=openmpi
-    #- COMPILER=g++-5   MPI=none
-    #- COMPILER=g++-7   MPI=none
-    #- COMPILER=clang++ MPI=none
     - BUILD_DOCS=1
 
 addons:
@@ -29,16 +20,6 @@ addons:
       - g++-5
       - g++-7
       - doxygen
-
-matrix:
-  include:
-    - os: osx
-      env: MPI=mpich
-      language: cpp
-    - os: osx
-      osx_image: xcode8
-      env: MPI=openmpi
-      language: cpp
 
 before_script:
   - if [[ -z $BUILD_DOCS ]]; then
