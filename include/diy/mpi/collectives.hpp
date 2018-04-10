@@ -221,9 +221,7 @@ namespace mpi
     {
 #ifndef DIY_NO_MPI
       out.resize(in.size());
-      int elem_size = count(in[0]);               // size of 1 vector element in units of mpi datatype
-      MPI_Allreduce(address(in), address(out),
-                    elem_size * in.size(),
+      MPI_Allreduce(address(in), address(out), count(in),
                     datatype(in),
                     detail::mpi_op<Op>::get(),
                     comm);
@@ -248,6 +246,9 @@ namespace mpi
     static void all_to_all(const communicator& comm, const std::vector<T>& in, std::vector<T>& out, int n = 1)
     {
 #ifndef DIY_NO_MPI
+      // n specifies how many elements go to/from every process from every process;
+      // the sizes of in and out are expected to be n * comm.size()
+
       int elem_size = count(in[0]);               // size of 1 vector element in units of mpi datatype
       // NB: this will fail if T is a vector
       MPI_Alltoall(address(in),
