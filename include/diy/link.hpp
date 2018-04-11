@@ -1,5 +1,5 @@
-#ifndef DIY_COVER_HPP
-#define DIY_COVER_HPP
+#ifndef DIY_LINK_HPP
+#define DIY_LINK_HPP
 
 #include <vector>
 #include <map>
@@ -99,7 +99,7 @@ namespace diy
 
       void      swap(RegularLink& other)                { Link::swap(other); dir_map_.swap(other.dir_map_); dir_vec_.swap(other.dir_vec_); nbr_bounds_.swap(other.nbr_bounds_); std::swap(dim_, other.dim_); wrap_.swap(other.wrap_); std::swap(core_, other.core_); std::swap(bounds_, other.bounds_); }
 
-      void      save(BinaryBuffer& bb) const
+      void      save(BinaryBuffer& bb) const override
       {
           Link::save(bb);
           diy::save(bb, dim_);
@@ -111,7 +111,7 @@ namespace diy
           diy::save(bb, wrap_);
       }
 
-      void      load(BinaryBuffer& bb)
+      void      load(BinaryBuffer& bb) override
       {
           Link::load(bb);
           diy::load(bb, dim_);
@@ -135,7 +135,74 @@ namespace diy
       std::vector<Direction>    wrap_;
   };
 
-  // Other cover candidates: KDTreeLink, AMRGridLink
+  struct AMRLink: public Link::Registrar<AMRLink>
+  {
+    public:
+      using Bounds  = DiscreteBounds;
+
+      struct Description
+      {
+          int       level;
+          int       refinement;         // refinement of this level w.r.t. level 0
+          Bounds    core;
+          Bounds    bounds;             // with ghosts
+      };
+
+    public:
+                    AMRLink(int dim, int level, int refinement, const Bounds& core, const Bounds& bounds):
+                        dim_(dim), local_ { level, refinement, core, bounds }           {}
+
+      // dimension
+      int           dimension() const                       { return dim_; }
+
+      // local information
+      int           level() const                           { return local_.level; }
+      int           refinement() const                      { return local_.refinement; }
+
+      // wrap
+      void          add_wrap(Direction dir)                { wrap_.push_back(dir); }
+      Direction     wrap(int i) const                      { return wrap_[i]; }
+      Direction&    wrap(int i)                            { return wrap_[i]; }
+
+      // bounds
+      const Bounds& core() const                            { return local_.core; }
+      Bounds&       core()                                  { return local_.core; }
+      const Bounds& bounds() const                          { return local_.bounds; }
+      Bounds&       bounds()                                { return local_.bounds; }
+      const Bounds& core(int i) const                       { return nbr_descriptions_[i].core; }
+      const Bounds& bounds(int i) const                     { return nbr_descriptions_[i].bounds; }
+      void          add_bounds(int level_,
+                               int refinement_,
+                               const Bounds& core_,
+                               const Bounds& bounds_)       { nbr_descriptions_.emplace_back(Description {level_, refinement_, core_, bounds_}); }
+
+      void          save(BinaryBuffer& bb) const override
+      {
+          Link::save(bb);
+          diy::save(bb, dim_);
+          diy::save(bb, local_);
+          diy::save(bb, nbr_descriptions_);
+          diy::save(bb, wrap_);
+      }
+
+      void          load(BinaryBuffer& bb) override
+      {
+          Link::load(bb);
+          diy::load(bb, dim_);
+          diy::load(bb, local_);
+          diy::load(bb, nbr_descriptions_);
+          diy::load(bb, wrap_);
+      }
+
+      virtual size_t id() const override                    { return 3; }
+
+    private:
+        int                         dim_;
+
+        Description                 local_;
+        std::vector<Description>    nbr_descriptions_;
+        std::vector<Direction>      wrap_;
+  };
 
   struct LinkFactory
   {
@@ -214,4 +281,4 @@ direction(Direction dir) const
     return it->second;
 }
 
-#endif
+#endif      // DIY_LINK_HPP
