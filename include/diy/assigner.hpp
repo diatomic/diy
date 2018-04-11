@@ -118,7 +118,8 @@ namespace diy
       virtual std::vector<int>
                     ranks(const std::vector<int>& gids) const override;
 
-      inline int    get_rank(int& rk, int gid) const;
+      inline std::tuple<bool,int>
+                    get_rank(int& rk, int gid) const;
 
       inline void   set_rank(int rk, int gid, bool flush = true);
       inline void   set_ranks(const std::vector<std::tuple<int,int>>& rank_gids);
@@ -189,7 +190,7 @@ set_nblocks(int nblocks__)
     rank_map_.lock_all(MPI_MODE_NOCHECK);
 }
 
-int
+std::tuple<bool,int>
 diy::DynamicAssigner::
 get_rank(int& rk, int gid) const
 {
@@ -200,7 +201,7 @@ get_rank(int& rk, int gid) const
 
     rank_map_.get(rk, r, offset);
 
-    return r;
+    return std::make_tuple(false, r);        // false indicates that the data wasn't read from cache
 }
 
 int
@@ -208,9 +209,10 @@ diy::DynamicAssigner::
 rank(int gid) const
 {
     int rk;
-    int rank_with_gid_entry = get_rank(rk, gid);
+    auto cached_gidrk = get_rank(rk, gid);
+    int gidrk = std::get<1>(cached_gidrk);
 
-    rank_map_.flush_local(rank_with_gid_entry);
+    rank_map_.flush_local(gidrk);
 
     return rk;
 }
@@ -224,8 +226,9 @@ ranks(const std::vector<int>& gids) const
     std::vector<int> result(gids.size());
     for (size_t i = 0; i < gids.size(); ++i)
     {
-        int rank_with_gid_entry = get_rank(result[i], gids[i]);
-        all_cached &= (rank_with_gid_entry != comm_.rank());
+        auto cached_gidrk = get_rank(result[i], gids[i]);
+        bool cached = std::get<0>(cached_gidrk);
+        all_cached  &= cached;
     }
 
     if (!all_cached)

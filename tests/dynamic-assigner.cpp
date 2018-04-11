@@ -49,6 +49,10 @@ TEST_CASE_METHOD(SimpleFixture, "Dynamic Assigner Test", "[dynamic-assigner]")
 
     dynamic.set_ranks(rank_gids);
 
+    // need to separate the setting and getting of the ranks into separate
+    // stages (that's how it's meant to be used normally)
+    world.barrier();
+
     // check that every rank has the same correct view
     for (int gid = 0; gid < nblocks; ++gid)
     {
