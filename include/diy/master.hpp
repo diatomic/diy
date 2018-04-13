@@ -1102,7 +1102,7 @@ check_incoming_queues(bool remote)
         if (ir.info.from == -1) // uninitialized
         {
             MemoryBuffer bb;
-            comm_.recv(mpi::any_source, mpi::any_tag, bb.buffer);
+            comm_.recv(ostatus->source(), ostatus->tag(), bb.buffer);
 
             if (ostatus->tag() == tags::piece)
             {
@@ -1128,7 +1128,7 @@ check_incoming_queues(bool remote)
             window.begin = &ir.message.buffer[start_idx];
             window.count = count;
 
-            comm_.recv(mpi::any_source, mpi::any_tag, window);
+            comm_.recv(ostatus->source(), ostatus->tag(), window);
         }
 
         // unload message
