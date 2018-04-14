@@ -99,6 +99,12 @@ if                          (mpi AND MPIEXEC)
           add_test          (NAME merge-swap-reduce-test-p${p}-b${b}
                              COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:merge-swap-reduce-test> -b ${b}
                             )
+          add_test          (NAME merge-swap-reduce-test-p${p}-m1-b${b}
+                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:merge-swap-reduce-test> -m 1 -b ${b}
+                            )
+          add_test          (NAME merge-swap-reduce-test-p${p}-t2-b${b}
+                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:merge-swap-reduce-test> -t 2 -b ${b}
+                            )
       endforeach            (b)
   endforeach                (p)
 
@@ -123,6 +129,12 @@ else                        (mpi AND MPIEXEC)
   foreach                   (b 2 4 8 9 12 24 36 44 48 56 64)
       add_test              (NAME merge-swap-reduce-test-nompi-b${b}
                              COMMAND merge-swap-reduce-test -b ${b}
+                            )
+      add_test              (NAME merge-swap-reduce-test-nompi-m1-b${b}
+                             COMMAND merge-swap-reduce-test -m 1 -b ${b}
+                            )
+      add_test              (NAME merge-swap-reduce-test-nompi-t2-b${b}
+                             COMMAND merge-swap-reduce-test -t 2 -b ${b}
                             )
   endforeach                (b)
 
