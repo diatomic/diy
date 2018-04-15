@@ -139,10 +139,10 @@ namespace utils
 
   inline void sync(int fd)
   {
-#if !defined(_WIN32)
-    fsync(fd);
-#else
+#if defined(_WIN32)
     DIY_UNUSED(fd);
+#else
+    fsync(fd);
 #endif
   }
 
