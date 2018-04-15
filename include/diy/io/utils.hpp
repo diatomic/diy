@@ -109,18 +109,19 @@ namespace utils
 #else // defined(_WIN32)
 
     const size_t slen = filename.size();
-    char *s_template = new char[filename.size() + 1];
-    std::copy_n(filename.c_str(), slen+1, s_template);
+    std::unique_ptr<char[]> s_template(new char[filename.size() + 1]);
+    std::copy(filename.begin(), filename.end(), s_template.get());
+    s_template[filename.size()] = 0;
 
     int handle = -1;
 #if defined(__MACH__)
     // TODO: figure out how to open with O_SYNC
-    handle = ::mkstemp(s_template);
+    handle = ::mkstemp(s_template.get());
 #else
-    handle = mkostemp(s_template, O_WRONLY | O_SYNC);
+    handle = mkostemp(s_template.get(), O_WRONLY | O_SYNC);
 #endif
     if (handle != -1)
-      filename = s_template;
+      filename = s_template.get();
     return handle;
 
 #endif // defined(_WIN32)
