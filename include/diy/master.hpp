@@ -296,7 +296,7 @@ namespace diy
                                              int out_queues_limit,
                                              IncomingRound& current_incoming,
                                              bool remote);
-      inline void       check_incoming_queues(bool remote);
+      inline void       check_incoming_queues();
 
       void              cancel_requests();              // TODO
 
@@ -883,7 +883,7 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
   // kick requests
   while(nudge());
 
-  check_incoming_queues(false);
+  check_incoming_queues();
 }
 
 /* Remote communicator */
@@ -928,7 +928,7 @@ rcomm_exchange(ToSendList& to_send, int out_queues_limit)
         // kick requests
         nudge();
 
-        check_incoming_queues(true);
+        check_incoming_queues();
         if (ibarr_act)
         {
             if (ibarr_req.test())
@@ -1092,7 +1092,7 @@ send_outgoing_queues(
 
 void
 diy::Master::
-check_incoming_queues(bool remote)
+check_incoming_queues()
 {
     mpi::optional<mpi::status> ostatus = comm_.iprobe(mpi::any_source, mpi::any_tag);
     while (ostatus)
