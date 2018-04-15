@@ -21,6 +21,25 @@ namespace io
 {
 namespace utils
 {
+  namespace detail
+  {
+    // internal method to split a filename into path and fullname.
+    inline void splitpath(const std::string& fullname, std::string& path, std::string& name)
+    {
+      auto pos = fullname.rfind('/');
+      if (pos != std::string::npos)
+      {
+        path = fullname.substr(0, pos);
+        name = fullname.substr(pos+1);
+      }
+      else
+      {
+        path = ".";
+        name = fullname;
+      }
+    }
+  } // namespace detail
+
   /**
    * returns true if the filename exists and refers to a directory.
    */
@@ -68,15 +87,33 @@ namespace utils
 
   inline int mkstemp(std::string& filename)
   {
+#if defined(_WIN32)
+
+    std::string path, name;
+    detail::splitpath(filename, path, name);
+    char temppath[MAX_PATH];
+    // note: GetTempFileName only uses the first 3 chars of the prefix (name)
+    // specified.
+    if (GetTempFileName(path.c_str(), name.c_str(), 0, temppath) == 0)
+    {
+      // failed! return invalid handle.
+      return -1;
+    }
+    int handle = -1;
+    // _sopen_s sets handle to -1 on error.
+    _sopen_s(&handle, temppath, _O_WRONLY | _O_CREAT | _O_BINARY, _SH_DENYNO, _S_IWRITE);
+    if (handle != -1)
+      filename = temppath;
+    return handle;
+
+#else // defined(_WIN32)
+
     const size_t slen = filename.size();
     char *s_template = new char[filename.size() + 1];
     std::copy_n(filename.c_str(), slen+1, s_template);
 
     int handle = -1;
-#if defined(_WIN32)
-    if (_mktemp_s(s_template, slen+1) == 0) // <- returns 0 on success.
-      _sopen_s(&handle, s_template, _O_WRONLY | _O_CREAT | _O_BINARY, _SH_DENYNO, _S_IWRITE);
-#elif defined(__MACH__)
+#if defined(__MACH__)
     // TODO: figure out how to open with O_SYNC
     handle = ::mkstemp(s_template);
 #else
@@ -85,6 +122,8 @@ namespace utils
     if (handle != -1)
       filename = s_template;
     return handle;
+
+#endif // defined(_WIN32)
   }
 
   inline void close(int fd)
@@ -108,7 +147,11 @@ namespace utils
 
   inline bool remove(const std::string& filename)
   {
+#if defined(_WIN32)
+    return DeleteFile(filename.c_str()) != 0;
+#else
     return ::remove(filename.c_str()) == 0;
+#endif
   }
 }
 }
