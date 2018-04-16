@@ -31,6 +31,9 @@ target_link_libraries       (mpi-window-test        ${libraries})
 add_executable              (dynamic-assigner-test  dynamic-assigner.cpp)
 target_link_libraries       (dynamic-assigner-test  ${libraries})
 
+add_executable              (rexchange-test         rexchange.cpp)
+target_link_libraries       (rexchange-test         ${libraries})
+
 foreach                     (b 2 4 8 64)
     add_test                (NAME kd-tree-test-b${b}
                              COMMAND kd-tree-test -b ${b}
@@ -66,7 +69,6 @@ foreach                     (b 2 4 8 9 12 24 36 44 48 56 64)
                              COMMAND swap-reduce-test -k 4 -b ${b}
                             )
 endforeach                  ()
-
 
 if                          (mpi AND MPIEXEC)
 
@@ -116,6 +118,20 @@ if                          (mpi AND MPIEXEC)
       set_tests_properties  (simple-test-p${p}-b${b} PROPERTIES TIMEOUT 300 RUN_SERIAL ON)
   endforeach                (p)
 
+  foreach                   (p RANGE 1 ${maxp})
+      foreach               (b 2 4 8 9 12 24 36)
+          add_test          (NAME rexchange-test-p${p}-b${b}
+                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:rexchange-test> -b ${b}
+                            )
+          add_test          (NAME rexchange-test-p${p}-m1-b${b}
+                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:rexchange-test> -m 1 -b ${b}
+                            )
+          add_test          (NAME rexchange-test-p${p}-t2-b${b}
+                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:rexchange-test> -t 2 -b ${b}
+                            )
+      endforeach            (b)
+  endforeach                (p)
+
 else                        (mpi AND MPIEXEC)
 
   add_test                  (NAME dynamic-assigner-test-p${p}
@@ -143,6 +159,18 @@ else                        (mpi AND MPIEXEC)
                              COMMAND simple-test -b ${b}
                             )
       set_tests_properties  (simple-test-nompi-b${b} PROPERTIES TIMEOUT 300 RUN_SERIAL ON)
+  endforeach                (b)
+
+  foreach                   (b 2 4 8 9 12 24 36)
+      add_test              (NAME rexchange-test-nompi-b${b}
+                             COMMAND rexchange-test -b ${b}
+                            )
+      add_test              (NAME rexchange-test-nompi-m1-b${b}
+                             COMMAND rexchange-test -m 1 -b ${b}
+                            )
+      add_test              (NAME rexchange-test-nompi-t2-b${b}
+                             COMMAND rexchange-test -t 2 -b ${b}
+                            )
   endforeach                (b)
 
 endif                       (mpi AND MPIEXEC)
