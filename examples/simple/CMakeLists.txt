@@ -9,3 +9,6 @@ target_link_libraries       (until-done     ${libraries})
 
 add_executable              (rexchange      rexchange.cpp)
 target_link_libraries       (rexchange      ${libraries})
+
+add_executable              (iexchange      iexchange.cpp)
+target_link_libraries       (iexchange      ${libraries})

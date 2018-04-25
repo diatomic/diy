@@ -147,8 +147,53 @@ namespace diy
       void*   block_;
       Link*   link_;
   };
-}
 
+  struct Master::IProxyWithLink: public Master::ProxyWithLink
+    {
+        IProxyWithLink(const Proxy&         proxy,
+                void*                       block,
+                Link*                       link):
+            ProxyWithLink(proxy, block, link)                       {}
+
+        template<class T>
+            void enqueue(const BlockID&     to,
+                    const T&                x,
+                    void (*save)(BinaryBuffer&, const T&) = &::diy::save<T>) const
+            {
+                diy::Master::Proxy::enqueue(to, x, save);
+                master()->icommunicate();
+            }
+
+        template<class T>
+            void enqueue(const BlockID&     to,
+                    const T*                x,
+                    size_t                  n,
+                    void (*save)(BinaryBuffer&, const T&) = &::diy::save<T>) const
+            {
+                diy::Master::Proxy::enqueue(to, x, n, save);
+                master()->icommunicate();
+            }
+
+        template<class T>
+            void dequeue(int                from,
+                    T&                      x,
+                    void (*load)(BinaryBuffer&, T&) = &::diy::load<T>) const
+            {
+                master()->icommunicate();
+                diy::Master::Proxy::dequeue(from, x, load);
+            }
+
+        template<class T>
+            void dequeue(int                from,
+                    T*                      x,
+                    size_t                  n,
+                    void (*load)(BinaryBuffer&, T&) = &::diy::load<T>) const
+            {
+                master()->icommunicate();
+                diy::Master::Proxy::dequeue(from, x, n, load);
+            }
+    };
+}
 
 void
 diy::Master::Proxy::

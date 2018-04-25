@@ -24,6 +24,10 @@
 #include "log.hpp"
 #include "stats.hpp"
 
+// TODO: I just made this up for iexchange protocal, TP
+static const size_t DIY_MAX_Q_SIZE = 8;
+static const size_t DIY_MAX_RECV_TRIES = 1;
+
 namespace diy
 {
   // Stores and manages blocks; initiates serialization and communication when necessary.
@@ -64,10 +68,15 @@ namespace diy
       // Communicator types
       struct Proxy;
       struct ProxyWithLink;
+      struct IProxyWithLink;
 
       // foreach callback
       template<class Block>
       using Callback = std::function<void(Block*, const ProxyWithLink&)>;
+
+      // iexchange callback
+      template<class Block>
+      using ICallback = std::function<bool(Block*, const IProxyWithLink&)>;
 
       struct QueuePolicy
       {
@@ -224,10 +233,30 @@ namespace diy
 
       //! exchange the queues between all the blocks (collective operation)
       inline void   exchange(bool remote = false);
+
+      //! nonblocking exchange of the queues between all the blocks
+      template<class Block>
+      void          iexchange_(
+              const ICallback<Block>&   f,
+              size_t                    max_q_size      = DIY_MAX_Q_SIZE,
+              size_t                    max_recv_tries  = DIY_MAX_RECV_TRIES);
+
+      template<class F>
+      void          iexchange(const F& f,
+                              size_t max_q_size = DIY_MAX_Q_SIZE,
+                              size_t max_recv_tries = DIY_MAX_RECV_TRIES)
+      {
+          using Block = typename detail::block_traits<F>::type;
+          iexchange_<Block>(f, max_q_size, max_recv_tries);
+      }
+
       inline void   process_collectives();
 
       inline
       ProxyWithLink proxy(int i) const;
+
+      inline
+      IProxyWithLink iproxy(int i) const;               // TODO: necessary?
 
       //! return the number of local blocks
       unsigned int  size() const                        { return static_cast<unsigned int>(blocks_.size()); }
@@ -297,6 +326,13 @@ namespace diy
                                              IncomingRound& current_incoming,
                                              bool remote);
       inline void       check_incoming_queues();
+      inline void       prep_out(ToSendList& to_send);
+      inline int        limit_out(const ToSendList& to_send);
+
+      // iexchange commmunication
+      inline void       icommunicate(size_t max_recv_tries = DIY_MAX_RECV_TRIES);
+      bool              global_all_done();              // get global all done status
+      bool              global_all_done(int status);    // set local done status and get global all done status
 
       void              cancel_requests();              // TODO
 
@@ -340,6 +376,7 @@ namespace diy
   {
       virtual       ~BaseCommand()                                                  {}      // to delete derived classes
       virtual void  execute(void* b, const ProxyWithLink& cp) const                 =0;
+      virtual void  execute(void* b, const IProxyWithLink& cp) const                =0;     // TODO: necessary?
       virtual bool  skip(int i, const Master& master) const                         =0;
   };
 
@@ -350,6 +387,7 @@ namespace diy
                 f(f_), s(s_)                                                        {}
 
       void  execute(void* b, const ProxyWithLink& cp) const override                { f(static_cast<Block*>(b), cp); }
+      void  execute(void* b, const IProxyWithLink& cp) const override               { f(static_cast<Block*>(b), cp); }  // TODO: necessary?
       bool  skip(int i, const Master& m) const override                             { return s(i,m); }
 
       Callback<Block>   f;
@@ -440,6 +478,8 @@ struct diy::Master::ProcessBlock
           for (size_t cmd = 0; cmd < master.commands_.size(); ++cmd)
           {
               master.commands_[cmd]->execute(0, master.proxy(i));  // 0 signals that we are skipping the block (even if it's loaded)
+              // TODO: is the following necessary, and if so, how to switch between proxy and iproxy
+//               master.commands_[cmd]->execute(0, master.iproxy(i));  // 0 signals that we are skipping the block (even if it's loaded)
 
               // no longer need them, so get rid of them, rather than risk reloading
               current_incoming[master.gid(i)].queues.clear();
@@ -463,6 +503,8 @@ struct diy::Master::ProcessBlock
           for (size_t cmd = 0; cmd < master.commands_.size(); ++cmd)
           {
               master.commands_[cmd]->execute(master.block(i), master.proxy(i));
+              // TODO: is the following necessary, and if so, how to switch between proxy and iproxy
+//               master.commands_[cmd]->execute(master.block(i), master.iproxy(i));
 
               // no longer need them, so get rid of them
               current_incoming[master.gid(i)].queues.clear();
@@ -658,6 +700,11 @@ diy::Master::
 proxy(int i) const
 { return ProxyWithLink(Proxy(const_cast<Master*>(this), gid(i)), block(i), link(i)); }
 
+// TODO: is iproxy needed?
+diy::Master::IProxyWithLink
+diy::Master::
+iproxy(int i) const
+{ return IProxyWithLink(Proxy(const_cast<Master*>(this), gid(i)), block(i), link(i)); }
 
 int
 diy::Master::
@@ -839,6 +886,82 @@ exchange(bool remote)
   log->debug("Finished exchange");
 }
 
+// iexchange()
+// {
+//     icommunicate()
+//     while !all_done
+//         for all blocks
+//             icommunicate
+//             iproxywithlink
+//             f
+//             icommunicate()
+// }
+
+template<class Block>
+void
+diy::Master::
+iexchange_(
+        const ICallback<Block>& f,
+        size_t max_q_size,
+        size_t max_recv_tries)
+{
+    // TODO: when do the following two lines need to be executed (or do they)?
+    // prepare for next round
+//     incoming_.erase(exchange_round_);
+//     ++exchange_round_;
+
+    // TODO: separate comm thread
+    // std::thread t(communicate);
+    icommunicate(max_recv_tries);
+
+    bool all_done           = false;            // globally all blocks are done
+    int prev_done           = 0;                // all local blocks done last iteration
+                                                // 1: yes, -1: no, 0: initial
+    while (!all_done)
+    {
+        int ndone = 0;                          // number of local blocks done in current iteration
+        for (size_t i = 0; i < size(); i++)     // for all blocks
+        {
+            IProxyWithLink icp(IProxyWithLink(Proxy(const_cast<Master*>(this), gid(i)), block(i), link(i)));
+            ndone += f(static_cast<Block*>(block(i)), icp);
+            icommunicate(max_recv_tries);
+        }
+
+        if (ndone == size())                        // locally all blocks done
+        {
+            if (prev_done == -1)                    // local status changed
+                all_done = global_all_done(1);      // put local status and get global status
+            else                                    // local status unchanged
+                all_done = global_all_done();       // get global status
+            prev_done = 1;
+        }
+        else                                        // locally not all blocks done
+        {
+            if (prev_done == 1)                     // local status changed
+                global_all_done(-1);                // set local status as not done
+            all_done = false;                       // global status not done if local is not done
+            prev_done = -1;
+        }
+    }
+
+}
+
+// get global all done status
+bool
+diy::Master::
+global_all_done()
+{
+    return true;                                    // TODO: hard-coded
+}
+
+// set local done status and get global all done status
+bool
+diy::Master::
+global_all_done(int status)                         // 1: locally all done; -1: locally not all done
+{
+    return true;                                    // TODO: hard-coded
+}
+
 namespace diy
 {
 namespace detail
@@ -945,6 +1068,95 @@ rcomm_exchange(ToSendList& to_send, int out_queues_limit)
     }                                                 // while !done
 }
 
+// fill list of outgoing queues to send (the ones in memory come first)
+// for iexchange
+void
+diy::Master::
+prep_out(ToSendList& to_send)
+{
+    for (OutgoingQueuesMap::iterator it = outgoing_.begin(); it != outgoing_.end(); ++it)
+    {
+        OutgoingQueuesRecord& out = it->second;
+        if (out.external == -1)
+            to_send.push_front(it->first);
+        else
+            to_send.push_back(it->first);
+    }
+    log->debug("to_send.size(): {}", to_send.size());
+}
+
+// compute maximum number of queues to keep in memory
+// first version just average number of queues per block * num_blocks in memory
+// for iexchange
+int
+diy::Master::
+limit_out(const ToSendList& to_send)
+{
+    // XXX: we probably want a cleverer limit than
+    // block limit times average number of queues per block
+    // XXX: with queues we could easily maintain a specific space limit
+    int out_queues_limit;
+    if (limit_ == -1 || size() == 0)
+        return to_send.size();
+    else
+        // average number of queues per block * in-memory block limit
+        return std::max((size_t) 1, to_send.size() / size() * limit_);
+}
+
+// iexchange communicator
+void
+diy::Master::
+icommunicate(size_t max_recv_tries)
+{
+    // make sure there is a queue for each neighbor
+    for (int i = 0; i < (int)size(); ++i)
+    {
+        OutgoingQueues&  outgoing_queues  = outgoing_[gid(i)].queues;
+        OutQueueRecords& external_local   = outgoing_[gid(i)].external_local;
+        if (outgoing_queues.size() < (size_t)link(i)->size())
+            for (unsigned j = 0; j < (unsigned)link(i)->size(); ++j)
+                // touch the outgoing queue, creating it if necessary
+                if (external_local.find(link(i)->target(j)) == external_local.end())
+                    outgoing_queues[link(i)->target(j)];
+    }
+
+    // prepare list of outgoing messages
+    ToSendList to_send;                          // gids of destinations
+    prep_out(to_send);
+
+    // decide how many queues to keep in memory
+    int out_queues_limit = limit_out(to_send);
+
+    // lock out other threads
+    // TODO: not threaded yet
+    // if (!CAS(comm_flag, 0, 1))
+    //     return;
+
+    // debug
+    log->info("out_queues_limit: {}", out_queues_limit);
+
+    // exchange
+    IncomingRound &current_incoming = incoming_[exchange_round_];       // TODO: copied from exchange, still makes sense here?
+    size_t num_tries = 0;
+    do
+    {
+        send_outgoing_queues(to_send, out_queues_limit, current_incoming, false);
+        while(nudge());
+        check_incoming_queues();
+        num_tries++;
+    } while (num_tries < max_recv_tries &&
+             (!inflight_sends_.empty() || current_incoming.received < expected_ || !to_send.empty()));
+
+    // cleanup
+
+    // NB: not doing outgoing_.clear() as in Master::flush() so that outgoing queues remain in place
+    // TODO: consider having a flush function for a final cleanup if the user plans to move to
+    // another part of the DIY program
+
+    log->debug("Done in icommunicate()");
+    current_incoming.received       = 0;
+}
+
 void
 diy::Master::
 send_outgoing_queues(
@@ -996,6 +1208,14 @@ send_outgoing_queues(
             BlockID to_proc = it->first;
             int     to      = to_proc.gid;
             int     proc    = to_proc.proc;
+
+            // TODO: was in github/tpeterka/diy, but causes infinite loop here. Why?
+            // skip empty queues
+//             if (!outgoing_[from].queues[to_proc].size())
+//             {
+//                 log->debug("Skipping empty queue: {} <- {}", to, from);
+//                 continue;
+//             }
 
             log->debug("Processing queue:      {} <- {} of size {}", to, from, outgoing_[from].queues[to_proc].size());
 
@@ -1135,10 +1355,10 @@ check_incoming_queues()
 
         if (ostatus->tag() == tags::queue)
         {
-            size_t size  = ir.message.size();
-            int from = ir.info.from;
-            int to = ir.info.to;
-            int external = -1;
+            size_t size     = ir.message.size();
+            int from        = ir.info.from;
+            int to          = ir.info.to;
+            int external    = -1;
 
             assert(ir.info.round >= exchange_round_);
             IncomingRound *in = &incoming_[ir.info.round];
@@ -1180,23 +1400,9 @@ flush(bool remote)
 
   // make a list of outgoing queues to send (the ones in memory come first)
   ToSendList    to_send;
-  for (OutgoingQueuesMap::iterator it = outgoing_.begin(); it != outgoing_.end(); ++it)
-  {
-    OutgoingQueuesRecord& out = it->second;
-    if (out.external == -1)
-        to_send.push_front(it->first);
-    else
-        to_send.push_back(it->first);
-  }
-  log->debug("to_send.size(): {}", to_send.size());
+  prep_out(to_send);
 
-  // XXX: we probably want a cleverer limit than block limit times average number of queues per block
-  // XXX: with queues we could easily maintain a specific space limit
-  int out_queues_limit;
-  if (limit_ == -1 || size() == 0)
-    out_queues_limit = static_cast<int>(to_send.size());
-  else
-    out_queues_limit = static_cast<int>(std::max((size_t) 1, to_send.size()/size()*limit_));      // average number of queues per block * in-memory block limit
+  int out_queues_limit = limit_out(to_send);
 
   if (remote)
       rcomm_exchange(to_send, out_queues_limit);
