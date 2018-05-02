@@ -68,39 +68,38 @@ bool foo(
     }
 
     // then dequeue/enqueue as long as there is something to do
-    while (1)
-    {
+//     while (1)
+//     {
         bool idle = true;
         for (size_t i = 0; i < l->size(); ++i)
         {
             int nbr_gid = l->target(i).gid;
             if (icp.incoming(nbr_gid).size())
             {
-                fmt::print(stderr, "gid={} nbr_gid={}\n", my_gid, nbr_gid);
-                icp.dequeue(nbr_gid, b->count);
+                int recvd_val;
+                icp.dequeue(nbr_gid, recvd_val);
+                fmt::print(stderr, "[{}] <- {} <- [{}]\n", my_gid, recvd_val, nbr_gid);
                 b->count++;
                 icp.enqueue(l->target(i), b->count);
                 idle = false;
             }
         }
 
-        if (idle)
-            break;
-    }
+//         if (idle)
+//             break;
+//     }
 
     icp.incoming()->clear();                       // TODO: should the user or diy clear?
 
-    // flip a coin to decide whether to be done
-    int done = rand() % 2;
-
+    // pretend to be done when b->count exceeds some threshold
+    bool done = b->count > 5 ? true : false;
     fmt::print(stderr, "returning: gid={} count={} done={}\n", my_gid, b->count, done);
-
-    return (true);                           // TODO: hard code all done
+    return (done);
 }
 
 int main(int argc, char* argv[])
 {
-    diy::create_logger("trace");
+//     diy::create_logger("trace");
 
     diy::mpi::environment     env(argc, argv);
     diy::mpi::communicator    world;

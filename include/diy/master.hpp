@@ -188,9 +188,10 @@ namespace diy
                       comm_(comm),
                       expected_(0),
                       exchange_round_(-1),
-                      immediate_(true)
-                                                        {}
-                    ~Master()                           { set_immediate(true); clear(); delete queue_policy_; }
+                      immediate_(true),
+                      ndone_(comm, 1)
+                                                        { ndone_.lock_all(MPI_MODE_NOCHECK); }
+                    ~Master()                           { set_immediate(true); clear(); delete queue_policy_; ndone_.unlock_all(); }
       inline void   clear();
       inline void   destroy(int i)                      { if (blocks_.own()) blocks_.destroy(i); }
 
@@ -321,11 +322,12 @@ namespace diy
       inline void       comm_exchange(ToSendList& to_send, int out_queues_limit);     // possibly called in between block computations
       inline void       rcomm_exchange(ToSendList& to_send, int out_queues_limit);    // possibly called in between block computations
       inline bool       nudge();
-      inline void       send_outgoing_queues(ToSendList& to_send,
-                                             int out_queues_limit,
+      inline void       send_outgoing_queues(ToSendList&    to_send,
+                                             int            out_queues_limit,
                                              IncomingRound& current_incoming,
-                                             bool remote);
-      inline void       check_incoming_queues();
+                                             bool           remote,
+                                             bool           iexchange);
+      inline void       check_incoming_queues(bool          iexchange);
       inline void       prep_out(ToSendList& to_send);
       inline int        limit_out(const ToSendList& to_send);
 
@@ -370,6 +372,9 @@ namespace diy
     public:
       std::shared_ptr<spd::logger>  log = get_logger();
       stats::Profiler               prof;
+
+    private:
+      mutable mpi::window<int>  ndone_;
   };
 
   struct Master::BaseCommand
@@ -915,15 +920,16 @@ iexchange_(
     icommunicate(max_recv_tries);
 
     bool all_done           = false;            // globally all blocks are done
-    int prev_done           = 0;                // all local blocks done last iteration
+    int prev_done           = -1;               // all local blocks done last iteration
                                                 // 1: yes, -1: no, 0: initial
     while (!all_done)
     {
         int ndone = 0;                          // number of local blocks done in current iteration
         for (size_t i = 0; i < size(); i++)     // for all blocks
         {
+            icommunicate(max_recv_tries);
             IProxyWithLink icp(IProxyWithLink(Proxy(const_cast<Master*>(this), gid(i)), block(i), link(i)));
-            ndone += f(static_cast<Block*>(block(i)), icp);
+            ndone += (f(static_cast<Block*>(block(i)), icp) ? 1 : 0);
             icommunicate(max_recv_tries);
         }
 
@@ -944,22 +950,6 @@ iexchange_(
         }
     }
 
-}
-
-// get global all done status
-bool
-diy::Master::
-global_all_done()
-{
-    return true;                                    // TODO: hard-coded
-}
-
-// set local done status and get global all done status
-bool
-diy::Master::
-global_all_done(int status)                         // 1: locally all done; -1: locally not all done
-{
-    return true;                                    // TODO: hard-coded
 }
 
 namespace diy
@@ -1001,12 +991,12 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
 {
   IncomingRound &current_incoming = incoming_[exchange_round_];
 
-  send_outgoing_queues(to_send, out_queues_limit, current_incoming, false);
+  send_outgoing_queues(to_send, out_queues_limit, current_incoming, false, false);
 
   // kick requests
   while(nudge());
 
-  check_incoming_queues();
+  check_incoming_queues(false);
 }
 
 /* Remote communicator */
@@ -1046,12 +1036,12 @@ rcomm_exchange(ToSendList& to_send, int out_queues_limit)
 
     while (!done)
     {
-        send_outgoing_queues(to_send, out_queues_limit, current_incoming, true);
+        send_outgoing_queues(to_send, out_queues_limit, current_incoming, true, false);
 
         // kick requests
         nudge();
 
-        check_incoming_queues();
+        check_incoming_queues(false);
         if (ibarr_act)
         {
             if (ibarr_req.test())
@@ -1133,16 +1123,16 @@ icommunicate(size_t max_recv_tries)
     //     return;
 
     // debug
-    log->info("out_queues_limit: {}", out_queues_limit);
+//     log->info("out_queues_limit: {}", out_queues_limit);
 
     // exchange
     IncomingRound &current_incoming = incoming_[exchange_round_];       // TODO: copied from exchange, still makes sense here?
     size_t num_tries = 0;
     do
     {
-        send_outgoing_queues(to_send, out_queues_limit, current_incoming, false);
+        send_outgoing_queues(to_send, out_queues_limit, current_incoming, false, true);
         while(nudge());
-        check_incoming_queues();
+        check_incoming_queues(true);
         num_tries++;
     } while (num_tries < max_recv_tries &&
              (!inflight_sends_.empty() || current_incoming.received < expected_ || !to_send.empty()));
@@ -1160,10 +1150,11 @@ icommunicate(size_t max_recv_tries)
 void
 diy::Master::
 send_outgoing_queues(
-        ToSendList& to_send,
-        int out_queues_limit,
-        IncomingRound& current_incoming,
-        bool remote)
+        ToSendList&     to_send,
+        int             out_queues_limit,
+        IncomingRound&  current_incoming,
+        bool            remote,
+        bool            iexchange)
 {
     static const size_t MAX_MPI_MESSAGE_COUNT = INT_MAX;
 
@@ -1211,11 +1202,11 @@ send_outgoing_queues(
 
             // TODO: was in github/tpeterka/diy, but causes infinite loop here. Why?
             // skip empty queues
-//             if (!outgoing_[from].queues[to_proc].size())
-//             {
-//                 log->debug("Skipping empty queue: {} <- {}", to, from);
-//                 continue;
-//             }
+            if (!outgoing_[from].queues[to_proc].size())
+            {
+                log->debug("Skipping empty queue: {} <- {}", to, from);
+                continue;
+            }
 
             log->debug("Processing queue:      {} <- {} of size {}", to, from, outgoing_[from].queues[to_proc].size());
 
@@ -1236,16 +1227,33 @@ send_outgoing_queues(
                     else
                     {
                         MemoryBuffer& in_bb = current_incoming.map[to].queues[from];
-                        in_bb.swap(bb);
-                        in_bb.reset();
+                        if (!iexchange)
+                        {
+                            in_bb.swap(bb);
+                            in_bb.reset();
+                        }
+                        else
+                        {
+                            // TODO: is this the right way to append?
+                            in_bb.save_binary(&in_bb.buffer[0], in_bb.size());        // append insted of overwrite
+                        }
                         in_qr.external = -1;
                     }
                 } else        // !in_external
                 {
                     log->debug("Swapping in memory:    {} <- {}", to, from);
                     MemoryBuffer& bb = current_incoming.map[to].queues[from];
-                    bb.swap(it->second);
-                    bb.reset();
+                    if (!iexchange)
+                    {
+                        bb.swap(it->second);
+                        bb.reset();
+                    }
+                    else
+                    {
+                        // TODO: causes infinite loop when nprocs = 1
+                        // TODO: is this the right way to append?
+                        bb.save_binary(&it->second.buffer[0], it->second.size());        // append insted of overwrite
+                    }
                     in_qr.size = bb.size();
                     in_qr.external = -1;
                 }
@@ -1312,7 +1320,7 @@ send_outgoing_queues(
 
 void
 diy::Master::
-check_incoming_queues()
+check_incoming_queues(bool iexchange)
 {
     mpi::optional<mpi::status> ostatus = comm_.iprobe(mpi::any_source, mpi::any_tag);
     while (ostatus)
@@ -1372,8 +1380,17 @@ check_incoming_queues()
             }
             else
             {
-                in->map[to].queues[from].swap(ir.message);
-                in->map[to].queues[from].reset();     // buffer position = 0
+                if (!iexchange)
+                {
+                    in->map[to].queues[from].swap(ir.message);
+                    in->map[to].queues[from].reset();     // buffer position = 0
+                }
+                else
+                {
+                    // causes infinite loop when nprocs = 2
+                    // TODO: is this the right way to append?
+                    in->map[to].queues[from].save_binary(&ir.message.buffer[0], ir.message.size());        // append insted of overwrite
+                }
             }
             in->map[to].records[from] = QueueRecord(size, external);
 
@@ -1519,6 +1536,33 @@ show_incoming_records() const
       }
     }
   }
+}
+
+// get global all done status
+bool
+diy::Master::
+global_all_done()
+{
+    int global_ndone;
+    ndone_.get(global_ndone, 0, 0);
+    ndone_.flush_local(0);
+//     fmt::print(stderr, "1: global_ndone = {} comm_.size() = {}\n", global_ndone, comm_.size());
+//     return(global_ndone == comm_.size());
+    return true;                                    // TODO: hard-coded
+}
+
+// set local done status and get global all done status
+bool
+diy::Master::
+global_all_done(int status)                         // 1: locally all done; -1: locally not all done
+{
+    int global_ndone;
+    ndone_.fetch_and_op(&status, &global_ndone, 0, 0, MPI_SUM);     // global_ndone is prior to adding status
+    global_ndone += status;
+    ndone_.flush(0);
+//     fmt::print(stderr, "2: global_ndone = {} comm_.size() = {}\n", global_ndone, comm_.size());
+//     return(global_ndone == comm_.size());
+    return true;                                    // TODO: hard-coded
 }
 
 #endif
