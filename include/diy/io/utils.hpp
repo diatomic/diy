@@ -108,7 +108,6 @@ namespace utils
 
 #else // defined(_WIN32)
 
-    const size_t slen = filename.size();
     std::unique_ptr<char[]> s_template(new char[filename.size() + 1]);
     std::copy(filename.begin(), filename.end(), s_template.get());
     s_template[filename.size()] = 0;
