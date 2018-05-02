@@ -345,7 +345,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">  <a name="_a26"></a><a class="code" href="classdiy_1_1mpi_1_1communicator.html">diy::mpi::communicator</a>    world;</div>
 <div class="line"></div>
 <div class="line">  <span class="keyword">using namespace </span>opts;</div>
-<div class="line">  Options ops(argc, argv);</div>
+<div class="line">  Options ops;</div>
 <div class="line"></div>
 <div class="line">  <span class="keywordtype">int</span>               nblocks     = world.<a name="a27"></a>size();</div>
 <div class="line">  <span class="keywordtype">size_t</span>            num_points  = 100;</div>
@@ -353,20 +353,22 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">  <span class="keywordtype">int</span>               mem_blocks  = -1;</div>
 <div class="line">  <span class="keywordtype">int</span>               threads     = 1;</div>
 <div class="line">  std::string       prefix      = <span class="stringliteral">&quot;./DIY.XXXXXX&quot;</span>;</div>
-<div class="line">  <span class="keywordtype">bool</span>              verbose     = ops &gt;&gt; Present(<span class="charliteral">&#39;v&#39;</span>, <span class="stringliteral">&quot;verbose&quot;</span>, <span class="stringliteral">&quot;verbose output&quot;</span>);</div>
+<div class="line">  <span class="keywordtype">bool</span>              verbose, wrap, sample, exponential, help;</div>
 <div class="line"></div>
 <div class="line">  ops</div>
-<div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;n&#39;</span>, <span class="stringliteral">&quot;number&quot;</span>,  num_points,     <span class="stringliteral">&quot;number of points per block&quot;</span>)</div>
-<div class="line">      &gt;&gt; Option(     <span class="stringliteral">&quot;hist&quot;</span>,    hist,           <span class="stringliteral">&quot;histogram multiplier&quot;</span>)</div>
-<div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;b&#39;</span>, <span class="stringliteral">&quot;blocks&quot;</span>,  nblocks,        <span class="stringliteral">&quot;number of blocks&quot;</span>)</div>
-<div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;t&#39;</span>, <span class="stringliteral">&quot;thread&quot;</span>,  threads,        <span class="stringliteral">&quot;number of threads&quot;</span>)</div>
-<div class="line">      &gt;&gt; Option(     <span class="stringliteral">&quot;prefix&quot;</span>,  prefix,         <span class="stringliteral">&quot;prefix for external storage&quot;</span>)</div>
+<div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;v&#39;</span>, <span class="stringliteral">&quot;verbose&quot;</span>,     verbose,        <span class="stringliteral">&quot;verbose output&quot;</span>)</div>
+<div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;n&#39;</span>, <span class="stringliteral">&quot;number&quot;</span>,      num_points,     <span class="stringliteral">&quot;number of points per block&quot;</span>)</div>
+<div class="line">      &gt;&gt; Option(     <span class="stringliteral">&quot;hist&quot;</span>,        hist,           <span class="stringliteral">&quot;histogram multiplier&quot;</span>)</div>
+<div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;b&#39;</span>, <span class="stringliteral">&quot;blocks&quot;</span>,      nblocks,        <span class="stringliteral">&quot;number of blocks&quot;</span>)</div>
+<div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;t&#39;</span>, <span class="stringliteral">&quot;thread&quot;</span>,      threads,        <span class="stringliteral">&quot;number of threads&quot;</span>)</div>
+<div class="line">      &gt;&gt; Option(     <span class="stringliteral">&quot;prefix&quot;</span>,      prefix,         <span class="stringliteral">&quot;prefix for external storage&quot;</span>)</div>
+<div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;w&#39;</span>, <span class="stringliteral">&quot;wrap&quot;</span>,        wrap,           <span class="stringliteral">&quot;use periodic boundary&quot;</span>)</div>
+<div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;s&#39;</span>, <span class="stringliteral">&quot;sample&quot;</span>,      sample,         <span class="stringliteral">&quot;use sampling k-d tree&quot;</span>)</div>
+<div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;e&#39;</span>, <span class="stringliteral">&quot;exponential&quot;</span>, exponential,    <span class="stringliteral">&quot;use exponential distribution of points&quot;</span>)</div>
+<div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;h&#39;</span>, <span class="stringliteral">&quot;help&quot;</span>,        help,           <span class="stringliteral">&quot;show help&quot;</span>)</div>
 <div class="line">  ;</div>
-<div class="line">  <span class="keywordtype">bool</span> wrap = ops &gt;&gt; Present(<span class="charliteral">&#39;w&#39;</span>, <span class="stringliteral">&quot;wrap&quot;</span>, <span class="stringliteral">&quot;use periodic boundary&quot;</span>);</div>
-<div class="line">  <span class="keywordtype">bool</span> sample = ops &gt;&gt; Present(<span class="charliteral">&#39;s&#39;</span>, <span class="stringliteral">&quot;sample&quot;</span>, <span class="stringliteral">&quot;use sampling k-d tree&quot;</span>);</div>
-<div class="line">  <span class="keywordtype">bool</span> exponential = ops &gt;&gt; Present(<span class="charliteral">&#39;e&#39;</span>, <span class="stringliteral">&quot;exponential&quot;</span>, <span class="stringliteral">&quot;use exponential distribution of points&quot;</span>);</div>
 <div class="line"></div>
-<div class="line">  <span class="keywordflow">if</span> (ops &gt;&gt; Present(<span class="charliteral">&#39;h&#39;</span>, <span class="stringliteral">&quot;help&quot;</span>, <span class="stringliteral">&quot;show help&quot;</span>))</div>
+<div class="line">  <span class="keywordflow">if</span> (!ops.parse(argc,argv) || help)</div>
 <div class="line">  {</div>
 <div class="line">      <span class="keywordflow">if</span> (world.<a name="a28"></a>rank() == 0)</div>
 <div class="line">      {</div>
@@ -439,7 +441,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 1 2018 21:44:59 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed May 2 2018 20:47:14 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

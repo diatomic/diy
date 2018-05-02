@@ -264,19 +264,22 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"></div>
 <div class="line">    <span class="comment">// get command line arguments</span></div>
 <div class="line">    <span class="keyword">using namespace </span>opts;</div>
-<div class="line">    Options ops(argc, argv);</div>
-<div class="line">    <span class="keywordtype">bool</span>                      verbose     = ops &gt;&gt; Present(<span class="charliteral">&#39;v&#39;</span>,</div>
-<div class="line">                                                           <span class="stringliteral">&quot;verbose&quot;</span>,</div>
-<div class="line">                                                           <span class="stringliteral">&quot;verbose output&quot;</span>);</div>
-<div class="line">    <span class="keywordtype">bool</span>                      contiguous  = ops &gt;&gt; Present(<span class="charliteral">&#39;c&#39;</span>,</div>
-<div class="line">                                                           <span class="stringliteral">&quot;contiguous&quot;</span>,</div>
-<div class="line">                                                           <span class="stringliteral">&quot;use contiguous partners&quot;</span>);</div>
+<div class="line">    Options ops;</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">bool</span> verbose, contiguous, help;</div>
+<div class="line">    ops</div>
+<div class="line">        &gt;&gt; Option(<span class="charliteral">&#39;v&#39;</span>, <span class="stringliteral">&quot;verbose&quot;</span>,    verbose,    <span class="stringliteral">&quot;verbose output&quot;</span>)</div>
+<div class="line">        &gt;&gt; Option(<span class="charliteral">&#39;c&#39;</span>, <span class="stringliteral">&quot;contiguous&quot;</span>, contiguous, <span class="stringliteral">&quot;use contiguous partners&quot;</span>)</div>
+<div class="line">        &gt;&gt; Option(<span class="charliteral">&#39;h&#39;</span>, <span class="stringliteral">&quot;help&quot;</span>,       help,       <span class="stringliteral">&quot;show help&quot;</span>)</div>
+<div class="line">        ;</div>
+<div class="line"></div>
 <div class="line">    ops</div>
 <div class="line">        &gt;&gt; Option(<span class="charliteral">&#39;d&#39;</span>, <span class="stringliteral">&quot;dim&quot;</span>,     dim,            <span class="stringliteral">&quot;dimension&quot;</span>)</div>
 <div class="line">        &gt;&gt; Option(<span class="charliteral">&#39;b&#39;</span>, <span class="stringliteral">&quot;blocks&quot;</span>,  nblocks,        <span class="stringliteral">&quot;number of blocks&quot;</span>)</div>
 <div class="line">        &gt;&gt; Option(<span class="charliteral">&#39;t&#39;</span>, <span class="stringliteral">&quot;thread&quot;</span>,  threads,        <span class="stringliteral">&quot;number of threads&quot;</span>)</div>
 <div class="line">        ;</div>
-<div class="line">    <span class="keywordflow">if</span> (ops &gt;&gt; Present(<span class="charliteral">&#39;h&#39;</span>, <span class="stringliteral">&quot;help&quot;</span>, <span class="stringliteral">&quot;show help&quot;</span>))</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordflow">if</span> (!ops.parse(argc, argv) || help)</div>
 <div class="line">    {</div>
 <div class="line">        std::cout &lt;&lt; <span class="stringliteral">&quot;Usage: &quot;</span> &lt;&lt; argv[0] &lt;&lt; <span class="stringliteral">&quot; [OPTIONS]\n&quot;</span>;</div>
 <div class="line">        std::cout &lt;&lt; ops;</div>
@@ -334,7 +337,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 1 2018 21:44:59 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed May 2 2018 20:47:14 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

@@ -192,8 +192,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">  domain.<a name="a18"></a>min[0] = domain.min[1] = domain.min[2] = 0;</div>
 <div class="line">  domain.max[0] = domain.max[1] = domain.max[2] = 100.;</div>
 <div class="line"></div>
+<div class="line">  <span class="keywordtype">bool</span>  verbose, help;</div>
+<div class="line"></div>
 <div class="line">  <span class="keyword">using namespace </span>opts;</div>
-<div class="line">  Options ops(argc, argv);</div>
+<div class="line">  Options ops;</div>
 <div class="line"></div>
 <div class="line">  ops</div>
 <div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;n&#39;</span>, <span class="stringliteral">&quot;number&quot;</span>,  num_points,     <span class="stringliteral">&quot;number of points per block&quot;</span>)</div>
@@ -210,9 +212,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;y&#39;</span>,  <span class="stringliteral">&quot;max-y&quot;</span>,  domain.max[1],  <span class="stringliteral">&quot;domain max y&quot;</span>)</div>
 <div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;z&#39;</span>,  <span class="stringliteral">&quot;max-z&quot;</span>,  domain.max[2],  <span class="stringliteral">&quot;domain max z&quot;</span>)</div>
 <div class="line">  ;</div>
-<div class="line">  <span class="keywordtype">bool</span>  verbose = ops &gt;&gt; Present(<span class="charliteral">&#39;v&#39;</span>, <span class="stringliteral">&quot;verbose&quot;</span>, <span class="stringliteral">&quot;print the block contents&quot;</span>);</div>
 <div class="line"></div>
-<div class="line">  <span class="keywordflow">if</span> (ops &gt;&gt; Present(<span class="charliteral">&#39;h&#39;</span>, <span class="stringliteral">&quot;help&quot;</span>, <span class="stringliteral">&quot;show help&quot;</span>))</div>
+<div class="line">  ops</div>
+<div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;v&#39;</span>, <span class="stringliteral">&quot;verbose&quot;</span>, verbose, <span class="stringliteral">&quot;print the block contents&quot;</span>)</div>
+<div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;h&#39;</span>, <span class="stringliteral">&quot;help&quot;</span>,    help,    <span class="stringliteral">&quot;show help&quot;</span>)</div>
+<div class="line">  ;</div>
+<div class="line"></div>
+<div class="line">  <span class="keywordflow">if</span> (!ops.parse(argc,argv) || help)</div>
 <div class="line">  {</div>
 <div class="line">      <span class="keywordflow">if</span> (world.<a name="a19"></a>rank() == 0)</div>
 <div class="line">      {</div>
@@ -251,7 +257,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 1 2018 21:44:59 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed May 2 2018 20:47:14 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

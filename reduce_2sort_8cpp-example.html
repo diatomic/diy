@@ -339,7 +339,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">  <a name="_a18"></a><a class="code" href="classdiy_1_1mpi_1_1communicator.html">diy::mpi::communicator</a>    world;</div>
 <div class="line"></div>
 <div class="line">  <span class="keyword">using namespace </span>opts;</div>
-<div class="line">  Options ops(argc, argv);</div>
+<div class="line">  Options ops;</div>
 <div class="line"></div>
 <div class="line">  <span class="keywordtype">int</span>               nblocks     = world.<a name="a19"></a>size();</div>
 <div class="line">  <span class="keywordtype">size_t</span>            num_values  = 100;</div>
@@ -349,12 +349,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">  <span class="keywordtype">int</span>               threads     = 1;</div>
 <div class="line">  <span class="keywordtype">int</span>               chunk_size  = 1;</div>
 <div class="line">  std::string       prefix      = <span class="stringliteral">&quot;./DIY.XXXXXX&quot;</span>;</div>
-<div class="line">  <span class="keywordtype">bool</span>              print       = ops &gt;&gt; Present(     <span class="stringliteral">&quot;print&quot;</span>,   <span class="stringliteral">&quot;print the result&quot;</span>);</div>
-<div class="line">  <span class="keywordtype">bool</span>              verbose     = ops &gt;&gt; Present(<span class="charliteral">&#39;v&#39;</span>, <span class="stringliteral">&quot;verbose&quot;</span>, <span class="stringliteral">&quot;verbose output&quot;</span>);</div>
-<div class="line">  <span class="keywordtype">bool</span>              verify      = ops &gt;&gt; Present(     <span class="stringliteral">&quot;verify&quot;</span>,  <span class="stringliteral">&quot;verify the result&quot;</span>);</div>
+<div class="line">  <span class="keywordtype">bool</span>              print, verbose, verify, help;</div>
 <div class="line"></div>
 <div class="line">  Value             min = 0,</div>
 <div class="line">                    max = 1 &lt;&lt; 20;</div>
+<div class="line"></div>
+<div class="line">  ops</div>
+<div class="line">      &gt;&gt; Option(     <span class="stringliteral">&quot;print&quot;</span>,   print,      <span class="stringliteral">&quot;print the result&quot;</span>)</div>
+<div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;v&#39;</span>, <span class="stringliteral">&quot;verbose&quot;</span>, verbose,    <span class="stringliteral">&quot;verbose output&quot;</span>)</div>
+<div class="line">      &gt;&gt; Option(     <span class="stringliteral">&quot;verify&quot;</span>,  verify,     <span class="stringliteral">&quot;verify the result&quot;</span>)</div>
+<div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;h&#39;</span>, <span class="stringliteral">&quot;help&quot;</span>,    help,       <span class="stringliteral">&quot;show help&quot;</span>)</div>
+<div class="line">  ;</div>
 <div class="line"></div>
 <div class="line">  ops</div>
 <div class="line">      &gt;&gt; Option(<span class="charliteral">&#39;n&#39;</span>, <span class="stringliteral">&quot;number&quot;</span>,  num_values,     <span class="stringliteral">&quot;number of values per block&quot;</span>)</div>
@@ -372,7 +377,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">      &gt;&gt; Option(     <span class="stringliteral">&quot;max&quot;</span>,     max,            <span class="stringliteral">&quot;range max&quot;</span>)</div>
 <div class="line">  ;</div>
 <div class="line"></div>
-<div class="line">  <span class="keywordflow">if</span> (ops &gt;&gt; Present(<span class="charliteral">&#39;h&#39;</span>, <span class="stringliteral">&quot;help&quot;</span>, <span class="stringliteral">&quot;show help&quot;</span>))</div>
+<div class="line">  <span class="keywordflow">if</span> (!ops.parse(argc,argv) || help)</div>
 <div class="line">  {</div>
 <div class="line">      <span class="keywordflow">if</span> (world.<a name="a20"></a>rank() == 0)</div>
 <div class="line">      {</div>
@@ -511,7 +516,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 1 2018 21:44:59 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed May 2 2018 20:47:14 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
