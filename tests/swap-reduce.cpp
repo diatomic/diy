@@ -195,9 +195,11 @@ int main(int argc, char* argv[])
 
     Catch::Session session;
 
+    bool help, verbose;
+
     // get command line arguments
     using namespace opts;
-    Options ops(argc, argv);
+    Options ops;
     ops
         >> Option('n', "number",  SwapReduceFixture::num_points,     "number of points per block")
         >> Option('k', "k",       SwapReduceFixture::k,              "use k-ary swap")
@@ -205,9 +207,10 @@ int main(int argc, char* argv[])
         >> Option('t', "thread",  SwapReduceFixture::threads,        "number of threads")
         >> Option('m', "memory",  SwapReduceFixture::mem_blocks,     "number of blocks to keep in memory")
         >> Option(     "prefix",  SwapReduceFixture::prefix,         "prefix for external storage")
+        >> Option('v', "verbose", verbose,                           "print the block contents")
+        >> Option('h', "help",    help,                              "show help")
         ;
-    bool  verbose = ops >> Present('v', "verbose", "print the block contents");
-    if (ops >> Present('h', "help", "show help"))
+    if (!ops.parse(argc,argv) || help)
     {
         if (world.rank() == 0)
         {

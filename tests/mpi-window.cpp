@@ -61,13 +61,15 @@ int main(int argc, char* argv[])
   Catch::Session session;
 
   using namespace opts;
-  Options ops(argc, argv);
+  Options ops;
 
+  bool help;
   ops
       >> Option('w', "width", SimpleFixture::width, "per process width of the window")
+      >> Option('h', "help",  help,                 "show help")
   ;
 
-  if (ops >> Present('h', "help", "show help"))
+  if (!ops.parse(argc,argv) || help)
   {
       if (world.rank() == 0)
       {

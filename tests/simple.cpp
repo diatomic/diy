@@ -158,13 +158,15 @@ int main(int argc, char* argv[])
   Catch::Session session;
 
   SimpleFixture::nblocks = std::max(world.size(), 2);
+  bool help;
 
   // get command line arguments
   using namespace opts;
-  Options ops(argc, argv);
+  Options ops;
   ops >> Option('b', "blocks", SimpleFixture::nblocks, "number of blocks")
-      >> Option('t', "thread", SimpleFixture::threads, "number of threads");
-  if (ops >> Present('h', "help", "show help"))
+      >> Option('t', "thread", SimpleFixture::threads, "number of threads")
+      >> Option('h', "help",   help,                   "show help");
+  if (!ops.parse(argc,argv) || help)
   {
     if (world.rank() == 0)
     {

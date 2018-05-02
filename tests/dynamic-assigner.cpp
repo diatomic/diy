@@ -73,14 +73,16 @@ int main(int argc, char* argv[])
   Catch::Session session;
 
   using namespace opts;
-  Options ops(argc, argv);
+  Options ops;
 
   SimpleFixture::nblocks = world.size() * 8 + 3;
+  bool help;
   ops
       >> Option('n', "nblocks", SimpleFixture::nblocks, "total number of blocks")
+      >> Option('h', "help",    help,                   "show help")
   ;
 
-  if (ops >> Present('h', "help", "show help"))
+  if (!ops.parse(argc,argv) || help)
   {
       if (world.rank() == 0)
       {

@@ -99,16 +99,19 @@ int main(int argc, char* argv[])
     std::string               prefix    = "./DIY.XXXXXX"; // prefix for temp files for blocks
                                                           // moved out of core
 
+    bool help;
+
     // get command line arguments
     using namespace opts;
-    Options ops(argc, argv);
+    Options ops;
     ops
         >> Option('b', "blocks",  nblocks,        "number of blocks")
         >> Option('t', "thread",  threads,        "number of threads")
         >> Option('m', "memory",  in_memory,      "maximum blocks to store in memory")
         >> Option(     "prefix",  prefix,         "prefix for external storage")
+        >> Option('h', "help",    help,           "show help")
         ;
-    if (ops >> Present('h', "help", "show help"))
+    if (!ops.parse(argc,argv) || help)
     {
         if (world.rank() == 0)
             std::cout << ops;
