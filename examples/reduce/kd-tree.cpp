@@ -260,7 +260,7 @@ int main(int argc, char* argv[])
   diy::mpi::communicator    world;
 
   using namespace opts;
-  Options ops(argc, argv);
+  Options ops;
 
   int               nblocks     = world.size();
   size_t            num_points  = 100;
@@ -268,20 +268,22 @@ int main(int argc, char* argv[])
   int               mem_blocks  = -1;
   int               threads     = 1;
   std::string       prefix      = "./DIY.XXXXXX";
-  bool              verbose     = ops >> Present('v', "verbose", "verbose output");
+  bool              verbose, wrap, sample, exponential, help;
 
   ops
-      >> Option('n', "number",  num_points,     "number of points per block")
-      >> Option(     "hist",    hist,           "histogram multiplier")
-      >> Option('b', "blocks",  nblocks,        "number of blocks")
-      >> Option('t', "thread",  threads,        "number of threads")
-      >> Option(     "prefix",  prefix,         "prefix for external storage")
+      >> Option('v', "verbose",     verbose,        "verbose output")
+      >> Option('n', "number",      num_points,     "number of points per block")
+      >> Option(     "hist",        hist,           "histogram multiplier")
+      >> Option('b', "blocks",      nblocks,        "number of blocks")
+      >> Option('t', "thread",      threads,        "number of threads")
+      >> Option(     "prefix",      prefix,         "prefix for external storage")
+      >> Option('w', "wrap",        wrap,           "use periodic boundary")
+      >> Option('s', "sample",      sample,         "use sampling k-d tree")
+      >> Option('e', "exponential", exponential,    "use exponential distribution of points")
+      >> Option('h', "help",        help,           "show help")
   ;
-  bool wrap = ops >> Present('w', "wrap", "use periodic boundary");
-  bool sample = ops >> Present('s', "sample", "use sampling k-d tree");
-  bool exponential = ops >> Present('e', "exponential", "use exponential distribution of points");
 
-  if (ops >> Present('h', "help", "show help"))
+  if (!ops.parse(argc,argv) || help)
   {
       if (world.rank() == 0)
       {

@@ -180,16 +180,19 @@ int main(int argc, char* argv[])
 
     Catch::Session session;
 
+    bool help;
+
     // get command line arguments
     using namespace opts;
-    Options ops(argc, argv);
+    Options ops;
     ops
         >> Option('b', "blocks",  RexchangeFixture::nblocks,        "number of blocks")
         >> Option('t', "thread",  RexchangeFixture::threads,        "number of threads")
         >> Option('m', "memory",  RexchangeFixture::mem_blocks,     "number of blocks to keep in memory")
+        >> Option('h', "help",    help,                             "show help")
         ;
 
-    if (ops >> Present('h', "help", "show help"))
+    if (!ops.parse(argc,argv) || help)
     {
         if (world.rank() == 0)
         {

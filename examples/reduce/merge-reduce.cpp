@@ -179,19 +179,22 @@ int main(int argc, char* argv[])
 
     // get command line arguments
     using namespace opts;
-    Options ops(argc, argv);
-    bool                      verbose     = ops >> Present('v',
-                                                           "verbose",
-                                                           "verbose output");
-    bool                      contiguous  = ops >> Present('c',
-                                                           "contiguous",
-                                                           "use contiguous partners");
+    Options ops;
+
+    bool verbose, contiguous, help;
+    ops
+        >> Option('v', "verbose",    verbose,    "verbose output")
+        >> Option('c', "contiguous", contiguous, "use contiguous partners")
+        >> Option('h', "help",       help,       "show help")
+        ;
+
     ops
         >> Option('d', "dim",     dim,            "dimension")
         >> Option('b', "blocks",  nblocks,        "number of blocks")
         >> Option('t', "thread",  threads,        "number of threads")
         ;
-    if (ops >> Present('h', "help", "show help"))
+
+    if (!ops.parse(argc, argv) || help)
     {
         std::cout << "Usage: " << argv[0] << " [OPTIONS]\n";
         std::cout << ops;

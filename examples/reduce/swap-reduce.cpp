@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
 
     // get command line arguments
     using namespace opts;
-    Options ops(argc, argv);
+    Options ops;
     ops
         >> Option('n', "number",  num_points,     "number of points per block")
         >> Option('k', "k",       k,              "use k-ary swap")
@@ -127,8 +127,14 @@ int main(int argc, char* argv[])
         >> Option('y',  "max-y",  domain.max[1],  "domain max y")
         >> Option('z',  "max-z",  domain.max[2],  "domain max z")
         ;
-    bool  verbose = ops >> Present('v', "verbose", "print the block contents");
-    if (ops >> Present('h', "help", "show help"))
+
+    bool verbose, help;
+    ops
+        >> Option('v', "verbose", verbose,  "print the block contents")
+        >> Option('h', "help",    help,     "show help")
+        ;
+
+    if (!ops.parse(argc,argv) || help)
     {
         if (world.rank() == 0)
         {

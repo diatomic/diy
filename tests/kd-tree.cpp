@@ -356,23 +356,25 @@ int main(int argc, char* argv[])
   Catch::Session session;
 
   using namespace opts;
-  Options ops(argc, argv);
+  Options ops;
 
   KDTreeFixture::nblocks     = world.size();
-  KDTreeFixture::verbose     = ops >> Present('v', "verbose", "verbose output");
 
+  bool help;
   ops
-      >> Option('n', "number",  KDTreeFixture::num_points,     "number of points per block")
-      >> Option(     "hist",    KDTreeFixture::hist,           "histogram multiplier")
-      >> Option('b', "blocks",  KDTreeFixture::nblocks,        "number of blocks")
-      >> Option('t', "thread",  KDTreeFixture::threads,        "number of threads")
-      >> Option(     "prefix",  KDTreeFixture::prefix,         "prefix for external storage")
+      >> Option('v', "verbose",     KDTreeFixture::verbose,     "verbose output")
+      >> Option('n', "number",      KDTreeFixture::num_points,  "number of points per block")
+      >> Option(     "hist",        KDTreeFixture::hist,        "histogram multiplier")
+      >> Option('b', "blocks",      KDTreeFixture::nblocks,     "number of blocks")
+      >> Option('t', "thread",      KDTreeFixture::threads,     "number of threads")
+      >> Option(     "prefix",      KDTreeFixture::prefix,      "prefix for external storage")
+      >> Option('w', "wrap",        KDTreeFixture::wrap,        "use periodic boundary")
+      >> Option('s', "sample",      KDTreeFixture::sample,      "use sampling k-d tree")
+      >> Option('e', "exponential", KDTreeFixture::exponential, "use exponential distribution of points")
+      >> Option('h', "help",        help,                       "show help")
   ;
-  KDTreeFixture::wrap        = ops >> Present('w', "wrap", "use periodic boundary");
-  KDTreeFixture::sample      = ops >> Present('s', "sample", "use sampling k-d tree");
-  KDTreeFixture::exponential = ops >> Present('e', "exponential", "use exponential distribution of points");
 
-  if (ops >> Present('h', "help", "show help"))
+  if (!ops.parse(argc,argv) || help)
   {
       if (world.rank() == 0)
       {

@@ -107,8 +107,10 @@ int main(int argc, char* argv[])
   domain.min[0] = domain.min[1] = domain.min[2] = 0;
   domain.max[0] = domain.max[1] = domain.max[2] = 100.;
 
+  bool  verbose, help;
+
   using namespace opts;
-  Options ops(argc, argv);
+  Options ops;
 
   ops
       >> Option('n', "number",  num_points,     "number of points per block")
@@ -125,9 +127,13 @@ int main(int argc, char* argv[])
       >> Option('y',  "max-y",  domain.max[1],  "domain max y")
       >> Option('z',  "max-z",  domain.max[2],  "domain max z")
   ;
-  bool  verbose = ops >> Present('v', "verbose", "print the block contents");
 
-  if (ops >> Present('h', "help", "show help"))
+  ops
+      >> Option('v', "verbose", verbose, "print the block contents")
+      >> Option('h', "help",    help,    "show help")
+  ;
+
+  if (!ops.parse(argc,argv) || help)
   {
       if (world.rank() == 0)
       {

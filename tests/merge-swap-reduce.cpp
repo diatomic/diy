@@ -277,10 +277,11 @@ int main(int argc, char* argv[])
     Catch::Session session;
 
     std::string log_level = "info";
+    bool        verbose, help;
 
     // get command line arguments
     using namespace opts;
-    Options ops(argc, argv);
+    Options ops;
     ops
         >> Option('n', "number",  MergeSwapReduceFixture::num_points,     "number of points per block")
         >> Option('k', "k",       MergeSwapReduceFixture::k,              "use k-ary swap")
@@ -289,9 +290,10 @@ int main(int argc, char* argv[])
         >> Option('m', "memory",  MergeSwapReduceFixture::mem_blocks,     "number of blocks to keep in memory")
         >> Option(     "prefix",  MergeSwapReduceFixture::prefix,         "prefix for external storage")
         >> Option('l', "log",     log_level,                              "log level")
+        >> Option('v', "verbose", verbose,                                "print the block contents")
+        >> Option('h', "help",    help,                                   "show help")
         ;
-    bool  verbose = ops >> Present('v', "verbose", "print the block contents");
-    if (ops >> Present('h', "help", "show help"))
+    if (!ops.parse(argc,argv) || help)
     {
         if (world.rank() == 0)
         {

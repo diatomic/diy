@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
   diy::mpi::communicator    world;
 
   using namespace opts;
-  Options ops(argc, argv);
+  Options ops;
 
   int               nblocks     = world.size();
   size_t            num_values  = 100;
@@ -46,9 +46,14 @@ int main(int argc, char* argv[])
   int               threads     = 1;
   int               chunk_size  = 1;
   std::string       prefix      = "./DIY.XXXXXX";
-  bool              print       = ops >> Present(     "print",   "print the result");
-  bool              verbose     = ops >> Present('v', "verbose", "verbose output");
-  bool              verify      = ops >> Present(     "verify",  "verify the result");
+
+  bool print, verbose, verify, help;
+  ops
+      >> Option(     "print",   print,      "print the result")
+      >> Option('v', "verbose", verbose,    "verbose output")
+      >> Option(     "verify",  verify,     "verify the result")
+      >> Option('h', "help",    help,       "show help")
+  ;
 
   Value             min = 0,
                     max = 1 << 20;
@@ -69,7 +74,7 @@ int main(int argc, char* argv[])
       >> Option(     "max",     max,            "range max")
   ;
 
-  if (ops >> Present('h', "help", "show help"))
+  if (!ops.parse(argc,argv) || help)
   {
       if (world.rank() == 0)
       {
