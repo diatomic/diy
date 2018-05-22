@@ -38,15 +38,17 @@ void enq(Block* b, const diy::Master::ProxyWithLink& cp)
 void deq(Block* b, const diy::Master::ProxyWithLink& cp)
 {
     diy::Link* l = cp.link();
+    int my_gid   = cp.gid();
 
     for (size_t i = 0; i < l->size(); ++i)
     {
+        fmt::print(stderr, "entering deq\n");
         int nbr_gid = l->target(i).gid;
         if (cp.incoming(nbr_gid).size())
         {
-            cp.dequeue(nbr_gid, b->count);
-            b->count++;
-            cp.enqueue(l->target(i), b->count);
+            int recvd_val;
+            cp.dequeue(nbr_gid, recvd_val);
+            fmt::print(stderr, "[{}] deq [{}] <- {} <- [{}]\n", my_gid, my_gid, recvd_val, nbr_gid);
         }
     }
 }
@@ -63,37 +65,49 @@ bool foo(
     if (!b->count)
     {
         for (size_t i = 0; i < l->size(); ++i)
+        {
             icp.enqueue(l->target(i), b->count);
+            fmt::print(stderr, "enq [{}] -> {} -> [{}]\n", my_gid, b->count, l->target(i).gid);
+        }
         b->count++;
     }
 
-    // then dequeue/enqueue as long as there is something to do
-//     while (1)
-//     {
-        bool idle = true;
-        for (size_t i = 0; i < l->size(); ++i)
+    // then dequeue as long as something is incoming and enqueue as long as count is below some threshold
+    // foo will be called by master multiple times until no more messages are in flight anywhere
+    int max_count = 2;
+    bool inc_count = false;
+    for (size_t i = 0; i < l->size(); ++i)
+    {
+        int nbr_gid = l->target(i).gid;
+        if (icp.incoming(nbr_gid).size())
         {
-            int nbr_gid = l->target(i).gid;
-            if (icp.incoming(nbr_gid).size())
+            int recvd_val;
+            bool retval;
+            do
             {
-                int recvd_val;
-                icp.dequeue(nbr_gid, recvd_val);
-                fmt::print(stderr, "[{}] <- {} <- [{}]\n", my_gid, recvd_val, nbr_gid);
-                b->count++;
+                retval = icp.dequeue(nbr_gid, recvd_val);
+                fmt::print(stderr, "deq [{}] <- {} <- [{}], size {}\n", my_gid, recvd_val, nbr_gid, icp.incoming(nbr_gid).size());
+            } while (icp.incoming(nbr_gid).size() && retval);
+
+            // TODO: any way to hide this in master or proxy?
+            icp.incoming(nbr_gid).clear();
+
+            if (b->count <= max_count)
+            {
                 icp.enqueue(l->target(i), b->count);
-                idle = false;
+                fmt::print(stderr, "enq [{}] -> {} -> [{}]\n", my_gid, b->count, nbr_gid);
+                inc_count = true;
             }
         }
+    }
 
-//         if (idle)
-//             break;
-//     }
-
-    icp.incoming()->clear();                       // TODO: should the user or diy clear?
+    if (inc_count)
+        b->count++;
 
     // pretend to be done when b->count exceeds some threshold
-    bool done = b->count > 5 ? true : false;
-    fmt::print(stderr, "returning: gid={} count={} done={}\n", my_gid, b->count, done);
+//     bool done = b->count > max_count ? true : false;
+    bool done = true;
+//     fmt::print(stderr, "returning: gid={} count={} done={}\n", my_gid, b->count, done);
     return (done);
 }
 
@@ -104,7 +118,7 @@ int main(int argc, char* argv[])
     diy::mpi::environment     env(argc, argv);
     diy::mpi::communicator    world;
 
-    int                       nblocks = 4 * world.size();
+    int                       nblocks = 2 * world.size();
 
     diy::FileStorage          storage("./DIY.XXXXXX");
 

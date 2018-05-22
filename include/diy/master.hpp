@@ -24,8 +24,7 @@
 #include "log.hpp"
 #include "stats.hpp"
 
-// TODO: I just made this up for iexchange protocal, TP
-static const size_t DIY_MAX_Q_SIZE = 8;
+// TODO: I just made this up for iexchange protocal, may not be needed at all, TP
 static const size_t DIY_MAX_RECV_TRIES = 1;
 
 namespace diy
@@ -239,16 +238,14 @@ namespace diy
       template<class Block>
       void          iexchange_(
               const ICallback<Block>&   f,
-              size_t                    max_q_size      = DIY_MAX_Q_SIZE,
               size_t                    max_recv_tries  = DIY_MAX_RECV_TRIES);
 
       template<class F>
       void          iexchange(const F& f,
-                              size_t max_q_size = DIY_MAX_Q_SIZE,
                               size_t max_recv_tries = DIY_MAX_RECV_TRIES)
       {
           using Block = typename detail::block_traits<F>::type;
-          iexchange_<Block>(f, max_q_size, max_recv_tries);
+          iexchange_<Block>(f, max_recv_tries);
       }
 
       inline void   process_collectives();
@@ -257,7 +254,7 @@ namespace diy
       ProxyWithLink proxy(int i) const;
 
       inline
-      IProxyWithLink iproxy(int i) const;               // TODO: necessary?
+      IProxyWithLink iproxy(int i) const;
 
       //! return the number of local blocks
       unsigned int  size() const                        { return static_cast<unsigned int>(blocks_.size()); }
@@ -327,14 +324,17 @@ namespace diy
                                              IncomingRound& current_incoming,
                                              bool           remote,
                                              bool           iexchange);
-      inline void       check_incoming_queues(bool          iexchange);
+      inline void       check_incoming_queues();
       inline void       prep_out(ToSendList& to_send);
       inline int        limit_out(const ToSendList& to_send);
 
       // iexchange commmunication
       inline void       icommunicate(size_t max_recv_tries = DIY_MAX_RECV_TRIES);
-      bool              global_all_done();              // get global all done status
-      bool              global_all_done(int status);    // set local done status and get global all done status
+      int               global_work();                  // get global work status (for debugging)
+      bool              all_done();                     // get global all done status
+      void              reset_work();                   // reset global work counter
+      void              add_work();                     // add work to global work counter
+      bool              rem_work();                     // remove work from global work counter and get global all done status
 
       void              cancel_requests();              // TODO
 
@@ -381,7 +381,7 @@ namespace diy
   {
       virtual       ~BaseCommand()                                                  {}      // to delete derived classes
       virtual void  execute(void* b, const ProxyWithLink& cp) const                 =0;
-      virtual void  execute(void* b, const IProxyWithLink& cp) const                =0;     // TODO: necessary?
+      virtual void  execute(void* b, const IProxyWithLink& cp) const                =0;
       virtual bool  skip(int i, const Master& master) const                         =0;
   };
 
@@ -392,7 +392,7 @@ namespace diy
                 f(f_), s(s_)                                                        {}
 
       void  execute(void* b, const ProxyWithLink& cp) const override                { f(static_cast<Block*>(b), cp); }
-      void  execute(void* b, const IProxyWithLink& cp) const override               { f(static_cast<Block*>(b), cp); }  // TODO: necessary?
+      void  execute(void* b, const IProxyWithLink& cp) const override               { f(static_cast<Block*>(b), cp); }
       bool  skip(int i, const Master& m) const override                             { return s(i,m); }
 
       Callback<Block>   f;
@@ -705,7 +705,6 @@ diy::Master::
 proxy(int i) const
 { return ProxyWithLink(Proxy(const_cast<Master*>(this), gid(i)), block(i), link(i)); }
 
-// TODO: is iproxy needed?
 diy::Master::IProxyWithLink
 diy::Master::
 iproxy(int i) const
@@ -893,7 +892,6 @@ exchange(bool remote)
 
 // iexchange()
 // {
-//     icommunicate()
 //     while !all_done
 //         for all blocks
 //             icommunicate
@@ -907,7 +905,6 @@ void
 diy::Master::
 iexchange_(
         const ICallback<Block>& f,
-        size_t max_q_size,
         size_t max_recv_tries)
 {
     // TODO: when do the following two lines need to be executed (or do they)?
@@ -915,39 +912,22 @@ iexchange_(
 //     incoming_.erase(exchange_round_);
 //     ++exchange_round_;
 
-    // TODO: separate comm thread
-    // std::thread t(communicate);
-    icommunicate(max_recv_tries);
 
-    bool all_done           = false;            // globally all blocks are done
-    int prev_done           = -1;               // all local blocks done last iteration
-                                                // 1: yes, -1: no, 0: initial
-    while (!all_done)
+    while (1)
     {
         int ndone = 0;                          // number of local blocks done in current iteration
         for (size_t i = 0; i < size(); i++)     // for all blocks
         {
-            icommunicate(max_recv_tries);
+            icommunicate(max_recv_tries);   // TODO: separate comm thread std::thread t(icommunicate);
             IProxyWithLink icp(IProxyWithLink(Proxy(const_cast<Master*>(this), gid(i)), block(i), link(i)));
             ndone += (f(static_cast<Block*>(block(i)), icp) ? 1 : 0);
-            icommunicate(max_recv_tries);
+            icommunicate(max_recv_tries);   // TODO: separate comm thread std::thread t(icommunicate);
         }
 
-        if (ndone == size())                        // locally all blocks done
-        {
-            if (prev_done == -1)                    // local status changed
-                all_done = global_all_done(1);      // put local status and get global status
-            else                                    // local status unchanged
-                all_done = global_all_done();       // get global status
-            prev_done = 1;
-        }
-        else                                        // locally not all blocks done
-        {
-            if (prev_done == 1)                     // local status changed
-                global_all_done(-1);                // set local status as not done
-            all_done = false;                       // global status not done if local is not done
-            prev_done = -1;
-        }
+        // all blocks signal they are done and no messages in flight
+//         fmt::print(stderr, "ndone = {} global_work = {} all_done = {}\n", ndone, global_work(), all_done());
+        if (ndone == size() && all_done())
+            break;
     }
 
 }
@@ -996,7 +976,7 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
   // kick requests
   while(nudge());
 
-  check_incoming_queues(false);
+  check_incoming_queues();
 }
 
 /* Remote communicator */
@@ -1041,7 +1021,7 @@ rcomm_exchange(ToSendList& to_send, int out_queues_limit)
         // kick requests
         nudge();
 
-        check_incoming_queues(false);
+        check_incoming_queues();
         if (ibarr_act)
         {
             if (ibarr_req.test())
@@ -1098,6 +1078,8 @@ void
 diy::Master::
 icommunicate(size_t max_recv_tries)
 {
+    log->debug("Entering icommunicate()");
+
     // make sure there is a queue for each neighbor
     for (int i = 0; i < (int)size(); ++i)
     {
@@ -1132,7 +1114,7 @@ icommunicate(size_t max_recv_tries)
     {
         send_outgoing_queues(to_send, out_queues_limit, current_incoming, false, true);
         while(nudge());
-        check_incoming_queues(true);
+        check_incoming_queues();
         num_tries++;
     } while (num_tries < max_recv_tries &&
              (!inflight_sends_.empty() || current_incoming.received < expected_ || !to_send.empty()));
@@ -1143,8 +1125,8 @@ icommunicate(size_t max_recv_tries)
     // TODO: consider having a flush function for a final cleanup if the user plans to move to
     // another part of the DIY program
 
-    log->debug("Done in icommunicate()");
     current_incoming.received       = 0;
+    log->debug("Exiting icommunicate()");
 }
 
 void
@@ -1153,7 +1135,7 @@ send_outgoing_queues(
         ToSendList&     to_send,
         int             out_queues_limit,
         IncomingRound&  current_incoming,
-        bool            remote,
+        bool            remote,                     // TODO: are remote and iexchange mutually exclusive? If so, use single enum?
         bool            iexchange)
 {
     static const size_t MAX_MPI_MESSAGE_COUNT = INT_MAX;
@@ -1200,7 +1182,6 @@ send_outgoing_queues(
             int     to      = to_proc.gid;
             int     proc    = to_proc.proc;
 
-            // TODO: was in github/tpeterka/diy, but causes infinite loop here. Why?
             // skip empty queues
             if (!outgoing_[from].queues[to_proc].size())
             {
@@ -1211,7 +1192,9 @@ send_outgoing_queues(
             log->debug("Processing queue:      {} <- {} of size {}", to, from, outgoing_[from].queues[to_proc].size());
 
             // There may be local outgoing queues that remained in memory
-            if (proc == comm_.rank())     // sending to ourselves: simply swap buffers
+
+            // sending to same rank: simply swap buffers
+            if (proc == comm_.rank())
             {
                 log->debug("Moving queue in-place: {} <- {}", to, from);
 
@@ -1233,10 +1216,8 @@ send_outgoing_queues(
                             in_bb.reset();
                         }
                         else
-                        {
                             // TODO: is this the right way to append?
                             in_bb.save_binary(&in_bb.buffer[0], in_bb.size());        // append insted of overwrite
-                        }
                         in_qr.external = -1;
                     }
                 } else        // !in_external
@@ -1249,35 +1230,41 @@ send_outgoing_queues(
                         bb.reset();
                     }
                     else
-                    {
-                        // TODO: causes infinite loop when nprocs = 1
                         // TODO: is this the right way to append?
                         bb.save_binary(&it->second.buffer[0], it->second.size());        // append insted of overwrite
-                    }
                     in_qr.size = bb.size();
                     in_qr.external = -1;
                 }
 
                 ++current_incoming.received;
                 continue;
-            }
+            }                           // sending to same rank
 
+            // sending to a different rank
             std::shared_ptr<MemoryBuffer> buffer = std::make_shared<MemoryBuffer>();
-            buffer->swap(it->second);
+            if (!iexchange)
+            {
+                buffer->swap(it->second);
+            }
+            else
+                // TODO: is this the right way to append?
+                buffer->save_binary(&it->second.buffer[0], it->second.size());        // append insted of overwrite
 
             MessageInfo info{from, to, exchange_round_};
+            // size fits in one message
             if (buffer->size() <= (MAX_MPI_MESSAGE_COUNT - sizeof(info)))
             {
                 diy::save(*buffer, info);
 
                 inflight_sends_.emplace_back();
                 inflight_sends_.back().info = info;
-                if (remote)
+                if (remote || iexchange)
                     inflight_sends_.back().request = comm_.issend(proc, tags::queue, buffer->buffer);
                 else
                     inflight_sends_.back().request = comm_.isend(proc, tags::queue, buffer->buffer);
                 inflight_sends_.back().message = buffer;
             }
+            // large message gets broken into chunks
             else
             {
                 int npieces = static_cast<int>((buffer->size() + MAX_MPI_MESSAGE_COUNT - 1)/MAX_MPI_MESSAGE_COUNT);
@@ -1289,7 +1276,7 @@ send_outgoing_queues(
 
                 inflight_sends_.emplace_back();
                 inflight_sends_.back().info = info;
-                if (remote)
+                if (remote || iexchange)
                     inflight_sends_.back().request = comm_.issend(proc, tags::piece, hb->buffer);
                 else
                     inflight_sends_.back().request = comm_.isend(proc, tags::piece, hb->buffer);
@@ -1307,25 +1294,27 @@ send_outgoing_queues(
 
                     inflight_sends_.emplace_back();
                     inflight_sends_.back().info = info;
-                    if (remote)
+                    if (remote || iexchange)
                         inflight_sends_.back().request = comm_.issend(proc, tag, window);
                     else
                         inflight_sends_.back().request = comm_.isend(proc, tag, window);
                     inflight_sends_.back().message = buffer;
                 }
-            }
+            }                                   // large message broken into pieces
         }                                       // for (OutgoingQueues::iterator it ...
     }                                           // while (inflight_sends_.size() ...
 }
 
 void
 diy::Master::
-check_incoming_queues(bool iexchange)
+check_incoming_queues()
 {
     mpi::optional<mpi::status> ostatus = comm_.iprobe(mpi::any_source, mpi::any_tag);
     while (ostatus)
     {
         InFlightRecv &ir = inflight_recvs_[ostatus->source()];
+
+        // get messge info
 
         if (ir.info.from == -1) // uninitialized
         {
@@ -1380,17 +1369,8 @@ check_incoming_queues(bool iexchange)
             }
             else
             {
-                if (!iexchange)
-                {
-                    in->map[to].queues[from].swap(ir.message);
-                    in->map[to].queues[from].reset();     // buffer position = 0
-                }
-                else
-                {
-                    // causes infinite loop when nprocs = 2
-                    // TODO: is this the right way to append?
-                    in->map[to].queues[from].save_binary(&ir.message.buffer[0], ir.message.size());        // append insted of overwrite
-                }
+                in->map[to].queues[from].swap(ir.message);
+                in->map[to].queues[from].reset();     // buffer position = 0
             }
             in->map[to].records[from] = QueueRecord(size, external);
 
@@ -1538,31 +1518,62 @@ show_incoming_records() const
   }
 }
 
+// return global work status (for debugging)
+int
+diy::Master::
+global_work()
+{
+    int global_work;
+    ndone_.get(global_work, 0, 0);
+    ndone_.flush_local(0);
+    return(global_work);
+}
+
 // get global all done status
 bool
 diy::Master::
-global_all_done()
+all_done()
 {
-    int global_ndone;
-    ndone_.get(global_ndone, 0, 0);
+    int global_work;
+    ndone_.get(global_work, 0, 0);
     ndone_.flush_local(0);
-//     fmt::print(stderr, "1: global_ndone = {} comm_.size() = {}\n", global_ndone, comm_.size());
-//     return(global_ndone == comm_.size());
-    return true;                                    // TODO: hard-coded
+    return(global_work ? false : true);
 }
 
-// set local done status and get global all done status
+// reset global work counter
+void
+diy::Master::
+reset_work()
+{
+    int val = 0;
+    ndone_.replace(val, 0, 0);
+    ndone_.flush(0);
+}
+
+// add work to global work counter
+void
+diy::Master::
+add_work()
+{
+    int val = 1;
+    int global_work;                                               // unused
+    ndone_.fetch_and_op(&val, &global_work, 0, 0, MPI_SUM);
+    ndone_.flush(0);
+}
+
+// remove work from global work counter and get global all done status
 bool
 diy::Master::
-global_all_done(int status)                         // 1: locally all done; -1: locally not all done
+rem_work()
 {
-    int global_ndone;
-    ndone_.fetch_and_op(&status, &global_ndone, 0, 0, MPI_SUM);     // global_ndone is prior to adding status
-    global_ndone += status;
+    int global_work;                                                // global work counter
+    int val = -1;
+    ndone_.fetch_and_op(&val, &global_work, 0, 0, MPI_SUM);
     ndone_.flush(0);
-//     fmt::print(stderr, "2: global_ndone = {} comm_.size() = {}\n", global_ndone, comm_.size());
-//     return(global_ndone == comm_.size());
-    return true;                                    // TODO: hard-coded
+    if (global_work <= 0)
+        fmt::print(stderr, "error: attempting to remove work when global_work already = {}\n", global_work);
+    assert(global_work >= 1);                                       // sanity, should not remove more work than was added
+    return(global_work == 1 ? true : false);                        // global_work is prior to decrementing
 }
 
 #endif

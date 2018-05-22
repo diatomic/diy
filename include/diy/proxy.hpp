@@ -161,6 +161,8 @@ namespace diy
                     void (*save)(BinaryBuffer&, const T&) = &::diy::save<T>) const
             {
                 diy::Master::Proxy::enqueue(to, x, save);
+                master()->add_work();
+//                 fmt::print(stderr, "adding work, global_work = {}\n", master()->global_work());
                 master()->icommunicate();
             }
 
@@ -171,16 +173,22 @@ namespace diy
                     void (*save)(BinaryBuffer&, const T&) = &::diy::save<T>) const
             {
                 diy::Master::Proxy::enqueue(to, x, n, save);
+                master()->add_work();
+//                 fmt::print(stderr, "adding work, global_work = {}\n", master()->global_work());
                 master()->icommunicate();
             }
 
+        // returns true if more data left in the queue
         template<class T>
-            void dequeue(int                from,
+            bool dequeue(int                from,
                     T&                      x,
                     void (*load)(BinaryBuffer&, T&) = &::diy::load<T>) const
             {
                 master()->icommunicate();
+                master()->rem_work();
+//                 fmt::print(stderr, "removing work, global_work = {}\n", master()->global_work());
                 diy::Master::Proxy::dequeue(from, x, load);
+                return(incoming(from).size() > sizeof(x));
             }
 
         template<class T>
@@ -190,6 +198,8 @@ namespace diy
                     void (*load)(BinaryBuffer&, T&) = &::diy::load<T>) const
             {
                 master()->icommunicate();
+                master()->rem_work();
+//                 fmt::print(stderr, "removing work, global_work = {}\n", master()->global_work());
                 diy::Master::Proxy::dequeue(from, x, n, load);
             }
     };
