@@ -8,17 +8,18 @@
 
 struct Block
 {
-    Block(): count(0)                   {}
+    Block(): count(0), tries(0)             {}
 
     int   count;
+    int   tries;
 };
 
-void* create_block()                      { return new Block; }
-void  destroy_block(void* b)              { delete static_cast<Block*>(b); }
+void* create_block()                        { return new Block; }
+void  destroy_block(void* b)                { delete static_cast<Block*>(b); }
 void  save_block(const void* b,
-                 diy::BinaryBuffer& bb)   { diy::save(bb, *static_cast<const Block*>(b)); }
+                 diy::BinaryBuffer& bb)     { diy::save(bb, *static_cast<const Block*>(b)); }
 void  load_block(void* b,
-                 diy::BinaryBuffer& bb)   { diy::load(bb, *static_cast<Block*>(b)); }
+                 diy::BinaryBuffer& bb)     { diy::load(bb, *static_cast<Block*>(b)); }
 
 // debug: test enqueue with original synchronous exchange
 void enq(Block* b, const diy::Master::ProxyWithLink& cp)
@@ -74,12 +75,13 @@ bool foo(
 
     // then dequeue as long as something is incoming and enqueue as long as count is below some threshold
     // foo will be called by master multiple times until no more messages are in flight anywhere
-    int max_count = 2;
-    bool inc_count = false;
+    int max_count   = 2;
+    int max_tries   = 10;
+    bool inc_count  = false;
     for (size_t i = 0; i < l->size(); ++i)
     {
         int nbr_gid = l->target(i).gid;
-        if (icp.incoming(nbr_gid).size())
+        if (icp.incoming(nbr_gid))
         {
             int recvd_val;
             bool retval;
@@ -87,10 +89,7 @@ bool foo(
             {
                 retval = icp.dequeue(nbr_gid, recvd_val);
                 fmt::print(stderr, "deq [{}] <- {} <- [{}], size {}\n", my_gid, recvd_val, nbr_gid, icp.incoming(nbr_gid).size());
-            } while (icp.incoming(nbr_gid).size() && retval);
-
-            // TODO: any way to hide this in master or proxy?
-            icp.incoming(nbr_gid).clear();
+            } while (icp.incoming(nbr_gid) && retval);
 
             if (b->count <= max_count)
             {
@@ -103,11 +102,10 @@ bool foo(
 
     if (inc_count)
         b->count++;
+    b->tries++;
 
-    // pretend to be done when b->count exceeds some threshold
-//     bool done = b->count > max_count ? true : false;
-    bool done = true;
-//     fmt::print(stderr, "returning: gid={} count={} done={}\n", my_gid, b->count, done);
+    // assume this block is done when b->count exceeds some threshold
+    bool done = (b->count > max_count) || (b->tries > max_tries) ? true : false;
     return (done);
 }
 
@@ -171,7 +169,5 @@ int main(int argc, char* argv[])
 #endif
 
     if (world.rank() == 0)
-        fmt::print(stderr,
-                   "Total iterations: {}\n", master.block<Block>(master.loaded_block())->count);
-
+        fmt::print(stderr, "Total iterations: {}\n", master.block<Block>(master.loaded_block())->count);
 }

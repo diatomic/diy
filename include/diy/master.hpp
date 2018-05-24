@@ -324,7 +324,7 @@ namespace diy
                                              IncomingRound& current_incoming,
                                              bool           remote,
                                              bool           iexchange);
-      inline void       check_incoming_queues();
+      inline void       check_incoming_queues(bool          iexchange);
       inline void       prep_out(ToSendList& to_send);
       inline int        limit_out(const ToSendList& to_send);
 
@@ -905,31 +905,41 @@ void
 diy::Master::
 iexchange_(
         const ICallback<Block>& f,
-        size_t max_recv_tries)
+        size_t                  max_recv_tries)
 {
     // TODO: when do the following two lines need to be executed (or do they)?
     // prepare for next round
 //     incoming_.erase(exchange_round_);
 //     ++exchange_round_;
 
-
-    while (1)
+    bool add_once = true;
+    bool rem_once = true;
+    do
     {
         int ndone = 0;                          // number of local blocks done in current iteration
         for (size_t i = 0; i < size(); i++)     // for all blocks
         {
-            icommunicate(max_recv_tries);   // TODO: separate comm thread std::thread t(icommunicate);
+            // add one unit of work for each block (one time only)
+            if (add_once)
+                add_work();
+
+            icommunicate(max_recv_tries);       // TODO: separate comm thread std::thread t(icommunicate);
             IProxyWithLink icp(IProxyWithLink(Proxy(const_cast<Master*>(this), gid(i)), block(i), link(i)));
             ndone += (f(static_cast<Block*>(block(i)), icp) ? 1 : 0);
-            icommunicate(max_recv_tries);   // TODO: separate comm thread std::thread t(icommunicate);
+            icommunicate(max_recv_tries);       // TODO: separate comm thread std::thread t(icommunicate);
+        }
+        add_once = false;
+
+        // if all local blocks are done, subtract one unit of work for each block (one time only)
+        if (rem_once && ndone == size())
+        {
+            for (size_t i = 0; i < size(); i++)
+                rem_work();
+            rem_once = false;
         }
 
-        // all blocks signal they are done and no messages in flight
 //         fmt::print(stderr, "ndone = {} global_work = {} all_done = {}\n", ndone, global_work(), all_done());
-        if (ndone == size() && all_done())
-            break;
-    }
-
+    } while (!all_done());                      // all blocks are done and no messages are in flight
 }
 
 namespace diy
@@ -976,7 +986,7 @@ comm_exchange(ToSendList& to_send, int out_queues_limit)
   // kick requests
   while(nudge());
 
-  check_incoming_queues();
+  check_incoming_queues(false);
 }
 
 /* Remote communicator */
@@ -1021,7 +1031,7 @@ rcomm_exchange(ToSendList& to_send, int out_queues_limit)
         // kick requests
         nudge();
 
-        check_incoming_queues();
+        check_incoming_queues(false);
         if (ibarr_act)
         {
             if (ibarr_req.test())
@@ -1114,7 +1124,7 @@ icommunicate(size_t max_recv_tries)
     {
         send_outgoing_queues(to_send, out_queues_limit, current_incoming, false, true);
         while(nudge());
-        check_incoming_queues();
+        check_incoming_queues(true);
         num_tries++;
     } while (num_tries < max_recv_tries &&
              (!inflight_sends_.empty() || current_incoming.received < expected_ || !to_send.empty()));
@@ -1216,8 +1226,10 @@ send_outgoing_queues(
                             in_bb.reset();
                         }
                         else
-                            // TODO: is this the right way to append?
-                            in_bb.save_binary(&in_bb.buffer[0], in_bb.size());        // append insted of overwrite
+                        {
+                            in_bb.append_binary(&bb.buffer[0], bb.size());
+                            bb.clear();
+                        }
                         in_qr.external = -1;
                     }
                 } else        // !in_external
@@ -1230,8 +1242,10 @@ send_outgoing_queues(
                         bb.reset();
                     }
                     else
-                        // TODO: is this the right way to append?
-                        bb.save_binary(&it->second.buffer[0], it->second.size());        // append insted of overwrite
+                    {
+                        bb.append_binary(&it->second.buffer[0], it->second.size());
+                        it->second.clear();
+                    }
                     in_qr.size = bb.size();
                     in_qr.external = -1;
                 }
@@ -1242,13 +1256,7 @@ send_outgoing_queues(
 
             // sending to a different rank
             std::shared_ptr<MemoryBuffer> buffer = std::make_shared<MemoryBuffer>();
-            if (!iexchange)
-            {
-                buffer->swap(it->second);
-            }
-            else
-                // TODO: is this the right way to append?
-                buffer->save_binary(&it->second.buffer[0], it->second.size());        // append insted of overwrite
+            buffer->swap(it->second);
 
             MessageInfo info{from, to, exchange_round_};
             // size fits in one message
@@ -1307,7 +1315,7 @@ send_outgoing_queues(
 
 void
 diy::Master::
-check_incoming_queues()
+check_incoming_queues(bool iexchange)
 {
     mpi::optional<mpi::status> ostatus = comm_.iprobe(mpi::any_source, mpi::any_tag);
     while (ostatus)
@@ -1369,8 +1377,16 @@ check_incoming_queues()
             }
             else
             {
-                in->map[to].queues[from].swap(ir.message);
-                in->map[to].queues[from].reset();     // buffer position = 0
+                if (!iexchange)
+                {
+                    in->map[to].queues[from].swap(ir.message);
+                    in->map[to].queues[from].reset();     // buffer position = 0
+                }
+                else
+                {
+                    in->map[to].queues[from].append_binary(&ir.message.buffer[0], ir.message.size());        // append insted of overwrite
+                    // TODO: no need for ir.message.clear()? (as in send_outgoing_queues)
+                }
             }
             in->map[to].records[from] = QueueRecord(size, external);
 

@@ -188,7 +188,7 @@ namespace diy
                 master()->rem_work();
 //                 fmt::print(stderr, "removing work, global_work = {}\n", master()->global_work());
                 diy::Master::Proxy::dequeue(from, x, load);
-                return(incoming(from).size() > sizeof(x));
+                return(incoming(from));
             }
 
         template<class T>
