@@ -24,9 +24,6 @@
 #include "log.hpp"
 #include "stats.hpp"
 
-// TODO: I just made this up for iexchange protocal, may not be needed at all, TP
-static const size_t DIY_MAX_RECV_TRIES = 1;
-
 namespace diy
 {
   // Stores and manages blocks; initiates serialization and communication when necessary.
@@ -236,16 +233,13 @@ namespace diy
 
       //! nonblocking exchange of the queues between all the blocks
       template<class Block>
-      void          iexchange_(
-              const ICallback<Block>&   f,
-              size_t                    max_recv_tries  = DIY_MAX_RECV_TRIES);
+      void          iexchange_(const ICallback<Block>&   f);
 
       template<class F>
-      void          iexchange(const F& f,
-                              size_t max_recv_tries = DIY_MAX_RECV_TRIES)
+      void          iexchange(const F& f)
       {
           using Block = typename detail::block_traits<F>::type;
-          iexchange_<Block>(f, max_recv_tries);
+          iexchange_<Block>(f);
       }
 
       inline void   process_collectives();
@@ -316,7 +310,9 @@ namespace diy
 
     private:
       // Communicator functionality
-      inline void       comm_exchange(ToSendList& to_send, int out_queues_limit);     // possibly called in between block computations
+      inline void       comm_exchange(ToSendList&           to_send,
+                                      int                   out_queues_limit,     // possibly called in between block computations
+                                      bool                  iexchange);
       inline void       rcomm_exchange(ToSendList& to_send, int out_queues_limit);    // possibly called in between block computations
       inline bool       nudge();
       inline void       send_outgoing_queues(ToSendList&    to_send,
@@ -329,7 +325,7 @@ namespace diy
       inline int        limit_out(const ToSendList& to_send);
 
       // iexchange commmunication
-      inline void       icommunicate(size_t max_recv_tries = DIY_MAX_RECV_TRIES);
+      inline void       icommunicate();                 // async communication
       int               global_work();                  // get global work status (for debugging)
       bool              all_done();                     // get global all done status
       void              reset_work();                   // reset global work counter
@@ -903,9 +899,7 @@ exchange(bool remote)
 template<class Block>
 void
 diy::Master::
-iexchange_(
-        const ICallback<Block>& f,
-        size_t                  max_recv_tries)
+iexchange_(const ICallback<Block>& f)
 {
     // TODO: when do the following two lines need to be executed (or do they)?
     // prepare for next round
@@ -923,10 +917,10 @@ iexchange_(
             if (add_once)
                 add_work();
 
-            icommunicate(max_recv_tries);       // TODO: separate comm thread std::thread t(icommunicate);
+            icommunicate();                     // TODO: separate comm thread std::thread t(icommunicate);
             IProxyWithLink icp(IProxyWithLink(Proxy(const_cast<Master*>(this), gid(i)), block(i), link(i)));
             ndone += (f(static_cast<Block*>(block(i)), icp) ? 1 : 0);
-            icommunicate(max_recv_tries);       // TODO: separate comm thread std::thread t(icommunicate);
+            icommunicate();                     // TODO: separate comm thread std::thread t(icommunicate);
         }
         add_once = false;
 
@@ -977,16 +971,14 @@ namespace detail
 /* Communicator */
 void
 diy::Master::
-comm_exchange(ToSendList& to_send, int out_queues_limit)
+comm_exchange(ToSendList&     to_send,
+              int             out_queues_limit,
+              bool            iexchange)
 {
-  IncomingRound &current_incoming = incoming_[exchange_round_];
-
-  send_outgoing_queues(to_send, out_queues_limit, current_incoming, false, false);
-
-  // kick requests
-  while(nudge());
-
-  check_incoming_queues(false);
+    IncomingRound &current_incoming = incoming_[exchange_round_];
+    send_outgoing_queues(to_send, out_queues_limit, current_incoming, false, iexchange);
+    while(nudge());                   // kick requests
+    check_incoming_queues(iexchange);
 }
 
 /* Remote communicator */
@@ -1086,7 +1078,7 @@ limit_out(const ToSendList& to_send)
 // iexchange communicator
 void
 diy::Master::
-icommunicate(size_t max_recv_tries)
+icommunicate()
 {
     log->debug("Entering icommunicate()");
 
@@ -1118,16 +1110,7 @@ icommunicate(size_t max_recv_tries)
 //     log->info("out_queues_limit: {}", out_queues_limit);
 
     // exchange
-    IncomingRound &current_incoming = incoming_[exchange_round_];       // TODO: copied from exchange, still makes sense here?
-    size_t num_tries = 0;
-    do
-    {
-        send_outgoing_queues(to_send, out_queues_limit, current_incoming, false, true);
-        while(nudge());
-        check_incoming_queues(true);
-        num_tries++;
-    } while (num_tries < max_recv_tries &&
-             (!inflight_sends_.empty() || current_incoming.received < expected_ || !to_send.empty()));
+    comm_exchange(to_send, out_queues_limit, true);
 
     // cleanup
 
@@ -1135,7 +1118,6 @@ icommunicate(size_t max_recv_tries)
     // TODO: consider having a flush function for a final cleanup if the user plans to move to
     // another part of the DIY program
 
-    current_incoming.received       = 0;
     log->debug("Exiting icommunicate()");
 }
 
@@ -1423,7 +1405,7 @@ flush(bool remote)
   {
       do
       {
-          comm_exchange(to_send, out_queues_limit);
+          comm_exchange(to_send, out_queues_limit, false);
 
 #ifdef DEBUG
           time_type cur = get_time();

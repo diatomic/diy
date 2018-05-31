@@ -27,7 +27,7 @@ namespace diy
       virtual inline void append_binary(const char* x, size_t count) override
       {
           size_t temp_pos = ftell(file);
-          fseek(file, static_cast<long>(tail) + count, SEEK_END);
+          fseek(file, static_cast<long>(tail), SEEK_END);
           fwrite(x, 1, count, file);
           tail += count;
           fseek(file, temp_pos, SEEK_SET);
