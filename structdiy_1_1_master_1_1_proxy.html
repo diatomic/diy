@@ -144,6 +144,14 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>gid</b> () const </td>
 <tr class="memitem:ac89cf0d43ad4eed8e67aabc0b221b745"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structdiy_1_1_master_1_1_proxy.html#ac89cf0d43ad4eed8e67aabc0b221b745">dequeue</a> (int from, T *x, size_t n, void(*load)(<a class="el" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a> &amp;, T &amp;)=&amp;::<a class="el" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a>&lt; T &gt;) const </td></tr>
 <tr class="memdesc:ac89cf0d43ad4eed8e67aabc0b221b745"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dequeue an array of data whose size is given explicitly by the user. In this case, the user needs to allocate the receive buffer prior to calling dequeue.  <a href="#ac89cf0d43ad4eed8e67aabc0b221b745">More...</a><br/></td></tr>
 <tr class="separator:ac89cf0d43ad4eed8e67aabc0b221b745"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acc930e3199b1c1cfe5b6e1f853601160"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:acc930e3199b1c1cfe5b6e1f853601160"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structdiy_1_1_master_1_1_proxy.html#acc930e3199b1c1cfe5b6e1f853601160">dequeue</a> (const <a class="el" href="structdiy_1_1_block_i_d.html">BlockID</a> &amp;from, T &amp;x, void(*load)(<a class="el" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a> &amp;, T &amp;)=&amp;::<a class="el" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a>&lt; T &gt;) const </td></tr>
+<tr class="memdesc:acc930e3199b1c1cfe5b6e1f853601160"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dequeue data whose size can be determined automatically (e.g., STL vector) and that was previously enqueued so that diy knows its size when it is received. In this case, diy will allocate the receive buffer; the user does not need to do so.  <a href="#acc930e3199b1c1cfe5b6e1f853601160">More...</a><br/></td></tr>
+<tr class="separator:acc930e3199b1c1cfe5b6e1f853601160"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6c68a702ad34a9ced41483842d5c1e4"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:ac6c68a702ad34a9ced41483842d5c1e4"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structdiy_1_1_master_1_1_proxy.html#ac6c68a702ad34a9ced41483842d5c1e4">dequeue</a> (const <a class="el" href="structdiy_1_1_block_i_d.html">BlockID</a> &amp;from, T *x, size_t n, void(*load)(<a class="el" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a> &amp;, T &amp;)=&amp;::<a class="el" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a>&lt; T &gt;) const </td></tr>
+<tr class="memdesc:ac6c68a702ad34a9ced41483842d5c1e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dequeue an array of data whose size is given explicitly by the user. In this case, the user needs to allocate the receive buffer prior to calling dequeue.  <a href="#ac6c68a702ad34a9ced41483842d5c1e4">More...</a><br/></td></tr>
+<tr class="separator:ac6c68a702ad34a9ced41483842d5c1e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8436e5952a53d3c7cb978198776da207"><td class="memTemplParams" colspan="2"><a class="anchor" id="a8436e5952a53d3c7cb978198776da207"></a>
 template&lt;class T &gt; </td></tr>
 <tr class="memitem:a8436e5952a53d3c7cb978198776da207"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structdiy_1_1_master_1_1_proxy_1_1_enqueue_iterator.html">EnqueueIterator</a>&lt; T &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>enqueuer</b> (const T &amp;x, void(*<a class="el" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>)(<a class="el" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a> &amp;, const T &amp;)=&amp;::<a class="el" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">diy::save</a>&lt; T &gt;) const </td></tr>
@@ -297,6 +305,117 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
+<a class="anchor" id="acc930e3199b1c1cfe5b6e1f853601160"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void diy::Master::Proxy::dequeue </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structdiy_1_1_block_i_d.html">BlockID</a> &amp;&#160;</td>
+          <td class="paramname"><em>from</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T &amp;&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void(*)(<a class="el" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a> &amp;, T &amp;)&#160;</td>
+          <td class="paramname"><em>load</em> = <code>&amp;::<a class="el" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a>&lt;T&gt;</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Dequeue data whose size can be determined automatically (e.g., STL vector) and that was previously enqueued so that diy knows its size when it is received. In this case, diy will allocate the receive buffer; the user does not need to do so. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">from</td><td>target block (gid,proc) </td></tr>
+    <tr><td class="paramname">x</td><td>data (eg. STL vector) </td></tr>
+    <tr><td class="paramname">load</td><td>optional serialization function </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ac6c68a702ad34a9ced41483842d5c1e4"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void diy::Master::Proxy::dequeue </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structdiy_1_1_block_i_d.html">BlockID</a> &amp;&#160;</td>
+          <td class="paramname"><em>from</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>n</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void(*)(<a class="el" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a> &amp;, T &amp;)&#160;</td>
+          <td class="paramname"><em>load</em> = <code>&amp;::<a class="el" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a>&lt;T&gt;</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Dequeue an array of data whose size is given explicitly by the user. In this case, the user needs to allocate the receive buffer prior to calling dequeue. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">from</td><td>target block (gid,proc) </td></tr>
+    <tr><td class="paramname">x</td><td>pointer to the data (eg. address of start of vector) </td></tr>
+    <tr><td class="paramname">n</td><td>size in data elements (eg. ints) </td></tr>
+    <tr><td class="paramname">load</td><td>optional serialization function </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a05bcb6fd6968e054c0b2f818c6cd24de"></a>
 <div class="memitem">
 <div class="memproto">
@@ -407,7 +526,7 @@ template&lt;class T &gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri May 11 2018 20:55:47 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jun 5 2018 01:05:24 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
