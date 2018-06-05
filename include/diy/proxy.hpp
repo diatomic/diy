@@ -54,6 +54,24 @@ namespace diy
                                 void (*load)(BinaryBuffer&, T&) = &::diy::load<T>       //!< optional serialization function
                                ) const;
 
+    //! Dequeue data whose size can be determined automatically (e.g., STL vector) and that was
+    //! previously enqueued so that diy knows its size when it is received.
+    //! In this case, diy will allocate the receive buffer; the user does not need to do so.
+    template<class T>
+    void                dequeue(const BlockID&  from,                                   //!< target block (gid,proc)
+                                T&              x,                                      //!< data (eg. STL vector)
+                                void (*load)(BinaryBuffer&, T&) = &::diy::load<T>       //!< optional serialization function
+                               ) const                                  { dequeue(from.gid, x, load); }
+
+    //! Dequeue an array of data whose size is given explicitly by the user.
+    //! In this case, the user needs to allocate the receive buffer prior to calling dequeue.
+    template<class T>
+    void                dequeue(const BlockID&  from,                                   //!< target block (gid,proc)
+                                T*              x,                                      //!< pointer to the data (eg. address of start of vector)
+                                size_t          n,                                      //!< size in data elements (eg. ints)
+                                void (*load)(BinaryBuffer&, T&) = &::diy::load<T>       //!< optional serialization function
+                               ) const                                  { dequeue(from.gid, x, n, load); }
+
     template<class T>
     EnqueueIterator<T>  enqueuer(const T& x,
                                  void (*save)(BinaryBuffer&, const T&) = &::diy::save<T>) const
