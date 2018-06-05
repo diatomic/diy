@@ -37,6 +37,8 @@ namespace diy
     struct Direction: public Point<int,DIY_MAX_DIM>
     {
               Direction()                 { for (size_t i = 0; i < DIY_MAX_DIM; ++i) (*this)[i] = 0; }
+              Direction(std::initializer_list<int> lst):
+                Direction()               { size_t i = 0; for(int x : lst) (*this)[i++] = x; }
               Direction(int dir)
       {
           for (size_t i = 0; i < DIY_MAX_DIM; ++i) (*this)[i] = 0;
