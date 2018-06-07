@@ -185,9 +185,9 @@ namespace diy
                       expected_(0),
                       exchange_round_(-1),
                       immediate_(true),
-                      ndone_(comm, 1)
-                                                        { ndone_.lock_all(MPI_MODE_NOCHECK); }
-                    ~Master()                           { set_immediate(true); clear(); delete queue_policy_; ndone_.unlock_all(); }
+                      global_work_(comm, 1)
+                                                        { global_work_.lock_all(MPI_MODE_NOCHECK); }
+                    ~Master()                           { set_immediate(true); clear(); delete queue_policy_; global_work_.unlock_all(); }
       inline void   clear();
       inline void   destroy(int i)                      { if (blocks_.own()) blocks_.destroy(i); }
 
@@ -329,8 +329,10 @@ namespace diy
       int               global_work();                  // get global work status (for debugging)
       bool              all_done();                     // get global all done status
       void              reset_work();                   // reset global work counter
-      void              add_work();                     // add work to global work counter
-      bool              rem_work();                     // remove work from global work counter and get global all done status
+      void              add_work(int work);             // add work to global work counter
+      bool              sub_work(int work);             // subtract work from global work counter and get global all done status
+      void              inc_work()                      { add_work(1); }            // increment global work counter
+      bool              dec_work()                      { return sub_work(1); }     // decremnent global work counter
 
       void              cancel_requests();              // TODO
 
@@ -370,7 +372,8 @@ namespace diy
       stats::Profiler               prof;
 
     private:
-      mutable mpi::window<int>  ndone_;
+      // work counter
+      mutable mpi::window<int>  global_work_;       // global work to do
   };
 
   struct Master::BaseCommand
@@ -906,34 +909,44 @@ iexchange_(const ICallback<Block>& f)
 //     incoming_.erase(exchange_round_);
 //     ++exchange_round_;
 
-    bool add_once = true;
-    bool rem_once = true;
+    std::vector<bool> done(size(), false);      // current done status of each block
+    int ndone;                                  // number of local blocks that are done
+    int nundeq;                                 // number of received but undequed messages
+
+    add_work(size());                           // start with one work unit for each block
+
     do
     {
-        int ndone = 0;                          // number of local blocks done in current iteration
+        ndone  = 0;
+        nundeq = 0;
+
         for (size_t i = 0; i < size(); i++)     // for all blocks
         {
-            // add one unit of work for each block (one time only)
-            if (add_once)
-                add_work();
-
             icommunicate();                     // TODO: separate comm thread std::thread t(icommunicate);
             IProxyWithLink icp(IProxyWithLink(Proxy(const_cast<Master*>(this), gid(i)), block(i), link(i)));
-            ndone += (f(static_cast<Block*>(block(i)), icp) ? 1 : 0);
-            icommunicate();                     // TODO: separate comm thread std::thread t(icommunicate);
-        }
-        add_once = false;
+            bool retval = f(static_cast<Block*>(block(i)), icp);
+            if (done[i] != retval)
+            {
+                if (retval)
+                {
+                    dec_work();
+                    done[i] = true;
+                }
+                else
+                {
+                    inc_work();
+                    done[i] = false;
+                }
+            }
 
-        // if all local blocks are done, subtract one unit of work for each block (one time only)
-        if (rem_once && ndone == size())
-        {
-            for (size_t i = 0; i < size(); i++)
-                rem_work();
-            rem_once = false;
+            ndone += done[i] ? 1 : 0;
+            for (size_t j = 0; j < icp.link()->size(); j++)
+                if (icp.incoming(icp.link()->target(j).gid))
+                    nundeq++;
         }
 
-//         fmt::print(stderr, "ndone = {} global_work = {} all_done = {}\n", ndone, global_work(), all_done());
-    } while (!all_done());                      // all blocks are done and no messages are in flight
+    // end when all received messages have been dequeued, all blocks are done, and no messages are in flight
+    } while (nundeq || ndone < size() || !all_done());
 }
 
 namespace diy
@@ -1249,7 +1262,11 @@ send_outgoing_queues(
                 inflight_sends_.emplace_back();
                 inflight_sends_.back().info = info;
                 if (remote || iexchange)
+                {
                     inflight_sends_.back().request = comm_.issend(proc, tags::queue, buffer->buffer);
+                    if (iexchange)
+                        inc_work();
+                }
                 else
                     inflight_sends_.back().request = comm_.isend(proc, tags::queue, buffer->buffer);
                 inflight_sends_.back().message = buffer;
@@ -1267,7 +1284,12 @@ send_outgoing_queues(
                 inflight_sends_.emplace_back();
                 inflight_sends_.back().info = info;
                 if (remote || iexchange)
+                {
                     inflight_sends_.back().request = comm_.issend(proc, tags::piece, hb->buffer);
+                    // add one unit of work for the entire large message (upon sending the head, not the individual pieces below)
+                    if (iexchange)
+                        inc_work();
+                }
                 else
                     inflight_sends_.back().request = comm_.isend(proc, tags::piece, hb->buffer);
                 inflight_sends_.back().message = hb;
@@ -1368,6 +1390,7 @@ check_incoming_queues(bool iexchange)
                 {
                     in->map[to].queues[from].append_binary(&ir.message.buffer[0], ir.message.size());        // append insted of overwrite
                     // TODO: no need for ir.message.clear()? (as in send_outgoing_queues)
+                    dec_work();
                 }
             }
             in->map[to].records[from] = QueueRecord(size, external);
@@ -1522,8 +1545,8 @@ diy::Master::
 global_work()
 {
     int global_work;
-    ndone_.get(global_work, 0, 0);
-    ndone_.flush_local(0);
+    global_work_.get(global_work, 0, 0);
+    global_work_.flush_local(0);
     return(global_work);
 }
 
@@ -1533,8 +1556,8 @@ diy::Master::
 all_done()
 {
     int global_work;
-    ndone_.get(global_work, 0, 0);
-    ndone_.flush_local(0);
+    global_work_.get(global_work, 0, 0);
+    global_work_.flush_local(0);
     return(global_work ? false : true);
 }
 
@@ -1544,34 +1567,33 @@ diy::Master::
 reset_work()
 {
     int val = 0;
-    ndone_.replace(val, 0, 0);
-    ndone_.flush(0);
+    global_work_.replace(val, 0, 0);
+    global_work_.flush(0);
 }
 
-// add work to global work counter
+// add arbitrary units of work to global work counter
 void
 diy::Master::
-add_work()
+add_work(int work)
 {
-    int val = 1;
     int global_work;                                               // unused
-    ndone_.fetch_and_op(&val, &global_work, 0, 0, MPI_SUM);
-    ndone_.flush(0);
+    global_work_.fetch_and_op(&work, &global_work, 0, 0, MPI_SUM);
+    global_work_.flush(0);
 }
 
-// remove work from global work counter and get global all done status
+// remove arbitrary units of work from global work counter and get global all done status
 bool
 diy::Master::
-rem_work()
+sub_work(int work)
 {
     int global_work;                                                // global work counter
-    int val = -1;
-    ndone_.fetch_and_op(&val, &global_work, 0, 0, MPI_SUM);
-    ndone_.flush(0);
-    if (global_work <= 0)
-        fmt::print(stderr, "error: attempting to remove work when global_work already = {}\n", global_work);
-    assert(global_work >= 1);                                       // sanity, should not remove more work than was added
-    return(global_work == 1 ? true : false);                        // global_work is prior to decrementing
+    int val = -work;
+    global_work_.fetch_and_op(&val, &global_work, 0, 0, MPI_SUM);
+    global_work_.flush(0);
+    if (global_work < work)
+        fmt::print(stderr, "error: attempting to subtract {} units of work when global_work prior to subtraction = {}\n", work, global_work);
+    assert(global_work >= work);                                       // sanity, should not remove more work than was added
+    return(global_work == work ? true : false);                        // global_work is prior to decrementing
 }
 
 #endif

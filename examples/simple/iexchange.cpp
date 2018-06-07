@@ -8,21 +8,21 @@
 
 struct Block
 {
-    Block(): count(0), tries(0)             {}
+    Block(): count(0)                       {}
 
     int   count;
-    int   tries;
 };
 
 void* create_block()                        { return new Block; }
-void  destroy_block(void* b)                { delete static_cast<Block*>(b); }
-void  save_block(const void* b,
+void  destroy_block(void*           b)      { delete static_cast<Block*>(b); }
+void  save_block(const void*        b,
                  diy::BinaryBuffer& bb)     { diy::save(bb, *static_cast<const Block*>(b)); }
-void  load_block(void* b,
+void  load_block(void*              b,
                  diy::BinaryBuffer& bb)     { diy::load(bb, *static_cast<Block*>(b)); }
 
 // debug: test enqueue with original synchronous exchange
-void enq(Block* b, const diy::Master::ProxyWithLink& cp)
+void enq(Block*                             b,
+        const diy::Master::ProxyWithLink&   cp)
 {
     diy::Link* l = cp.link();
 
@@ -36,7 +36,8 @@ void enq(Block* b, const diy::Master::ProxyWithLink& cp)
 }
 
 // debug: test dequeue with original synchronous exchange
-void deq(Block* b, const diy::Master::ProxyWithLink& cp)
+void deq(Block*                             b,
+        const diy::Master::ProxyWithLink&   cp)
 {
     diy::Link* l = cp.link();
     int my_gid   = cp.gid();
@@ -55,8 +56,8 @@ void deq(Block* b, const diy::Master::ProxyWithLink& cp)
 }
 
 // callback for asynchronous iexchange
-bool foo(
-        Block*                              b,
+// return: true = I'm done unless more work arrives; false = I'm not done, please call me again
+bool foo(Block*                             b,
         const diy::Master::IProxyWithLink&  icp)
 {
     diy::Link* l = icp.link();
@@ -73,40 +74,28 @@ bool foo(
         b->count++;
     }
 
-    // then dequeue as long as something is incoming and enqueue as long as count is below some threshold
+    // then dequeue as long as something is incoming and enqueue as long as received value is below some threshold
     // foo will be called by master multiple times until no more messages are in flight anywhere
-    int max_count   = 2;
-    int max_tries   = 10;
-    bool inc_count  = false;
+    int max_count   = 3;
     for (size_t i = 0; i < l->size(); ++i)
     {
         int nbr_gid = l->target(i).gid;
         if (icp.incoming(nbr_gid))
         {
             int recvd_val;
-            bool retval;
-            do
-            {
-                retval = icp.dequeue(nbr_gid, recvd_val);
-                fmt::print(stderr, "deq [{}] <- {} <- [{}], size {}\n", my_gid, recvd_val, nbr_gid, icp.incoming(nbr_gid).size());
-            } while (icp.incoming(nbr_gid) && retval);
+            icp.dequeue(nbr_gid, recvd_val);
+            b->count++;
+            fmt::print(stderr, "deq [{}] <- {} <- [{}] (count = {})\n", my_gid, recvd_val, nbr_gid, b->count);
 
-            if (b->count <= max_count)
+            if (recvd_val < max_count)
             {
                 icp.enqueue(l->target(i), b->count);
                 fmt::print(stderr, "enq [{}] -> {} -> [{}]\n", my_gid, b->count, nbr_gid);
-                inc_count = true;
             }
         }
     }
 
-    if (inc_count)
-        b->count++;
-    b->tries++;
-
-    // assume this block is done when b->count exceeds some threshold
-    bool done = (b->count > max_count) || (b->tries > max_tries) ? true : false;
-    return (done);
+    return b->count >= max_count ? true : false;
 }
 
 int main(int argc, char* argv[])
