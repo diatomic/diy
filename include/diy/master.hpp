@@ -7,6 +7,7 @@
 #include <deque>
 #include <algorithm>
 #include <functional>
+#include <numeric>
 
 #include "link.hpp"
 #include "collection.hpp"
@@ -910,14 +911,12 @@ iexchange_(const ICallback<Block>& f)
 //     ++exchange_round_;
 
     std::vector<bool> done(size(), false);      // current done status of each block
-    int ndone;                                  // number of local blocks that are done
     int nundeq;                                 // number of received but undequed messages
 
     add_work(size());                           // start with one work unit for each block
 
     do
     {
-        ndone  = 0;
         nundeq = 0;
 
         for (size_t i = 0; i < size(); i++)     // for all blocks
@@ -927,26 +926,24 @@ iexchange_(const ICallback<Block>& f)
             bool retval = f(static_cast<Block*>(block(i)), icp);
             if (done[i] != retval)
             {
+                done[i] = retval;
                 if (retval)
-                {
                     dec_work();
-                    done[i] = true;
-                }
                 else
-                {
                     inc_work();
-                    done[i] = false;
-                }
             }
 
-            ndone += done[i] ? 1 : 0;
             for (size_t j = 0; j < icp.link()->size(); j++)
                 if (icp.incoming(icp.link()->target(j).gid))
                     nundeq++;
         }
 
+        fmt::print(stderr, "[{}] ndone = {} out of {}, nundeq = {}\n",
+                           comm_.rank(), std::accumulate(done.begin(), done.end(), (int) 0),
+                           size(), nundeq);
+
     // end when all received messages have been dequeued, all blocks are done, and no messages are in flight
-    } while (nundeq || ndone < size() || !all_done());
+    } while (nundeq || !all_done());
 }
 
 namespace diy
@@ -1263,9 +1260,9 @@ send_outgoing_queues(
                 inflight_sends_.back().info = info;
                 if (remote || iexchange)
                 {
-                    inflight_sends_.back().request = comm_.issend(proc, tags::queue, buffer->buffer);
                     if (iexchange)
                         inc_work();
+                    inflight_sends_.back().request = comm_.issend(proc, tags::queue, buffer->buffer);
                 }
                 else
                     inflight_sends_.back().request = comm_.isend(proc, tags::queue, buffer->buffer);
@@ -1285,10 +1282,10 @@ send_outgoing_queues(
                 inflight_sends_.back().info = info;
                 if (remote || iexchange)
                 {
-                    inflight_sends_.back().request = comm_.issend(proc, tags::piece, hb->buffer);
                     // add one unit of work for the entire large message (upon sending the head, not the individual pieces below)
                     if (iexchange)
                         inc_work();
+                    inflight_sends_.back().request = comm_.issend(proc, tags::piece, hb->buffer);
                 }
                 else
                     inflight_sends_.back().request = comm_.isend(proc, tags::piece, hb->buffer);
@@ -1545,7 +1542,7 @@ diy::Master::
 global_work()
 {
     int global_work;
-    global_work_.get(global_work, 0, 0);
+    global_work_.fetch(global_work, 0, 0);
     global_work_.flush_local(0);
     return(global_work);
 }
@@ -1556,7 +1553,7 @@ diy::Master::
 all_done()
 {
     int global_work;
-    global_work_.get(global_work, 0, 0);
+    global_work_.fetch(global_work, 0, 0);
     global_work_.flush_local(0);
     return(global_work ? false : true);
 }
