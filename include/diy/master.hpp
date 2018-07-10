@@ -928,6 +928,7 @@ iexchange_(const ICallback<Block>& f)
     iexchange.add_work(size());                 // start with one work unit for each block
 
     int global_work_ = -1;
+    int prev_global_work_ = -1;
 
     do
     {
@@ -936,25 +937,19 @@ iexchange_(const ICallback<Block>& f)
             icommunicate(&iexchange);            // TODO: separate comm thread std::thread t(icommunicate);
             IProxyWithLink icp = iproxy(i, &iexchange);
 
-            int nundeq_before = 0;
-            for (size_t j = 0; j < icp.link()->size(); j++)
-                if (icp.incoming(icp.link()->target(j).gid))
-                    ++nundeq_before;
-
-            if (iexchange.done[i] && nundeq_before == 0) continue;
+            bool done = f(block<Block>(i), icp);
 
             int nundeq_after = 0;
             for (size_t j = 0; j < icp.link()->size(); j++)
                 if (icp.incoming(icp.link()->target(j).gid))
                     ++nundeq_after;
 
-            bool retval = f(static_cast<Block*>(block(i)), icp);
-            retval &= (nundeq_after == 0);
+            done &= (nundeq_after == 0);
 
-            if (iexchange.done[i] != retval)
+            if (iexchange.done[i] != done)
             {
-                iexchange.done[i] = retval;
-                if (retval)
+                iexchange.done[i] = done;
+                if (done)
                     iexchange.dec_work();
                 else
                     iexchange.inc_work();
@@ -962,9 +957,11 @@ iexchange_(const ICallback<Block>& f)
         }
 
         global_work_ = iexchange.global_work();
-        fmt::print(stderr, "[{}] ndone = {} out of {}, global_work = {}\n",
-                           iexchange.comm.rank(), std::accumulate(iexchange.done.begin(), iexchange.done.end(), (int) 0),
-                           size(), global_work_);
+        if (global_work_ != prev_global_work_)
+            fmt::print(stderr, "[{}] ndone = {} out of {}, global_work = {}\n",
+                               iexchange.comm.rank(), std::accumulate(iexchange.done.begin(), iexchange.done.end(), (int) 0),
+                               size(), global_work_);
+        prev_global_work_ = global_work_;
 
     // end when all received messages have been dequeued, all blocks are done, and no messages are in flight
     } while (global_work_ > 0);
@@ -1600,7 +1597,7 @@ void
 diy::Master::IExchangeInfo::
 add_work(int work)
 {
-    fmt::print(stderr, "[{}] Adding {} work\n", comm.rank(), work);
+    //fmt::print(stderr, "[{}] Adding {} work\n", comm.rank(), work);
     int global_work;                                               // unused
     global_work_->fetch_and_op(&work, &global_work, 0, 0, MPI_SUM);
     global_work_->flush(0);
@@ -1611,7 +1608,7 @@ bool
 diy::Master::IExchangeInfo::
 sub_work(int work)
 {
-    fmt::print(stderr, "[{}] Removing {} work\n", comm.rank(), work);
+    //fmt::print(stderr, "[{}] Removing {} work\n", comm.rank(), work);
     int global_work;                                                // global work counter
     int val = -work;
     global_work_->fetch_and_op(&val, &global_work, 0, 0, MPI_SUM);
