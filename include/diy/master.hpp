@@ -912,6 +912,7 @@ iexchange_(const ICallback<Block>& f)
 
     std::vector<bool> done(size(), false);      // current done status of each block
     int nundeq;                                 // number of received but undequed messages
+    bool all_done_ = false;
 
     add_work(size());                           // start with one work unit for each block
 
@@ -938,12 +939,14 @@ iexchange_(const ICallback<Block>& f)
                     nundeq++;
         }
 
-        fmt::print(stderr, "[{}] ndone = {} out of {}, nundeq = {}\n",
+        all_done_ = all_done();
+        fmt::print(stderr, "[{}] ndone = {} out of {}, nundeq = {}, all_done = {}\n",
                            comm_.rank(), std::accumulate(done.begin(), done.end(), (int) 0),
-                           size(), nundeq);
+                           size(), nundeq, all_done_);
 
     // end when all received messages have been dequeued, all blocks are done, and no messages are in flight
-    } while (nundeq || !all_done());
+    } while (nundeq || !all_done_);
+    fmt::print(stderr, "[{}] ==== Leaving iexchange ====\n", comm_.rank());
 }
 
 namespace diy
