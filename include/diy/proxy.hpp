@@ -160,43 +160,43 @@ namespace diy
           iexchange(iexchange_)                                   {}
 
       template<class T>
-          void enqueue(const BlockID&     to,
-                  const T&                x,
-                  void (*save)(BinaryBuffer&, const T&) = &::diy::save<T>) const
-          {
-              diy::Master::Proxy::enqueue(to, x, save);
-              master()->icommunicate(iexchange);
-          }
+      void enqueue(const BlockID&     to,
+              const T&                x,
+              void (*save)(BinaryBuffer&, const T&) = &::diy::save<T>) const
+      {
+          diy::Master::Proxy::enqueue(to, x, save);
+          master()->icommunicate(iexchange);
+      }
 
       template<class T>
-          void enqueue(const BlockID&     to,
-                  const T*                x,
-                  size_t                  n,
-                  void (*save)(BinaryBuffer&, const T&) = &::diy::save<T>) const
-          {
-              diy::Master::Proxy::enqueue(to, x, n, save);
-              master()->icommunicate(iexchange);
-          }
+      void enqueue(const BlockID&     to,
+              const T*                x,
+              size_t                  n,
+              void (*save)(BinaryBuffer&, const T&) = &::diy::save<T>) const
+      {
+          diy::Master::Proxy::enqueue(to, x, n, save);
+          master()->icommunicate(iexchange);
+      }
 
       // returns true if more data left in the queue
       template<class T>
-          void dequeue(int                from,
-                  T&                      x,
-                  void (*load)(BinaryBuffer&, T&) = &::diy::load<T>) const
-          {
-              master()->icommunicate(iexchange);
-              diy::Master::Proxy::dequeue(from, x, load);
-          }
+      void dequeue(int                from,
+              T&                      x,
+              void (*load)(BinaryBuffer&, T&) = &::diy::load<T>) const
+      {
+          master()->icommunicate(iexchange);
+          diy::Master::Proxy::dequeue(from, x, load);
+      }
 
       template<class T>
-          void dequeue(int                from,
-                  T*                      x,
-                  size_t                  n,
-                  void (*load)(BinaryBuffer&, T&) = &::diy::load<T>) const
-          {
-              master()->icommunicate(iexchange);
-              diy::Master::Proxy::dequeue(from, x, n, load);
-          }
+      void dequeue(int                from,
+              T*                      x,
+              size_t                  n,
+              void (*load)(BinaryBuffer&, T&) = &::diy::load<T>) const
+      {
+          master()->icommunicate(iexchange);
+          diy::Master::Proxy::dequeue(from, x, n, load);
+      }
   };
 }
 
