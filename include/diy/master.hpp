@@ -926,12 +926,16 @@ iexchange_(const ICallback<Block>& f)
 
     IExchangeInfo iexchange(size(), comm_);
     iexchange.add_work(size());                 // start with one work unit for each block
+    comm_.barrier();                            // make sure that everyone's original work is accounted for
 
     int global_work_ = -1;
     int prev_global_work_ = -1;
 
     do
     {
+        int nundeq = 0;
+        int nunenq = 0;
+
         for (size_t i = 0; i < size(); i++)     // for all blocks
         {
             icommunicate(&iexchange);            // TODO: separate comm thread std::thread t(icommunicate);
@@ -940,27 +944,41 @@ iexchange_(const ICallback<Block>& f)
             bool done = f(block<Block>(i), icp);
 
             int nundeq_after = 0;
+            int nunenq_after = 0;
             for (size_t j = 0; j < icp.link()->size(); j++)
+            {
                 if (icp.incoming(icp.link()->target(j).gid))
                     ++nundeq_after;
+                if (icp.outgoing(icp.link()->target(j)).size())
+                    ++nunenq_after;
+            }
+            nundeq += nundeq_after;
+            nunenq += nunenq_after;
 
             done &= (nundeq_after == 0);
+            done &= (nunenq_after == 0);
 
             if (iexchange.done[i] != done)
             {
                 iexchange.done[i] = done;
                 if (done)
+                {
+                    fmt::print(stderr, "[{}] Decrementing work when switching done after callback, for {}\n", comm_.rank(), gid(i));
                     iexchange.dec_work();
+                }
                 else
+                {
+                    fmt::print(stderr, "[{}] Incrementing work when switching done after callback, for {}\n", comm_.rank(), gid(i));
                     iexchange.inc_work();
+                }
             }
         }
 
         global_work_ = iexchange.global_work();
         if (global_work_ != prev_global_work_)
-            fmt::print(stderr, "[{}] ndone = {} out of {}, global_work = {}\n",
+            fmt::print(stderr, "[{}] ndone = {} out of {}, nundeq = {}, nunenq = {} global_work = {}\n",
                                iexchange.comm.rank(), std::accumulate(iexchange.done.begin(), iexchange.done.end(), (int) 0),
-                               size(), global_work_);
+                               size(), nundeq, nunenq, global_work_);
         prev_global_work_ = global_work_;
 
     // end when all received messages have been dequeued, all blocks are done, and no messages are in flight
@@ -1283,7 +1301,10 @@ send_outgoing_queues(
                 if (remote || iexchange)
                 {
                     if (iexchange)
+                    {
+                        fmt::print(stderr, "[{}] Incrementing work when sending queue\n", comm_.rank());
                         iexchange->inc_work();
+                    }
                     inflight_sends_.back().request = comm_.issend(proc, tags::queue, buffer->buffer);
                 }
                 else
@@ -1306,7 +1327,10 @@ send_outgoing_queues(
                 {
                     // add one unit of work for the entire large message (upon sending the head, not the individual pieces below)
                     if (iexchange)
+                    {
+                        fmt::print(stderr, "[{}] Incrementing work when sending the first piece\n", comm_.rank());
                         iexchange->inc_work();
+                    }
                     inflight_sends_.back().request = comm_.issend(proc, tags::piece, hb->buffer);
                 }
                 else
@@ -1409,11 +1433,13 @@ check_incoming_queues(IExchangeInfo* iexchange)
                 {
                     if (iexchange->done[to])
                     {
+                        fmt::print(stderr, "[{}] Incrementing work when switching done for {}\n", comm_.rank(), to);
                         iexchange->done[to] = false;
                         iexchange->inc_work();
                     }
                     in->map[to].queues[from].append_binary(&ir.message.buffer[0], ir.message.size());        // append insted of overwrite
                     // TODO: no need for ir.message.clear()? (as in send_outgoing_queues)
+                    fmt::print(stderr, "[{}] Decrementing work after receiving for {}\n", comm_.rank(), to);
                     iexchange->dec_work();
                 }
             }

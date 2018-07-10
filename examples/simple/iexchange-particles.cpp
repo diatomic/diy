@@ -43,14 +43,14 @@ bool bounce(Block*                              b,
     // start with every block enqueueing particles to random neighbors
     int id = my_gid * 1000;
     if (b->count > 0)
-        fmt::print(stderr, "{} enqueue {} particles\n", my_gid, b->count);
+        fmt::print(stderr, "[{}] enqueue {} particles\n", my_gid, b->count);
     while (b->count > 0)
     {
         int nbr = rand() % l->size();
         Particle p(id++, 1 + rand() % 20);
+        fmt::print(stderr, "[{}] -> ({},{}) -> [{}]\n", my_gid, p.id, p.hops, l->target(nbr).gid);
         icp.enqueue(l->target(nbr), p);
         b->count--;
-        fmt::print(stderr, "enq [{}] -> ({},{}) -> [{}]\n", my_gid, p.id, p.hops, l->target(nbr).gid);
     }
 
     // then dequeue as long as something is incoming and enqueue as long as the hop count is not exceeded
@@ -62,16 +62,16 @@ bool bounce(Block*                              b,
         {
             Particle p;
             icp.dequeue(nbr_gid, p);
-            fmt::print(stderr, "deq [{}] <- ({},{}) <- [{}]\n", my_gid, p.id, p.hops, nbr_gid);
+            fmt::print(stderr, "[{}] <- ({},{}) <- [{}]\n", my_gid, p.id, p.hops, nbr_gid);
 
             p.hops--;
             if (p.hops > 0)
             {
                 int nbr = rand() % l->size();
+                fmt::print(stderr, "[{}] -> ({},{}) -> [{}]\n", my_gid, p.id, p.hops, l->target(nbr).gid);
                 icp.enqueue(l->target(nbr), p);
-                fmt::print(stderr, "enq [{}] -> ({},{}) -> [{}]\n", my_gid, p.id, p.hops, l->target(nbr).gid);
             } else
-                fmt::print(stderr, "fin [{}] particle ({},{})\n", my_gid, p.id, p.hops);
+                fmt::print(stderr, "[{}] finish particle ({},{})\n", my_gid, p.id, p.hops);
         }
     }
 
@@ -80,12 +80,12 @@ bool bounce(Block*                              b,
 
 int main(int argc, char* argv[])
 {
-//     diy::create_logger("trace");
+     //diy::create_logger("debug");
 
     diy::mpi::environment     env(argc, argv);
     diy::mpi::communicator    world;
 
-    int                       nblocks = 2 * world.size();
+    int                       nblocks = world.size();
 
     diy::FileStorage          storage("./DIY.XXXXXX");
 
