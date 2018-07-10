@@ -75,6 +75,33 @@ namespace diy
       template<class Block>
       using ICallback = std::function<bool(Block*, const IProxyWithLink&)>;
 
+      struct IExchangeInfo
+      {
+        IExchangeInfo():
+            n(0)                                                {}
+        IExchangeInfo(size_t n_, mpi::communicator comm_):
+            n(n_),
+            comm(comm_),
+            done(n, false),
+            global_work_(new mpi::window<int>(comm, 1))         { global_work_->lock_all(MPI_MODE_NOCHECK); }
+        ~IExchangeInfo()                                        { global_work_->unlock_all(); }
+
+        operator bool() const                                   { return n == 0; }
+
+        int               global_work();                  // get global work status (for debugging)
+        bool              all_done();                     // get global all done status
+        void              reset_work();                   // reset global work counter
+        void              add_work(int work);             // add work to global work counter
+        bool              sub_work(int work);             // subtract work from global work counter and get global all done status
+        void              inc_work()                      { add_work(1); }            // increment global work counter
+        bool              dec_work()                      { return sub_work(1); }     // decremnent global work counter
+
+        size_t                              n;
+        mpi::communicator                   comm;
+        std::vector<bool>                   done;
+        std::unique_ptr<mpi::window<int>>   global_work_;       // global work to do
+      };
+
       struct QueuePolicy
       {
         virtual bool    unload_incoming(const Master& master, int from, int to, size_t size) const  =0;
@@ -185,10 +212,8 @@ namespace diy
                       comm_(comm),
                       expected_(0),
                       exchange_round_(-1),
-                      immediate_(true),
-                      global_work_(comm, 1)
-                                                        { global_work_.lock_all(MPI_MODE_NOCHECK); }
-                    ~Master()                           { set_immediate(true); clear(); delete queue_policy_; global_work_.unlock_all(); }
+                      immediate_(true)                  {}
+                    ~Master()                           { set_immediate(true); clear(); delete queue_policy_; }
       inline void   clear();
       inline void   destroy(int i)                      { if (blocks_.own()) blocks_.destroy(i); }
 
@@ -249,7 +274,7 @@ namespace diy
       ProxyWithLink proxy(int i) const;
 
       inline
-      IProxyWithLink iproxy(int i) const;
+      IProxyWithLink iproxy(int i, IExchangeInfo* iexchange) const;
 
       //! return the number of local blocks
       unsigned int  size() const                        { return static_cast<unsigned int>(blocks_.size()); }
@@ -311,29 +336,22 @@ namespace diy
 
     private:
       // Communicator functionality
-      inline void       comm_exchange(ToSendList&           to_send,
-                                      int                   out_queues_limit,     // possibly called in between block computations
-                                      bool                  iexchange);
+      inline void       comm_exchange(ToSendList&       to_send,
+                                      int               out_queues_limit,     // possibly called in between block computations
+                                      IExchangeInfo*    iexchange = 0);
       inline void       rcomm_exchange(ToSendList& to_send, int out_queues_limit);    // possibly called in between block computations
       inline bool       nudge();
       inline void       send_outgoing_queues(ToSendList&    to_send,
                                              int            out_queues_limit,
                                              IncomingRound& current_incoming,
                                              bool           remote,
-                                             bool           iexchange);
-      inline void       check_incoming_queues(bool          iexchange);
+                                             IExchangeInfo* iexchange = 0);
+      inline void       check_incoming_queues(IExchangeInfo* iexchange = 0);
       inline void       prep_out(ToSendList& to_send);
       inline int        limit_out(const ToSendList& to_send);
 
       // iexchange commmunication
-      inline void       icommunicate();                 // async communication
-      int               global_work();                  // get global work status (for debugging)
-      bool              all_done();                     // get global all done status
-      void              reset_work();                   // reset global work counter
-      void              add_work(int work);             // add work to global work counter
-      bool              sub_work(int work);             // subtract work from global work counter and get global all done status
-      void              inc_work()                      { add_work(1); }            // increment global work counter
-      bool              dec_work()                      { return sub_work(1); }     // decremnent global work counter
+      inline void       icommunicate(IExchangeInfo* iexchange);     // async communication
 
       void              cancel_requests();              // TODO
 
@@ -371,10 +389,6 @@ namespace diy
     public:
       std::shared_ptr<spd::logger>  log = get_logger();
       stats::Profiler               prof;
-
-    private:
-      // work counter
-      mutable mpi::window<int>  global_work_;       // global work to do
   };
 
   struct Master::BaseCommand
@@ -707,8 +721,8 @@ proxy(int i) const
 
 diy::Master::IProxyWithLink
 diy::Master::
-iproxy(int i) const
-{ return IProxyWithLink(Proxy(const_cast<Master*>(this), gid(i)), block(i), link(i)); }
+iproxy(int i, IExchangeInfo* iexchange) const
+{ return IProxyWithLink(Proxy(const_cast<Master*>(this), gid(i)), block(i), link(i), iexchange); }
 
 int
 diy::Master::
@@ -910,43 +924,51 @@ iexchange_(const ICallback<Block>& f)
 //     incoming_.erase(exchange_round_);
 //     ++exchange_round_;
 
-    std::vector<bool> done(size(), false);      // current done status of each block
-    int nundeq;                                 // number of received but undequed messages
-    bool all_done_ = false;
+    IExchangeInfo iexchange(size(), comm_);
+    iexchange.add_work(size());                 // start with one work unit for each block
 
-    add_work(size());                           // start with one work unit for each block
+    int global_work_ = -1;
 
     do
     {
-        nundeq = 0;
-
         for (size_t i = 0; i < size(); i++)     // for all blocks
         {
-            icommunicate();                     // TODO: separate comm thread std::thread t(icommunicate);
-            IProxyWithLink icp(IProxyWithLink(Proxy(const_cast<Master*>(this), gid(i)), block(i), link(i)));
-            bool retval = f(static_cast<Block*>(block(i)), icp);
-            if (done[i] != retval)
-            {
-                done[i] = retval;
-                if (retval)
-                    dec_work();
-                else
-                    inc_work();
-            }
+            icommunicate(&iexchange);            // TODO: separate comm thread std::thread t(icommunicate);
+            IProxyWithLink icp = iproxy(i, &iexchange);
 
+            int nundeq_before = 0;
             for (size_t j = 0; j < icp.link()->size(); j++)
                 if (icp.incoming(icp.link()->target(j).gid))
-                    nundeq++;
+                    ++nundeq_before;
+
+            if (iexchange.done[i] && nundeq_before == 0) continue;
+
+            int nundeq_after = 0;
+            for (size_t j = 0; j < icp.link()->size(); j++)
+                if (icp.incoming(icp.link()->target(j).gid))
+                    ++nundeq_after;
+
+            bool retval = f(static_cast<Block*>(block(i)), icp);
+            retval &= (nundeq_after == 0);
+
+            if (iexchange.done[i] != retval)
+            {
+                iexchange.done[i] = retval;
+                if (retval)
+                    iexchange.dec_work();
+                else
+                    iexchange.inc_work();
+            }
         }
 
-        all_done_ = all_done();
-        fmt::print(stderr, "[{}] ndone = {} out of {}, nundeq = {}, all_done = {}\n",
-                           comm_.rank(), std::accumulate(done.begin(), done.end(), (int) 0),
-                           size(), nundeq, all_done_);
+        global_work_ = iexchange.global_work();
+        fmt::print(stderr, "[{}] ndone = {} out of {}, global_work = {}\n",
+                           iexchange.comm.rank(), std::accumulate(iexchange.done.begin(), iexchange.done.end(), (int) 0),
+                           size(), global_work_);
 
     // end when all received messages have been dequeued, all blocks are done, and no messages are in flight
-    } while (nundeq || !all_done_);
-    fmt::print(stderr, "[{}] ==== Leaving iexchange ====\n", comm_.rank());
+    } while (global_work_ > 0);
+    fmt::print(stderr, "[{}] ==== Leaving iexchange ====\n", iexchange.comm.rank());
 }
 
 namespace diy
@@ -984,9 +1006,9 @@ namespace detail
 /* Communicator */
 void
 diy::Master::
-comm_exchange(ToSendList&     to_send,
-              int             out_queues_limit,
-              bool            iexchange)
+comm_exchange(ToSendList&       to_send,
+              int               out_queues_limit,
+              IExchangeInfo*    iexchange)
 {
     IncomingRound &current_incoming = incoming_[exchange_round_];
     send_outgoing_queues(to_send, out_queues_limit, current_incoming, false, iexchange);
@@ -1031,12 +1053,12 @@ rcomm_exchange(ToSendList& to_send, int out_queues_limit)
 
     while (!done)
     {
-        send_outgoing_queues(to_send, out_queues_limit, current_incoming, true, false);
+        send_outgoing_queues(to_send, out_queues_limit, current_incoming, true, 0);
 
         // kick requests
         nudge();
 
-        check_incoming_queues(false);
+        check_incoming_queues(0);
         if (ibarr_act)
         {
             if (ibarr_req.test())
@@ -1091,7 +1113,7 @@ limit_out(const ToSendList& to_send)
 // iexchange communicator
 void
 diy::Master::
-icommunicate()
+icommunicate(IExchangeInfo* iexchange)
 {
     log->debug("Entering icommunicate()");
 
@@ -1123,7 +1145,7 @@ icommunicate()
 //     log->info("out_queues_limit: {}", out_queues_limit);
 
     // exchange
-    comm_exchange(to_send, out_queues_limit, true);
+    comm_exchange(to_send, out_queues_limit, iexchange);
 
     // cleanup
 
@@ -1141,7 +1163,7 @@ send_outgoing_queues(
         int             out_queues_limit,
         IncomingRound&  current_incoming,
         bool            remote,                     // TODO: are remote and iexchange mutually exclusive? If so, use single enum?
-        bool            iexchange)
+        IExchangeInfo*  iexchange)
 {
     static const size_t MAX_MPI_MESSAGE_COUNT = INT_MAX;
 
@@ -1264,7 +1286,7 @@ send_outgoing_queues(
                 if (remote || iexchange)
                 {
                     if (iexchange)
-                        inc_work();
+                        iexchange->inc_work();
                     inflight_sends_.back().request = comm_.issend(proc, tags::queue, buffer->buffer);
                 }
                 else
@@ -1287,7 +1309,7 @@ send_outgoing_queues(
                 {
                     // add one unit of work for the entire large message (upon sending the head, not the individual pieces below)
                     if (iexchange)
-                        inc_work();
+                        iexchange->inc_work();
                     inflight_sends_.back().request = comm_.issend(proc, tags::piece, hb->buffer);
                 }
                 else
@@ -1319,7 +1341,7 @@ send_outgoing_queues(
 
 void
 diy::Master::
-check_incoming_queues(bool iexchange)
+check_incoming_queues(IExchangeInfo* iexchange)
 {
     mpi::optional<mpi::status> ostatus = comm_.iprobe(mpi::any_source, mpi::any_tag);
     while (ostatus)
@@ -1388,9 +1410,14 @@ check_incoming_queues(bool iexchange)
                 }
                 else
                 {
+                    if (iexchange->done[to])
+                    {
+                        iexchange->done[to] = false;
+                        iexchange->inc_work();
+                    }
                     in->map[to].queues[from].append_binary(&ir.message.buffer[0], ir.message.size());        // append insted of overwrite
                     // TODO: no need for ir.message.clear()? (as in send_outgoing_queues)
-                    dec_work();
+                    iexchange->dec_work();
                 }
             }
             in->map[to].records[from] = QueueRecord(size, external);
@@ -1428,7 +1455,7 @@ flush(bool remote)
   {
       do
       {
-          comm_exchange(to_send, out_queues_limit, false);
+          comm_exchange(to_send, out_queues_limit, 0);
 
 #ifdef DEBUG
           time_type cur = get_time();
@@ -1541,55 +1568,54 @@ show_incoming_records() const
 
 // return global work status (for debugging)
 int
-diy::Master::
+diy::Master::IExchangeInfo::
 global_work()
 {
     int global_work;
-    global_work_.fetch(global_work, 0, 0);
-    global_work_.flush_local(0);
+    global_work_->fetch(global_work, 0, 0);
+    global_work_->flush_local(0);
     return(global_work);
 }
 
 // get global all done status
 bool
-diy::Master::
+diy::Master::IExchangeInfo::
 all_done()
 {
-    int global_work;
-    global_work_.fetch(global_work, 0, 0);
-    global_work_.flush_local(0);
-    return(global_work ? false : true);
+    return global_work() == 0;
 }
 
 // reset global work counter
 void
-diy::Master::
+diy::Master::IExchangeInfo::
 reset_work()
 {
     int val = 0;
-    global_work_.replace(val, 0, 0);
-    global_work_.flush(0);
+    global_work_->replace(val, 0, 0);
+    global_work_->flush(0);
 }
 
 // add arbitrary units of work to global work counter
 void
-diy::Master::
+diy::Master::IExchangeInfo::
 add_work(int work)
 {
+    fmt::print(stderr, "[{}] Adding {} work\n", comm.rank(), work);
     int global_work;                                               // unused
-    global_work_.fetch_and_op(&work, &global_work, 0, 0, MPI_SUM);
-    global_work_.flush(0);
+    global_work_->fetch_and_op(&work, &global_work, 0, 0, MPI_SUM);
+    global_work_->flush(0);
 }
 
 // remove arbitrary units of work from global work counter and get global all done status
 bool
-diy::Master::
+diy::Master::IExchangeInfo::
 sub_work(int work)
 {
+    fmt::print(stderr, "[{}] Removing {} work\n", comm.rank(), work);
     int global_work;                                                // global work counter
     int val = -work;
-    global_work_.fetch_and_op(&val, &global_work, 0, 0, MPI_SUM);
-    global_work_.flush(0);
+    global_work_->fetch_and_op(&val, &global_work, 0, 0, MPI_SUM);
+    global_work_->flush(0);
     if (global_work < work)
         fmt::print(stderr, "error: attempting to subtract {} units of work when global_work prior to subtraction = {}\n", work, global_work);
     assert(global_work >= work);                                       // sanity, should not remove more work than was added

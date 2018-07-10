@@ -56,7 +56,7 @@ bool foo(Block*                             b,
     for (size_t i = 0; i < l->size(); ++i)
     {
         int nbr_gid = l->target(i).gid;
-        if (icp.incoming(nbr_gid))
+        if (icp.incoming(nbr_gid))      // FIXME: make this while
         {
             Particle p;
             icp.dequeue(nbr_gid, p);
@@ -72,7 +72,7 @@ bool foo(Block*                             b,
         }
     }
 
-    return (b->count == 0);      // this will always be false, but the logic is that we have no work left inside the block
+    return (b->count == 0);      // this will always be true, but the logic is that we have no work left inside the block
 }
 
 int main(int argc, char* argv[])
