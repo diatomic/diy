@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
     diy::mpi::environment     env(argc, argv);
     diy::mpi::communicator    world;
 
-    int                       nblocks = world.size();
+    int                       nblocks = 2 * world.size();
 
     diy::FileStorage          storage("./DIY.XXXXXX");
 

@@ -82,7 +82,6 @@ namespace diy
         IExchangeInfo(size_t n_, mpi::communicator comm_):
             n(n_),
             comm(comm_),
-            done(n, false),
             global_work_(new mpi::window<int>(comm, 1))         { global_work_->lock_all(MPI_MODE_NOCHECK); }
         ~IExchangeInfo()                                        { global_work_->unlock_all(); }
 
@@ -91,14 +90,13 @@ namespace diy
         int               global_work();                  // get global work status (for debugging)
         bool              all_done();                     // get global all done status
         void              reset_work();                   // reset global work counter
-        void              add_work(int work);             // add work to global work counter
-        bool              sub_work(int work);             // subtract work from global work counter and get global all done status
-        void              inc_work()                      { add_work(1); }            // increment global work counter
-        bool              dec_work()                      { return sub_work(1); }     // decremnent global work counter
+        int               add_work(int work);             // add work to global work counter
+        int               inc_work()                      { return add_work(1); }   // increment global work counter
+        int               dec_work()                      { return add_work(-1); }  // decremnent global work counter
 
         size_t                              n;
         mpi::communicator                   comm;
-        std::vector<bool>                   done;
+        std::unordered_map<int, bool>       done;               // gid -> done
         std::unique_ptr<mpi::window<int>>   global_work_;       // global work to do
       };
 
@@ -958,27 +956,35 @@ iexchange_(const ICallback<Block>& f)
             done &= (nundeq_after == 0);
             done &= (nunenq_after == 0);
 
-            if (iexchange.done[i] != done)
+            int gid = icp.gid();
+            //fmt::print(stderr, "[{}] done = {}, result = {}\n", gid, iexchange.done[gid], done);
+            if (iexchange.done[gid] != done)
             {
-                iexchange.done[i] = done;
+                iexchange.done[gid] = done;
                 if (done)
                 {
-                    fmt::print(stderr, "[{}] Decrementing work when switching done after callback, for {}\n", comm_.rank(), gid(i));
-                    iexchange.dec_work();
+                    int work = iexchange.dec_work();
+                    fmt::print(stderr, "[{}] Decrementing work when switching done after callback, for {}: work = {}\n", comm_.rank(), gid, work);
                 }
                 else
                 {
-                    fmt::print(stderr, "[{}] Incrementing work when switching done after callback, for {}\n", comm_.rank(), gid(i));
-                    iexchange.inc_work();
+                    int work = iexchange.inc_work();
+                    fmt::print(stderr, "[{}] Incrementing work when switching done after callback, for {}: work = {}\n", comm_.rank(), gid, work);
                 }
             }
         }
 
         global_work_ = iexchange.global_work();
         if (global_work_ != prev_global_work_)
+        {
+            int ndone = 0;
+            for (auto& x : iexchange.done)
+                if (x.second)
+                    ndone++;
             fmt::print(stderr, "[{}] ndone = {} out of {}, nundeq = {}, nunenq = {} global_work = {}\n",
-                               iexchange.comm.rank(), std::accumulate(iexchange.done.begin(), iexchange.done.end(), (int) 0),
-                               size(), nundeq, nunenq, global_work_);
+                               iexchange.comm.rank(), ndone, size(),
+                               nundeq, nunenq, global_work_);
+        }
         prev_global_work_ = global_work_;
 
     // end when all received messages have been dequeued, all blocks are done, and no messages are in flight
@@ -1302,8 +1308,8 @@ send_outgoing_queues(
                 {
                     if (iexchange)
                     {
-                        fmt::print(stderr, "[{}] Incrementing work when sending queue\n", comm_.rank());
-                        iexchange->inc_work();
+                        int work = iexchange->inc_work();
+                        fmt::print(stderr, "[{}] Incrementing work when sending queue: work = {}\n", comm_.rank(), work);
                     }
                     inflight_sends_.back().request = comm_.issend(proc, tags::queue, buffer->buffer);
                 }
@@ -1328,8 +1334,8 @@ send_outgoing_queues(
                     // add one unit of work for the entire large message (upon sending the head, not the individual pieces below)
                     if (iexchange)
                     {
-                        fmt::print(stderr, "[{}] Incrementing work when sending the first piece\n", comm_.rank());
-                        iexchange->inc_work();
+                        int work = iexchange->inc_work();
+                        fmt::print(stderr, "[{}] Incrementing work when sending the first piece: work = {}\n", comm_.rank(), work);
                     }
                     inflight_sends_.back().request = comm_.issend(proc, tags::piece, hb->buffer);
                 }
@@ -1433,14 +1439,15 @@ check_incoming_queues(IExchangeInfo* iexchange)
                 {
                     if (iexchange->done[to])
                     {
-                        fmt::print(stderr, "[{}] Incrementing work when switching done for {}\n", comm_.rank(), to);
                         iexchange->done[to] = false;
-                        iexchange->inc_work();
-                    }
+                        int work = iexchange->inc_work();
+                        fmt::print(stderr, "[{}] Incrementing work when switching done (on receipt) for {}: work = {}\n", comm_.rank(), to, work);
+                    } else
+                        fmt::print(stderr, "[{}] {} is not done, no need to increment work\n", comm_.rank(), to);
                     in->map[to].queues[from].append_binary(&ir.message.buffer[0], ir.message.size());        // append insted of overwrite
                     // TODO: no need for ir.message.clear()? (as in send_outgoing_queues)
-                    fmt::print(stderr, "[{}] Decrementing work after receiving for {}\n", comm_.rank(), to);
-                    iexchange->dec_work();
+                    int work = iexchange->dec_work();
+                    fmt::print(stderr, "[{}] Decrementing work after receiving for {}: work = {}\n", comm_.rank(), to, work);
                 }
             }
             in->map[to].records[from] = QueueRecord(size, external);
@@ -1597,7 +1604,7 @@ global_work()
     int global_work;
     global_work_->fetch(global_work, 0, 0);
     global_work_->flush_local(0);
-    return(global_work);
+    return global_work;
 }
 
 // get global all done status
@@ -1619,7 +1626,7 @@ reset_work()
 }
 
 // add arbitrary units of work to global work counter
-void
+int
 diy::Master::IExchangeInfo::
 add_work(int work)
 {
@@ -1627,22 +1634,9 @@ add_work(int work)
     int global_work;                                               // unused
     global_work_->fetch_and_op(&work, &global_work, 0, 0, MPI_SUM);
     global_work_->flush(0);
-}
-
-// remove arbitrary units of work from global work counter and get global all done status
-bool
-diy::Master::IExchangeInfo::
-sub_work(int work)
-{
-    //fmt::print(stderr, "[{}] Removing {} work\n", comm.rank(), work);
-    int global_work;                                                // global work counter
-    int val = -work;
-    global_work_->fetch_and_op(&val, &global_work, 0, 0, MPI_SUM);
-    global_work_->flush(0);
-    if (global_work < work)
-        fmt::print(stderr, "error: attempting to subtract {} units of work when global_work prior to subtraction = {}\n", work, global_work);
-    assert(global_work >= work);                                       // sanity, should not remove more work than was added
-    return(global_work == work ? true : false);                        // global_work is prior to decrementing
+    if (global_work + work < 0)
+        throw std::runtime_error(fmt::format("error: attempting to subtract {} units of work when global_work prior to subtraction = {}", work, global_work));
+    return global_work + work;
 }
 
 #endif
