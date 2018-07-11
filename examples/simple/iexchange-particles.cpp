@@ -124,7 +124,7 @@ int main(int argc, char* argv[])
             link->add_neighbor(neighbor);
         }
 
-        master.add(gid, new Block(1 + rand() % 3), link);    // add the current local block to the master
+        master.add(gid, new Block(1 + rand() % 10), link);    // add the current local block to the master
     }
 
     // dequeue, enqueue, exchange all in one nonblocking routine
