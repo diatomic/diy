@@ -170,6 +170,7 @@ namespace diy
                       exchange_round_(-1),
                       immediate_(true)                  {}
                     ~Master()                           { set_immediate(true); clear(); delete queue_policy_; }
+
       inline void   clear();
       inline void   destroy(int i)                      { if (blocks_.own()) blocks_.destroy(i); }
 
@@ -180,6 +181,11 @@ namespace diy
       inline void*  block(int i) const                  { return blocks_.find(i); }
       template<class Block>
       Block*        block(int i) const                  { return static_cast<Block*>(block(i)); }
+      //! return the `i`-th block, loading it if necessary
+      void*         get(int i)                          { return blocks_.get(i); }
+      template<class Block>
+      Block*        get(int i)                          { return static_cast<Block*>(get(i)); }
+
       inline Link*  link(int i) const                   { return links_[i]; }
       inline int    loaded_block() const                { return blocks_.available(); }
 
@@ -201,8 +207,6 @@ namespace diy
       //! return the MPI communicator
       mpi::communicator&        communicator()          { return comm_; }
 
-      //! return the `i`-th block, loading it if necessary
-      void*         get(int i)                          { return blocks_.get(i); }
       //! return gid of the `i`-th block
       int           gid(int i) const                    { return gids_[i]; }
       //! return the local id of the local block with global id gid, or -1 if not local
@@ -996,7 +1000,7 @@ rcomm_exchange(ToSendList& to_send, int out_queues_limit)
         // kick requests
         nudge();
 
-        check_incoming_queues(0);
+        check_incoming_queues();
         if (ibarr_act)
         {
             if (ibarr_req.test())
