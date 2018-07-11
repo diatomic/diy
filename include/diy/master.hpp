@@ -1120,7 +1120,7 @@ send_outgoing_queues(
             int     proc    = to_proc.proc;
 
             // skip empty queues
-            if (!outgoing_[from].queues[to_proc].size())
+            if (iexchange && !outgoing_[from].queues[to_proc].size())
             {
                 log->debug("Skipping empty queue: {} <- {}", to, from);
                 continue;

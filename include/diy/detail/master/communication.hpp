@@ -81,6 +81,7 @@ namespace diy
     } // namespace mpi::detail
 } // namespace diy
 
+// receive message described by status
 void
 diy::Master::InFlightRecv::
 recv(mpi::communicator& comm, const mpi::status& status)
@@ -121,6 +122,7 @@ recv(mpi::communicator& comm, const mpi::status& status)
         done = true;
 }
 
+// once the InFlightRecv is done, place it either out of core or in the appropriate incoming queue
 void
 diy::Master::InFlightRecv::
 place(IncomingRound* in, bool unload, ExternalStorage* storage, IExchangeInfo* iexchange)
