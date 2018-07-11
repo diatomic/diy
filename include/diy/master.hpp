@@ -296,10 +296,8 @@ namespace diy
 
     private:
       // Communicator functionality
-      inline void       comm_exchange(ToSendList&       to_send,
-                                      int               out_queues_limit,     // possibly called in between block computations
-                                      IExchangeInfo*    iexchange = 0);
-      inline void       rcomm_exchange(ToSendList& to_send, int out_queues_limit);    // possibly called in between block computations
+      inline void       comm_exchange(ToSendList& to_send, IExchangeInfo*    iexchange = 0);
+      inline void       rcomm_exchange();    // possibly called in between block computations
       inline bool       nudge();
       inline void       send_outgoing_queues(ToSendList&    to_send,
                                              int            out_queues_limit,
@@ -307,7 +305,7 @@ namespace diy
                                              bool           remote,
                                              IExchangeInfo* iexchange = 0);
       inline void       check_incoming_queues(IExchangeInfo* iexchange = 0);
-      inline void       prep_out(ToSendList& to_send);
+      inline ToSendList prep_out();
       inline int        limit_out(const ToSendList& to_send);
 
       // iexchange commmunication
@@ -916,10 +914,10 @@ iexchange_(const ICallback<Block>& f)
 /* Communicator */
 void
 diy::Master::
-comm_exchange(ToSendList&       to_send,
-              int               out_queues_limit,
-              IExchangeInfo*    iexchange)
+comm_exchange(ToSendList& to_send, IExchangeInfo* iexchange)
 {
+    int out_queues_limit = limit_out(to_send);
+
     IncomingRound &current_incoming = incoming_[exchange_round_];
     send_outgoing_queues(to_send, out_queues_limit, current_incoming, false, iexchange);
     while(nudge());                   // kick requests
@@ -954,12 +952,16 @@ comm_exchange(ToSendList&       to_send,
 //
 void
 diy::Master::
-rcomm_exchange(ToSendList& to_send, int out_queues_limit)
+rcomm_exchange()
 {
     IncomingRound   &current_incoming   = incoming_[exchange_round_];
     bool            done                = false;
     bool            ibarr_act           = false;
     mpi::request    ibarr_req;                      // mpi request associated with ibarrier
+
+    // make a list of outgoing queues to send (the ones in memory come first)
+    ToSendList   to_send = prep_out();
+    int out_queues_limit = limit_out(to_send);
 
     while (!done)
     {
@@ -987,10 +989,12 @@ rcomm_exchange(ToSendList& to_send, int out_queues_limit)
 
 // fill list of outgoing queues to send (the ones in memory come first)
 // for iexchange
-void
+diy::Master::ToSendList
 diy::Master::
-prep_out(ToSendList& to_send)
+prep_out()
 {
+    ToSendList to_send;
+
     for (OutgoingQueuesMap::iterator it = outgoing_.begin(); it != outgoing_.end(); ++it)
     {
         OutgoingQueuesRecord& out = it->second;
@@ -1000,6 +1004,8 @@ prep_out(ToSendList& to_send)
             to_send.push_back(it->first);
     }
     log->debug("to_send.size(): {}", to_send.size());
+
+    return to_send;
 }
 
 // compute maximum number of queues to keep in memory
@@ -1039,13 +1045,6 @@ icommunicate(IExchangeInfo* iexchange)
                     outgoing_queues[link(i)->target(j)];
     }
 
-    // prepare list of outgoing messages
-    ToSendList to_send;                          // gids of destinations
-    prep_out(to_send);
-
-    // decide how many queues to keep in memory
-    int out_queues_limit = limit_out(to_send);
-
     // lock out other threads
     // TODO: not threaded yet
     // if (!CAS(comm_flag, 0, 1))
@@ -1055,7 +1054,8 @@ icommunicate(IExchangeInfo* iexchange)
 //     log->info("out_queues_limit: {}", out_queues_limit);
 
     // exchange
-    comm_exchange(to_send, out_queues_limit, iexchange);
+    ToSendList to_send = prep_out();
+    comm_exchange(to_send, iexchange);
 
     // cleanup
 
@@ -1295,19 +1295,14 @@ flush(bool remote)
   incoming_.erase(exchange_round_);
   ++exchange_round_;
 
-  // make a list of outgoing queues to send (the ones in memory come first)
-  ToSendList    to_send;
-  prep_out(to_send);
-
-  int out_queues_limit = limit_out(to_send);
-
   if (remote)
-      rcomm_exchange(to_send, out_queues_limit);
+      rcomm_exchange();
   else
   {
+      ToSendList to_send = prep_out();
       do
       {
-          comm_exchange(to_send, out_queues_limit, 0);
+          comm_exchange(to_send);
 
 #ifdef DEBUG
           time_type cur = get_time();
