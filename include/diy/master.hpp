@@ -15,7 +15,6 @@
 // Communicator functionality
 #include "mpi.hpp"
 #include "serialization.hpp"
-#include "detail/collectives.hpp"
 #include "time.hpp"
 
 #include "thread.hpp"
@@ -38,16 +37,13 @@ namespace diy
     public:
       struct ProcessBlock;
 
-      template<class Block>
-      struct Binder;
-
-      // Commands
+      // Commands; forward declarations, defined in detail/master/commands.hpp
       struct BaseCommand;
 
       template<class Block>
       struct Command;
 
-      typedef std::vector<BaseCommand*>     Commands;
+      using Commands = std::vector<BaseCommand*>;
 
       // Skip
       using Skip = std::function<bool(int, const Master&)>;
@@ -62,7 +58,7 @@ namespace diy
       typedef Collection::Load              LoadBlock;
 
     public:
-      // Communicator types
+      // Communicator types, defined in proxy.hpp
       struct Proxy;
       struct ProxyWithLink;
       struct IProxyWithLink;
@@ -74,31 +70,6 @@ namespace diy
       // iexchange callback
       template<class Block>
       using ICallback = std::function<bool(Block*, const IProxyWithLink&)>;
-
-      struct IExchangeInfo
-      {
-        IExchangeInfo():
-            n(0)                                                {}
-        IExchangeInfo(size_t n_, mpi::communicator comm_):
-            n(n_),
-            comm(comm_),
-            global_work_(new mpi::window<int>(comm, 1))         { global_work_->lock_all(MPI_MODE_NOCHECK); }
-        ~IExchangeInfo()                                        { global_work_->unlock_all(); }
-
-        operator bool() const                                   { return n == 0; }
-
-        int               global_work();                  // get global work status (for debugging)
-        bool              all_done();                     // get global all done status
-        void              reset_work();                   // reset global work counter
-        int               add_work(int work);             // add work to global work counter
-        int               inc_work()                      { return add_work(1); }   // increment global work counter
-        int               dec_work()                      { return add_work(-1); }  // decremnent global work counter
-
-        size_t                              n;
-        mpi::communicator                   comm;
-        std::unordered_map<int, bool>       done;               // gid -> done
-        std::unique_ptr<mpi::window<int>>   global_work_;       // global work to do
-      };
 
       struct QueuePolicy
       {
@@ -117,29 +88,16 @@ namespace diy
         size_t  size;
       };
 
-      struct MessageInfo
-      {
-        int from, to;
-        int round;
-      };
+      // forward declarations, defined in detail/master/communication.hpp
+      struct MessageInfo;
+      struct InFlightSend;
+      struct InFlightRecv;
+      struct tags;
 
-      struct InFlightSend
-      {
-        std::shared_ptr<MemoryBuffer> message;
-        mpi::request                  request;
+      struct IExchangeInfo;
 
-        // for debug purposes:
-        MessageInfo info;
-      };
-
-      struct InFlightRecv
-      {
-        MemoryBuffer message;
-        MessageInfo info{ -1, -1, -1 };
-      };
-
+      // forward declarations, defined in detail/master/collectives.hpp
       struct Collective;
-      struct tags       { enum { queue, piece }; };
 
       typedef           std::list<InFlightSend>             InFlightSendsList;
       typedef           std::map<int, InFlightRecv>         InFlightRecvsMap;
@@ -389,57 +347,16 @@ namespace diy
       stats::Profiler               prof;
   };
 
-  struct Master::BaseCommand
-  {
-      virtual       ~BaseCommand()                                                  {}      // to delete derived classes
-      virtual void  execute(void* b, const ProxyWithLink& cp) const                 =0;
-      virtual void  execute(void* b, const IProxyWithLink& cp) const                =0;
-      virtual bool  skip(int i, const Master& master) const                         =0;
-  };
-
-  template<class Block>
-  struct Master::Command: public BaseCommand
-  {
-            Command(Callback<Block> f_, const Skip& s_):
-                f(f_), s(s_)                                                        {}
-
-      void  execute(void* b, const ProxyWithLink& cp) const override                { f(static_cast<Block*>(b), cp); }
-      void  execute(void* b, const IProxyWithLink& cp) const override               { f(static_cast<Block*>(b), cp); }
-      bool  skip(int i, const Master& m) const override                             { return s(i,m); }
-
-      Callback<Block>   f;
-      Skip              s;
-  };
-
   struct Master::SkipNoIncoming
   { bool operator()(int i, const Master& master) const   { return !master.has_incoming(i); } };
-
-  struct Master::Collective
-  {
-            Collective():
-              cop_(0)                           {}
-            Collective(detail::CollectiveOp* cop):
-              cop_(cop)                         {}
-            // this copy constructor is very ugly, but need it to insert Collectives into a list
-            Collective(const Collective& other):
-              cop_(0)                           { swap(const_cast<Collective&>(other)); }
-            ~Collective()                       { delete cop_; }
-
-    void    init()                              { cop_->init(); }
-    void    swap(Collective& other)             { std::swap(cop_, other.cop_); }
-    void    update(const Collective& other)     { cop_->update(*other.cop_); }
-    void    global(const mpi::communicator& c)  { cop_->global(c); }
-    void    copy_from(Collective& other) const  { cop_->copy_from(*other.cop_); }
-    void    result_out(void* x) const           { cop_->result_out(x); }
-
-    detail::CollectiveOp*                       cop_;
-
-    private:
-    Collective& operator=(const Collective& other);
-  };
 }
 
+#include "detail/master/communication.hpp"
+#include "detail/master/collectives.hpp"
+#include "detail/master/commands.hpp"
+
 #include "proxy.hpp"
+
 
 // --- ProcessBlock ---
 struct diy::Master::ProcessBlock
