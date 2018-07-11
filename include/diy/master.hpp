@@ -1262,91 +1262,24 @@ check_incoming_queues(IExchangeInfo* iexchange)
     mpi::optional<mpi::status> ostatus = comm_.iprobe(mpi::any_source, mpi::any_tag);
     while (ostatus)
     {
-        InFlightRecv &ir = inflight_recvs_[ostatus->source()];
+        InFlightRecv& ir = inflight_recvs_[ostatus->source()];
+        ir.recv(comm_, *ostatus);     // possibly partial recv, in case of a multi-piece message
 
-        // get messge info
-
-        if (ir.info.from == -1) // uninitialized
+        if (ir.done)                 // all pieces assembled
         {
-            MemoryBuffer bb;
-            comm_.recv(ostatus->source(), ostatus->tag(), bb.buffer);
-
-            if (ostatus->tag() == tags::piece)
-            {
-                size_t msg_size;
-                diy::load(bb, msg_size);
-                diy::load(bb, ir.info);
-
-                ir.message.buffer.reserve(msg_size);
-            }
-            else // tags::queue
-            {
-                diy::load_back(bb, ir.info);
-                ir.message.swap(bb);
-            }
-        }
-        else
-        {
-            size_t start_idx = ir.message.buffer.size();
-            size_t count = ostatus->count<char>();
-            ir.message.buffer.resize(start_idx + count);
-
-            detail::VectorWindow<char> window;
-            window.begin = &ir.message.buffer[start_idx];
-            window.count = count;
-
-            comm_.recv(ostatus->source(), ostatus->tag(), window);
-        }
-
-        // unload message
-
-        if (ostatus->tag() == tags::queue)
-        {
-            size_t size     = ir.message.size();
-            int from        = ir.info.from;
-            int to          = ir.info.to;
-            int external    = -1;
-
             assert(ir.info.round >= exchange_round_);
-            IncomingRound *in = &incoming_[ir.info.round];
+            IncomingRound* in = &incoming_[ir.info.round];
 
-            bool unload_queue = ((ir.info.round == exchange_round_) ? (block(lid(to)) == 0) : (limit_ != -1)) &&
-                queue_policy_->unload_incoming(*this, from, to, size);
-            if (unload_queue)
-            {
-                log->debug("Directly unloading queue {} <- {}", to, from);
-                external = storage_->put(ir.message); // unload directly
-            }
-            else
-            {
-                if (!iexchange)
-                {
-                    in->map[to].queues[from].swap(ir.message);
-                    in->map[to].queues[from].reset();     // buffer position = 0
-                }
-                else
-                {
-                    if (iexchange->done[to])
-                    {
-                        iexchange->done[to] = false;
-                        int work = iexchange->inc_work();
-                        fmt::print(stderr, "[{}] Incrementing work when switching done (on receipt) for {}: work = {}\n", comm_.rank(), to, work);
-                    } else
-                        fmt::print(stderr, "[{}] {} is not done, no need to increment work\n", comm_.rank(), to);
-                    in->map[to].queues[from].append_binary(&ir.message.buffer[0], ir.message.size());        // append insted of overwrite
-                    // TODO: no need for ir.message.clear()? (as in send_outgoing_queues)
-                    int work = iexchange->dec_work();
-                    fmt::print(stderr, "[{}] Decrementing work after receiving for {}: work = {}\n", comm_.rank(), to, work);
-                }
-            }
-            in->map[to].records[from] = QueueRecord(size, external);
+            bool unload = ((ir.info.round == exchange_round_) ? (block(lid(ir.info.to)) == 0) : (limit_ != -1))
+                          && queue_policy_->unload_incoming(*this, ir.info.from, ir.info.to, ir.message.size());
 
-            ++(in->received);
-            ir = InFlightRecv(); // reset
+            ir.place(in, unload, storage_, iexchange);
+
+            ir = InFlightRecv();    // reset
         }
 
         ostatus = comm_.iprobe(mpi::any_source, mpi::any_tag);
-    }                                             // while ostatus
+    }
 }
 
 void

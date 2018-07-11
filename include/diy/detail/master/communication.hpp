@@ -19,7 +19,11 @@ namespace diy
     struct Master::InFlightRecv
     {
         MemoryBuffer    message;
-        MessageInfo     info{ -1, -1, -1 };
+        MessageInfo     info { -1, -1, -1 };
+        bool            done = false;
+
+        void            recv(mpi::communicator& comm, const mpi::status& status);
+        void            place(IncomingRound* in, bool unload, ExternalStorage* storage, IExchangeInfo* iexchange);
     };
 
     struct Master::IExchangeInfo
@@ -75,5 +79,81 @@ namespace diy
         };
     }
     } // namespace mpi::detail
-
 } // namespace diy
+
+void
+diy::Master::InFlightRecv::
+recv(mpi::communicator& comm, const mpi::status& status)
+{
+    if (info.from == -1)            // uninitialized
+    {
+        MemoryBuffer bb;
+        comm.recv(status.source(), status.tag(), bb.buffer);
+
+        if (status.tag() == tags::piece)     // first piece is the header
+        {
+            size_t msg_size;
+            diy::load(bb, msg_size);
+            diy::load(bb, info);
+
+            message.buffer.reserve(msg_size);
+        }
+        else    // tags::queue
+        {
+            diy::load_back(bb, info);
+            message.swap(bb);
+        }
+    }
+    else
+    {
+        size_t start_idx = message.buffer.size();
+        size_t count = status.count<char>();
+        message.buffer.resize(start_idx + count);
+
+        detail::VectorWindow<char> window;
+        window.begin = &message.buffer[start_idx];
+        window.count = count;
+
+        comm.recv(status.source(), status.tag(), window);
+    }
+
+    if (status.tag() == tags::queue)
+        done = true;
+}
+
+void
+diy::Master::InFlightRecv::
+place(IncomingRound* in, bool unload, ExternalStorage* storage, IExchangeInfo* iexchange)
+{
+    size_t size     = message.size();
+    int from        = info.from;
+    int to          = info.to;
+    int external    = -1;
+
+    if (unload)
+    {
+        get_logger()->debug("Directly unloading queue {} <- {}", to, from);
+        external = storage->put(message);       // unload directly
+    }
+    else if (!iexchange)
+    {
+        in->map[to].queues[from].swap(message);
+        in->map[to].queues[from].reset();       // buffer position = 0
+    }
+    else    // iexchange
+    {
+        if (iexchange->done[to])
+        {
+            iexchange->done[to] = false;
+            int work = iexchange->inc_work();
+            fmt::print(stderr, "[{}] Incrementing work when switching done (on receipt): work = {}\n", to, work);
+        } else
+            fmt::print(stderr, "[{}] Not done, no need to increment work\n", to);
+        in->map[to].queues[from].append_binary(&message.buffer[0], message.size());        // append insted of overwrite
+        int work = iexchange->dec_work();
+        fmt::print(stderr, "[{}] Decrementing work after receiving: work = {}\n", to, work);
+    }
+    in->map[to].records[from] = QueueRecord(size, external);
+
+    ++(in->received);
+}
