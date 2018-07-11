@@ -913,38 +913,6 @@ iexchange_(const ICallback<Block>& f)
     fmt::print(stderr, "[{}] ==== Leaving iexchange ====\n", iexchange.comm.rank());
 }
 
-namespace diy
-{
-namespace detail
-{
-  template <typename T>
-  struct VectorWindow
-  {
-    T *begin;
-    size_t count;
-  };
-} // namespace detail
-
-namespace mpi
-{
-namespace detail
-{
-  template<typename T>  struct is_mpi_datatype< diy::detail::VectorWindow<T> > { typedef true_type type; };
-
-  template <typename T>
-  struct mpi_datatype< diy::detail::VectorWindow<T> >
-  {
-    typedef diy::detail::VectorWindow<T> VecWin;
-    static MPI_Datatype         datatype()                { return get_mpi_datatype<T>(); }
-    static const void*          address(const VecWin& x)  { return x.begin; }
-    static void*                address(VecWin& x)        { return x.begin; }
-    static int                  count(const VecWin& x)    { return static_cast<int>(x.count); }
-  };
-}
-} // namespace mpi::detail
-
-} // namespace diy
-
 /* Communicator */
 void
 diy::Master::
