@@ -154,16 +154,20 @@ place(IncomingRound* in, bool unload, ExternalStorage* storage, IExchangeInfo* i
     }
     else    // iexchange
     {
+        auto log = get_logger();
+
         if (iexchange->done[to])
         {
             iexchange->done[to] = false;
             int work = iexchange->inc_work();
-            fmt::print(stderr, "[{}] Incrementing work when switching done (on receipt): work = {}\n", to, work);
+            log->debug("[{}] Incrementing work when switching done (on receipt): work = {}\n", to, work);
         } else
-            fmt::print(stderr, "[{}] Not done, no need to increment work\n", to);
+            log->debug("[{}] Not done, no need to increment work\n", to);
+
         in->map[to].queues[from].append_binary(&message.buffer[0], message.size());        // append insted of overwrite
+
         int work = iexchange->dec_work();
-        fmt::print(stderr, "[{}] Decrementing work after receiving: work = {}\n", to, work);
+        log->debug("[{}] Decrementing work after receiving: work = {}\n", to, work);
     }
     in->map[to].records[from] = QueueRecord(size, external);
 

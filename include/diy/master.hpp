@@ -300,13 +300,15 @@ namespace diy
       inline void       rcomm_exchange();    // possibly called in between block computations
       inline bool       nudge();
       inline void       send_outgoing_queues(GidSendOrder&   gid_order,
-                                             IncomingRound&  current_incoming,
                                              bool            remote,
                                              IExchangeInfo*  iexchange = 0);
       inline void       check_incoming_queues(IExchangeInfo* iexchange = 0);
       inline GidSendOrder
                         order_gids();
       inline void       touch_queues();
+      inline void       move_external_local(int from);
+      inline void       send_same_rank(int from, int to, MemoryBuffer& bb, IExchangeInfo* iexchange);
+      inline void       send_different_rank(int from, int to, int proc, MemoryBuffer& bb, bool remote, IExchangeInfo* iexchange);
 
       // iexchange commmunication
       inline void       icommunicate(IExchangeInfo* iexchange);     // async communication
@@ -849,7 +851,6 @@ iexchange_(const ICallback<Block>& f)
     comm_.barrier();                            // make sure that everyone's original work is accounted for
 
     int global_work_ = -1;
-    int prev_global_work_ = -1;
 
     do
     {
@@ -879,39 +880,25 @@ iexchange_(const ICallback<Block>& f)
             done &= (nunenq_after == 0);
 
             int gid = icp.gid();
-            //fmt::print(stderr, "[{}] done = {}, result = {}\n", gid, iexchange.done[gid], done);
             if (iexchange.done[gid] != done)
             {
                 iexchange.done[gid] = done;
                 if (done)
                 {
                     int work = iexchange.dec_work();
-                    fmt::print(stderr, "[{}] Decrementing work when switching done after callback, for {}: work = {}\n", comm_.rank(), gid, work);
+                    log->debug("[{}] Decrementing work when switching done after callback, for {}: work = {}\n", comm_.rank(), gid, work);
                 }
                 else
                 {
                     int work = iexchange.inc_work();
-                    fmt::print(stderr, "[{}] Incrementing work when switching done after callback, for {}: work = {}\n", comm_.rank(), gid, work);
+                    log->debug("[{}] Incrementing work when switching done after callback, for {}: work = {}\n", comm_.rank(), gid, work);
                 }
             }
         }
 
         global_work_ = iexchange.global_work();
-        if (global_work_ != prev_global_work_)
-        {
-            int ndone = 0;
-            for (auto& x : iexchange.done)
-                if (x.second)
-                    ndone++;
-            fmt::print(stderr, "[{}] ndone = {} out of {}, nundeq = {}, nunenq = {} global_work = {}\n",
-                               iexchange.comm.rank(), ndone, size(),
-                               nundeq, nunenq, global_work_);
-        }
-        prev_global_work_ = global_work_;
-
-    // end when all received messages have been dequeued, all blocks are done, and no messages are in flight
     } while (global_work_ > 0);
-    fmt::print(stderr, "[{}] ==== Leaving iexchange ====\n", iexchange.comm.rank());
+    log->debug("[{}] ==== Leaving iexchange ====\n", iexchange.comm.rank());
 }
 
 /* Communicator */
@@ -919,8 +906,7 @@ void
 diy::Master::
 comm_exchange(GidSendOrder& gid_order, IExchangeInfo* iexchange)
 {
-    IncomingRound &current_incoming = incoming_[exchange_round_];
-    send_outgoing_queues(gid_order, current_incoming, false, iexchange);
+    send_outgoing_queues(gid_order, false, iexchange);
     while(nudge());                   // kick requests
     check_incoming_queues(iexchange);
 }
@@ -955,7 +941,6 @@ void
 diy::Master::
 rcomm_exchange()
 {
-    IncomingRound   &current_incoming   = incoming_[exchange_round_];
     bool            done                = false;
     bool            ibarr_act           = false;
     mpi::request    ibarr_req;                      // mpi request associated with ibarrier
@@ -965,7 +950,7 @@ rcomm_exchange()
 
     while (!done)
     {
-        send_outgoing_queues(gid_order, current_incoming, true, 0);
+        send_outgoing_queues(gid_order, true, 0);
 
         // kick requests
         nudge();
@@ -1048,42 +1033,15 @@ icommunicate(IExchangeInfo* iexchange)
 void
 diy::Master::
 send_outgoing_queues(GidSendOrder&   gid_order,
-                     IncomingRound&  current_incoming,
                      bool            remote,                     // TODO: are remote and iexchange mutually exclusive? If so, use single enum?
                      IExchangeInfo*  iexchange)
 {
-    static const size_t MAX_MPI_MESSAGE_COUNT = INT_MAX;
-
     while (inflight_sends_.size() < gid_order.limit && !gid_order.empty())
     {
         int from = gid_order.pop();
 
-        // deal with external_local queues
-        for (OutQueueRecords::iterator it = outgoing_[from].external_local.begin(); it != outgoing_[from].external_local.end(); ++it)
-        {
-            int to = it->first.gid;
-
-            log->debug("Processing local queue: {} <- {} of size {}", to, from, it->second.size);
-
-            QueueRecord& in_qr  = current_incoming.map[to].records[from];
-            bool in_external  = block(lid(to)) == 0;
-
-            if (in_external)
-                in_qr = it->second;
-            else
-            {
-                // load the queue
-                in_qr.size     = it->second.size;
-                in_qr.external = -1;
-
-                MemoryBuffer bb;
-                storage_->get(it->second.external, bb);
-
-                current_incoming.map[to].queues[from].swap(bb);
-            }
-            ++current_incoming.received;
-        }
-        outgoing_[from].external_local.clear();
+        // move external queues going to our rank
+        move_external_local(from);
 
         if (outgoing_[from].external != -1)
             load_outgoing(from);
@@ -1094,141 +1052,186 @@ send_outgoing_queues(GidSendOrder&   gid_order,
             BlockID to_proc = it->first;
             int     to      = to_proc.gid;
             int     proc    = to_proc.proc;
+            log->debug("Processing queue:      {} <- {} of size {}", to, from, outgoing_[from].queues[to_proc].size());
 
             // skip empty queues
-            if (iexchange && !outgoing_[from].queues[to_proc].size())
+            if (iexchange && !it->second.size())
             {
                 log->debug("Skipping empty queue: {} <- {}", to, from);
                 continue;
             }
 
-            log->debug("Processing queue:      {} <- {} of size {}", to, from, outgoing_[from].queues[to_proc].size());
-
-            // There may be local outgoing queues that remained in memory
-
             // sending to same rank: simply swap buffers
             if (proc == comm_.rank())
-            {
-                log->debug("Moving queue in-place: {} <- {}", to, from);
-
-                QueueRecord& in_qr  = current_incoming.map[to].records[from];
-                bool in_external  = block(lid(to)) == 0;
-                if (in_external)
-                {
-                    log->debug("Unloading outgoing directly as incoming: {} <- {}", to, from);
-                    MemoryBuffer& bb = it->second;
-                    in_qr.size = bb.size();
-                    if (queue_policy_->unload_incoming(*this, from, to, in_qr.size))
-                        in_qr.external = storage_->put(bb);
-                    else
-                    {
-                        MemoryBuffer& in_bb = current_incoming.map[to].queues[from];
-                        if (!iexchange)
-                        {
-                            in_bb.swap(bb);
-                            in_bb.reset();
-                        }
-                        else
-                        {
-                            in_bb.append_binary(&bb.buffer[0], bb.size());
-                            bb.clear();
-                        }
-                        in_qr.external = -1;
-                    }
-                } else        // !in_external
-                {
-                    log->debug("Swapping in memory:    {} <- {}", to, from);
-                    MemoryBuffer& bb = current_incoming.map[to].queues[from];
-                    if (!iexchange)
-                    {
-                        bb.swap(it->second);
-                        bb.reset();
-                    }
-                    else
-                    {
-                        bb.append_binary(&it->second.buffer[0], it->second.size());
-                        it->second.clear();
-                    }
-                    in_qr.size = bb.size();
-                    in_qr.external = -1;
-                }
-
-                ++current_incoming.received;
-                continue;
-            }                           // sending to same rank
-
-            // sending to a different rank
-            std::shared_ptr<MemoryBuffer> buffer = std::make_shared<MemoryBuffer>();
-            buffer->swap(it->second);
-
-            MessageInfo info{from, to, exchange_round_};
-            // size fits in one message
-            if (buffer->size() <= (MAX_MPI_MESSAGE_COUNT - sizeof(info)))
-            {
-                diy::save(*buffer, info);
-
-                inflight_sends_.emplace_back();
-                inflight_sends_.back().info = info;
-                if (remote || iexchange)
-                {
-                    if (iexchange)
-                    {
-                        int work = iexchange->inc_work();
-                        fmt::print(stderr, "[{}] Incrementing work when sending queue: work = {}\n", comm_.rank(), work);
-                    }
-                    inflight_sends_.back().request = comm_.issend(proc, tags::queue, buffer->buffer);
-                }
-                else
-                    inflight_sends_.back().request = comm_.isend(proc, tags::queue, buffer->buffer);
-                inflight_sends_.back().message = buffer;
-            }
-            // large message gets broken into chunks
+                send_same_rank(from, to, it->second, iexchange);
             else
-            {
-                int npieces = static_cast<int>((buffer->size() + MAX_MPI_MESSAGE_COUNT - 1)/MAX_MPI_MESSAGE_COUNT);
+                send_different_rank(from, to, proc, it->second, remote, iexchange);
 
-                // first send the head
-                std::shared_ptr<MemoryBuffer> hb = std::make_shared<MemoryBuffer>();
-                diy::save(*hb, buffer->size());
-                diy::save(*hb, info);
-
-                inflight_sends_.emplace_back();
-                inflight_sends_.back().info = info;
-                if (remote || iexchange)
-                {
-                    // add one unit of work for the entire large message (upon sending the head, not the individual pieces below)
-                    if (iexchange)
-                    {
-                        int work = iexchange->inc_work();
-                        fmt::print(stderr, "[{}] Incrementing work when sending the first piece: work = {}\n", comm_.rank(), work);
-                    }
-                    inflight_sends_.back().request = comm_.issend(proc, tags::piece, hb->buffer);
-                }
-                else
-                    inflight_sends_.back().request = comm_.isend(proc, tags::piece, hb->buffer);
-                inflight_sends_.back().message = hb;
-
-                // send the message pieces
-                size_t msg_buff_idx = 0;
-                for (int i = 0; i < npieces; ++i, msg_buff_idx += MAX_MPI_MESSAGE_COUNT)
-                {
-                    int tag = (i == (npieces - 1)) ? tags::queue : tags::piece;
-
-                    detail::VectorWindow<char> window;
-                    window.begin = &buffer->buffer[msg_buff_idx];
-                    window.count = std::min(MAX_MPI_MESSAGE_COUNT, buffer->size() - msg_buff_idx);
-
-                    inflight_sends_.emplace_back();
-                    inflight_sends_.back().info = info;
-                    if (remote || iexchange)
-                        inflight_sends_.back().request = comm_.issend(proc, tag, window);
-                    else
-                        inflight_sends_.back().request = comm_.isend(proc, tag, window);
-                    inflight_sends_.back().message = buffer;
-                }
-            }                                   // large message broken into pieces
         }                                       // for (OutgoingQueues::iterator it ...
     }                                           // while (inflight_sends_.size() ...
+}
+
+void
+diy::Master::
+move_external_local(int from)
+{
+    IncomingRound& current_incoming = incoming_[exchange_round_];
+
+    // deal with external_local queues
+    for (auto& x : outgoing_[from].external_local)
+    {
+        int to = x.first.gid;
+
+        log->debug("Processing local queue: {} <- {} of size {}", to, from, x.second.size);
+
+        QueueRecord& in_qr        = current_incoming.map[to].records[from];
+        bool         to_external  = block(lid(to)) == 0;
+
+        if (to_external)
+            in_qr = x.second;
+        else
+        {
+            // load the queue
+            in_qr.size     = x.second.size;
+            in_qr.external = -1;
+
+            MemoryBuffer bb;
+            storage_->get(x.second.external, bb);
+
+            current_incoming.map[to].queues[from].swap(bb);
+        }
+        current_incoming.received++;
+    }
+    outgoing_[from].external_local.clear();
+}
+
+void
+diy::Master::
+send_same_rank(int from, int to, MemoryBuffer& bb, IExchangeInfo* iexchange)
+{
+    log->debug("Moving queue in-place: {} <- {}", to, from);
+
+    IncomingRound& current_incoming = incoming_[exchange_round_];
+
+    QueueRecord& in_qr       = current_incoming.map[to].records[from];
+    bool         to_external = block(lid(to)) == 0;
+    if (to_external)
+    {
+        log->debug("Unloading outgoing directly as incoming: {} <- {}", to, from);
+        in_qr.size = bb.size();
+        if (queue_policy_->unload_incoming(*this, from, to, in_qr.size))
+            in_qr.external = storage_->put(bb);
+        else
+        {
+            MemoryBuffer& in_bb = current_incoming.map[to].queues[from];
+            if (!iexchange)
+            {
+                in_bb.swap(bb);
+                in_bb.reset();
+            }
+            else
+            {
+                in_bb.append_binary(&bb.buffer[0], bb.size());
+                bb.clear();
+            }
+            in_qr.external = -1;
+        }
+    } else        // !to_external
+    {
+        log->debug("Swapping in memory:    {} <- {}", to, from);
+        MemoryBuffer& in_bb = current_incoming.map[to].queues[from];
+        if (!iexchange)
+        {
+            in_bb.swap(bb);
+            in_bb.reset();
+        }
+        else
+        {
+            in_bb.append_binary(&bb.buffer[0], bb.size());
+            bb.wipe();
+        }
+        in_qr.size = bb.size();
+        in_qr.external = -1;
+    }
+
+    ++current_incoming.received;
+}
+
+void
+diy::Master::
+send_different_rank(int from, int to, int proc, MemoryBuffer& bb, bool remote, IExchangeInfo* iexchange)
+{
+    static const size_t MAX_MPI_MESSAGE_COUNT = INT_MAX;
+
+    // sending to a different rank
+    std::shared_ptr<MemoryBuffer> buffer = std::make_shared<MemoryBuffer>();
+    buffer->swap(bb);
+
+    MessageInfo info{from, to, exchange_round_};
+    // size fits in one message
+    if (Serialization<MemoryBuffer>::size(*buffer) + Serialization<MessageInfo>::size(info) <= MAX_MPI_MESSAGE_COUNT)
+    {
+        diy::save(*buffer, info);
+
+        inflight_sends_.emplace_back();
+        inflight_sends_.back().info = info;
+        if (remote || iexchange)
+        {
+            if (iexchange)
+            {
+                int work = iexchange->inc_work();
+                log->debug("[{}] Incrementing work when sending queue: work = {}\n", comm_.rank(), work);
+            }
+            inflight_sends_.back().request = comm_.issend(proc, tags::queue, buffer->buffer);
+        }
+        else
+            inflight_sends_.back().request = comm_.isend(proc, tags::queue, buffer->buffer);
+        inflight_sends_.back().message = buffer;
+    }
+    else // large message gets broken into chunks
+    {
+        int npieces = static_cast<int>((buffer->size() + MAX_MPI_MESSAGE_COUNT - 1)/MAX_MPI_MESSAGE_COUNT);
+
+        // first send the head
+        std::shared_ptr<MemoryBuffer> hb = std::make_shared<MemoryBuffer>();
+        diy::save(*hb, buffer->size());
+        diy::save(*hb, info);
+
+        inflight_sends_.emplace_back();
+        inflight_sends_.back().info = info;
+        if (remote || iexchange)
+        {
+            // add one unit of work for the entire large message (upon sending the head, not the individual pieces below)
+            if (iexchange)
+            {
+                int work = iexchange->inc_work();
+                log->debug("[{}] Incrementing work when sending the first piece: work = {}\n", comm_.rank(), work);
+            }
+            inflight_sends_.back().request = comm_.issend(proc, tags::piece, hb->buffer);
+        }
+        else
+            inflight_sends_.back().request = comm_.isend(proc, tags::piece, hb->buffer);
+        inflight_sends_.back().message = hb;
+
+        // send the message pieces
+        size_t msg_buff_idx = 0;
+        for (int i = 0; i < npieces; ++i, msg_buff_idx += MAX_MPI_MESSAGE_COUNT)
+        {
+            int tag = (i == (npieces - 1)) ? tags::queue : tags::piece;     // last piece is marked as queue, to indicate that we are done
+
+            detail::VectorWindow<char> window;
+            window.begin = &buffer->buffer[msg_buff_idx];
+            window.count = std::min(MAX_MPI_MESSAGE_COUNT, buffer->size() - msg_buff_idx);
+
+            inflight_sends_.emplace_back();
+            inflight_sends_.back().info = info;
+            if (remote || iexchange)
+                inflight_sends_.back().request = comm_.issend(proc, tag, window);
+            else
+                inflight_sends_.back().request = comm_.isend(proc, tag, window);
+            inflight_sends_.back().message = buffer;
+        }
+    }   // large message broken into pieces
 }
 
 void
@@ -1423,7 +1426,6 @@ int
 diy::Master::IExchangeInfo::
 add_work(int work)
 {
-    //fmt::print(stderr, "[{}] Adding {} work\n", comm.rank(), work);
     int global_work;                                               // unused
     global_work_->fetch_and_op(&work, &global_work, 0, 0, MPI_SUM);
     global_work_->flush(0);
