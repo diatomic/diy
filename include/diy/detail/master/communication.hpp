@@ -24,7 +24,14 @@ namespace diy
 
         void            recv(mpi::communicator& comm, const mpi::status& status);
         void            place(IncomingRound* in, bool unload, ExternalStorage* storage, IExchangeInfo* iexchange);
+        void            reset()     { *this = InFlightRecv(); }
     };
+
+    struct Master::InFlightRecvsMap: public std::map<int, InFlightRecv>
+    {};
+
+    struct Master::InFlightSendsList: public std::list<InFlightSend>
+    {};
 
     struct Master::GidSendOrder
     {
@@ -90,6 +97,19 @@ namespace diy
     }
     } // namespace mpi::detail
 } // namespace diy
+
+diy::Master::InFlightRecv&
+diy::Master::
+inflight_recv(int proc)
+{
+    return (*inflight_recvs_)[proc];
+}
+
+diy::Master::InFlightSendsList&
+diy::Master::inflight_sends()
+{
+    return *inflight_sends_;
+}
 
 // receive message described by status
 void

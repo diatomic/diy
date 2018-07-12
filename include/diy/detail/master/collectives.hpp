@@ -68,4 +68,24 @@ namespace diy
 
         detail::CollectiveOp*                           cop_;
     };
+
+    struct Master::CollectivesList: public std::list<Collective>
+    {};
+
+    struct Master::CollectivesMap: public std::map<int, CollectivesList>
+    {};
+}
+
+diy::Master::CollectivesMap&
+diy::Master::
+collectives()
+{
+    return *collectives_;
+}
+
+diy::Master::CollectivesList&
+diy::Master::
+collectives(int gid__)
+{
+    return (*collectives_)[gid__];
 }
