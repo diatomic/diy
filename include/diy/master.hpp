@@ -683,9 +683,6 @@ iexchange_(const ICallback<Block>& f)
 
     do
     {
-        int nundeq = 0;
-        int nunenq = 0;
-
         for (size_t i = 0; i < size(); i++)     // for all blocks
         {
             icommunicate(&iexchange);            // TODO: separate comm thread std::thread t(icommunicate);
@@ -702,8 +699,6 @@ iexchange_(const ICallback<Block>& f)
                 if (icp.outgoing(icp.link()->target(j)).size())
                     ++nunenq_after;
             }
-            nundeq += nundeq_after;
-            nunenq += nunenq_after;
 
             done &= (nundeq_after == 0);
             done &= (nunenq_after == 0);
