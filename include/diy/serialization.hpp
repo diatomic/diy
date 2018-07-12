@@ -176,6 +176,11 @@ namespace diy
       x.buffer.resize(x.position);
       diy::load(bb, &x.buffer[0], x.position);
     }
+
+    static size_t       size(const MemoryBuffer& x)
+    {
+        return sizeof(x.position) + x.position;
+    }
   };
 
   // save/load for std::vector<U>

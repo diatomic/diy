@@ -94,6 +94,7 @@ namespace diy
       struct InFlightRecv;
       struct tags;
 
+      struct GidSendOrder;
       struct IExchangeInfo;
 
       // forward declarations, defined in detail/master/collectives.hpp
@@ -101,7 +102,6 @@ namespace diy
 
       typedef           std::list<InFlightSend>             InFlightSendsList;
       typedef           std::map<int, InFlightRecv>         InFlightRecvsMap;
-      typedef           std::list<int>                      ToSendList;         // [gid]
       typedef           std::list<Collective>               CollectivesList;
       typedef           std::map<int, CollectivesList>      CollectivesMap;     // gid          -> [collectives]
 
@@ -296,17 +296,16 @@ namespace diy
 
     private:
       // Communicator functionality
-      inline void       comm_exchange(ToSendList& to_send, IExchangeInfo*    iexchange = 0);
+      inline void       comm_exchange(GidSendOrder& gid_order, IExchangeInfo*    iexchange = 0);
       inline void       rcomm_exchange();    // possibly called in between block computations
       inline bool       nudge();
-      inline void       send_outgoing_queues(ToSendList&    to_send,
-                                             int            out_queues_limit,
-                                             IncomingRound& current_incoming,
-                                             bool           remote,
-                                             IExchangeInfo* iexchange = 0);
+      inline void       send_outgoing_queues(GidSendOrder&   gid_order,
+                                             IncomingRound&  current_incoming,
+                                             bool            remote,
+                                             IExchangeInfo*  iexchange = 0);
       inline void       check_incoming_queues(IExchangeInfo* iexchange = 0);
-      inline ToSendList prep_out();
-      inline int        limit_out(const ToSendList& to_send);
+      inline GidSendOrder
+                        order_gids();
       inline void       touch_queues();
 
       // iexchange commmunication
@@ -524,14 +523,13 @@ unload_outgoing(int gid__)
 
   size_t out_queues_size = sizeof(size_t);   // map size
   size_t count = 0;
-  for (OutgoingQueues::iterator it = out_qr.queues.begin(); it != out_qr.queues.end(); ++it)
+  // count the size of the queues we need to pack
+  for (auto& rec : out_qr.queues)
   {
-    if (it->first.proc == comm_.rank()) continue;
+    if (rec.first.proc == comm_.rank()) continue;
 
-    out_queues_size += sizeof(BlockID);     // target
-    out_queues_size += sizeof(size_t);      // buffer.position
-    out_queues_size += sizeof(size_t);      // buffer.size
-    out_queues_size += it->second.size();   // buffer contents
+    out_queues_size += sizeof(BlockID);                                 // target
+    out_queues_size += Serialization<MemoryBuffer>::size(rec.second);   // buffer contents
     ++count;
   }
   if (queue_policy_->unload_outgoing(*this, gid__, out_queues_size - sizeof(size_t)))
@@ -540,29 +538,30 @@ unload_outgoing(int gid__)
       MemoryBuffer  bb;     bb.reserve(out_queues_size);
       diy::save(bb, count);
 
-      for (OutgoingQueues::iterator it = out_qr.queues.begin(); it != out_qr.queues.end();)
+      // pack queues going to a remote proc into bb; queues going to a
+      // different block on our rank, stay separated, recorded in external_local
+      for (auto it = out_qr.queues.begin(); it != out_qr.queues.end();)
       {
-        if (it->first.proc == comm_.rank())
+        auto  bid    = it->first;
+        auto& buffer = it->second;
+        if (bid.proc == comm_.rank())
         {
           // treat as incoming
-          if (queue_policy_->unload_incoming(*this, gid__, it->first.gid, it->second.size()))
+          if (queue_policy_->unload_incoming(*this, gid__, bid.gid, buffer.size()))
           {
-            QueueRecord& qr = out_qr.external_local[it->first];
-            qr.size = it->second.size();
-            qr.external = storage_->put(it->second);
+            QueueRecord& qr = out_qr.external_local[bid];
+            qr.size     = buffer.size();
+            qr.external = storage_->put(buffer);
 
             out_qr.queues.erase(it++);
-            continue;
-          } // else keep in memory
+          } ++it; // else keep in memory
         } else
         {
-          diy::save(bb, it->first);
-          diy::save(bb, it->second);
+          diy::save(bb, bid);
+          diy::save(bb, buffer);
 
           out_qr.queues.erase(it++);
-          continue;
         }
-        ++it;
       }
 
       // TODO: this mechanism could be adjusted for direct saving to disk
@@ -918,12 +917,10 @@ iexchange_(const ICallback<Block>& f)
 /* Communicator */
 void
 diy::Master::
-comm_exchange(ToSendList& to_send, IExchangeInfo* iexchange)
+comm_exchange(GidSendOrder& gid_order, IExchangeInfo* iexchange)
 {
-    int out_queues_limit = limit_out(to_send);
-
     IncomingRound &current_incoming = incoming_[exchange_round_];
-    send_outgoing_queues(to_send, out_queues_limit, current_incoming, false, iexchange);
+    send_outgoing_queues(gid_order, current_incoming, false, iexchange);
     while(nudge());                   // kick requests
     check_incoming_queues(iexchange);
 }
@@ -964,12 +961,11 @@ rcomm_exchange()
     mpi::request    ibarr_req;                      // mpi request associated with ibarrier
 
     // make a list of outgoing queues to send (the ones in memory come first)
-    ToSendList   to_send = prep_out();
-    int out_queues_limit = limit_out(to_send);
+    auto gid_order = order_gids();
 
     while (!done)
     {
-        send_outgoing_queues(to_send, out_queues_limit, current_incoming, true, 0);
+        send_outgoing_queues(gid_order, current_incoming, true, 0);
 
         // kick requests
         nudge();
@@ -982,7 +978,7 @@ rcomm_exchange()
         }
         else
         {
-            if (to_send.empty() && inflight_sends_.empty())
+            if (gid_order.empty() && inflight_sends_.empty())
             {
                 ibarr_req = comm_.ibarrier();
                 ibarr_act = true;
@@ -993,41 +989,32 @@ rcomm_exchange()
 
 // fill list of outgoing queues to send (the ones in memory come first)
 // for iexchange
-diy::Master::ToSendList
+diy::Master::GidSendOrder
 diy::Master::
-prep_out()
+order_gids()
 {
-    ToSendList to_send;
+    GidSendOrder order;
 
     for (OutgoingQueuesMap::iterator it = outgoing_.begin(); it != outgoing_.end(); ++it)
     {
         OutgoingQueuesRecord& out = it->second;
         if (out.external == -1)
-            to_send.push_front(it->first);
+            order.list.push_front(it->first);
         else
-            to_send.push_back(it->first);
+            order.list.push_back(it->first);
     }
-    log->debug("to_send.size(): {}", to_send.size());
+    log->debug("order.size(): {}", order.size());
 
-    return to_send;
-}
-
-// compute maximum number of queues to keep in memory
-// first version just average number of queues per block * num_blocks in memory
-// for iexchange
-int
-diy::Master::
-limit_out(const ToSendList& to_send)
-{
-    // XXX: we probably want a cleverer limit than
-    // block limit times average number of queues per block
-    // XXX: with queues we could easily maintain a specific space limit
-    int out_queues_limit;
+    // compute maximum number of queues to keep in memory
+    // first version just average number of queues per block * num_blocks in memory
+    // for iexchange
     if (limit_ == -1 || size() == 0)
-        return to_send.size();
+        order.limit = order.size();
     else
         // average number of queues per block * in-memory block limit
-        return std::max((size_t) 1, to_send.size() / size() * limit_);
+        order.limit = std::max((size_t) 1, order.size() / size() * limit_);
+
+    return order;
 }
 
 // iexchange communicator
@@ -1046,8 +1033,8 @@ icommunicate(IExchangeInfo* iexchange)
 //     log->info("out_queues_limit: {}", out_queues_limit);
 
     // exchange
-    ToSendList to_send = prep_out();
-    comm_exchange(to_send, iexchange);
+    auto gid_order = order_gids();
+    comm_exchange(gid_order, iexchange);
 
     // cleanup
 
@@ -1060,18 +1047,16 @@ icommunicate(IExchangeInfo* iexchange)
 
 void
 diy::Master::
-send_outgoing_queues(
-        ToSendList&     to_send,
-        int             out_queues_limit,
-        IncomingRound&  current_incoming,
-        bool            remote,                     // TODO: are remote and iexchange mutually exclusive? If so, use single enum?
-        IExchangeInfo*  iexchange)
+send_outgoing_queues(GidSendOrder&   gid_order,
+                     IncomingRound&  current_incoming,
+                     bool            remote,                     // TODO: are remote and iexchange mutually exclusive? If so, use single enum?
+                     IExchangeInfo*  iexchange)
 {
     static const size_t MAX_MPI_MESSAGE_COUNT = INT_MAX;
 
-    while (inflight_sends_.size() < (size_t)out_queues_limit && !to_send.empty())
+    while (inflight_sends_.size() < gid_order.limit && !gid_order.empty())
     {
-        int from = to_send.front();
+        int from = gid_order.pop();
 
         // deal with external_local queues
         for (OutQueueRecords::iterator it = outgoing_[from].external_local.begin(); it != outgoing_[from].external_local.end(); ++it)
@@ -1102,7 +1087,6 @@ send_outgoing_queues(
 
         if (outgoing_[from].external != -1)
             load_outgoing(from);
-        to_send.pop_front();
 
         OutgoingQueues& outgoing = outgoing_[from].queues;
         for (OutgoingQueues::iterator it = outgoing.begin(); it != outgoing.end(); ++it)
@@ -1291,10 +1275,10 @@ flush(bool remote)
       rcomm_exchange();
   else
   {
-      ToSendList to_send = prep_out();
+      auto gid_order = order_gids();
       do
       {
-          comm_exchange(to_send);
+          comm_exchange(gid_order);
 
 #ifdef DEBUG
           time_type cur = get_time();
@@ -1305,7 +1289,7 @@ flush(bool remote)
               wait *= 2;
           }
 #endif
-      } while (!inflight_sends_.empty() || incoming_[exchange_round_].received < expected_ || !to_send.empty());
+      } while (!inflight_sends_.empty() || incoming_[exchange_round_].received < expected_ || !gid_order.empty());
   }
 
   outgoing_.clear();

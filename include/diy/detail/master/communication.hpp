@@ -26,6 +26,16 @@ namespace diy
         void            place(IncomingRound* in, bool unload, ExternalStorage* storage, IExchangeInfo* iexchange);
     };
 
+    struct Master::GidSendOrder
+    {
+        size_t              size() const                        { return list.size(); }
+        bool                empty() const                       { return list.empty(); }
+        int                 pop()                               { int x = list.front(); list.pop_front(); return x; }
+
+        std::list<int>      list;
+        size_t              limit = 0;
+    };
+
     struct Master::IExchangeInfo
     {
       IExchangeInfo():
