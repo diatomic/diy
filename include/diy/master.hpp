@@ -955,14 +955,7 @@ send_same_rank(int from, int to, MemoryBuffer& bb, IExchangeInfo* iexchange)
             }
             else
             {
-                if (iexchange->done[to])
-                {
-                    iexchange->done[to] = false;
-                    int work = iexchange->inc_work();
-                    log->debug("[{}] Incrementing work when switching done (moving in-place): work = {}\n", to, work);
-                } else
-                    log->debug("[{}] Not done, no need to increment work\n", to);
-
+                iexchange->not_done(to);
                 in_bb.append_binary(&bb.buffer[0], bb.size());
                 bb.clear();
             }
@@ -979,14 +972,7 @@ send_same_rank(int from, int to, MemoryBuffer& bb, IExchangeInfo* iexchange)
         }
         else
         {
-            if (iexchange->done[to])
-            {
-                iexchange->done[to] = false;
-                int work = iexchange->inc_work();
-                log->debug("[{}] Incrementing work when switching done (moving in-place): work = {}\n", to, work);
-            } else
-                log->debug("[{}] Not done, no need to increment work\n", to);
-
+            iexchange->not_done(to);
             in_bb.append_binary(&bb.buffer[0], bb.size());
             bb.wipe();
         }

@@ -45,15 +45,15 @@ namespace diy
 
     struct Master::IExchangeInfo
     {
-      IExchangeInfo():
-          n(0)                                                  {}
-      IExchangeInfo(size_t n_, mpi::communicator comm_):
-          n(n_),
-          comm(comm_),
-          global_work_(new mpi::window<int>(comm, 1))           { global_work_->lock_all(MPI_MODE_NOCHECK); }
-      ~IExchangeInfo()                                          { global_work_->unlock_all(); }
+                        IExchangeInfo():
+                            n(0)                                                  {}
+                        IExchangeInfo(size_t n_, mpi::communicator comm_):
+                            n(n_),
+                            comm(comm_),
+                            global_work_(new mpi::window<int>(comm, 1))           { global_work_->lock_all(MPI_MODE_NOCHECK); }
+                        ~IExchangeInfo()                                          { global_work_->unlock_all(); }
 
-      operator bool() const                                     { return n == 0; }
+      void              not_done(int gid);
 
       int               global_work();                          // get global work status (for debugging)
       bool              all_done();                             // get global all done status
@@ -66,6 +66,7 @@ namespace diy
       mpi::communicator                   comm;
       std::unordered_map<int, bool>       done;                 // gid -> done
       std::unique_ptr<mpi::window<int>>   global_work_;         // global work to do
+      std::shared_ptr<spd::logger>        log = get_logger();
     };
 
     // VectorWindow is used to send and receive subsets of a contiguous array in-place
@@ -97,6 +98,19 @@ namespace diy
     }
     } // namespace mpi::detail
 } // namespace diy
+
+void
+diy::Master::IExchangeInfo::
+not_done(int gid)
+{
+    if (done[gid])
+    {
+        done[gid] = false;
+        int work = inc_work();
+        log->debug("[{}] Incrementing work when switching done (on receipt): work = {}\n", gid, work);
+    } else
+        log->debug("[{}] Not done, no need to increment work\n", gid);
+}
 
 diy::Master::InFlightRecv&
 diy::Master::
@@ -176,14 +190,7 @@ place(IncomingRound* in, bool unload, ExternalStorage* storage, IExchangeInfo* i
     {
         auto log = get_logger();
 
-        if (iexchange->done[to])
-        {
-            iexchange->done[to] = false;
-            int work = iexchange->inc_work();
-            log->debug("[{}] Incrementing work when switching done (on receipt): work = {}\n", to, work);
-        } else
-            log->debug("[{}] Not done, no need to increment work\n", to);
-
+        iexchange->not_done(to);
         in->map[to].queues[from].append_binary(&message.buffer[0], message.size());        // append insted of overwrite
 
         int work = iexchange->dec_work();
