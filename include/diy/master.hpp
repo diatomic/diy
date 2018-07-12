@@ -44,7 +44,7 @@ namespace diy
       template<class Block>
       struct Command;
 
-      using Commands = std::vector<BaseCommand*>;
+      using Commands = std::vector<std::unique_ptr<BaseCommand>>;
 
       // Skip
       using Skip = std::function<bool(int, const Master&)>;
@@ -323,9 +323,9 @@ namespace diy
       std::unique_ptr<InFlightRecvsMap>  inflight_recvs_;
       std::unique_ptr<CollectivesMap>    collectives_;
 
-      int                   expected_;
-      int                   exchange_round_;
-      bool                  immediate_;
+      int                   expected_           = 0;
+      int                   exchange_round_     = -1;
+      bool                  immediate_          = true;
       Commands              commands_;
 
     private:
@@ -343,8 +343,8 @@ namespace diy
 #include "detail/master/communication.hpp"
 #include "detail/master/collectives.hpp"
 #include "detail/master/commands.hpp"
-
 #include "proxy.hpp"
+#include "detail/master/execution.hpp"
 
 diy::Master::
 Master(mpi::communicator    comm,
@@ -365,10 +365,7 @@ Master(mpi::communicator    comm,
   comm_(comm),
   inflight_sends_(new InFlightSendsList),
   inflight_recvs_(new InFlightRecvsMap),
-  collectives_(new CollectivesMap),
-  expected_(0),
-  exchange_round_(-1),
-  immediate_(true)
+  collectives_(new CollectivesMap)
 {}
 
 diy::Master::
@@ -378,108 +375,6 @@ diy::Master::
     clear();
     delete queue_policy_;
 }
-
-// --- ProcessBlock ---
-struct diy::Master::ProcessBlock
-{
-          ProcessBlock(Master&                    master_,
-                       const std::deque<int>&     blocks__,
-                       int                        local_limit_,
-                       critical_resource<int>&    idx_):
-              master(master_),
-              blocks(blocks__),
-              local_limit(local_limit_),
-              idx(idx_)
-          {}
-
-  void    process()
-  {
-    master.log->debug("Processing with thread: {}",  this_thread::get_id());
-
-    std::vector<int>      local;
-    do
-    {
-      int cur = (*idx.access())++;
-
-      if ((size_t)cur >= blocks.size())
-          return;
-
-      int i = blocks[cur];
-      if (master.block(i))
-      {
-          if (local.size() == (size_t)local_limit)
-              master.unload(local);
-          local.push_back(i);
-      }
-
-      master.log->debug("Processing block: {}", master.gid(i));
-
-      bool skip_block = true;
-      for (size_t cmd = 0; cmd < master.commands_.size(); ++cmd)
-      {
-          if (!master.commands_[cmd]->skip(i, master))
-          {
-              skip_block = false;
-              break;
-          }
-      }
-
-      IncomingQueuesMap &current_incoming = master.incoming_[master.exchange_round_].map;
-      if (skip_block)
-      {
-          if (master.block(i) == 0)
-              master.load_queues(i);      // even though we are skipping the block, the queues might be necessary
-
-          for (size_t cmd = 0; cmd < master.commands_.size(); ++cmd)
-          {
-              master.commands_[cmd]->execute(0, master.proxy(i));  // 0 signals that we are skipping the block (even if it's loaded)
-              // TODO: is the following necessary, and if so, how to switch between proxy and iproxy
-//               master.commands_[cmd]->execute(0, master.iproxy(i));  // 0 signals that we are skipping the block (even if it's loaded)
-
-              // no longer need them, so get rid of them, rather than risk reloading
-              current_incoming[master.gid(i)].queues.clear();
-              current_incoming[master.gid(i)].records.clear();
-          }
-
-          if (master.block(i) == 0)
-              master.unload_queues(i);    // even though we are skipping the block, the queues might be necessary
-      }
-      else
-      {
-          if (master.block(i) == 0)                             // block unloaded
-          {
-              if (local.size() == (size_t)local_limit)                    // reached the local limit
-                  master.unload(local);
-
-              master.load(i);
-              local.push_back(i);
-          }
-
-          for (size_t cmd = 0; cmd < master.commands_.size(); ++cmd)
-          {
-              master.commands_[cmd]->execute(master.block(i), master.proxy(i));
-              // TODO: is the following necessary, and if so, how to switch between proxy and iproxy
-//               master.commands_[cmd]->execute(master.block(i), master.iproxy(i));
-
-              // no longer need them, so get rid of them
-              current_incoming[master.gid(i)].queues.clear();
-              current_incoming[master.gid(i)].records.clear();
-          }
-      }
-    } while(true);
-
-    // TODO: invoke opportunistic communication
-    //       don't forget to adjust Master::exchange()
-  }
-
-  static void run(void* bf)                   { static_cast<ProcessBlock*>(bf)->process(); }
-
-  Master&                 master;
-  const std::deque<int>&  blocks;
-  int                     local_limit;
-  critical_resource<int>& idx;
-};
-// --------------------
 
 void
 diy::Master::
@@ -712,95 +607,10 @@ foreach_(const Callback<Block>& f, const Skip& skip)
     auto scoped = prof.scoped("foreach");
     DIY_UNUSED(scoped);
 
-    commands_.push_back(new Command<Block>(f, skip));
+    commands_.emplace_back(new Command<Block>(f, skip));
 
     if (immediate())
         execute();
-}
-
-void
-diy::Master::
-execute()
-{
-  log->debug("Entered execute()");
-  auto scoped = prof.scoped("execute");
-  DIY_UNUSED(scoped);
-  //show_incoming_records();
-
-  // touch the outgoing and incoming queues as well as collectives to make sure they exist
-  for (unsigned i = 0; i < size(); ++i)
-  {
-    outgoing(gid(i));
-    incoming(gid(i));           // implicitly touches queue records
-    collectives(gid(i));
-  }
-
-  if (commands_.empty())
-      return;
-
-  // Order the blocks, so the loaded ones come first
-  std::deque<int>   blocks;
-  for (unsigned i = 0; i < size(); ++i)
-    if (block(i) == 0)
-        blocks.push_back(i);
-    else
-        blocks.push_front(i);
-
-  // don't use more threads than we can have blocks in memory
-  int num_threads;
-  int blocks_per_thread;
-  if (limit_ == -1)
-  {
-    num_threads = threads_;
-    blocks_per_thread = size();
-  }
-  else
-  {
-    num_threads = std::min(threads_, limit_);
-    blocks_per_thread = limit_/num_threads;
-  }
-
-  // idx is shared
-  critical_resource<int> idx(0);
-
-  typedef                 ProcessBlock                                   BlockFunctor;
-  if (num_threads > 1)
-  {
-    // launch the threads
-    typedef               std::pair<thread*, BlockFunctor*>               ThreadFunctorPair;
-    typedef               std::list<ThreadFunctorPair>                    ThreadFunctorList;
-    ThreadFunctorList     threads;
-    for (unsigned i = 0; i < (unsigned)num_threads; ++i)
-    {
-        BlockFunctor* bf = new BlockFunctor(*this, blocks, blocks_per_thread, idx);
-        threads.push_back(ThreadFunctorPair(new thread(&BlockFunctor::run, bf), bf));
-    }
-
-    // join the threads
-    for(ThreadFunctorList::iterator it = threads.begin(); it != threads.end(); ++it)
-    {
-        thread*           t  = it->first;
-        BlockFunctor*     bf = it->second;
-        t->join();
-        delete t;
-        delete bf;
-    }
-  } else
-  {
-      BlockFunctor bf(*this, blocks, blocks_per_thread, idx);
-      BlockFunctor::run(&bf);
-  }
-
-  // clear incoming queues
-  incoming_[exchange_round_].map.clear();
-
-  if (limit() != -1 && in_memory() > limit())
-      throw std::runtime_error(fmt::format("Fatal: {} blocks in memory, with limit {}", in_memory(), limit()));
-
-  // clear commands
-  for (size_t i = 0; i < commands_.size(); ++i)
-      delete commands_[i];
-  commands_.clear();
 }
 
 void
