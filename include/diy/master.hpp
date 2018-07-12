@@ -1328,45 +1328,6 @@ flush(bool remote)
   process_collectives();
 }
 
-void
-diy::Master::
-process_collectives()
-{
-  auto scoped = prof.scoped("collectives");
-  DIY_UNUSED(scoped);
-
-  if (collectives().empty())
-      return;
-
-  typedef       CollectivesList::iterator       CollectivesIterator;
-  std::vector<CollectivesIterator>  iters;
-  std::vector<int>                  gids;
-  for (auto& x : collectives())
-  {
-    gids.push_back(x.first);
-    iters.push_back(x.second.begin());
-  }
-
-  while (iters[0] != collectives().begin()->second.end())
-  {
-    iters[0]->init();
-    for (unsigned j = 1; j < iters.size(); ++j)
-    {
-      // NB: this assumes that the operations are commutative
-      iters[0]->update(*iters[j]);
-    }
-    iters[0]->global(comm_);        // do the mpi collective
-
-    for (unsigned j = 1; j < iters.size(); ++j)
-    {
-      iters[j]->copy_from(*iters[0]);
-      ++iters[j];
-    }
-
-    ++iters[0];
-  }
-}
-
 bool
 diy::Master::
 nudge()
