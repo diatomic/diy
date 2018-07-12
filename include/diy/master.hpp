@@ -307,11 +307,10 @@ namespace diy
       inline void       check_incoming_queues(IExchangeInfo* iexchange = 0);
       inline ToSendList prep_out();
       inline int        limit_out(const ToSendList& to_send);
+      inline void       touch_queues();
 
       // iexchange commmunication
       inline void       icommunicate(IExchangeInfo* iexchange);     // async communication
-
-      void              cancel_requests();              // TODO
 
       // debug
       inline void       show_incoming_records() const;
@@ -803,22 +802,27 @@ exchange(bool remote)
 
   // make sure there is a queue for each neighbor
   if (!remote)
-  {
-      for (int i = 0; i < (int)size(); ++i)
-      {
-          OutgoingQueues&  outgoing_queues  = outgoing_[gid(i)].queues;
-          OutQueueRecords& external_local   = outgoing_[gid(i)].external_local;
-          if (outgoing_queues.size() < (size_t)link(i)->size())
-              for (unsigned j = 0; j < (unsigned)link(i)->size(); ++j)
-              {
-                  if (external_local.find(link(i)->target(j)) == external_local.end())
-                      outgoing_queues[link(i)->target(j)];        // touch the outgoing queue, creating it if necessary
-              }
-      }
-  }
+      touch_queues();
 
   flush(remote);
   log->debug("Finished exchange");
+}
+
+void
+diy::Master::
+touch_queues()
+{
+  for (int i = 0; i < (int)size(); ++i)
+  {
+      OutgoingQueues&  outgoing_queues  = outgoing_[gid(i)].queues;
+      OutQueueRecords& external_local   = outgoing_[gid(i)].external_local;
+      if (outgoing_queues.size() < (size_t)link(i)->size())
+          for (unsigned j = 0; j < (unsigned)link(i)->size(); ++j)
+          {
+              if (external_local.find(link(i)->target(j)) == external_local.end())
+                  outgoing_queues[link(i)->target(j)];        // touch the outgoing queue, creating it if necessary
+          }
+  }
 }
 
 // iexchange()
@@ -1032,18 +1036,6 @@ diy::Master::
 icommunicate(IExchangeInfo* iexchange)
 {
     log->debug("Entering icommunicate()");
-
-    // make sure there is a queue for each neighbor
-    for (int i = 0; i < (int)size(); ++i)
-    {
-        OutgoingQueues&  outgoing_queues  = outgoing_[gid(i)].queues;
-        OutQueueRecords& external_local   = outgoing_[gid(i)].external_local;
-        if (outgoing_queues.size() < (size_t)link(i)->size())
-            for (unsigned j = 0; j < (unsigned)link(i)->size(); ++j)
-                // touch the outgoing queue, creating it if necessary
-                if (external_local.find(link(i)->target(j)) == external_local.end())
-                    outgoing_queues[link(i)->target(j)];
-    }
 
     // lock out other threads
     // TODO: not threaded yet
