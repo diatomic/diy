@@ -670,10 +670,9 @@ void
 diy::Master::
 iexchange_(const ICallback<Block>& f)
 {
-    // TODO: when do the following two lines need to be executed (or do they)?
     // prepare for next round
-//     incoming_.erase(exchange_round_);
-//     ++exchange_round_;
+    incoming_.erase(exchange_round_);
+    ++exchange_round_;
 
     IExchangeInfo iexchange(size(), comm_);
     iexchange.add_work(size());                 // start with one work unit for each block
@@ -723,6 +722,8 @@ iexchange_(const ICallback<Block>& f)
         global_work_ = iexchange.global_work();
     } while (global_work_ > 0);
     log->debug("[{}] ==== Leaving iexchange ====\n", iexchange.comm.rank());
+
+    outgoing_.clear();
 }
 
 /* Communicator */

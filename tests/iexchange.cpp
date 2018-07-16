@@ -5,6 +5,8 @@
 #include <diy/master.hpp>
 #include <diy/assigner.hpp>
 #include <diy/serialization.hpp>
+#include <diy/reduce.hpp>
+#include <diy/partners/merge.hpp>
 
 #include "opts.h"
 
@@ -93,18 +95,20 @@ bool bounce(Block*                              b,
 
 int main(int argc, char* argv[])
 {
-     //diy::create_logger("debug");
-
     diy::mpi::environment     env(argc, argv);
     diy::mpi::communicator    world;
 
     // get command line arguments
-    int nblocks = world.size();
+    int         nblocks     = world.size();
+    std::string log_level   = "info";
     using namespace opts;
     Options ops(argc, argv);
     ops
         >> Option('b', "blocks",  nblocks,        "number of blocks")
+        >> Option('l', "log",     log_level,      "log level")
     ;
+
+    diy::create_logger(log_level);
 
     diy::FileStorage          storage("./DIY.XXXXXX");
 
@@ -149,33 +153,66 @@ int main(int argc, char* argv[])
     // dequeue, enqueue, exchange all in one nonblocking routine
     master.iexchange(&bounce);
 
-    master.foreach([](Block* b, const diy::Master::ProxyWithLink& cp)
-                   {
-                     cp.all_reduce(b->expected_particles, std::plus<int>());
-                     cp.all_reduce(b->expected_hops,      std::plus<int>());
-                     cp.all_reduce(b->finished_particles, std::plus<int>());
-                     cp.all_reduce(b->finished_hops,      std::plus<int>());
-                   });
-    master.exchange();      // process collectives
-    master.foreach([](Block* b, const diy::Master::ProxyWithLink& cp)
-                   {
-                     int all_expected_particles = cp.get<int>();
-                     int all_expected_hops      = cp.get<int>();
-                     int all_finished_particles = cp.get<int>();
-                     int all_finished_hops      = cp.get<int>();
-                     if (all_expected_particles != all_finished_particles)
-                     {
-                        fmt::print(stderr, "In block {}, all_expected_particles != all_finished_particles: {} != {}\n",
-                                           cp.gid(), all_expected_particles, all_finished_particles);
-                        std::abort();
-                     }
-                     if (all_expected_hops != all_finished_hops)
-                     {
-                        fmt::print(stderr, "In block {}, all_expected_hops != all_finished_hops: {} != {}\n",
-                                           cp.gid(), all_expected_hops, all_finished_hops);
-                        std::abort();
-                     }
-                   });
+    fmt::print("[{}]: Checking correctness\n", world.rank());
+
+    // check correctness: number of finished particles and hops matches the expected numbers
+    diy::RegularDecomposer<diy::DiscreteBounds> decomposer(1, diy::interval(0, nblocks-1), nblocks);
+    diy::RegularMergePartners  merge_partners(decomposer, 2, false);
+    diy::reduce(master, assigner, merge_partners,
+                [](Block*                           b,
+                   const diy::ReduceProxy&          rp,
+                   const diy::RegularMergePartners& partners)
+                {
+                    fmt::print("[{}]: round = {}, entered\n", rp.gid(), rp.round());
+
+                    // step 1: dequeue
+                    for (int i = 0; i < rp.in_link().size(); ++i)
+                    {
+                        int nbr_gid = rp.in_link().target(i).gid;
+                        if (nbr_gid == rp.gid())
+                            continue;
+
+                        int ep; rp.dequeue(nbr_gid, ep);    b->expected_particles   += ep;
+                        int eh; rp.dequeue(nbr_gid, eh);    b->expected_hops        += eh;
+                        int fp; rp.dequeue(nbr_gid, fp);    b->finished_particles   += fp;
+                        int fh; rp.dequeue(nbr_gid, fh);    b->finished_hops        += fh;
+                    }
+
+                    // step 2: enqueue
+                    for (int i = 0; i < rp.out_link().size(); ++i)    // redundant since size should equal to 1
+                    {
+                        // only send to root of group, but not self
+                        if (rp.out_link().target(i).gid != rp.gid())
+                        {
+                            rp.enqueue(rp.out_link().target(i), b->expected_particles);
+                            rp.enqueue(rp.out_link().target(i), b->expected_hops);
+                            rp.enqueue(rp.out_link().target(i), b->finished_particles);
+                            rp.enqueue(rp.out_link().target(i), b->finished_hops);
+                        }
+                    }
+
+                    if (rp.out_link().size() == 0 && rp.gid() == 0)     // tip of the reduction, check correctness
+                    {
+                        fmt::print("[{}]: checking correctness, {} vs {}, {} vs {}\n",
+                                   rp.gid(),
+                                   b->expected_particles, b->finished_particles,
+                                   b->expected_hops, b->finished_hops);
+
+                        if (b->expected_particles != b->finished_particles)
+                        {
+                           fmt::print(stderr, "In block {}, all_expected_particles != all_finished_particles: {} != {}\n",
+                                              rp.gid(), b->expected_particles, b->finished_particles);
+                           std::abort();
+                        }
+                        if (b->expected_hops != b->finished_hops)
+                        {
+                           fmt::print(stderr, "In block {}, all_expected_hops != all_finished_hops: {} != {}\n",
+                                              rp.gid(), b->expected_hops, b->finished_hops);
+                           std::abort();
+                        }
+                    }
+                    fmt::print("[{}]: round = {}, leaving\n", rp.gid(), rp.round());
+                });
 
     if (world.rank() == 0)
         fmt::print(stderr, "Total iterations: {}\n", master.block<Block>(master.loaded_block())->count);
