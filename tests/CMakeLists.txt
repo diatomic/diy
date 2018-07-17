@@ -34,6 +34,9 @@ target_link_libraries       (dynamic-assigner-test  ${libraries})
 add_executable              (rexchange-test         rexchange.cpp)
 target_link_libraries       (rexchange-test         ${libraries})
 
+add_executable              (iexchange-test         iexchange.cpp)
+target_link_libraries       (iexchange-test         ${libraries})
+
 foreach                     (b 2 4 8 64)
     add_test                (NAME kd-tree-test-b${b}
                              COMMAND kd-tree-test -b ${b}
@@ -128,6 +131,14 @@ if                          (mpi AND MPIEXEC)
                             )
           add_test          (NAME rexchange-test-p${p}-t2-b${b}
                              COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:rexchange-test> -t 2 -b ${b}
+                            )
+      endforeach            (b)
+  endforeach                (p)
+
+  foreach                   (p RANGE 1 ${maxp})
+      foreach               (b 2 4 8 9 12 24 36)
+          add_test          (NAME iexchange-test-p${p}-b${b}
+                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:iexchange-test> -b ${b}
                             )
       endforeach            (b)
   endforeach                (p)

@@ -20,6 +20,7 @@ namespace diy
   {
     virtual ~BinaryBuffer()                                         =default;
     virtual void        save_binary(const char* x, size_t count)    =0;   //!< copy `count` bytes from `x` into the buffer
+    virtual inline void append_binary(const char* x, size_t count)  =0;   //!< append `count` bytes from `x` to end of buffer
     virtual void        load_binary(char* x, size_t count)          =0;   //!< copy `count` bytes into `x` from the buffer
     virtual void        load_binary_back(char* x, size_t count)     =0;   //!< copy `count` bytes into `x` from the back of the buffer
   };
@@ -30,6 +31,7 @@ namespace diy
                           position(position_)                       {}
 
     virtual inline void save_binary(const char* x, size_t count) override;   //!< copy `count` bytes from `x` into the buffer
+    virtual inline void append_binary(const char* x, size_t count) override; //!< append `count` bytes from `x` to end of buffer
     virtual inline void load_binary(char* x, size_t count) override;         //!< copy `count` bytes into `x` from the buffer
     virtual inline void load_binary_back(char* x, size_t count) override;    //!< copy `count` bytes into `x` from the back of the buffer
 
@@ -96,6 +98,7 @@ namespace diy
 
     static void         save(BinaryBuffer& bb, const T& x)          { bb.save_binary((const char*)  &x, sizeof(T)); }
     static void         load(BinaryBuffer& bb, T& x)                { bb.load_binary((char*)        &x, sizeof(T)); }
+    static size_t       size(const T& x)                            { return sizeof(T); }
   };
 
   //! Saves `x` to `bb` by calling `diy::Serialization<T>::save(bb,x)`.
@@ -174,6 +177,11 @@ namespace diy
       diy::load(bb, x.position);
       x.buffer.resize(x.position);
       diy::load(bb, &x.buffer[0], x.position);
+    }
+
+    static size_t       size(const MemoryBuffer& x)
+    {
+        return sizeof(x.position) + x.position;
     }
   };
 
@@ -428,6 +436,16 @@ save_binary(const char* x, size_t count)
 
   std::copy_n(x, count, &buffer[position]);
   position += count;
+}
+
+void
+diy::MemoryBuffer::
+append_binary(const char* x, size_t count)
+{
+    size_t temp_pos = position;
+    position = size();
+    save_binary(x, count);
+    position = temp_pos;
 }
 
 void
