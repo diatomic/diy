@@ -18,7 +18,6 @@ var searchData=
   ['basicstringref_3c_20char_20_3e',['BasicStringRef&lt; char &gt;',['../classfmt_1_1_basic_string_ref.html',1,'fmt']]],
   ['basicwriter',['BasicWriter',['../classfmt_1_1_basic_writer.html',1,'fmt']]],
   ['binarybuffer',['BinaryBuffer',['../structdiy_1_1_binary_buffer.html',1,'diy']]],
-  ['binder',['Binder',['../structdiy_1_1_master_1_1_binder.html',1,'diy::Master']]],
   ['blockid',['BlockID',['../structdiy_1_1_block_i_d.html',1,'diy']]],
   ['bounds',['Bounds',['../structdiy_1_1_bounds.html',1,'diy']]],
   ['boundsvalue',['BoundsValue',['../structdiy_1_1_bounds_value.html',1,'diy']]],

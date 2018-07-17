@@ -94,7 +94,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
-<a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="structdiy_1_1thread-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">diy::thread Struct Reference</div>  </div>
@@ -103,9 +102,16 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ae7d79421333d66d9472e98716362796f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae7d79421333d66d9472e98716362796f"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>thread</b> (void(*f)(void *), void *args)</td></tr>
-<tr class="separator:ae7d79421333d66d9472e98716362796f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a788b3a9c2bed15c7a388fbeec76c415e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a788b3a9c2bed15c7a388fbeec76c415e"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>thread</b> (<a class="el" href="structdiy_1_1thread.html">thread</a> &amp;&amp;)=default</td></tr>
+<tr class="separator:a788b3a9c2bed15c7a388fbeec76c415e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a424a328544dff4070a2e379d2c86df4f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a424a328544dff4070a2e379d2c86df4f"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>thread</b> (const <a class="el" href="structdiy_1_1thread.html">thread</a> &amp;)=delete</td></tr>
+<tr class="separator:a424a328544dff4070a2e379d2c86df4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acdf2b459538d2c7775a7b1d578f9bc27"><td class="memTemplParams" colspan="2"><a class="anchor" id="acdf2b459538d2c7775a7b1d578f9bc27"></a>
+template&lt;class Function , class... Args&gt; </td></tr>
+<tr class="memitem:acdf2b459538d2c7775a7b1d578f9bc27"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><b>thread</b> (Function &amp;&amp;f, Args &amp;&amp;...args)</td></tr>
+<tr class="separator:acdf2b459538d2c7775a7b1d578f9bc27"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a552186fab3f4d591fdb2e6ecb7f7fb9b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a552186fab3f4d591fdb2e6ecb7f7fb9b"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>join</b> ()</td></tr>
 <tr class="separator:a552186fab3f4d591fdb2e6ecb7f7fb9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -115,15 +121,6 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a55ae3c91c6f1db11486a8b0a771d5104"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a55ae3c91c6f1db11486a8b0a771d5104"></a>
 static unsigned&#160;</td><td class="memItemRight" valign="bottom"><b>hardware_concurrency</b> ()</td></tr>
 <tr class="separator:a55ae3c91c6f1db11486a8b0a771d5104"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
-Public Attributes</h2></td></tr>
-<tr class="memitem:a792129a44323dc901b316f3f4f705626"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a792129a44323dc901b316f3f4f705626"></a>
-void(*&#160;</td><td class="memItemRight" valign="bottom"><b>f_</b> )(void *)</td></tr>
-<tr class="separator:a792129a44323dc901b316f3f4f705626"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a87416bcb12846be34463c5bb28d2cebc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a87416bcb12846be34463c5bb28d2cebc"></a>
-void *&#160;</td><td class="memItemRight" valign="bottom"><b>args_</b></td></tr>
-<tr class="separator:a87416bcb12846be34463c5bb28d2cebc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this struct was generated from the following file:<ul>
 <li>include/diy/<a class="el" href="no-thread_8hpp_source.html">no-thread.hpp</a></li>
@@ -131,7 +128,7 @@ void *&#160;</td><td class="memItemRight" valign="bottom"><b>args_</b></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jun 5 2018 01:05:24 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jul 17 2018 13:45:13 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

@@ -93,7 +93,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="structdiy_1_1_master_1_1_process_block-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -106,15 +105,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aed9d3189c4ff4e57965094b55f0bdabf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aed9d3189c4ff4e57965094b55f0bdabf"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>ProcessBlock</b> (<a class="el" href="classdiy_1_1_master.html">Master</a> &amp;master_, const std::deque&lt; int &gt; &amp;blocks__, int local_limit_, <a class="el" href="classdiy_1_1critical__resource.html">critical_resource</a>&lt; int &gt; &amp;idx_)</td></tr>
 <tr class="separator:aed9d3189c4ff4e57965094b55f0bdabf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a93175ee3acac03a050f8660d86ab796f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a93175ee3acac03a050f8660d86ab796f"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>process</b> ()</td></tr>
-<tr class="separator:a93175ee3acac03a050f8660d86ab796f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
-Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a05d5c42f6344dc4054a573a39d27a039"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a05d5c42f6344dc4054a573a39d27a039"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>run</b> (void *bf)</td></tr>
-<tr class="separator:a05d5c42f6344dc4054a573a39d27a039"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aadbf1cbc9db1333568a891013cd6fb03"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aadbf1cbc9db1333568a891013cd6fb03"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>ProcessBlock</b> (const <a class="el" href="structdiy_1_1_master_1_1_process_block.html">ProcessBlock</a> &amp;)=delete</td></tr>
+<tr class="separator:aadbf1cbc9db1333568a891013cd6fb03"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad532ace3f30b4c8368395e8355010811"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad532ace3f30b4c8368395e8355010811"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>ProcessBlock</b> (<a class="el" href="structdiy_1_1_master_1_1_process_block.html">ProcessBlock</a> &amp;&amp;)=default</td></tr>
+<tr class="separator:ad532ace3f30b4c8368395e8355010811"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72db18b02558809cadc707983109ab0d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a72db18b02558809cadc707983109ab0d"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>operator()</b> ()</td></tr>
+<tr class="separator:a72db18b02558809cadc707983109ab0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af035ac90bfe2e362102abdadfa4c02bb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af035ac90bfe2e362102abdadfa4c02bb"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>all_skip</b> (int i) const </td></tr>
+<tr class="separator:af035ac90bfe2e362102abdadfa4c02bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -132,12 +134,12 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>local_limit</b></td></
 <tr class="separator:a5d93ccb907968fb2c46e45b897b2b5a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li>include/diy/<a class="el" href="master_8hpp_source.html">master.hpp</a></li>
+<li>include/diy/detail/master/<a class="el" href="execution_8hpp_source.html">execution.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jun 5 2018 01:05:24 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jul 17 2018 13:45:13 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

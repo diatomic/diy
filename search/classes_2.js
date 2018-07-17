@@ -5,6 +5,8 @@ var searchData=
   ['chartraits_3c_20wchar_5ft_20_3e',['CharTraits&lt; wchar_t &gt;',['../classfmt_1_1internal_1_1_char_traits_3_01wchar__t_01_4.html',1,'fmt::internal']]],
   ['collection',['Collection',['../classdiy_1_1_collection.html',1,'diy']]],
   ['collective',['Collective',['../structdiy_1_1_master_1_1_collective.html',1,'diy::Master']]],
+  ['collectiveslist',['CollectivesList',['../structdiy_1_1_master_1_1_collectives_list.html',1,'diy::Master']]],
+  ['collectivesmap',['CollectivesMap',['../structdiy_1_1_master_1_1_collectives_map.html',1,'diy::Master']]],
   ['command',['Command',['../structdiy_1_1_master_1_1_command.html',1,'diy::Master']]],
   ['communicator',['communicator',['../classdiy_1_1mpi_1_1communicator.html',1,'diy::mpi']]],
   ['conditional',['Conditional',['../structfmt_1_1internal_1_1_conditional.html',1,'fmt::internal']]],

@@ -9,6 +9,7 @@ var searchData=
   ['all_5freduce',['all_reduce',['../group___communication.html#gabce4381d1244875967dc3d127227bd45',1,'diy::Master::Proxy::all_reduce()'],['../group___m_p_i.html#ga44987b4d3a2fbc6b22f458617a445dc5',1,'diy::mpi::all_reduce(const communicator &amp;comm, const T &amp;in, T &amp;out, const Op &amp;op)'],['../group___m_p_i.html#ga891f9e9f5bb623f051f31d5a5fdf39dc',1,'diy::mpi::all_reduce(const communicator &amp;comm, const std::vector&lt; T &gt; &amp;in, std::vector&lt; T &gt; &amp;out, const Op &amp;op)']]],
   ['all_5fto_5fall',['all_to_all',['../group___m_p_i.html#ga173b8718e3db0f8e804acb303b9db33b',1,'diy::mpi::all_to_all()'],['../group___communication.html#ga3dfb1bdb9c078d9f18fc6953295a0208',1,'diy::all_to_all()']]],
   ['append',['append',['../classfmt_1_1_buffer.html#a7ca155741c43ec7c7edcea8dd28a2123',1,'fmt::Buffer']]],
+  ['append_5fbinary',['append_binary',['../structdiy_1_1_binary_buffer.html#a3dfaa6a4881eebe258fc5c42e9e91e8d',1,'diy::BinaryBuffer::append_binary()'],['../structdiy_1_1_memory_buffer.html#a7efb80d0acab4aaab97207cc821ab56a',1,'diy::MemoryBuffer::append_binary()']]],
   ['arg',['Arg',['../structfmt_1_1internal_1_1_arg.html',1,'fmt::internal']]],
   ['argarray',['ArgArray',['../structfmt_1_1internal_1_1_arg_array.html',1,'fmt::internal']]],
   ['argarray_3c_20n_2c_20false_20_3e',['ArgArray&lt; N, false &gt;',['../structfmt_1_1internal_1_1_arg_array_3_01_n_00_01false_01_4.html',1,'fmt::internal']]],
