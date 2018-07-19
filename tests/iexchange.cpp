@@ -102,11 +102,20 @@ int main(int argc, char* argv[])
     int         nblocks     = world.size();
     std::string log_level   = "info";
     using namespace opts;
-    Options ops(argc, argv);
+    Options ops;
     ops
         >> Option('b', "blocks",  nblocks,        "number of blocks")
         >> Option('l', "log",     log_level,      "log level")
     ;
+    if (!ops.parse(argc,argv))
+    {
+        if (world.rank() == 0)
+        {
+            std::cout << "Usage: " << argv[0] << " [OPTIONS]\n";
+            std::cout << ops;
+        }
+        return 1;
+    }
 
     diy::create_logger(log_level);
 
