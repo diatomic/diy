@@ -145,9 +145,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keyword">typedef</span>     std::vector&lt;U&gt;      VecU;</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keyword">static</span> MPI_Datatype         datatype()              { <span class="keywordflow">return</span> mpi_datatype&lt;U&gt;::datatype(); }</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">void</span>*          address(<span class="keyword">const</span> VecU&amp; x)  { <span class="keywordflow">return</span> &amp;x[0]; }</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span>*                address(VecU&amp; x)        { <span class="keywordflow">return</span> &amp;x[0]; }</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">int</span>                  count(<span class="keyword">const</span> VecU&amp; x)    { <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(x.size()) * mpi_datatype&lt;U&gt;::count(x[0]); }</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">void</span>*          address(<span class="keyword">const</span> VecU&amp; x)  { <span class="keywordflow">return</span> x.data(); }</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span>*                address(VecU&amp; x)        { <span class="keywordflow">return</span> x.data(); }</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">int</span>                  count(<span class="keyword">const</span> VecU&amp; x)    { <span class="keywordflow">return</span> x.empty() ? 0 : (<span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(x.size()) * mpi_datatype&lt;U&gt;::count(x[0])); }</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  };</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;} <span class="comment">// detail</span></div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
@@ -188,7 +188,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jul 19 2018 20:46:35 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Jul 20 2018 09:57:11 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
