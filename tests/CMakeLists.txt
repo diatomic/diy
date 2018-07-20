@@ -37,6 +37,9 @@ target_link_libraries       (rexchange-test         ${libraries})
 add_executable              (iexchange-test         iexchange.cpp)
 target_link_libraries       (iexchange-test         ${libraries})
 
+add_executable              (grid-test         grid.cpp)
+target_link_libraries       (grid-test         ${libraries})
+
 foreach                     (b 2 4 8 64)
     add_test                (NAME kd-tree-test-b${b}
                              COMMAND kd-tree-test -b ${b}
@@ -55,6 +58,10 @@ add_test                    (NAME decomposer-test
 
 add_test                    (NAME partners-test
                              COMMAND partners-test
+                            )
+
+add_test                    (NAME grid-test
+                             COMMAND grid-test
                             )
 
 if                          (mpi)
