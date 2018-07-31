@@ -40,6 +40,9 @@ target_link_libraries       (iexchange-test         ${libraries})
 add_executable              (grid-test         grid.cpp)
 target_link_libraries       (grid-test         ${libraries})
 
+add_executable              (two-masters         two-masters.cpp)
+target_link_libraries       (two-masters         ${libraries})
+
 foreach                     (b 2 4 8 64)
     add_test                (NAME kd-tree-test-b${b}
                              COMMAND kd-tree-test -b ${b}
@@ -148,6 +151,12 @@ if                          (mpi AND MPIEXEC)
                              COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:iexchange-test> -b ${b}
                             )
       endforeach            (b)
+  endforeach                (p)
+
+  foreach                   (p RANGE 1 ${maxp})
+          add_test          (NAME two-masters-p${p}
+                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:two-masters>
+                            )
   endforeach                (p)
 
 else                        (mpi AND MPIEXEC)
