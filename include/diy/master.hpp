@@ -366,10 +366,7 @@ Master(mpi::communicator    comm,
   inflight_recvs_(new InFlightRecvsMap),
   collectives_(new CollectivesMap)
 {
-    MPI_Comm commdup;
-    MPI_Comm_dup(comm, &commdup);
-    mpi::communicator comm_dup(commdup, true);      // true means "take ownership"
-    comm_ = std::move(comm_dup);                    // ownership is transferred on move, see mpi/communicator.hpp
+    comm_.duplicate(comm);
 }
 
 diy::Master::
