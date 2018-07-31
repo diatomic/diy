@@ -362,11 +362,15 @@ Master(mpi::communicator    comm,
   threads_(threads__ == -1 ? static_cast<int>(thread::hardware_concurrency()) : threads__),
   storage_(storage),
   // Communicator functionality
-  comm_(comm),
   inflight_sends_(new InFlightSendsList),
   inflight_recvs_(new InFlightRecvsMap),
   collectives_(new CollectivesMap)
-{}
+{
+    MPI_Comm commdup;
+    MPI_Comm_dup(comm, &commdup);
+    mpi::communicator comm_dup(commdup, true);      // true means "take ownership"
+    comm_ = std::move(comm_dup);                    // ownership is transferred on move, see mpi/communicator.hpp
+}
 
 diy::Master::
 ~Master()
