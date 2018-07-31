@@ -362,11 +362,12 @@ Master(mpi::communicator    comm,
   threads_(threads__ == -1 ? static_cast<int>(thread::hardware_concurrency()) : threads__),
   storage_(storage),
   // Communicator functionality
-  comm_(comm),
   inflight_sends_(new InFlightSendsList),
   inflight_recvs_(new InFlightRecvsMap),
   collectives_(new CollectivesMap)
-{}
+{
+    comm_.duplicate(comm);
+}
 
 diy::Master::
 ~Master()
