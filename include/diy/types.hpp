@@ -19,12 +19,12 @@ namespace diy
     struct Bounds
     {
         using Coordinate = Coordinate_;
+        using Point      = diy::Point<Coordinate, DIY_MAX_DIM>;
 
-        Point<Coordinate, DIY_MAX_DIM>    min, max;
+        Point min, max;
 
         Bounds() = default;
-        Bounds(const Point<Coordinate, DIY_MAX_DIM>& _min,
-               const Point<Coordinate, DIY_MAX_DIM>& _max) : min(_min), max(_max) {}
+        Bounds(const Point& _min, const Point& _max) : min(_min), max(_max) {}
     };
     using DiscreteBounds   = Bounds<int>;
     using ContinuousBounds = Bounds<float>;
