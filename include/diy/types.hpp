@@ -10,14 +10,21 @@ namespace diy
     struct BlockID
     {
         int gid, proc;
+
+        BlockID() = default;
+        BlockID(int _gid, int _proc) : gid(_gid), proc(_proc) {}
     };
 
     template<class Coordinate_>
     struct Bounds
     {
         using Coordinate = Coordinate_;
+        using Point      = diy::Point<Coordinate, DIY_MAX_DIM>;
 
-        Point<Coordinate, DIY_MAX_DIM>    min, max;
+        Point min, max;
+
+        Bounds() = default;
+        Bounds(const Point& _min, const Point& _max) : min(_min), max(_max) {}
     };
     using DiscreteBounds   = Bounds<int>;
     using ContinuousBounds = Bounds<float>;
