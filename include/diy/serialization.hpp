@@ -123,6 +123,12 @@ namespace diy
   template<class T>
   void                  load_back(BinaryBuffer& bb, T& x)           { bb.load_binary_back((char*) &x, sizeof(T)); }
 
+  template<class T, class... Args>
+  void                  save(BinaryBuffer& bb, const T& x, const Args&... args)     { save(bb, x); save(bb, args...);}
+
+  template<class T, class... Args>
+  void                  load(BinaryBuffer& bb, T& x, Args&... args)                 { load(bb, x); load(bb, args...);}
+
   //@}
 
 
