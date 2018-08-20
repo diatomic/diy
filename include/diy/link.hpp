@@ -138,7 +138,8 @@ namespace diy
   struct AMRLink: public Link::Registrar<AMRLink>
   {
     public:
-      using Bounds  = DiscreteBounds;
+      using Bounds      = DiscreteBounds;
+      using Directions  = std::vector<Direction>;
 
       struct Description
       {
@@ -147,6 +148,7 @@ namespace diy
           Bounds    core;
           Bounds    bounds;             // with ghosts
       };
+      using Descriptions = std::vector<Description>;
 
     public:
                     AMRLink(int dim, int level, int refinement, const Bounds& core, const Bounds& bounds):
@@ -160,9 +162,9 @@ namespace diy
       int           refinement() const                      { return local_.refinement; }
 
       // wrap
-      void          add_wrap(Direction dir)                { wrap_.push_back(dir); }
-      Direction     wrap(int i) const                      { return wrap_[i]; }
-      Direction&    wrap(int i)                            { return wrap_[i]; }
+      void          add_wrap(Direction dir)                 { wrap_.push_back(dir); }
+      const Directions&
+                    wrap() const                            { return wrap_; }
 
       // bounds
       const Bounds& core() const                            { return local_.core; }
@@ -200,8 +202,8 @@ namespace diy
         int                         dim_;
 
         Description                 local_;
-        std::vector<Description>    nbr_descriptions_;
-        std::vector<Direction>      wrap_;
+        Descriptions                nbr_descriptions_;
+        Directions                  wrap_;
   };
 
   struct LinkFactory
