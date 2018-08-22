@@ -329,6 +329,15 @@ template&lt;class C , unsigned D&gt; </td></tr>
 <tr class="memitem:gac4f9294e9a7e7a7f2034bcbddf4e7084"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group___communication.html#gac4f9294e9a7e7a7f2034bcbddf4e7084">reduce</a> (<a class="el" href="classdiy_1_1_master.html">Master</a> &amp;master, const <a class="el" href="classdiy_1_1_assigner.html">Assigner</a> &amp;assigner, const Partners &amp;partners, const Reduce &amp;reducer)</td></tr>
 <tr class="memdesc:gac4f9294e9a7e7a7f2034bcbddf4e7084"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implementation of the reduce communication pattern (includes swap-reduce, merge-reduce, and any other global communication).  <a href="group___communication.html#gac4f9294e9a7e7a7f2034bcbddf4e7084">More...</a><br/></td></tr>
 <tr class="separator:gac4f9294e9a7e7a7f2034bcbddf4e7084"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3738d284b0ca58e768752a4ff512571"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad3738d284b0ca58e768752a4ff512571"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fix_links</b> (<a class="el" href="classdiy_1_1_master.html">diy::Master</a> &amp;master, <a class="el" href="classdiy_1_1_dynamic_assigner.html">diy::DynamicAssigner</a> &amp;assigner)</td></tr>
+<tr class="separator:ad3738d284b0ca58e768752a4ff512571"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af1d7bedf62b279e628c981a76c8cfde4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af1d7bedf62b279e628c981a76c8cfde4"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>record_local_gids</b> (const <a class="el" href="classdiy_1_1_master.html">diy::Master</a> &amp;master, <a class="el" href="classdiy_1_1_dynamic_assigner.html">diy::DynamicAssigner</a> &amp;assigner)</td></tr>
+<tr class="separator:af1d7bedf62b279e628c981a76c8cfde4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6407c94d2a4659e5a0d81b4f97353234"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6407c94d2a4659e5a0d81b4f97353234"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>update_links</b> (<a class="el" href="classdiy_1_1_master.html">diy::Master</a> &amp;master, const <a class="el" href="classdiy_1_1_dynamic_assigner.html">diy::DynamicAssigner</a> &amp;assigner)</td></tr>
+<tr class="separator:a6407c94d2a4659e5a0d81b4f97353234"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gafaac9aa4ccdc04930f612ca20341fc9b"><td class="memTemplParams" colspan="2"><a class="anchor" id="gafaac9aa4ccdc04930f612ca20341fc9b"></a>
 template&lt;class T &gt; </td></tr>
 <tr class="memitem:gafaac9aa4ccdc04930f612ca20341fc9b"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a> (<a class="el" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a> &amp;bb, const T &amp;x)</td></tr>
@@ -354,6 +363,14 @@ template&lt;class T &gt; </td></tr>
 <tr class="memitem:ga33accb25f133567d216ebd3bee44595b"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group___serialization.html#ga33accb25f133567d216ebd3bee44595b">load_back</a> (<a class="el" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a> &amp;bb, T &amp;x)</td></tr>
 <tr class="memdesc:ga33accb25f133567d216ebd3bee44595b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Supports only binary data copying (meant for simple footers). <br/></td></tr>
 <tr class="separator:ga33accb25f133567d216ebd3bee44595b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga2285dc3e151eef16d71a0632964bfa80"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga2285dc3e151eef16d71a0632964bfa80"></a>
+template&lt;class T , class... Args&gt; </td></tr>
+<tr class="memitem:ga2285dc3e151eef16d71a0632964bfa80"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>save</b> (<a class="el" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a> &amp;bb, const T &amp;x, const Args &amp;...args)</td></tr>
+<tr class="separator:ga2285dc3e151eef16d71a0632964bfa80"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga96378e7a9bb5783728635747c6867ab5"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga96378e7a9bb5783728635747c6867ab5"></a>
+template&lt;class T , class... Args&gt; </td></tr>
+<tr class="memitem:ga96378e7a9bb5783728635747c6867ab5"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>load</b> (<a class="el" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a> &amp;bb, T &amp;x, Args &amp;...args)</td></tr>
+<tr class="separator:ga96378e7a9bb5783728635747c6867ab5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a70ab6c91bf439aa186ee6aa41ba92914"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a70ab6c91bf439aa186ee6aa41ba92914"></a>
 time_type&#160;</td><td class="memItemRight" valign="bottom"><b>get_time</b> ()</td></tr>
 <tr class="separator:a70ab6c91bf439aa186ee6aa41ba92914"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -493,7 +510,7 @@ template&lt;class Bounds , class Point , class OutIter &gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Aug 1 2018 17:36:57 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Aug 22 2018 19:55:48 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

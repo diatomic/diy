@@ -193,7 +193,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;      <span class="keyword">inline</span> std::tuple&lt;bool,int&gt;</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;                    get_rank(<span class="keywordtype">int</span>&amp; rk, <span class="keywordtype">int</span> gid) <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;      <span class="keyword">inline</span> <span class="keywordtype">void</span>   set_rank(<span class="keywordtype">int</span> rk, <span class="keywordtype">int</span> gid, <span class="keywordtype">bool</span> flush = <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;      <span class="keyword">inline</span> <span class="keywordtype">void</span>   set_rank(<span class="keyword">const</span> <span class="keywordtype">int</span>&amp; rk, <span class="keywordtype">int</span> gid, <span class="keywordtype">bool</span> flush = <span class="keyword">true</span>);</div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;      <span class="keyword">inline</span> <span class="keywordtype">void</span>   set_ranks(<span class="keyword">const</span> std::vector&lt;std::tuple&lt;int,int&gt;&gt;&amp; rank_gids);</div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;</div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;      std::tuple&lt;int,int&gt;</div>
@@ -295,7 +295,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00223"></a><span class="lineno"><a class="line" href="classdiy_1_1_dynamic_assigner.html#ac7c94a9201193fdcec733603d944ab58">  223</a></span>&#160;<a class="code" href="classdiy_1_1_dynamic_assigner.html#ac7c94a9201193fdcec733603d944ab58">ranks</a>(<span class="keyword">const</span> std::vector&lt;int&gt;&amp; gids)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;<span class="keyword"></span>{</div>
 <div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    <span class="keywordtype">bool</span> all_cached = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    std::vector&lt;int&gt; result(gids.size());</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    std::vector&lt;int&gt; result(gids.size(), -1);</div>
 <div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; gids.size(); ++i)</div>
 <div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    {</div>
 <div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;        <span class="keyword">auto</span> cached_gidrk = get_rank(result[i], gids[i]);</div>
@@ -311,7 +311,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;</div>
 <div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;<span class="keywordtype">void</span></div>
 <div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;diy::DynamicAssigner::</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;set_rank(<span class="keywordtype">int</span> rk, <span class="keywordtype">int</span> gid, <span class="keywordtype">bool</span> flush)</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;set_rank(<span class="keyword">const</span> <span class="keywordtype">int</span>&amp; rk, <span class="keywordtype">int</span> gid, <span class="keywordtype">bool</span> flush)</div>
 <div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;{</div>
 <div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    <span class="comment">// TODO: update cache</span></div>
 <div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;</div>
@@ -358,7 +358,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Aug 1 2018 17:36:56 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Aug 22 2018 19:55:48 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
