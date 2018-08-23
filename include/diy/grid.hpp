@@ -47,7 +47,9 @@ struct GridRef
         GridRef&    operator=(C value)                          { Index s = size(); for (Index i = 0; i < s; ++i) data_[i] = value; return *this; }
         GridRef&    operator/=(C value)                         { Index s = size(); for (Index i = 0; i < s; ++i) data_[i] /= value; return *this; }
 
-        Vertex      vertex(Index idx) const                     { Vertex v; for (unsigned i = 0; i < D; ++i) { v[i] = idx / stride_[i]; idx %= stride_[i]; } return v; }
+        inline
+        Vertex      vertex(Index idx) const;
+
         Index       index(const Vertex& v) const                { Index idx = 0; for (unsigned i = 0; i < D; ++i) { idx += ((Index) v[i]) * ((Index) stride_[i]); } return idx; }
 
         Index       size() const                                { return size(shape()); }
@@ -147,6 +149,27 @@ struct Grid: public GridRef<C,D>
                 Parent::data()[i] = data[i];
         }
 };
+
+template<class C, unsigned D>
+typename GridRef<C, D>::Vertex
+GridRef<C, D>::
+vertex(typename GridRef<C, D>::Index idx) const
+{
+    Vertex v;
+    if (c_order())
+        for (unsigned i = 0; i < D; ++i)
+        {
+            v[i] = idx / stride_[i];
+            idx %= stride_[i];
+        }
+    else
+        for (int i = D-1; i >= 0; --i)
+        {
+            v[i] = idx / stride_[i];
+            idx %= stride_[i];
+        }
+    return v;
+}
 
 }
 
