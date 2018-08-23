@@ -48,6 +48,11 @@ struct GridRef
         GridRef&    operator/=(C value)                         { Index s = size(); for (Index i = 0; i < s; ++i) data_[i] /= value; return *this; }
 
         inline
+        bool        operator==(const GridRef& other) const;
+        bool        operator!=(const GridRef& other) const      { return !(*this == other); }
+
+
+        inline
         Vertex      vertex(Index idx) const;
 
         Index       index(const Vertex& v) const                { Index idx = 0; for (unsigned i = 0; i < D; ++i) { idx += ((Index) v[i]) * ((Index) stride_[i]); } return idx; }
@@ -149,6 +154,23 @@ struct Grid: public GridRef<C,D>
                 Parent::data()[i] = data[i];
         }
 };
+
+
+template<class C, unsigned D>
+bool GridRef<C, D>::operator==(const GridRef<C, D>& other) const
+{
+    if (c_order() != other.c_order())
+        return false;
+
+    if (shape() != other.shape())
+        return false;
+
+    for(unsigned i = 0; i < size(); ++i)
+        if (data()[i] != other.data()[i])
+            return false;
+
+    return true;
+}
 
 template<class C, unsigned D>
 typename GridRef<C, D>::Vertex
