@@ -62,7 +62,6 @@ namespace diy
       // Communicator types, defined in proxy.hpp
       struct Proxy;
       struct ProxyWithLink;
-      struct IProxyWithLink;
 
       // foreach callback
       template<class Block>
@@ -70,7 +69,7 @@ namespace diy
 
       // iexchange callback
       template<class Block>
-      using ICallback = std::function<bool(Block*, const IProxyWithLink&)>;
+      using ICallback = std::function<bool(Block*, const ProxyWithLink&)>;
 
       struct QueuePolicy
       {
@@ -225,7 +224,7 @@ namespace diy
       ProxyWithLink proxy(int i) const;
 
       inline
-      IProxyWithLink iproxy(int i, IExchangeInfo* iexchange) const;
+      ProxyWithLink proxy(int i, IExchangeInfo* iexchange) const;
 
       //! return the number of local blocks
       unsigned int  size() const                        { return static_cast<unsigned int>(blocks_.size()); }
@@ -551,10 +550,10 @@ diy::Master::
 proxy(int i) const
 { return ProxyWithLink(Proxy(const_cast<Master*>(this), gid(i)), block(i), link(i)); }
 
-diy::Master::IProxyWithLink
+diy::Master::ProxyWithLink
 diy::Master::
-iproxy(int i, IExchangeInfo* iexchange) const
-{ return IProxyWithLink(Proxy(const_cast<Master*>(this), gid(i)), block(i), link(i), iexchange); }
+proxy(int i, IExchangeInfo* iexchange) const
+{ return ProxyWithLink(Proxy(const_cast<Master*>(this), gid(i)), block(i), link(i), iexchange); }
 
 int
 diy::Master::
@@ -686,24 +685,24 @@ iexchange_(const ICallback<Block>& f)
         for (size_t i = 0; i < size(); i++)     // for all blocks
         {
             icommunicate(&iexchange);            // TODO: separate comm thread std::thread t(icommunicate);
-            IProxyWithLink icp = iproxy(i, &iexchange);
+            ProxyWithLink cp = proxy(i, &iexchange);
 
-            bool done = f(block<Block>(i), icp);
+            bool done = f(block<Block>(i), cp);
 
             int nundeq_after = 0;
             int nunenq_after = 0;
-            for (size_t j = 0; j < icp.link()->size(); j++)
+            for (size_t j = 0; j < cp.link()->size(); j++)
             {
-                if (icp.incoming(icp.link()->target(j).gid))
+                if (cp.incoming(cp.link()->target(j).gid))
                     ++nundeq_after;
-                if (icp.outgoing(icp.link()->target(j)).size())
+                if (cp.outgoing(cp.link()->target(j)).size())
                     ++nunenq_after;
             }
 
             done &= (nundeq_after == 0);
             done &= (nunenq_after == 0);
 
-            int gid = icp.gid();
+            int gid = cp.gid();
             if (iexchange.done[gid] != done)
             {
                 iexchange.done[gid] = done;

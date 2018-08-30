@@ -33,12 +33,10 @@ void  load_block(void*              b,
 // callback for asynchronous iexchange
 // return: true = I'm done unless more work arrives; false = I'm not done, please call me again
 bool bounce(Block*                              b,
-            const diy::Master::IProxyWithLink&  icp)
+            const diy::Master::ProxyWithLink&   cp)
 {
-    diy::Link* l = icp.link();
-    int my_gid   = icp.gid();
-
-    //fmt::print(stderr, "Block {} with {} count\n", my_gid, b->count);
+    diy::Link* l = cp.link();
+    int my_gid   = cp.gid();
 
     // start with every block enqueueing particles to random neighbors
     int id = my_gid * 1000;
@@ -49,7 +47,7 @@ bool bounce(Block*                              b,
         int nbr = rand() % l->size();
         Particle p(id++, 1 + rand() % 20);
         fmt::print(stderr, "[{}] -> ({},{}) -> [{}]\n", my_gid, p.id, p.hops, l->target(nbr).gid);
-        icp.enqueue(l->target(nbr), p);
+        cp.enqueue(l->target(nbr), p);
         b->count--;
     }
 
@@ -58,10 +56,10 @@ bool bounce(Block*                              b,
     for (size_t i = 0; i < l->size(); ++i)
     {
         int nbr_gid = l->target(i).gid;
-        if (icp.incoming(nbr_gid))      // FIXME: make this while
+        while (cp.incoming(nbr_gid))
         {
             Particle p;
-            icp.dequeue(nbr_gid, p);
+            cp.dequeue(nbr_gid, p);
             fmt::print(stderr, "[{}] <- ({},{}) <- [{}]\n", my_gid, p.id, p.hops, nbr_gid);
 
             p.hops--;
@@ -69,13 +67,13 @@ bool bounce(Block*                              b,
             {
                 int nbr = rand() % l->size();
                 fmt::print(stderr, "[{}] -> ({},{}) -> [{}]\n", my_gid, p.id, p.hops, l->target(nbr).gid);
-                icp.enqueue(l->target(nbr), p);
+                cp.enqueue(l->target(nbr), p);
             } else
                 fmt::print(stderr, "[{}] finish particle ({},{})\n", my_gid, p.id, p.hops);
         }
     }
 
-    return (b->count == 0);      // this will always be true, but the logic is that we have no work left inside the block
+    return true;
 }
 
 int main(int argc, char* argv[])
@@ -129,7 +127,4 @@ int main(int argc, char* argv[])
 
     // dequeue, enqueue, exchange all in one nonblocking routine
     master.iexchange(&bounce);
-
-    if (world.rank() == 0)
-        fmt::print(stderr, "Total iterations: {}\n", master.block<Block>(master.loaded_block())->count);
 }

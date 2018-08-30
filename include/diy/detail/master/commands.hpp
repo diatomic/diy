@@ -4,7 +4,6 @@ namespace diy
     {
         virtual       ~BaseCommand()                                                  {}      // to delete derived classes
         virtual void  execute(void* b, const ProxyWithLink& cp) const                 =0;
-        virtual void  execute(void* b, const IProxyWithLink& cp) const                =0;
         virtual bool  skip(int i, const Master& master) const                         =0;
     };
 
@@ -15,7 +14,6 @@ namespace diy
                   f(f_), s(s_)                                                        {}
 
         void  execute(void* b, const ProxyWithLink& cp) const override                { f(static_cast<Block*>(b), cp); }
-        void  execute(void* b, const IProxyWithLink& cp) const override               { f(static_cast<Block*>(b), cp); }
         bool  skip(int i, const Master& m) const override                             { return s(i,m); }
 
         Callback<Block>   f;
