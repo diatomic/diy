@@ -151,7 +151,7 @@ namespace diy
            * destroy a block (a function that's expected to upcast and delete),
            * serialize a block
       */
-                    Master(mpi::communicator    comm,          //!< communicator
+      inline        Master(mpi::communicator    comm,          //!< communicator
                            int                  threads__ = 1,  //!< number of threads DIY can use
                            int                  limit__   = -1, //!< number of blocks to store in memory
                            CreateBlock          create_   = 0,  //!< block create function; master manages creation if create != 0
@@ -160,7 +160,7 @@ namespace diy
                            SaveBlock            save      = 0,  //!< block save function; master manages saving if save != 0
                            LoadBlock            load_     = 0,  //!< block load function; master manages loading if load != 0
                            QueuePolicy*         q_policy  = new QueueSizePolicy(4096)); //!< policy for managing message queues specifies maximum size of message queues to keep in memory
-                    ~Master();
+      inline        ~Master();
 
       inline void   clear();
       inline void   destroy(int i)                      { if (blocks_.own()) blocks_.destroy(i); }
@@ -263,9 +263,9 @@ namespace diy
       // Communicator functionality
       IncomingQueues&   incoming(int gid__)             { return incoming_[exchange_round_].map[gid__].queues; }
       OutgoingQueues&   outgoing(int gid__)             { return outgoing_[gid__].queues; }
-      CollectivesList&  collectives(int gid__);
-      CollectivesMap&   collectives();
       size_t            outgoing_count(int gid__) const { OutgoingQueuesMap::const_iterator it = outgoing_.find(gid__); if (it == outgoing_.end()) return 0; return it->second.queues.size(); }
+      inline CollectivesList&  collectives(int gid__);
+      inline CollectivesMap&   collectives();
 
       void              set_expected(int expected)      { expected_ = expected; }
       void              add_expected(int i)             { expected_ += i; }
@@ -292,8 +292,8 @@ namespace diy
       inline void       send_same_rank(int from, int to, MemoryBuffer& bb, IExchangeInfo* iexchange);
       inline void       send_different_rank(int from, int to, int proc, MemoryBuffer& bb, bool remote, IExchangeInfo* iexchange);
 
-      InFlightRecv&         inflight_recv(int proc);
-      InFlightSendsList&    inflight_sends();
+      inline InFlightRecv&         inflight_recv(int proc);
+      inline InFlightSendsList&    inflight_sends();
 
       // iexchange commmunication
       inline void       icommunicate(IExchangeInfo* iexchange);     // async communication

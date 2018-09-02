@@ -22,8 +22,8 @@ namespace diy
         MessageInfo     info { -1, -1, -1 };
         bool            done = false;
 
-        void            recv(mpi::communicator& comm, const mpi::status& status);
-        void            place(IncomingRound* in, bool unload, ExternalStorage* storage, IExchangeInfo* iexchange);
+        inline void     recv(mpi::communicator& comm, const mpi::status& status);
+        inline void     place(IncomingRound* in, bool unload, ExternalStorage* storage, IExchangeInfo* iexchange);
         void            reset()     { *this = InFlightRecv(); }
     };
 
@@ -53,12 +53,12 @@ namespace diy
                             global_work_(new mpi::window<int>(comm, 1))           { global_work_->lock_all(MPI_MODE_NOCHECK); }
                         ~IExchangeInfo()                                          { global_work_->unlock_all(); }
 
-      void              not_done(int gid);
+      inline void       not_done(int gid);
 
-      int               global_work();                          // get global work status (for debugging)
-      bool              all_done();                             // get global all done status
-      void              reset_work();                           // reset global work counter
-      int               add_work(int work);                     // add work to global work counter
+      inline int        global_work();                          // get global work status (for debugging)
+      inline bool       all_done();                             // get global all done status
+      inline void       reset_work();                           // reset global work counter
+      inline int        add_work(int work);                     // add work to global work counter
       int               inc_work()                              { return add_work(1); }   // increment global work counter
       int               dec_work()                              { return add_work(-1); }  // decremnent global work counter
 
