@@ -235,7 +235,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;</div>
 <div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;</div>
 <div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;                    <a class="code" href="classdiy_1_1_master.html#a57dc152e96dba39554399cf63e7b4fc9">Master</a>(<a class="code" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a>    comm,          </div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;      <span class="keyword">inline</span>        <a class="code" href="classdiy_1_1_master.html#a57dc152e96dba39554399cf63e7b4fc9">Master</a>(<a class="code" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a>    comm,          </div>
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;                           <span class="keywordtype">int</span>                  threads__ = 1,  </div>
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;                           <span class="keywordtype">int</span>                  limit__   = -1, </div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;                           CreateBlock          create_   = 0,  </div>
@@ -244,7 +244,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;                           SaveBlock            <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>      = 0,  </div>
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;                           LoadBlock            load_     = 0,  </div>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;                           <a class="code" href="structdiy_1_1_master_1_1_queue_policy.html">QueuePolicy</a>*         q_policy  = <span class="keyword">new</span> <a class="code" href="structdiy_1_1_master_1_1_queue_size_policy.html">QueueSizePolicy</a>(4096)); </div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;                    ~<a class="code" href="classdiy_1_1_master.html">Master</a>();</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;      <span class="keyword">inline</span>        ~<a class="code" href="classdiy_1_1_master.html">Master</a>();</div>
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;</div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;      <span class="keyword">inline</span> <span class="keywordtype">void</span>   clear();</div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;      <span class="keyword">inline</span> <span class="keywordtype">void</span>   destroy(<span class="keywordtype">int</span> i)                      { <span class="keywordflow">if</span> (blocks_.own()) blocks_.destroy(i); }</div>
@@ -336,9 +336,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;      <span class="comment">// Communicator functionality</span></div>
 <div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;      IncomingQueues&amp;   incoming(<span class="keywordtype">int</span> gid__)             { <span class="keywordflow">return</span> incoming_[exchange_round_].map[gid__].queues; }</div>
 <div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;      OutgoingQueues&amp;   outgoing(<span class="keywordtype">int</span> gid__)             { <span class="keywordflow">return</span> outgoing_[gid__].queues; }</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;      CollectivesList&amp;  collectives(<span class="keywordtype">int</span> gid__);</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;      CollectivesMap&amp;   collectives();</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;      <span class="keywordtype">size_t</span>            outgoing_count(<span class="keywordtype">int</span> gid__)<span class="keyword"> const </span>{ OutgoingQueuesMap::const_iterator it = outgoing_.find(gid__); <span class="keywordflow">if</span> (it == outgoing_.end()) <span class="keywordflow">return</span> 0; <span class="keywordflow">return</span> it-&gt;second.queues.size(); }</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;      <span class="keywordtype">size_t</span>            outgoing_count(<span class="keywordtype">int</span> gid__)<span class="keyword"> const </span>{ OutgoingQueuesMap::const_iterator it = outgoing_.find(gid__); <span class="keywordflow">if</span> (it == outgoing_.end()) <span class="keywordflow">return</span> 0; <span class="keywordflow">return</span> it-&gt;second.queues.size(); }</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;      <span class="keyword">inline</span> CollectivesList&amp;  collectives(<span class="keywordtype">int</span> gid__);</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;      <span class="keyword">inline</span> CollectivesMap&amp;   collectives();</div>
 <div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;</div>
 <div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;      <span class="keywordtype">void</span>              set_expected(<span class="keywordtype">int</span> expected)      { expected_ = expected; }</div>
 <div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;      <span class="keywordtype">void</span>              add_expected(<span class="keywordtype">int</span> i)             { expected_ += i; }</div>
@@ -365,8 +365,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;      <span class="keyword">inline</span> <span class="keywordtype">void</span>       send_same_rank(<span class="keywordtype">int</span> from, <span class="keywordtype">int</span> to, MemoryBuffer&amp; bb, IExchangeInfo* iexchange);</div>
 <div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;      <span class="keyword">inline</span> <span class="keywordtype">void</span>       send_different_rank(<span class="keywordtype">int</span> from, <span class="keywordtype">int</span> to, <span class="keywordtype">int</span> proc, MemoryBuffer&amp; bb, <span class="keywordtype">bool</span> remote, IExchangeInfo* iexchange);</div>
 <div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;      InFlightRecv&amp;         inflight_recv(<span class="keywordtype">int</span> proc);</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;      InFlightSendsList&amp;    inflight_sends();</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;      <span class="keyword">inline</span> InFlightRecv&amp;         inflight_recv(<span class="keywordtype">int</span> proc);</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;      <span class="keyword">inline</span> InFlightSendsList&amp;    inflight_sends();</div>
 <div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;</div>
 <div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;      <span class="comment">// iexchange commmunication</span></div>
 <div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;      <span class="keyword">inline</span> <span class="keywordtype">void</span>       icommunicate(IExchangeInfo* iexchange);     <span class="comment">// async communication</span></div>
@@ -1353,7 +1353,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Aug 25 2018 04:05:00 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Sep 2 2018 22:04:21 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
