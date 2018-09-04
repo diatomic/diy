@@ -448,6 +448,32 @@ void
 diy::MemoryBuffer::
 append_binary(const char* x, size_t count)
 {
+    if (buffer.size() + count > buffer.capacity())     // growth/copying will be triggered
+    {
+        size_t cur_size = buffer.size() - position;
+        size_t new_size = cur_size + count;
+        if (new_size * growth_multiplier() <= buffer.capacity())        // we have enough space in this buffer, copy in place
+        {
+            // copy the data to the beginning of the buffer and reduce its size
+            for (size_t i = 0; i < cur_size; ++i)
+                buffer[i] = buffer[position++];
+
+            buffer.resize(cur_size);
+            position = 0;
+        } else
+        {
+            std::vector<char> tmp;
+            tmp.reserve(new_size * growth_multiplier());
+            tmp.resize(cur_size);
+
+            for (size_t i = 0; i < tmp.size(); ++i)
+                tmp[i] = buffer[position++];
+
+            buffer.swap(tmp);
+            position = 0;
+        }
+    }
+
     size_t temp_pos = position;
     position = size();
     save_binary(x, count);
