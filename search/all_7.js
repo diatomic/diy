@@ -18,7 +18,6 @@ var searchData=
   ['inttraits',['IntTraits',['../structfmt_1_1internal_1_1_int_traits.html',1,'fmt::internal']]],
   ['io',['IO',['../group___i_o.html',1,'']]],
   ['iprobe',['iprobe',['../classdiy_1_1mpi_1_1communicator.html#a985ffab378f21b2b5f70a4cc1ddb3dc9',1,'diy::mpi::communicator']]],
-  ['iproxywithlink',['IProxyWithLink',['../structdiy_1_1_master_1_1_i_proxy_with_link.html',1,'diy::Master']]],
   ['irecv',['irecv',['../classdiy_1_1mpi_1_1communicator.html#ac8953e70e3bb38f820279f2e3c57e9ff',1,'diy::mpi::communicator']]],
   ['isend',['isend',['../classdiy_1_1mpi_1_1communicator.html#ac30151886b5c0927314e051ccac2a69b',1,'diy::mpi::communicator']]],
   ['issend',['issend',['../classdiy_1_1mpi_1_1communicator.html#a62fdce43a8d33fc367d20fb69fbfd213',1,'diy::mpi::communicator']]],

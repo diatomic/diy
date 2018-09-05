@@ -215,166 +215,116 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;  {</div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;            <a class="code" href="structdiy_1_1_master_1_1_proxy_with_link.html">ProxyWithLink</a>(<span class="keyword">const</span> <a class="code" href="structdiy_1_1_master_1_1_proxy.html">Proxy</a>&amp;    proxy,</div>
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;                          <span class="keywordtype">void</span>*           block__,</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;                          <a class="code" href="classdiy_1_1_link.html">Link</a>*           link__):</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;              <a class="code" href="structdiy_1_1_master_1_1_proxy.html">Proxy</a>(proxy),</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;              block_(block__),</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;              link_(link__)                                         {}</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;      <a class="code" href="classdiy_1_1_link.html">Link</a>*   link()<span class="keyword"> const                                          </span>{ <span class="keywordflow">return</span> link_; }</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;      <span class="keywordtype">void</span>*   block()<span class="keyword"> const                                         </span>{ <span class="keywordflow">return</span> block_; }</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;      <span class="keywordtype">void</span>*   block_;</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;      <a class="code" href="classdiy_1_1_link.html">Link</a>*   link_;</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;  };</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;</div>
-<div class="line"><a name="l00169"></a><span class="lineno"><a class="line" href="structdiy_1_1_master_1_1_i_proxy_with_link.html">  169</a></span>&#160;  <span class="keyword">struct </span><a class="code" href="structdiy_1_1_master_1_1_i_proxy_with_link.html">Master::IProxyWithLink</a>: <span class="keyword">public</span> <a class="code" href="structdiy_1_1_master_1_1_proxy_with_link.html">Master::ProxyWithLink</a></div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;  {</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;      <a class="code" href="structdiy_1_1_master_1_1_i_exchange_info.html">IExchangeInfo</a>* iexchange;</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;                          <a class="code" href="classdiy_1_1_link.html">Link</a>*           link__,</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;                          <a class="code" href="structdiy_1_1_master_1_1_i_exchange_info.html">IExchangeInfo</a>*  iexchange__ = 0):</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;              <a class="code" href="structdiy_1_1_master_1_1_proxy.html">Proxy</a>(proxy),</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;              block_(block__),</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;              link_(link__),</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;              iexchange_(iexchange__)                               {}</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;      <a class="code" href="classdiy_1_1_link.html">Link</a>*   link()<span class="keyword"> const                                          </span>{ <span class="keywordflow">return</span> link_; }</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;      <span class="keywordtype">void</span>*   block()<span class="keyword"> const                                         </span>{ <span class="keywordflow">return</span> block_; }</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;      <span class="keywordtype">void</span>*             block_;</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;      <a class="code" href="classdiy_1_1_link.html">Link</a>*             link_;</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;      <a class="code" href="structdiy_1_1_master_1_1_i_exchange_info.html">IExchangeInfo</a>*    iexchange_;         <span class="comment">// not used for iexchange presently, but later could trigger some special behavior</span></div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;  };</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;}                                           <span class="comment">// diy namespace</span></div>
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;      <a class="code" href="structdiy_1_1_master_1_1_i_proxy_with_link.html">IProxyWithLink</a>(<span class="keyword">const</span> <a class="code" href="structdiy_1_1_master_1_1_proxy.html">Proxy</a>&amp;         proxy,</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;              <span class="keywordtype">void</span>*                       block,</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;              <a class="code" href="classdiy_1_1_link.html">Link</a>*                       link,</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;              <a class="code" href="structdiy_1_1_master_1_1_i_exchange_info.html">Master::IExchangeInfo</a>*      <a class="code" href="classdiy_1_1_master.html#af3a1e07acdca4253fb09f5829f52df71">iexchange_</a>):</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;          <a class="code" href="structdiy_1_1_master_1_1_proxy_with_link.html">ProxyWithLink</a>(proxy, block, link),</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;          iexchange(iexchange_)                                   {}</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;      <span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;      <span class="keywordtype">void</span> enqueue(<span class="keyword">const</span> <a class="code" href="structdiy_1_1_block_i_d.html">BlockID</a>&amp;     to,</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;              <span class="keyword">const</span> T&amp;                x,</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;              <span class="keywordtype">void</span> (*<a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>)(<a class="code" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a>&amp;, <span class="keyword">const</span> T&amp;) = &amp;::diy::save&lt;T&gt;)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;<span class="keyword">      </span>{</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;          <a class="code" href="structdiy_1_1_master_1_1_proxy.html#a05bcb6fd6968e054c0b2f818c6cd24de">diy::Master::Proxy::enqueue</a>(to, x, <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>);</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;          master()-&gt;icommunicate(iexchange);</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;      }</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;<span class="keywordtype">void</span></div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;diy::Master::Proxy::</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;incoming(std::vector&lt;int&gt;&amp; v)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;  <span class="keywordflow">for</span> (IncomingQueues::const_iterator it = incoming_-&gt;begin(); it != incoming_-&gt;end(); ++it)</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    v.push_back(it-&gt;first);</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;}</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T, <span class="keyword">class</span> Op&gt;</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;<span class="keywordtype">void</span></div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;<a class="code" href="group___communication.html#gabce4381d1244875967dc3d127227bd45">diy::Master::Proxy::</a></div>
+<div class="line"><a name="l00184"></a><span class="lineno"><a class="line" href="group___communication.html#gabce4381d1244875967dc3d127227bd45">  184</a></span>&#160;<a class="code" href="group___communication.html#gabce4381d1244875967dc3d127227bd45">all_reduce</a>(<span class="keyword">const</span> T&amp; <a class="code" href="namespacediy.html#a861d8601719a75414c57d6aa6a99e0fc">in</a>, Op op)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;  collectives_-&gt;push_back(<a class="code" href="structdiy_1_1_master_1_1_collective.html">Collective</a>(<span class="keyword">new</span> detail::AllReduceOp&lt;T,Op&gt;(in, op)));</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;}</div>
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;      <span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;      <span class="keywordtype">void</span> enqueue(<span class="keyword">const</span> <a class="code" href="structdiy_1_1_block_i_d.html">BlockID</a>&amp;     to,</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;              <span class="keyword">const</span> T*                x,</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;              <span class="keywordtype">size_t</span>                  n,</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;              <span class="keywordtype">void</span> (*<a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>)(<a class="code" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a>&amp;, <span class="keyword">const</span> T&amp;) = &amp;::diy::save&lt;T&gt;)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;<span class="keyword">      </span>{</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;          <a class="code" href="structdiy_1_1_master_1_1_proxy.html#a05bcb6fd6968e054c0b2f818c6cd24de">diy::Master::Proxy::enqueue</a>(to, x, n, <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>);</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;          master()-&gt;icommunicate(iexchange);</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;      }</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;T</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;<a class="code" href="group___communication.html#ga39e95469ec8128e4f4f4bcc20c2a6205">diy::Master::Proxy::</a></div>
+<div class="line"><a name="l00192"></a><span class="lineno"><a class="line" href="group___communication.html#ga39e95469ec8128e4f4f4bcc20c2a6205">  192</a></span>&#160;<a class="code" href="group___communication.html#ga39e95469ec8128e4f4f4bcc20c2a6205">read</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;  T res;</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;  collectives_-&gt;front().result_out(&amp;res);</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;  <span class="keywordflow">return</span> res;</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;}</div>
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;      <span class="comment">// returns true if more data left in the queue</span></div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;      <span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;      <span class="keywordtype">void</span> dequeue(<span class="keywordtype">int</span>                from,</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;              T&amp;                      x,</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;              <span class="keywordtype">void</span> (*<a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a>)(<a class="code" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a>&amp;, T&amp;) = &amp;::diy::load&lt;T&gt;)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;<span class="keyword">      </span>{</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;          master()-&gt;icommunicate(iexchange);</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;          <a class="code" href="structdiy_1_1_master_1_1_proxy.html#ad7af65dcf357c32fe550b82a872d8692">diy::Master::Proxy::dequeue</a>(from, x, <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a>);</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;      }</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;T</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;<a class="code" href="group___communication.html#gae5ffa2d35209fbe7b2e9161e9fb79d96">diy::Master::Proxy::</a></div>
+<div class="line"><a name="l00202"></a><span class="lineno"><a class="line" href="group___communication.html#gae5ffa2d35209fbe7b2e9161e9fb79d96">  202</a></span>&#160;<a class="code" href="group___communication.html#gae5ffa2d35209fbe7b2e9161e9fb79d96">get</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;  T res = read&lt;T&gt;();</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;  collectives_-&gt;pop_front();</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;  <span class="keywordflow">return</span> res;</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;}</div>
 <div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;      <span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;      <span class="keywordtype">void</span> dequeue(<span class="keywordtype">int</span>                from,</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;              T*                      x,</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;              <span class="keywordtype">size_t</span>                  n,</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;              <span class="keywordtype">void</span> (*<a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a>)(<a class="code" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a>&amp;, T&amp;) = &amp;::diy::load&lt;T&gt;)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;<span class="keyword">      </span>{</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;          master()-&gt;icommunicate(iexchange);</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;          <a class="code" href="structdiy_1_1_master_1_1_proxy.html#ad7af65dcf357c32fe550b82a872d8692">diy::Master::Proxy::dequeue</a>(from, x, n, <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">load</a>);</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;      }</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;  };</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;}</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;<span class="keywordtype">void</span></div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;diy::Master::Proxy::</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;incoming(std::vector&lt;int&gt;&amp; v)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;  <span class="keywordflow">for</span> (IncomingQueues::const_iterator it = incoming_-&gt;begin(); it != incoming_-&gt;end(); ++it)</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    v.push_back(it-&gt;first);</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;}</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T, <span class="keyword">class</span> Op&gt;</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;<span class="keywordtype">void</span></div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;<a class="code" href="group___communication.html#gabce4381d1244875967dc3d127227bd45">diy::Master::Proxy::</a></div>
-<div class="line"><a name="l00232"></a><span class="lineno"><a class="line" href="group___communication.html#gabce4381d1244875967dc3d127227bd45">  232</a></span>&#160;<a class="code" href="group___communication.html#gabce4381d1244875967dc3d127227bd45">all_reduce</a>(<span class="keyword">const</span> T&amp; <a class="code" href="namespacediy.html#a861d8601719a75414c57d6aa6a99e0fc">in</a>, Op op)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;  collectives_-&gt;push_back(<a class="code" href="structdiy_1_1_master_1_1_collective.html">Collective</a>(<span class="keyword">new</span> detail::AllReduceOp&lt;T,Op&gt;(in, op)));</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;}</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;T</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;<a class="code" href="group___communication.html#ga39e95469ec8128e4f4f4bcc20c2a6205">diy::Master::Proxy::</a></div>
-<div class="line"><a name="l00240"></a><span class="lineno"><a class="line" href="group___communication.html#ga39e95469ec8128e4f4f4bcc20c2a6205">  240</a></span>&#160;<a class="code" href="group___communication.html#ga39e95469ec8128e4f4f4bcc20c2a6205">read</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;  T res;</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;  collectives_-&gt;front().result_out(&amp;res);</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;  <span class="keywordflow">return</span> res;</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;<span class="keywordtype">void</span></div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;diy::Master::Proxy::</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;scratch(<span class="keyword">const</span> T&amp; <a class="code" href="namespacediy.html#a861d8601719a75414c57d6aa6a99e0fc">in</a>)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;  collectives_-&gt;push_back(<a class="code" href="structdiy_1_1_master_1_1_collective.html">Collective</a>(<span class="keyword">new</span> detail::Scratch&lt;T&gt;(in)));</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;}</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;<span class="keywordtype">void</span></div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a05bcb6fd6968e054c0b2f818c6cd24de">diy::Master::Proxy::</a></div>
+<div class="line"><a name="l00220"></a><span class="lineno"><a class="line" href="structdiy_1_1_master_1_1_proxy.html#a41338b73df5f6e1995c771efe1f960e0">  220</a></span>&#160;<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a05bcb6fd6968e054c0b2f818c6cd24de">enqueue</a>(<span class="keyword">const</span> <a class="code" href="structdiy_1_1_block_i_d.html">BlockID</a>&amp; to, <span class="keyword">const</span> T* x, <span class="keywordtype">size_t</span> n,</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;        <span class="keywordtype">void</span> (*<a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>)(<a class="code" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a>&amp;, <span class="keyword">const</span> T&amp;))<span class="keyword"> const</span></div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    OutgoingQueues&amp; out = *outgoing_;</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    <a class="code" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a>&amp;   bb  = out[to];</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a> == (<span class="keywordtype">void</span> (*)(<a class="code" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a>&amp;, <span class="keyword">const</span> T&amp;)) &amp;::diy::save&lt;T&gt;)</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;        <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">diy::save</a>(bb, x, n);       <span class="comment">// optimized for unspecialized types</span></div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; n; ++i)</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;            <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>(bb, x[i]);</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;}</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;<span class="keywordtype">void</span></div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;<a class="code" href="structdiy_1_1_master_1_1_proxy.html#ad7af65dcf357c32fe550b82a872d8692">diy::Master::Proxy::</a></div>
+<div class="line"><a name="l00235"></a><span class="lineno"><a class="line" href="structdiy_1_1_master_1_1_proxy.html#ac89cf0d43ad4eed8e67aabc0b221b745">  235</a></span>&#160;<a class="code" href="structdiy_1_1_master_1_1_proxy.html#ad7af65dcf357c32fe550b82a872d8692">dequeue</a>(<span class="keywordtype">int</span> from, T* x, <span class="keywordtype">size_t</span> n,</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;        <span class="keywordtype">void</span> (*load)(<a class="code" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a>&amp;, T&amp;))<span class="keyword"> const</span></div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    IncomingQueues&amp; in = *incoming_;</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    <a class="code" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a>&amp;   bb = in[from];</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <span class="keywordflow">if</span> (load == (<span class="keywordtype">void</span> (*)(<a class="code" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a>&amp;, T&amp;)) &amp;::diy::load&lt;T&gt;)</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;        <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a>(bb, x, n);       <span class="comment">// optimized for unspecialized types</span></div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; n; ++i)</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;            load(bb, x[i]);</div>
 <div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;}</div>
 <div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;T</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;<a class="code" href="group___communication.html#gae5ffa2d35209fbe7b2e9161e9fb79d96">diy::Master::Proxy::</a></div>
-<div class="line"><a name="l00250"></a><span class="lineno"><a class="line" href="group___communication.html#gae5ffa2d35209fbe7b2e9161e9fb79d96">  250</a></span>&#160;<a class="code" href="group___communication.html#gae5ffa2d35209fbe7b2e9161e9fb79d96">get</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;  T res = read&lt;T&gt;();</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;  collectives_-&gt;pop_front();</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;  <span class="keywordflow">return</span> res;</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;}</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;<span class="keywordtype">void</span></div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;diy::Master::Proxy::</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;scratch(<span class="keyword">const</span> T&amp; <a class="code" href="namespacediy.html#a861d8601719a75414c57d6aa6a99e0fc">in</a>)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;  collectives_-&gt;push_back(<a class="code" href="structdiy_1_1_master_1_1_collective.html">Collective</a>(<span class="keyword">new</span> detail::Scratch&lt;T&gt;(in)));</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;}</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;<span class="keywordtype">void</span></div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a05bcb6fd6968e054c0b2f818c6cd24de">diy::Master::Proxy::</a></div>
-<div class="line"><a name="l00268"></a><span class="lineno"><a class="line" href="structdiy_1_1_master_1_1_proxy.html#a41338b73df5f6e1995c771efe1f960e0">  268</a></span>&#160;<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a05bcb6fd6968e054c0b2f818c6cd24de">enqueue</a>(<span class="keyword">const</span> <a class="code" href="structdiy_1_1_block_i_d.html">BlockID</a>&amp; to, <span class="keyword">const</span> T* x, <span class="keywordtype">size_t</span> n,</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;        <span class="keywordtype">void</span> (*<a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>)(<a class="code" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a>&amp;, <span class="keyword">const</span> T&amp;))<span class="keyword"> const</span></div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    OutgoingQueues&amp; out = *outgoing_;</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    <a class="code" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a>&amp;   bb  = out[to];</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a> == (<span class="keywordtype">void</span> (*)(<a class="code" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a>&amp;, <span class="keyword">const</span> T&amp;)) &amp;::diy::save&lt;T&gt;)</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;        <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">diy::save</a>(bb, x, n);       <span class="comment">// optimized for unspecialized types</span></div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; n; ++i)</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;            <a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>(bb, x[i]);</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;}</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;<span class="keywordtype">void</span></div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;<a class="code" href="structdiy_1_1_master_1_1_proxy.html#ad7af65dcf357c32fe550b82a872d8692">diy::Master::Proxy::</a></div>
-<div class="line"><a name="l00283"></a><span class="lineno"><a class="line" href="structdiy_1_1_master_1_1_proxy.html#ac89cf0d43ad4eed8e67aabc0b221b745">  283</a></span>&#160;<a class="code" href="structdiy_1_1_master_1_1_proxy.html#ad7af65dcf357c32fe550b82a872d8692">dequeue</a>(<span class="keywordtype">int</span> from, T* x, <span class="keywordtype">size_t</span> n,</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;        <span class="keywordtype">void</span> (*load)(<a class="code" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a>&amp;, T&amp;))<span class="keyword"> const</span></div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    IncomingQueues&amp; in = *incoming_;</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;    <a class="code" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a>&amp;   bb = in[from];</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;    <span class="keywordflow">if</span> (load == (<span class="keywordtype">void</span> (*)(<a class="code" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a>&amp;, T&amp;)) &amp;::diy::load&lt;T&gt;)</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;        <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a>(bb, x, n);       <span class="comment">// optimized for unspecialized types</span></div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; n; ++i)</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;            load(bb, x[i]);</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;}</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="group___serialization_html_gae54f4c5c6740fcf7627009bdcfe02aa1"><div class="ttname"><a href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a></div><div class="ttdeci">void load(BinaryBuffer &amp;bb, T &amp;x)</div><div class="ttdoc">Loads x from bb by calling diy::Serialization&lt;T&gt;::load(bb,x). </div><div class="ttdef"><b>Definition:</b> serialization.hpp:110</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_i_exchange_info_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_i_exchange_info.html">diy::Master::IExchangeInfo</a></div><div class="ttdef"><b>Definition:</b> communication.hpp:46</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_proxy_html_ad7af65dcf357c32fe550b82a872d8692"><div class="ttname"><a href="structdiy_1_1_master_1_1_proxy.html#ad7af65dcf357c32fe550b82a872d8692">diy::Master::Proxy::dequeue</a></div><div class="ttdeci">void dequeue(int from, T &amp;x, void(*load)(BinaryBuffer &amp;, T &amp;)=&amp;::diy::load&lt; T &gt;) const </div><div class="ttdoc">Dequeue data whose size can be determined automatically (e.g., STL vector) and that was previously en...</div><div class="ttdef"><b>Definition:</b> proxy.hpp:42</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_collective_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_collective.html">diy::Master::Collective</a></div><div class="ttdef"><b>Definition:</b> collectives.hpp:49</div></div>
-<div class="ttc" id="group___communication_html_gae5ffa2d35209fbe7b2e9161e9fb79d96"><div class="ttname"><a href="group___communication.html#gae5ffa2d35209fbe7b2e9161e9fb79d96">diy::Master::Proxy::get</a></div><div class="ttdeci">T get() const </div><div class="ttdoc">Return the result of a proxy collective; result is popped off the collectives list. </div><div class="ttdef"><b>Definition:</b> proxy.hpp:250</div></div>
+<div class="ttc" id="group___communication_html_gae5ffa2d35209fbe7b2e9161e9fb79d96"><div class="ttname"><a href="group___communication.html#gae5ffa2d35209fbe7b2e9161e9fb79d96">diy::Master::Proxy::get</a></div><div class="ttdeci">T get() const </div><div class="ttdoc">Return the result of a proxy collective; result is popped off the collectives list. </div><div class="ttdef"><b>Definition:</b> proxy.hpp:202</div></div>
 <div class="ttc" id="structdiy_1_1_block_i_d_html"><div class="ttname"><a href="structdiy_1_1_block_i_d.html">diy::BlockID</a></div><div class="ttdef"><b>Definition:</b> types.hpp:10</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_proxy_with_link_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_proxy_with_link.html">diy::Master::ProxyWithLink</a></div><div class="ttdef"><b>Definition:</b> proxy.hpp:152</div></div>
-<div class="ttc" id="group___communication_html_gabce4381d1244875967dc3d127227bd45"><div class="ttname"><a href="group___communication.html#gabce4381d1244875967dc3d127227bd45">diy::Master::Proxy::all_reduce</a></div><div class="ttdeci">void all_reduce(const T &amp;in, Op op) const </div><div class="ttdoc">Post an all-reduce collective using an existing communication proxy. Available operators are: maximum...</div><div class="ttdef"><b>Definition:</b> proxy.hpp:232</div></div>
+<div class="ttc" id="group___communication_html_gabce4381d1244875967dc3d127227bd45"><div class="ttname"><a href="group___communication.html#gabce4381d1244875967dc3d127227bd45">diy::Master::Proxy::all_reduce</a></div><div class="ttdeci">void all_reduce(const T &amp;in, Op op) const </div><div class="ttdoc">Post an all-reduce collective using an existing communication proxy. Available operators are: maximum...</div><div class="ttdef"><b>Definition:</b> proxy.hpp:184</div></div>
 <div class="ttc" id="group___serialization_html_gafaac9aa4ccdc04930f612ca20341fc9b"><div class="ttname"><a href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">diy::save</a></div><div class="ttdeci">void save(BinaryBuffer &amp;bb, const T &amp;x)</div><div class="ttdoc">Saves x to bb by calling diy::Serialization&lt;T&gt;::save(bb,x). </div><div class="ttdef"><b>Definition:</b> serialization.hpp:106</div></div>
-<div class="ttc" id="classdiy_1_1_master_html_af3a1e07acdca4253fb09f5829f52df71"><div class="ttname"><a href="classdiy_1_1_master.html#af3a1e07acdca4253fb09f5829f52df71">diy::Master::iexchange_</a></div><div class="ttdeci">void iexchange_(const ICallback&lt; Block &gt; &amp;f)</div><div class="ttdoc">nonblocking exchange of the queues between all the blocks </div><div class="ttdef"><b>Definition:</b> master.hpp:672</div></div>
 <div class="ttc" id="namespacediy_html_a861d8601719a75414c57d6aa6a99e0fc"><div class="ttname"><a href="namespacediy.html#a861d8601719a75414c57d6aa6a99e0fc">diy::in</a></div><div class="ttdeci">void in(const RegularLink&lt; Bounds &gt; &amp;link, const Point &amp;p, OutIter out, const Bounds &amp;domain)</div><div class="ttdoc">Finds the neighbor(s) containing the target point. </div><div class="ttdef"><b>Definition:</b> pick.hpp:102</div></div>
 <div class="ttc" id="classdiy_1_1_master_html"><div class="ttname"><a href="classdiy_1_1_master.html">diy::Master</a></div><div class="ttdef"><b>Definition:</b> master.hpp:36</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_proxy_1_1_enqueue_iterator_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_proxy_1_1_enqueue_iterator.html">diy::Master::Proxy::EnqueueIterator</a></div><div class="ttdef"><b>Definition:</b> proxy.hpp:11</div></div>
 <div class="ttc" id="classdiy_1_1_link_html"><div class="ttname"><a href="classdiy_1_1_link.html">diy::Link</a></div><div class="ttdef"><b>Definition:</b> link.hpp:15</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_proxy_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_proxy.html">diy::Master::Proxy</a></div><div class="ttdoc">Communication proxy, used for enqueueing and dequeueing items for future exchange. </div><div class="ttdef"><b>Definition:</b> proxy.hpp:8</div></div>
-<div class="ttc" id="structdiy_1_1_master_1_1_i_proxy_with_link_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_i_proxy_with_link.html">diy::Master::IProxyWithLink</a></div><div class="ttdef"><b>Definition:</b> proxy.hpp:169</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_proxy_html_ac6c68a702ad34a9ced41483842d5c1e4"><div class="ttname"><a href="structdiy_1_1_master_1_1_proxy.html#ac6c68a702ad34a9ced41483842d5c1e4">diy::Master::Proxy::dequeue</a></div><div class="ttdeci">void dequeue(const BlockID &amp;from, T *x, size_t n, void(*load)(BinaryBuffer &amp;, T &amp;)=&amp;::diy::load&lt; T &gt;) const </div><div class="ttdoc">Dequeue an array of data whose size is given explicitly by the user. In this case, the user needs to allocate the receive buffer prior to calling dequeue. </div><div class="ttdef"><b>Definition:</b> proxy.hpp:69</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_proxy_html_acc930e3199b1c1cfe5b6e1f853601160"><div class="ttname"><a href="structdiy_1_1_master_1_1_proxy.html#acc930e3199b1c1cfe5b6e1f853601160">diy::Master::Proxy::dequeue</a></div><div class="ttdeci">void dequeue(const BlockID &amp;from, T &amp;x, void(*load)(BinaryBuffer &amp;, T &amp;)=&amp;::diy::load&lt; T &gt;) const </div><div class="ttdoc">Dequeue data whose size can be determined automatically (e.g., STL vector) and that was previously en...</div><div class="ttdef"><b>Definition:</b> proxy.hpp:61</div></div>
-<div class="ttc" id="group___communication_html_ga39e95469ec8128e4f4f4bcc20c2a6205"><div class="ttname"><a href="group___communication.html#ga39e95469ec8128e4f4f4bcc20c2a6205">diy::Master::Proxy::read</a></div><div class="ttdeci">T read() const </div><div class="ttdoc">Return the result of a proxy collective without popping it off the collectives list (same result woul...</div><div class="ttdef"><b>Definition:</b> proxy.hpp:240</div></div>
+<div class="ttc" id="group___communication_html_ga39e95469ec8128e4f4f4bcc20c2a6205"><div class="ttname"><a href="group___communication.html#ga39e95469ec8128e4f4f4bcc20c2a6205">diy::Master::Proxy::read</a></div><div class="ttdeci">T read() const </div><div class="ttdoc">Return the result of a proxy collective without popping it off the collectives list (same result woul...</div><div class="ttdef"><b>Definition:</b> proxy.hpp:192</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_collectives_list_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_collectives_list.html">diy::Master::CollectivesList</a></div><div class="ttdef"><b>Definition:</b> collectives.hpp:72</div></div>
 <div class="ttc" id="structdiy_1_1_binary_buffer_html"><div class="ttname"><a href="structdiy_1_1_binary_buffer.html">diy::BinaryBuffer</a></div><div class="ttdoc">A serialization buffer. </div><div class="ttdef"><b>Definition:</b> serialization.hpp:19</div></div>
 <div class="ttc" id="group___communication_html_gae3dbd9440a4a0b72abf3b8e35891c5d4"><div class="ttname"><a href="group___communication.html#gae3dbd9440a4a0b72abf3b8e35891c5d4">diy::Master::Proxy::collectives</a></div><div class="ttdeci">CollectivesList * collectives() const </div><div class="ttdoc">Return the list of proxy collectives (values and operations) </div><div class="ttdef"><b>Definition:</b> proxy.hpp:118</div></div>
@@ -382,7 +332,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Sep 2 2018 22:04:21 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Sep 5 2018 15:55:27 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

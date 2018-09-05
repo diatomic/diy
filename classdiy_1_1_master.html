@@ -130,8 +130,6 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_master_1_1_in_flight_sends_list.html">InFlightSendsList</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_master_1_1_i_proxy_with_link.html">IProxyWithLink</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_master_1_1_message_info.html">MessageInfo</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_master_1_1_never_skip.html">NeverSkip</a></td></tr>
@@ -181,10 +179,10 @@ typedef Collection::Load&#160;</td><td class="memItemRight" valign="bottom"><b>L
 template&lt;class Block &gt; </td></tr>
 <tr class="memitem:afb9cf63a4a48a85af44e8f7a51f74ad0"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>Callback</b> = std::function&lt; void(Block *, const <a class="el" href="structdiy_1_1_master_1_1_proxy_with_link.html">ProxyWithLink</a> &amp;)&gt;</td></tr>
 <tr class="separator:afb9cf63a4a48a85af44e8f7a51f74ad0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a779710d53cf3ef5c8fa1411555e03e29"><td class="memTemplParams" colspan="2"><a class="anchor" id="a779710d53cf3ef5c8fa1411555e03e29"></a>
+<tr class="memitem:ac8ee8b0a5b3ee09fcdf569f8ce95d883"><td class="memTemplParams" colspan="2"><a class="anchor" id="ac8ee8b0a5b3ee09fcdf569f8ce95d883"></a>
 template&lt;class Block &gt; </td></tr>
-<tr class="memitem:a779710d53cf3ef5c8fa1411555e03e29"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>ICallback</b> = std::function&lt; bool(Block *, const <a class="el" href="structdiy_1_1_master_1_1_i_proxy_with_link.html">IProxyWithLink</a> &amp;)&gt;</td></tr>
-<tr class="separator:a779710d53cf3ef5c8fa1411555e03e29"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac8ee8b0a5b3ee09fcdf569f8ce95d883"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>ICallback</b> = std::function&lt; bool(Block *, const <a class="el" href="structdiy_1_1_master_1_1_proxy_with_link.html">ProxyWithLink</a> &amp;)&gt;</td></tr>
+<tr class="separator:ac8ee8b0a5b3ee09fcdf569f8ce95d883"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab953b3c9c9086cd39804146d1452a301"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab953b3c9c9086cd39804146d1452a301"></a>
 typedef std::map&lt; int, <br class="typebreak"/>
 <a class="el" href="structdiy_1_1_master_1_1_queue_record.html">QueueRecord</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>InQueueRecords</b></td></tr>
@@ -325,9 +323,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>process_collectives</
 <tr class="memitem:a2800a71c640f3dd1b7f0018f0058e76b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2800a71c640f3dd1b7f0018f0058e76b"></a>
 <a class="el" href="structdiy_1_1_master_1_1_proxy_with_link.html">ProxyWithLink</a>&#160;</td><td class="memItemRight" valign="bottom"><b>proxy</b> (int i) const </td></tr>
 <tr class="separator:a2800a71c640f3dd1b7f0018f0058e76b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad2cb379d4b8988b6d1cbb28248714860"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad2cb379d4b8988b6d1cbb28248714860"></a>
-<a class="el" href="structdiy_1_1_master_1_1_i_proxy_with_link.html">IProxyWithLink</a>&#160;</td><td class="memItemRight" valign="bottom"><b>iproxy</b> (int i, <a class="el" href="structdiy_1_1_master_1_1_i_exchange_info.html">IExchangeInfo</a> *iexchange) const </td></tr>
-<tr class="separator:ad2cb379d4b8988b6d1cbb28248714860"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac10a5608f90a109e9771020e0a9dee1e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac10a5608f90a109e9771020e0a9dee1e"></a>
+<a class="el" href="structdiy_1_1_master_1_1_proxy_with_link.html">ProxyWithLink</a>&#160;</td><td class="memItemRight" valign="bottom"><b>proxy</b> (int i, <a class="el" href="structdiy_1_1_master_1_1_i_exchange_info.html">IExchangeInfo</a> *iexchange) const </td></tr>
+<tr class="separator:ac10a5608f90a109e9771020e0a9dee1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acf5ddc5dbd765ce578571aa90c238b45"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acf5ddc5dbd765ce578571aa90c238b45"></a>
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1_master.html#acf5ddc5dbd765ce578571aa90c238b45">size</a> () const </td></tr>
 <tr class="memdesc:acf5ddc5dbd765ce578571aa90c238b45"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the number of local blocks <br/></td></tr>
@@ -549,7 +547,7 @@ std::shared_ptr&lt; <a class="el" href="structdiy_1_1spd_1_1logger.html">spd::lo
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Sep 2 2018 22:04:22 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Sep 5 2018 15:55:27 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

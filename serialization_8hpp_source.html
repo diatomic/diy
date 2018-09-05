@@ -514,54 +514,80 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;<a class="code" href="structdiy_1_1_memory_buffer.html#a7efb80d0acab4aaab97207cc821ab56a">diy::MemoryBuffer::</a></div>
 <div class="line"><a name="l00449"></a><span class="lineno"><a class="line" href="structdiy_1_1_memory_buffer.html#a7efb80d0acab4aaab97207cc821ab56a">  449</a></span>&#160;<a class="code" href="structdiy_1_1_memory_buffer.html#a7efb80d0acab4aaab97207cc821ab56a">append_binary</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* x, <span class="keywordtype">size_t</span> count)</div>
 <div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;{</div>
-<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;    <span class="keywordtype">size_t</span> temp_pos = position;</div>
-<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;    position = size();</div>
-<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;    save_binary(x, count);</div>
-<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;    position = temp_pos;</div>
-<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;}</div>
-<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;</div>
-<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;<span class="keywordtype">void</span></div>
-<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;<a class="code" href="structdiy_1_1_memory_buffer.html#a6237d511cb70a55a243c96c2db284590">diy::MemoryBuffer::</a></div>
-<div class="line"><a name="l00459"></a><span class="lineno"><a class="line" href="structdiy_1_1_memory_buffer.html#a6237d511cb70a55a243c96c2db284590">  459</a></span>&#160;<a class="code" href="structdiy_1_1_memory_buffer.html#a6237d511cb70a55a243c96c2db284590">load_binary</a>(<span class="keywordtype">char</span>* x, <span class="keywordtype">size_t</span> count)</div>
-<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;{</div>
-<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;  std::copy_n(&amp;buffer[position], count, x);</div>
-<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;  position += count;</div>
-<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;}</div>
-<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;</div>
-<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;<span class="keywordtype">void</span></div>
-<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;<a class="code" href="structdiy_1_1_memory_buffer.html#a4007c8c1eec489d41616cd6d97c00995">diy::MemoryBuffer::</a></div>
-<div class="line"><a name="l00467"></a><span class="lineno"><a class="line" href="structdiy_1_1_memory_buffer.html#a4007c8c1eec489d41616cd6d97c00995">  467</a></span>&#160;<a class="code" href="structdiy_1_1_memory_buffer.html#a4007c8c1eec489d41616cd6d97c00995">load_binary_back</a>(<span class="keywordtype">char</span>* x, <span class="keywordtype">size_t</span> count)</div>
-<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;{</div>
-<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;  std::copy_n(&amp;buffer[buffer.size() - count], count, x);</div>
-<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;  buffer.resize(buffer.size() - count);</div>
-<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;}</div>
-<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;</div>
-<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;<span class="keywordtype">void</span></div>
-<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;<a class="code" href="structdiy_1_1_memory_buffer.html#acf7080d0f3b5f15e3bb8b7e1a8ebdf61">diy::MemoryBuffer::</a></div>
-<div class="line"><a name="l00475"></a><span class="lineno"><a class="line" href="structdiy_1_1_memory_buffer.html#acf7080d0f3b5f15e3bb8b7e1a8ebdf61">  475</a></span>&#160;<a class="code" href="structdiy_1_1_memory_buffer.html#acf7080d0f3b5f15e3bb8b7e1a8ebdf61">copy</a>(<a class="code" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a>&amp; from, <a class="code" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a>&amp; to)</div>
-<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;{</div>
-<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;  <span class="keywordtype">size_t</span> sz;</div>
-<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;  <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a>(from, sz);</div>
-<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;  from.position -= <span class="keyword">sizeof</span>(size_t);</div>
-<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;</div>
-<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;  <span class="keywordtype">size_t</span> total = <span class="keyword">sizeof</span>(size_t) + sz;</div>
-<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;  to.buffer.resize(to.position + total);</div>
-<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;  std::copy_n(&amp;from.buffer[from.position], total, &amp;to.buffer[to.position]);</div>
-<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;  to.position += total;</div>
-<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;  from.position += total;</div>
-<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;}</div>
-<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;</div>
-<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;    <span class="keywordflow">if</span> (buffer.size() + count &gt; buffer.capacity())     <span class="comment">// growth/copying will be triggered</span></div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;    {</div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;        <span class="keywordtype">size_t</span> cur_size = buffer.size() - position;</div>
+<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;        <span class="keywordtype">size_t</span> new_size = cur_size + count;</div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;        <span class="keywordflow">if</span> (new_size * growth_multiplier() &lt;= buffer.capacity())        <span class="comment">// we have enough space in this buffer, copy in place</span></div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;        {</div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;            <span class="comment">// copy the data to the beginning of the buffer and reduce its size</span></div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; cur_size; ++i)</div>
+<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;                buffer[i] = buffer[position++];</div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;</div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;            buffer.resize(cur_size);</div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;            position = 0;</div>
+<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;        } <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;        {</div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;            std::vector&lt;char&gt; tmp;</div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;            tmp.reserve(new_size * growth_multiplier());</div>
+<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;            tmp.resize(cur_size);</div>
+<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;</div>
+<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; tmp.size(); ++i)</div>
+<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;                tmp[i] = buffer[position++];</div>
+<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;</div>
+<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;            buffer.swap(tmp);</div>
+<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;            position = 0;</div>
+<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;        }</div>
+<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;    }</div>
+<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;</div>
+<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;    <span class="keywordtype">size_t</span> temp_pos = position;</div>
+<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;    position = size();</div>
+<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;    save_binary(x, count);</div>
+<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;    position = temp_pos;</div>
+<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;}</div>
+<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;</div>
+<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;<span class="keywordtype">void</span></div>
+<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;<a class="code" href="structdiy_1_1_memory_buffer.html#a6237d511cb70a55a243c96c2db284590">diy::MemoryBuffer::</a></div>
+<div class="line"><a name="l00485"></a><span class="lineno"><a class="line" href="structdiy_1_1_memory_buffer.html#a6237d511cb70a55a243c96c2db284590">  485</a></span>&#160;<a class="code" href="structdiy_1_1_memory_buffer.html#a6237d511cb70a55a243c96c2db284590">load_binary</a>(<span class="keywordtype">char</span>* x, <span class="keywordtype">size_t</span> count)</div>
+<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;{</div>
+<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;  std::copy_n(&amp;buffer[position], count, x);</div>
+<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;  position += count;</div>
+<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;}</div>
+<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;</div>
+<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;<span class="keywordtype">void</span></div>
+<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;<a class="code" href="structdiy_1_1_memory_buffer.html#a4007c8c1eec489d41616cd6d97c00995">diy::MemoryBuffer::</a></div>
+<div class="line"><a name="l00493"></a><span class="lineno"><a class="line" href="structdiy_1_1_memory_buffer.html#a4007c8c1eec489d41616cd6d97c00995">  493</a></span>&#160;<a class="code" href="structdiy_1_1_memory_buffer.html#a4007c8c1eec489d41616cd6d97c00995">load_binary_back</a>(<span class="keywordtype">char</span>* x, <span class="keywordtype">size_t</span> count)</div>
+<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;{</div>
+<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;  std::copy_n(&amp;buffer[buffer.size() - count], count, x);</div>
+<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;  buffer.resize(buffer.size() - count);</div>
+<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;}</div>
+<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;</div>
+<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;<span class="keywordtype">void</span></div>
+<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;<a class="code" href="structdiy_1_1_memory_buffer.html#acf7080d0f3b5f15e3bb8b7e1a8ebdf61">diy::MemoryBuffer::</a></div>
+<div class="line"><a name="l00501"></a><span class="lineno"><a class="line" href="structdiy_1_1_memory_buffer.html#acf7080d0f3b5f15e3bb8b7e1a8ebdf61">  501</a></span>&#160;<a class="code" href="structdiy_1_1_memory_buffer.html#acf7080d0f3b5f15e3bb8b7e1a8ebdf61">copy</a>(<a class="code" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a>&amp; from, <a class="code" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a>&amp; to)</div>
+<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;{</div>
+<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;  <span class="keywordtype">size_t</span> sz;</div>
+<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;  <a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a>(from, sz);</div>
+<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;  from.position -= <span class="keyword">sizeof</span>(size_t);</div>
+<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;</div>
+<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;  <span class="keywordtype">size_t</span> total = <span class="keyword">sizeof</span>(size_t) + sz;</div>
+<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;  to.buffer.resize(to.position + total);</div>
+<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;  std::copy_n(&amp;from.buffer[from.position], total, &amp;to.buffer[to.position]);</div>
+<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;  to.position += total;</div>
+<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;  from.position += total;</div>
+<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;}</div>
+<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;</div>
+<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="group___serialization_html_gae54f4c5c6740fcf7627009bdcfe02aa1"><div class="ttname"><a href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a></div><div class="ttdeci">void load(BinaryBuffer &amp;bb, T &amp;x)</div><div class="ttdoc">Loads x from bb by calling diy::Serialization&lt;T&gt;::load(bb,x). </div><div class="ttdef"><b>Definition:</b> serialization.hpp:110</div></div>
 <div class="ttc" id="group___serialization_html_ga33accb25f133567d216ebd3bee44595b"><div class="ttname"><a href="group___serialization.html#ga33accb25f133567d216ebd3bee44595b">diy::load_back</a></div><div class="ttdeci">void load_back(BinaryBuffer &amp;bb, T &amp;x)</div><div class="ttdoc">Supports only binary data copying (meant for simple footers). </div><div class="ttdef"><b>Definition:</b> serialization.hpp:124</div></div>
 <div class="ttc" id="structdiy_1_1_binary_buffer_html_a9d0ab30fe4978c730176a52ccd142cc3"><div class="ttname"><a href="structdiy_1_1_binary_buffer.html#a9d0ab30fe4978c730176a52ccd142cc3">diy::BinaryBuffer::save_binary</a></div><div class="ttdeci">virtual void save_binary(const char *x, size_t count)=0</div><div class="ttdoc">copy count bytes from x into the buffer </div></div>
-<div class="ttc" id="structdiy_1_1_memory_buffer_html_a6237d511cb70a55a243c96c2db284590"><div class="ttname"><a href="structdiy_1_1_memory_buffer.html#a6237d511cb70a55a243c96c2db284590">diy::MemoryBuffer::load_binary</a></div><div class="ttdeci">virtual void load_binary(char *x, size_t count) override</div><div class="ttdoc">copy count bytes into x from the buffer </div><div class="ttdef"><b>Definition:</b> serialization.hpp:459</div></div>
+<div class="ttc" id="structdiy_1_1_memory_buffer_html_a6237d511cb70a55a243c96c2db284590"><div class="ttname"><a href="structdiy_1_1_memory_buffer.html#a6237d511cb70a55a243c96c2db284590">diy::MemoryBuffer::load_binary</a></div><div class="ttdeci">virtual void load_binary(char *x, size_t count) override</div><div class="ttdoc">copy count bytes into x from the buffer </div><div class="ttdef"><b>Definition:</b> serialization.hpp:485</div></div>
 <div class="ttc" id="structdiy_1_1_binary_buffer_html_a3dfaa6a4881eebe258fc5c42e9e91e8d"><div class="ttname"><a href="structdiy_1_1_binary_buffer.html#a3dfaa6a4881eebe258fc5c42e9e91e8d">diy::BinaryBuffer::append_binary</a></div><div class="ttdeci">virtual void append_binary(const char *x, size_t count)=0</div><div class="ttdoc">append count bytes from x to end of buffer </div></div>
 <div class="ttc" id="structdiy_1_1_memory_buffer_html_a7efb80d0acab4aaab97207cc821ab56a"><div class="ttname"><a href="structdiy_1_1_memory_buffer.html#a7efb80d0acab4aaab97207cc821ab56a">diy::MemoryBuffer::append_binary</a></div><div class="ttdeci">virtual void append_binary(const char *x, size_t count) override</div><div class="ttdoc">append count bytes from x to end of buffer </div><div class="ttdef"><b>Definition:</b> serialization.hpp:449</div></div>
-<div class="ttc" id="structdiy_1_1_memory_buffer_html_acf7080d0f3b5f15e3bb8b7e1a8ebdf61"><div class="ttname"><a href="structdiy_1_1_memory_buffer.html#acf7080d0f3b5f15e3bb8b7e1a8ebdf61">diy::MemoryBuffer::copy</a></div><div class="ttdeci">static void copy(MemoryBuffer &amp;from, MemoryBuffer &amp;to)</div><div class="ttdoc">copy a memory buffer from one buffer to another, bypassing making a temporary copy first ...</div><div class="ttdef"><b>Definition:</b> serialization.hpp:475</div></div>
+<div class="ttc" id="structdiy_1_1_memory_buffer_html_acf7080d0f3b5f15e3bb8b7e1a8ebdf61"><div class="ttname"><a href="structdiy_1_1_memory_buffer.html#acf7080d0f3b5f15e3bb8b7e1a8ebdf61">diy::MemoryBuffer::copy</a></div><div class="ttdeci">static void copy(MemoryBuffer &amp;from, MemoryBuffer &amp;to)</div><div class="ttdoc">copy a memory buffer from one buffer to another, bypassing making a temporary copy first ...</div><div class="ttdef"><b>Definition:</b> serialization.hpp:501</div></div>
 <div class="ttc" id="structdiy_1_1_memory_buffer_html_a5e2f70569226e09b8a0ca3c8319d93bc"><div class="ttname"><a href="structdiy_1_1_memory_buffer.html#a5e2f70569226e09b8a0ca3c8319d93bc">diy::MemoryBuffer::growth_multiplier</a></div><div class="ttdeci">static float growth_multiplier()</div><div class="ttdoc">multiplier used for the geometric growth of the container </div><div class="ttdef"><b>Definition:</b> serialization.hpp:52</div></div>
 <div class="ttc" id="group___serialization_html_gafaac9aa4ccdc04930f612ca20341fc9b"><div class="ttname"><a href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">diy::save</a></div><div class="ttdeci">void save(BinaryBuffer &amp;bb, const T &amp;x)</div><div class="ttdoc">Saves x to bb by calling diy::Serialization&lt;T&gt;::save(bb,x). </div><div class="ttdef"><b>Definition:</b> serialization.hpp:106</div></div>
-<div class="ttc" id="structdiy_1_1_memory_buffer_html_a4007c8c1eec489d41616cd6d97c00995"><div class="ttname"><a href="structdiy_1_1_memory_buffer.html#a4007c8c1eec489d41616cd6d97c00995">diy::MemoryBuffer::load_binary_back</a></div><div class="ttdeci">virtual void load_binary_back(char *x, size_t count) override</div><div class="ttdoc">copy count bytes into x from the back of the buffer </div><div class="ttdef"><b>Definition:</b> serialization.hpp:467</div></div>
+<div class="ttc" id="structdiy_1_1_memory_buffer_html_a4007c8c1eec489d41616cd6d97c00995"><div class="ttname"><a href="structdiy_1_1_memory_buffer.html#a4007c8c1eec489d41616cd6d97c00995">diy::MemoryBuffer::load_binary_back</a></div><div class="ttdeci">virtual void load_binary_back(char *x, size_t count) override</div><div class="ttdoc">copy count bytes into x from the back of the buffer </div><div class="ttdef"><b>Definition:</b> serialization.hpp:493</div></div>
 <div class="ttc" id="namespacediy_html_a861d8601719a75414c57d6aa6a99e0fc"><div class="ttname"><a href="namespacediy.html#a861d8601719a75414c57d6aa6a99e0fc">diy::in</a></div><div class="ttdeci">void in(const RegularLink&lt; Bounds &gt; &amp;link, const Point &amp;p, OutIter out, const Bounds &amp;domain)</div><div class="ttdoc">Finds the neighbor(s) containing the target point. </div><div class="ttdef"><b>Definition:</b> pick.hpp:102</div></div>
 <div class="ttc" id="structdiy_1_1_memory_buffer_html"><div class="ttname"><a href="structdiy_1_1_memory_buffer.html">diy::MemoryBuffer</a></div><div class="ttdef"><b>Definition:</b> serialization.hpp:28</div></div>
 <div class="ttc" id="structdiy_1_1_binary_buffer_html_a53b5ba450ddf8b6e9b262c552b2ef673"><div class="ttname"><a href="structdiy_1_1_binary_buffer.html#a53b5ba450ddf8b6e9b262c552b2ef673">diy::BinaryBuffer::load_binary</a></div><div class="ttdeci">virtual void load_binary(char *x, size_t count)=0</div><div class="ttdoc">copy count bytes into x from the buffer </div></div>
@@ -572,7 +598,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Sep 2 2018 22:04:21 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Sep 5 2018 15:55:27 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

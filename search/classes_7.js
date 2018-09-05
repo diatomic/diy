@@ -8,6 +8,5 @@ var searchData=
   ['inflightsend',['InFlightSend',['../structdiy_1_1_master_1_1_in_flight_send.html',1,'diy::Master']]],
   ['inflightsendslist',['InFlightSendsList',['../structdiy_1_1_master_1_1_in_flight_sends_list.html',1,'diy::Master']]],
   ['intformatspec',['IntFormatSpec',['../classfmt_1_1_int_format_spec.html',1,'fmt']]],
-  ['inttraits',['IntTraits',['../structfmt_1_1internal_1_1_int_traits.html',1,'fmt::internal']]],
-  ['iproxywithlink',['IProxyWithLink',['../structdiy_1_1_master_1_1_i_proxy_with_link.html',1,'diy::Master']]]
+  ['inttraits',['IntTraits',['../structfmt_1_1internal_1_1_int_traits.html',1,'fmt::internal']]]
 ];
