@@ -40,6 +40,9 @@ target_link_libraries       (iexchange-test         ${libraries})
 add_executable              (grid-test         grid.cpp)
 target_link_libraries       (grid-test         ${libraries})
 
+add_executable              (serialization-test serialization.cpp)
+target_link_libraries       (serialization-test ${libraries})
+
 add_executable              (two-masters         two-masters.cpp)
 target_link_libraries       (two-masters         ${libraries})
 
@@ -65,6 +68,10 @@ add_test                    (NAME partners-test
 
 add_test                    (NAME grid-test
                              COMMAND grid-test
+                            )
+
+add_test                    (NAME serialization-test
+                             COMMAND serialization-test
                             )
 
 if                          (mpi)
