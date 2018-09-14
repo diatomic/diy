@@ -47,6 +47,17 @@ TEST_CASE("Test BOV", "[io]")
     }
 }
 
+TEST_CASE("Test MPI-IO", "[io]")
+{
+    diy::mpi::communicator world;
+
+    SECTION("file doesn't exist")
+    {
+        REQUIRE_THROWS_AS  (diy::mpi::io::file(world, "non-existent-file", diy::mpi::io::file::rdonly), std::runtime_error);
+        REQUIRE_THROWS_WITH(diy::mpi::io::file(world, "non-existent-file", diy::mpi::io::file::rdonly), Catch::Contains("DIY cannot open file"));
+    }
+}
+
 int main()
 {
   diy::mpi::environment env;
