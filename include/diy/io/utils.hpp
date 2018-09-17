@@ -4,6 +4,7 @@
 #if defined(_WIN32)
 #include <direct.h>
 #include <io.h>
+#include <share.h>
 #else
 #include <unistd.h>     // mkstemp() on Mac
 #include <dirent.h>
