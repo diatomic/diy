@@ -13,6 +13,7 @@ var searchData=
   ['serialization_3c_20std_3a_3aunordered_5fset_3c_20t_2c_20h_2c_20e_2c_20a_20_3e_20_3e',['Serialization&lt; std::unordered_set&lt; T, H, E, A &gt; &gt;',['../structdiy_1_1_serialization_3_01std_1_1unordered__set_3_01_t_00_01_h_00_01_e_00_01_a_01_4_01_4.html',1,'diy']]],
   ['serialization_3c_20std_3a_3avalarray_3c_20u_20_3e_20_3e',['Serialization&lt; std::valarray&lt; U &gt; &gt;',['../structdiy_1_1_serialization_3_01std_1_1valarray_3_01_u_01_4_01_4.html',1,'diy']]],
   ['serialization_3c_20std_3a_3avector_3c_20u_20_3e_20_3e',['Serialization&lt; std::vector&lt; U &gt; &gt;',['../structdiy_1_1_serialization_3_01std_1_1vector_3_01_u_01_4_01_4.html',1,'diy']]],
+  ['sharedoutfile',['SharedOutFile',['../classdiy_1_1io_1_1_shared_out_file.html',1,'diy::io']]],
   ['signchecker',['SignChecker',['../structfmt_1_1internal_1_1_sign_checker.html',1,'fmt::internal']]],
   ['signchecker_3c_20false_20_3e',['SignChecker&lt; false &gt;',['../structfmt_1_1internal_1_1_sign_checker_3_01false_01_4.html',1,'fmt::internal']]],
   ['skipnoincoming',['SkipNoIncoming',['../structdiy_1_1_master_1_1_skip_no_incoming.html',1,'diy::Master']]],
