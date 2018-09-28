@@ -8,6 +8,8 @@ option                      (log                "Build DIY with logging"        
 option                      (profile            "Build DIY with profiling"                                  OFF)
 option                      (mpi                "Build DIY with mpi"                                        ON)
 option                      (wrapped_mpi        "MPI compiler wrapper requires no further MPI libraries"    OFF)
+option                      (build_examples     "Build DIY examples"                                        ON)
+option                      (build_tests        "Build DIY tests"                                           ON)
 
 # Default to Release
 if                          (NOT CMAKE_BUILD_TYPE)
@@ -69,5 +71,13 @@ endif                       (mpi)
 enable_testing              ()
 include                     (CTest)
 
-add_subdirectory            (examples)
-add_subdirectory            (tests)
+if                          (build_examples)
+    add_subdirectory        (examples)
+endif                       (build_examples)
+
+if                          (build_tests)
+    add_subdirectory        (tests)
+endif                       (build_tests)
+
+install                     (DIRECTORY   ${CMAKE_SOURCE_DIR}/include/diy
+                             DESTINATION ${CMAKE_INSTALL_PREFIX}/include)

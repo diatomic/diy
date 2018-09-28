@@ -46,6 +46,9 @@ target_link_libraries       (serialization-test ${libraries})
 add_executable              (two-masters         two-masters.cpp)
 target_link_libraries       (two-masters         ${libraries})
 
+add_executable              (shared-output         shared-output.cpp)
+target_link_libraries       (shared-output         ${libraries})
+
 foreach                     (b 2 4 8 64)
     add_test                (NAME kd-tree-test-b${b}
                              COMMAND kd-tree-test -b ${b}
