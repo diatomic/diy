@@ -127,4 +127,7 @@ int main(int argc, char* argv[])
 
     // dequeue, enqueue, exchange all in one nonblocking routine
     master.iexchange(&bounce);
+
+    // one may also reduce the number of small messages as follows
+//     master.iexchange(&bounce, 16, 1000); // hold messages smaller than 16 bytes for up to 1000 milliseconds
 }

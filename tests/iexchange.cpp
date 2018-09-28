@@ -160,6 +160,10 @@ int main(int argc, char* argv[])
     // dequeue, enqueue, exchange all in one nonblocking routine
     master.iexchange(&bounce);
 
+    // alternatively, can hold small messages to reduce communication frequency
+    // TODO: add this option to the test once we decide we will keep it
+//     master.iexchange(&bounce, 16, 100);
+
     fmt::print("[{}]: Checking correctness\n", world.rank());
 
     // check correctness: number of finished particles and hops matches the expected numbers

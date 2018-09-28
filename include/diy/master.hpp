@@ -209,13 +209,17 @@ namespace diy
 
       //! nonblocking exchange of the queues between all the blocks
       template<class Block>
-      void          iexchange_(const ICallback<Block>&   f);
+      void          iexchange_(const ICallback<Block>&  f,
+                               const size_t             min_queue_size,
+                               const size_t             max_hold_time);
 
       template<class F>
-      void          iexchange(const F& f)
+      void          iexchange(const     F&      f,
+                              const     size_t  min_queue_size = 0,     // in bytes, queues smaller than min_queue_size will be held for up to max_hold_time
+                              const     size_t  max_hold_time  = 0)     // in milliseconds
       {
           using Block = typename detail::block_traits<F>::type;
-          iexchange_<Block>(f);
+          iexchange_<Block>(f, min_queue_size, max_hold_time);
       }
 
       inline void   process_collectives();
@@ -668,7 +672,9 @@ touch_queues()
 template<class Block>
 void
 diy::Master::
-iexchange_(const ICallback<Block>& f)
+iexchange_(const    ICallback<Block>&   f,
+           const    size_t              min_queue_size,
+           const    size_t              max_hold_time)
 {
     auto scoped = prof.scoped("iexchange");
 
@@ -676,7 +682,7 @@ iexchange_(const ICallback<Block>& f)
     incoming_.erase(exchange_round_);
     ++exchange_round_;
 
-    IExchangeInfo iexchange(size(), comm_);
+    IExchangeInfo iexchange(size(), comm_, min_queue_size, max_hold_time);
     iexchange.add_work(size());                 // start with one work unit for each block
     comm_.barrier();                            // make sure that everyone's original work is accounted for
 
@@ -889,14 +895,17 @@ send_outgoing_queues(GidSendOrder&   gid_order,
             int     proc    = to_proc.proc;
             log->debug("Processing queue:      {} <- {} of size {}", to, from, outgoing_[from].queues[to_proc].size());
 
-            // skip empty queues
-            if (iexchange && !it->second.size())
+            // skip empty queues and hold queues shorter than some limit for some time
+            if ( iexchange &&
+                    (!it->second.size() || iexchange->hold(it->second.size())) )
             {
-                log->debug("Skipping empty queue: {} <- {}", to, from);
+                log->debug("Skipping/holding empty/short queue:      {} <- {} of size {}\n", to, from, outgoing_[from].queues[to_proc].size());
                 continue;
             }
 
             // sending to same rank: simply swap buffers
+            if (iexchange)
+                iexchange->time_stamp_send();       // hold time begins counting from now
             if (proc == comm_.rank())
                 send_same_rank(from, to, it->second, iexchange);
             else

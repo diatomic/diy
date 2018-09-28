@@ -45,12 +45,19 @@ namespace diy
 
     struct Master::IExchangeInfo
     {
+        using   Clock   = std::chrono::high_resolution_clock;
+        using   Time    = Clock::time_point;
+
                         IExchangeInfo():
-                            n(0)                                                  {}
-                        IExchangeInfo(size_t n_, mpi::communicator comm_):
+                            n(0),
+                            min_queue_size_(0),
+                            max_hold_time_(0)                                     {}
+                        IExchangeInfo(size_t n_, mpi::communicator comm_, size_t min_queue_size, size_t max_hold_time):
                             n(n_),
                             comm(comm_),
-                            global_work_(new mpi::window<int>(comm, 1))           { global_work_->lock_all(MPI_MODE_NOCHECK); }
+                            global_work_(new mpi::window<int>(comm, 1)),
+                            min_queue_size_(min_queue_size),
+                            max_hold_time_(max_hold_time)                         { global_work_->lock_all(MPI_MODE_NOCHECK); time_stamp_send(); }
                         ~IExchangeInfo()                                          { global_work_->unlock_all(); }
 
       inline void       not_done(int gid);
@@ -61,12 +68,19 @@ namespace diy
       inline int        add_work(int work);                     // add work to global work counter
       int               inc_work()                              { return add_work(1); }   // increment global work counter
       int               dec_work()                              { return add_work(-1); }  // decremnent global work counter
+      void              time_stamp_send()                       { time_last_send = Clock::now(); }
+      bool              hold(size_t queue_size)                 { return queue_size < min_queue_size_ && hold_time() < max_hold_time_; }
+      size_t            hold_time()                             { return std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - time_last_send).count(); }
+
 
       size_t                              n;
       mpi::communicator                   comm;
       std::unordered_map<int, bool>       done;                 // gid -> done
       std::unique_ptr<mpi::window<int>>   global_work_;         // global work to do
       std::shared_ptr<spd::logger>        log = get_logger();
+      Time                                time_last_send;       // time of last send from any queue in send_outgoing_queues()
+      size_t                              min_queue_size_;      // minimum short message size (bytes)
+      size_t                              max_hold_time_;       // maximum short message hold time (milliseconds)
     };
 
     // VectorWindow is used to send and receive subsets of a contiguous array in-place
