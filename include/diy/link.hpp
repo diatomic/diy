@@ -159,7 +159,9 @@ namespace diy
 
       // local information
       int           level() const                           { return local_.level; }
+      int           level(int i) const                      { return nbr_descriptions_[i].level; }
       int           refinement() const                      { return local_.refinement; }
+      int           refinement(int i) const                 { return nbr_descriptions_[i].refinement; }
 
       // wrap
       void          add_wrap(Direction dir)                 { wrap_.push_back(dir); }
