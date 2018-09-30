@@ -553,7 +553,7 @@ proxy(int i) const
 diy::Master::ProxyWithLink
 diy::Master::
 proxy(int i, IExchangeInfo* iexchange) const
-{ return ProxyWithLink(Proxy(const_cast<Master*>(this), gid(i)), block(i), link(i), iexchange); }
+{ return ProxyWithLink(Proxy(const_cast<Master*>(this), gid(i), iexchange), block(i), link(i)); }
 
 int
 diy::Master::

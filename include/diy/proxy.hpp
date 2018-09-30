@@ -10,9 +10,11 @@ namespace diy
     template <class T>
     struct EnqueueIterator;
 
-                        Proxy(Master* master__, int gid__):
+                        Proxy(Master* master__, int gid__,
+                              IExchangeInfo*  iexchange__ = 0):
                           gid_(gid__),
                           master_(master__),
+                          iexchange_(iexchange__),
                           incoming_(&master__->incoming(gid__)),
                           outgoing_(&master__->outgoing(gid__)),
                           collectives_(&master__->collectives(gid__))   {}
@@ -25,7 +27,11 @@ namespace diy
                                 const T&        x,                                      //!< data (eg. STL vector)
                                 void (*save)(BinaryBuffer&, const T&) = &::diy::save<T> //!< optional serialization function
                                ) const
-    { OutgoingQueues& out = *outgoing_; save(out[to], x); }
+    {
+        OutgoingQueues& out = *outgoing_; save(out[to], x);
+        if (iexchange_)
+            master()->icommunicate(iexchange_);
+    }
 
     //! Enqueue data whose size is given explicitly by the user, e.g., an array.
     template<class T>
@@ -122,6 +128,8 @@ namespace diy
     private:
       int               gid_;
       Master*           master_;
+      IExchangeInfo*    iexchange_;
+
       IncomingQueues*   incoming_;
       OutgoingQueues*   outgoing_;
       CollectivesList*  collectives_;
@@ -153,12 +161,10 @@ namespace diy
   {
             ProxyWithLink(const Proxy&    proxy,
                           void*           block__,
-                          Link*           link__,
-                          IExchangeInfo*  iexchange__ = 0):
+                          Link*           link__):
               Proxy(proxy),
               block_(block__),
-              link_(link__),
-              iexchange_(iexchange__)                               {}
+              link_(link__)                                         {}
 
       Link*   link() const                                          { return link_; }
       void*   block() const                                         { return block_; }
@@ -166,52 +172,6 @@ namespace diy
     private:
       void*             block_;
       Link*             link_;
-      IExchangeInfo*    iexchange_;         // not used for iexchange presently, but later could trigger some special behavior
-
-    public:
-      template<class T>
-      void enqueue(const BlockID&     to,
-              const T&                x,
-              void (*save)(BinaryBuffer&, const T&) = &::diy::save<T>) const
-      {
-          diy::Master::Proxy::enqueue(to, x, save);
-          if (iexchange_)
-              master()->icommunicate(iexchange_);
-      }
-
-      template<class T>
-      void enqueue(const BlockID&     to,
-              const T*                x,
-              size_t                  n,
-              void (*save)(BinaryBuffer&, const T&) = &::diy::save<T>) const
-      {
-          diy::Master::Proxy::enqueue(to, x, n, save);
-          if (iexchange_)
-              master()->icommunicate(iexchange_);
-      }
-
-      template<class T>
-      void dequeue(int                from,
-              T&                      x,
-              void (*load)(BinaryBuffer&, T&) = &::diy::load<T>) const
-      {
-          // TODO: uncomment if necessary, try first without icommunicating on dequeue
-//           if (iexchange_)
-//               master()->icommunicate(iexchange_);
-          diy::Master::Proxy::dequeue(from, x, load);
-      }
-
-      template<class T>
-      void dequeue(int                from,
-              T*                      x,
-              size_t                  n,
-              void (*load)(BinaryBuffer&, T&) = &::diy::load<T>) const
-      {
-          // TODO: uncomment if necessary, try first without icommunicating on dequeue
-//           if (iexchange_)
-//               master()->icommunicate(iexchange_);
-          diy::Master::Proxy::dequeue(from, x, n, load);
-      }
   };
 }                                           // diy namespace
 
@@ -272,6 +232,9 @@ enqueue(const BlockID& to, const T* x, size_t n,
     else
         for (size_t i = 0; i < n; ++i)
             save(bb, x[i]);
+
+    if (iexchange_)
+        master()->icommunicate(iexchange_);
 }
 
 template<class T>
