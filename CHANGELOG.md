@@ -6,5 +6,6 @@
   floating point type.
 - Change `LinkFactory` mechanism to make link serialization generic.
 - Add `AMRLink` in `include/diy/link.hpp`
+- Add `min_queue_size` and `max_hold_time` to control `Master::iexchange()` behavior
 
 # Version 3.5.0
