@@ -953,6 +953,8 @@ void
 diy::Master::
 send_same_rank(int from, int to, MemoryBuffer& bb, IExchangeInfo* iexchange)
 {
+    auto scoped = prof.scoped("send-same-rank");
+
     log->debug("Moving queue in-place: {} <- {}", to, from);
 
     IncomingRound& current_incoming = incoming_[exchange_round_];
@@ -1007,6 +1009,8 @@ void
 diy::Master::
 send_different_rank(int from, int to, int proc, MemoryBuffer& bb, bool remote, IExchangeInfo* iexchange)
 {
+    auto scoped = prof.scoped("send-different-rank");
+
     static const size_t MAX_MPI_MESSAGE_COUNT = INT_MAX;
 
     // sending to a different rank
