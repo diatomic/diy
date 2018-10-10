@@ -29,8 +29,8 @@ namespace diy
                                ) const
     {
         OutgoingQueues& out = *outgoing_; save(out[to], x);
-        if (iexchange_)
-            master()->icommunicate(iexchange_);
+//         if (iexchange_)
+//             master()->icommunicate(iexchange_);
     }
 
     //! Enqueue data whose size is given explicitly by the user, e.g., an array.
