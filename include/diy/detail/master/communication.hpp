@@ -52,15 +52,17 @@ namespace diy
                             n(0),
                             min_queue_size_(0),
                             max_hold_time_(0),
-                            gid(-1)                             {}
-                        IExchangeInfo(size_t n_, mpi::communicator comm_, size_t min_queue_size, size_t max_hold_time):
+                            gid(-1),
+                            fine_(false)                                          {}
+                        IExchangeInfo(size_t n_, mpi::communicator comm_, size_t min_queue_size, size_t max_hold_time, bool fine):
                             n(n_),
                             comm(comm_),
                             global_work_(new mpi::window<int>(comm, 1)),
                             min_queue_size_(min_queue_size),
                             max_hold_time_(max_hold_time),
-                            gid(-1)                             { global_work_->lock_all(MPI_MODE_NOCHECK); time_stamp_send(); }
-                        ~IExchangeInfo()                        { global_work_->unlock_all(); }
+                            gid(-1),
+                            fine_(fine)                                           { global_work_->lock_all(MPI_MODE_NOCHECK); time_stamp_send(); }
+                        ~IExchangeInfo()                                          { global_work_->unlock_all(); }
 
       inline void       not_done(int gid);
 
@@ -70,6 +72,7 @@ namespace diy
       inline int        add_work(int work);                     // add work to global work counter
       int               inc_work()                              { return add_work(1); }   // increment global work counter
       int               dec_work()                              { return add_work(-1); }  // decremnent global work counter
+
       void              time_stamp_send()                       { time_last_send = Clock::now(); }
       bool              hold(size_t queue_size)                 { return min_queue_size_ >= 0 && max_hold_time_ >= 0 &&
                                                                          queue_size < min_queue_size_ && hold_time() < max_hold_time_; }
@@ -80,6 +83,7 @@ namespace diy
                                      BlockID to_block)          { gid = gid_; block_id = to_block; }
 
 
+      bool              fine() const                            { return fine_; }
 
       size_t                              n;
       mpi::communicator                   comm;
@@ -96,6 +100,8 @@ namespace diy
       // gid = -1 means ignore gid and block_id and don't shortcut send_outgoing_queues
       int                                 gid;                  // gid of most recent enqueue
       BlockID                             block_id;             // block id of target of most recent enqueue
+
+      bool                                fine_ = false;
     };
 
     // VectorWindow is used to send and receive subsets of a contiguous array in-place

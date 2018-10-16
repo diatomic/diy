@@ -210,16 +210,18 @@ namespace diy
       //! nonblocking exchange of the queues between all the blocks
       template<class Block>
       void          iexchange_(const ICallback<Block>&  f,
-                               const size_t             min_queue_size,
-                               const size_t             max_hold_time);
+                               size_t                   min_queue_size,
+                               size_t                   max_hold_time,
+                               bool                     fine);
 
       template<class F>
       void          iexchange(const     F&      f,
-                              const     size_t  min_queue_size = 0,     // in bytes, queues smaller than min_queue_size will be held for up to max_hold_time
-                              const     size_t  max_hold_time  = 0)     // in milliseconds
+                              size_t            min_queue_size = 0,     // in bytes, queues smaller than min_queue_size will be held for up to max_hold_time
+                              size_t            max_hold_time  = 0,     // in milliseconds
+                              bool              fine           = false)
       {
           using Block = typename detail::block_traits<F>::type;
-          iexchange_<Block>(f, min_queue_size, max_hold_time);
+          iexchange_<Block>(f, min_queue_size, max_hold_time, fine);
       }
 
       inline void   process_collectives();
@@ -674,8 +676,9 @@ template<class Block>
 void
 diy::Master::
 iexchange_(const    ICallback<Block>&   f,
-           const    size_t              min_queue_size,
-           const    size_t              max_hold_time)
+           size_t                       min_queue_size,
+           size_t                       max_hold_time,
+           bool                         fine)
 {
     auto scoped = prof.scoped("iexchange");
 
@@ -683,7 +686,7 @@ iexchange_(const    ICallback<Block>&   f,
     incoming_.erase(exchange_round_);
     ++exchange_round_;
 
-    IExchangeInfo iexchange(size(), comm_, min_queue_size, max_hold_time);
+    IExchangeInfo iexchange(size(), comm_, min_queue_size, max_hold_time, fine);
     iexchange.add_work(size());                 // start with one work unit for each block
     comm_.barrier();                            // make sure that everyone's original work is accounted for
 
