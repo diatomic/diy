@@ -717,6 +717,7 @@ iexchange_(const    ICallback<Block>&   f,
             done &= (nundeq_after == 0);
             done &= (nunenq_after == 0);
 
+            prof << "work-counting";
             int gid = cp.gid();
             if (iexchange.done[gid] != done)
             {
@@ -732,9 +733,12 @@ iexchange_(const    ICallback<Block>&   f,
                     log->debug("[{}] Incrementing work when switching done after callback, for {}: work = {}\n", comm_.rank(), gid, work);
                 }
             }
+            prof >> "work-counting";
         }
 
+        prof << "global-work";
         global_work_ = iexchange.global_work();
+        prof >> "global-work";
     } while (global_work_ > 0);
     log->debug("[{}] ==== Leaving iexchange ====\n", iexchange.comm.rank());
 
