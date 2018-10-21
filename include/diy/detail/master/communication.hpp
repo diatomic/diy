@@ -69,7 +69,8 @@ namespace diy
       int               inc_work()                              { return add_work(1); }   // increment global work counter
       int               dec_work()                              { return add_work(-1); }  // decremnent global work counter
       void              time_stamp_send()                       { time_last_send = Clock::now(); }
-      bool              hold(size_t queue_size)                 { return queue_size < min_queue_size_ && hold_time() < max_hold_time_; }
+      bool              hold(size_t queue_size)                 { return min_queue_size_ >= 0 && max_hold_time_ >= 0 &&
+                                                                         queue_size < min_queue_size_ && hold_time() < max_hold_time_; }
       size_t            hold_time()                             { return std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - time_last_send).count(); }
 
 
@@ -79,8 +80,9 @@ namespace diy
       std::unique_ptr<mpi::window<int>>   global_work_;         // global work to do
       std::shared_ptr<spd::logger>        log = get_logger();
       Time                                time_last_send;       // time of last send from any queue in send_outgoing_queues()
-      size_t                              min_queue_size_;      // minimum short message size (bytes)
-      size_t                              max_hold_time_;       // maximum short message hold time (milliseconds)
+      // TODO: for now, negative min_queue_size or max_hold_time indicates don't do fine-grain icommunicate at all
+      int                                 min_queue_size_;      // minimum short message size (bytes)
+      int                                 max_hold_time_;       // maximum short message hold time (milliseconds)
     };
 
     // VectorWindow is used to send and receive subsets of a contiguous array in-place

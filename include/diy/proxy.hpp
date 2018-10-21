@@ -29,8 +29,9 @@ namespace diy
                                ) const
     {
         OutgoingQueues& out = *outgoing_; save(out[to], x);
-//         if (iexchange_)
-//             master()->icommunicate(iexchange_);
+        // TODO: for now, negative min_queue_size or max_hold_time indicates don't do fine-grain icommunicate at all
+        if (iexchange_ && iexchange_->min_queue_size_ >= 0 && iexchange_->max_hold_time_ >= 0)
+            master()->icommunicate(iexchange_);
     }
 
     //! Enqueue data whose size is given explicitly by the user, e.g., an array.
@@ -233,7 +234,8 @@ enqueue(const BlockID& to, const T* x, size_t n,
         for (size_t i = 0; i < n; ++i)
             save(bb, x[i]);
 
-    if (iexchange_)
+    // TODO: for now, negative min_queue_size or max_hold_time indicates don't do fine-grain icommunicate at all
+    if (iexchange_ && iexchange_->min_queue_size_ >= 0 && iexchange_->max_hold_time_ >= 0)
         master()->icommunicate(iexchange_);
 }
 
