@@ -80,4 +80,4 @@ if                          (build_tests)
 endif                       (build_tests)
 
 install                     (DIRECTORY   ${CMAKE_SOURCE_DIR}/include/diy
-                             DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
+                             DESTINATION include)
