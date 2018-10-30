@@ -869,6 +869,82 @@ icommunicate(IExchangeInfo* iexchange)
     log->debug("Exiting icommunicate()");
 }
 
+#if 1           // new version that only checks current queue for iexchange
+
+void
+diy::Master::
+send_outgoing_queues(GidSendOrder&   gid_order,
+                     bool            remote,                     // TODO: are remote and iexchange mutually exclusive? If so, use single enum?
+                     IExchangeInfo*  iexchange)
+{
+    auto scoped = prof.scoped("send-outgoing-queues");
+
+    // for iexchange, if single outgoing queue is set, use it
+    // TODO: ignores gid_order.pop() and loading external queues (see the else case below)
+    if (iexchange && iexchange->gid >= 0)     // shortcut mode for iexchange: check only single outgoing queue
+    {
+        BlockID to_block    = iexchange->block_id;
+        int     from_gid    = iexchange->gid;
+        int     to_gid      = iexchange->block_id.gid;
+        int     to_proc     = iexchange->block_id.proc;
+        log->debug("Processing queue:      {} <- {} of size {}", to_gid, from_gid, outgoing_[from_gid].queues[to_block].size());
+
+        // skip empty queues and hold queues shorter than some limit for some time
+        if ( outgoing_[from_gid].queues[to_block].size() && !iexchange->hold(outgoing_[from_gid].queues[to_block].size()) )
+        {
+            // sending to same rank: simply swap buffers
+            iexchange->time_stamp_send();       // hold time begins counting from now
+            if (to_proc == comm_.rank())
+                send_same_rank(from_gid, to_gid, outgoing_[from_gid].queues[to_block], iexchange);
+            else
+                send_different_rank(from_gid, to_gid, to_proc, outgoing_[from_gid].queues[to_block], remote, iexchange);
+        }
+
+        iexchange->gid = -1;
+    }
+    else                                    // normal mode: check all outgoing queues
+    {
+        while (inflight_sends().size() < gid_order.limit && !gid_order.empty())
+        {
+            int from = gid_order.pop();
+
+            // move external queues going to our rank
+            move_external_local(from);
+
+            if (outgoing_[from].external != -1)
+                load_outgoing(from);
+
+            OutgoingQueues& outgoing = outgoing_[from].queues;
+            for (OutgoingQueues::iterator it = outgoing.begin(); it != outgoing.end(); ++it)
+            {
+                BlockID to_block    = it->first;
+                int     to_gid      = to_block.gid;
+                int     to_proc     = to_block.proc;
+                log->debug("Processing queue:      {} <- {} of size {}", to_gid, from, outgoing_[from].queues[to_block].size());
+
+                // skip empty queues and hold queues shorter than some limit for some time
+                if ( iexchange &&
+                        (!it->second.size() || iexchange->hold(it->second.size())) )
+                {
+                    log->debug("Skipping/holding empty/short queue:      {} <- {} of size {}\n", to_gid, from, outgoing_[from].queues[to_block].size());
+                    continue;
+                }
+
+                // sending to same rank: simply swap buffers
+                if (iexchange)
+                    iexchange->time_stamp_send();       // hold time begins counting from now
+                if (to_proc == comm_.rank())
+                    send_same_rank(from, to_gid, it->second, iexchange);
+                else
+                    send_different_rank(from, to_gid, to_proc, it->second, remote, iexchange);
+
+            }                                           // for (OutgoingQueues::iterator it ...
+        }                                               // while (inflight_sends().size() ...
+    }                                                   // else   // check all queues
+}
+
+# else      // original version that checks all queues
+
 void
 diy::Master::
 send_outgoing_queues(GidSendOrder&   gid_order,
@@ -914,6 +990,8 @@ send_outgoing_queues(GidSendOrder&   gid_order,
         }                                       // for (OutgoingQueues::iterator it ...
     }                                           // while (inflight_sends().size() ...
 }
+
+#endif
 
 void
 diy::Master::

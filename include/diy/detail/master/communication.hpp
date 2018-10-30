@@ -51,14 +51,16 @@ namespace diy
                         IExchangeInfo():
                             n(0),
                             min_queue_size_(0),
-                            max_hold_time_(0)                                     {}
+                            max_hold_time_(0),
+                            gid(-1)                             {}
                         IExchangeInfo(size_t n_, mpi::communicator comm_, size_t min_queue_size, size_t max_hold_time):
                             n(n_),
                             comm(comm_),
                             global_work_(new mpi::window<int>(comm, 1)),
                             min_queue_size_(min_queue_size),
-                            max_hold_time_(max_hold_time)                         { global_work_->lock_all(MPI_MODE_NOCHECK); time_stamp_send(); }
-                        ~IExchangeInfo()                                          { global_work_->unlock_all(); }
+                            max_hold_time_(max_hold_time),
+                            gid(-1)                             { global_work_->lock_all(MPI_MODE_NOCHECK); time_stamp_send(); }
+                        ~IExchangeInfo()                        { global_work_->unlock_all(); }
 
       inline void       not_done(int gid);
 
@@ -80,9 +82,15 @@ namespace diy
       std::unique_ptr<mpi::window<int>>   global_work_;         // global work to do
       std::shared_ptr<spd::logger>        log = get_logger();
       Time                                time_last_send;       // time of last send from any queue in send_outgoing_queues()
+
       // TODO: for now, negative min_queue_size or max_hold_time indicates don't do fine-grain icommunicate at all
       int                                 min_queue_size_;      // minimum short message size (bytes)
       int                                 max_hold_time_;       // maximum short message hold time (milliseconds)
+
+      // the following 2 members are for short-cutting send_outgoing_queues
+      // gid = -1 means ignore gid and block_id and don't shortcut send_outgoing_queues
+      int                                 gid;                  // gid of most recent enqueue
+      BlockID                             block_id;             // block id of target of most recent enqueue
     };
 
     // VectorWindow is used to send and receive subsets of a contiguous array in-place

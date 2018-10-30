@@ -78,7 +78,7 @@ bool bounce(Block*                              b,
 
 int main(int argc, char* argv[])
 {
-     //diy::create_logger("debug");
+//     diy::create_logger("trace");
 
     diy::mpi::environment     env(argc, argv);
     diy::mpi::communicator    world;
