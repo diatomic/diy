@@ -325,7 +325,7 @@ decompose(int rank, const StaticAssigner& assigner, const Creator& create)
       if (all(offsets, 0)) continue;      // skip ourselves
 
       DivisionsVector     nhbr_coords(dim);
-      Direction           dir, wrap_dir;
+      Direction           dir(dim,0), wrap_dir(dim,0);
       bool                inbounds = true;
       for (int k = 0; k < dim; ++k)
       {

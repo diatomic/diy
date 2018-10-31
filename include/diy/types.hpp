@@ -4,6 +4,7 @@
 #include <iostream>
 #include "constants.h"
 #include "dynamic-point.hpp"
+#include "serialization.hpp"
 
 // From https://stackoverflow.com/a/21265197/44738
 #if defined(__cplusplus) && (__cplusplus >= 201402L)
@@ -58,8 +59,14 @@ namespace diy
         using Parent::dimension;
         using Parent::operator[];
 
+        // DM: This breaks the old behavior. Ideally, we'd explicitly deprecate
+        //     this, but we need the default constructor in Serialization.  I
+        //     believe I've fixed all uses of this In DIY proper. Hopefully, no
+        //     existing codes break.
+              Direction(): Parent(0)                              {}
+
               Direction(int dim, int dir):
-                  DynamicPoint(dim)
+                  Parent(dim)
       {
           if (dim > 0 && dir & DIY_X0) (*this)[0] -= 1;
           if (dim > 0 && dir & DIY_X1) (*this)[0] += 1;
@@ -72,7 +79,7 @@ namespace diy
       }
 
         DEPRECATED("Direction without dimension is deprecated")
-              Direction(int dir = 0):
+              Direction(int dir):
                   Direction(DIY_MAX_DIM, dir)       // if we are decoding the old constants, we assume DIY_MAX_DIM dimensional space
       {
       }
