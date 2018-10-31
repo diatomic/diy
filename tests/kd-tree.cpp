@@ -8,6 +8,7 @@
 #include <diy/reduce-operations.hpp>
 #include <diy/partners/swap.hpp>
 #include <diy/assigner.hpp>
+#include <diy/point.hpp>
 
 #include <diy/algorithms.hpp>
 
@@ -21,18 +22,9 @@ typedef     diy::ContinuousBounds       Bounds;
 
 static const unsigned DIM = 2;
 
-template<unsigned D>
-struct SimplePoint
-{
-    float   coords[D];
-
-    float&  operator[](unsigned i)                          { return coords[i]; }
-    float   operator[](unsigned i) const                    { return coords[i]; }
-};
-
 struct Block
 {
-  typedef         SimplePoint<DIM>                            Point;
+  typedef         diy::Point<float,DIM>                         Point;
 
                   Block(const Bounds& domain_):
                       domain(domain_)                           {}
@@ -97,28 +89,21 @@ void print_block(Block* b, const diy::Master::ProxyWithLink& cp, bool verbose)
 {
   RCLink*  link      = static_cast<RCLink*>(cp.link());
 
-  fmt::print("{}: [{},{},{}] - [{},{},{}] ({} neighbors): {} points\n",
+  fmt::print("{}: [{}] - [{}] ({} neighbors): {} points\n",
              cp.gid(),
-             link->bounds().min[0], link->bounds().min[1], link->bounds().min[2],
-             link->bounds().max[0], link->bounds().max[1], link->bounds().max[2],
+             link->bounds().min, link->bounds().max,
              link->size(), b->points.size());
 
   for (int i = 0; i < link->size(); ++i)
   {
-      fmt::print("  ({},{},({},{},{})):",
-                 link->target(i).gid, link->target(i).proc,
-                 link->direction(i)[0],
-                 link->direction(i)[1],
-                 link->direction(i)[2]);
+      fmt::print("  ({},{},({})):", link->target(i).gid, link->target(i).proc, link->direction(i));
       const Bounds& bounds = link->bounds(i);
-      fmt::print(" [{},{},{}] - [{},{},{}]\n",
-                 bounds.min[0], bounds.min[1], bounds.min[2],
-                 bounds.max[0], bounds.max[1], bounds.max[2]);
+      fmt::print(" [{}] - [{}]\n", bounds.min, bounds.max);
   }
 
   if (verbose)
     for (size_t i = 0; i < b->points.size(); ++i)
-      fmt::print("  {} {} {}\n", b->points[i][0], b->points[i][1], b->points[i][2]);
+      fmt::print("  {}\n", b->points[i]);
 }
 
 namespace diy
