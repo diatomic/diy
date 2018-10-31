@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
     std::string               prefix      = "./DIY.XXXXXX"; // for saving block files out of core
 
     // set some global data bounds (defaults set before option parsing)
-    Bounds domain;
+    Bounds domain { DIM };
     domain.min[0] = domain.min[1] = domain.min[2] = 0;
     domain.max[0] = domain.max[1] = domain.max[2] = 100.;
 

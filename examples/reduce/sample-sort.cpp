@@ -158,7 +158,7 @@ int main(int argc, char* argv[])
 
       // read values from a file
       b->values.resize(block_size);
-      diy::DiscreteBounds block_bounds;
+      diy::DiscreteBounds block_bounds(1);
       block_bounds.min[0] =  gid      * (block_size / chunk_size);
       block_bounds.max[0] = (gid + 1) * (block_size / chunk_size) - 1;
 

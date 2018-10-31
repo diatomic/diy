@@ -24,8 +24,8 @@ struct PointBlock
     typedef         SimplePoint<DIM>                            Point;
     typedef         diy::ContinuousBounds                       Bounds;
 
-PointBlock(const Bounds& bounds_):
-    bounds(bounds_)                         {}
+    PointBlock(const Bounds& bounds_):
+        bounds(bounds_)                         {}
 
     // allocate a new block
     static void*    create()                { return new PointBlock; }
@@ -72,24 +72,16 @@ PointBlock(const Bounds& bounds_):
                 if (points[i][j] < box.min[j] || points[i][j] > box.max[j])
                 {
                     fmt::print(stderr, "!!! Point outside the box !!!\n");
-                    fmt::print(stderr, "    {} {} {}\n", points[i][0], points[i][1], points[i][2]);
-                    fmt::print(stderr, "    {} {} {} - {} {} {}\n",
-                               box.min[0], box.min[1], box.min[2],
-                               box.max[0], box.max[1], box.max[2]);
+                    fmt::print(stderr, "    {}\n", points[i]);
+                    fmt::print(stderr, "    {} - {}\n", box.min, box.max);
                 }
     }
     // print block values
     void          print_block(const diy::Master::ProxyWithLink& cp,  // communication proxy
                               bool verbose)                          // amount of output
     {
-        fmt::print("[{}] Box:    {} {} {} -- {} {} {}\n",
-                cp.gid(),
-                box.min[0], box.min[1], box.min[2],
-                box.max[0], box.max[1], box.max[2]);
-        fmt::print("[{}] Bounds: {} {} {} -- {} {} {}\n",
-                cp.gid(),
-                bounds.min[0], bounds.min[1], bounds.min[2],
-                bounds.max[0], bounds.max[1], bounds.max[2]);
+        fmt::print("[{}] Box:    {} -- {}\n", cp.gid(), box.min, box.max);
+        fmt::print("[{}] Bounds: {} -- {}\n", cp.gid(), bounds.min, bounds.max);
 
         if (verbose)
         {
@@ -100,8 +92,8 @@ PointBlock(const Bounds& bounds_):
     }
 
     // block data
-    Bounds                bounds;
-    Bounds                box;
+    Bounds                bounds { DIM };
+    Bounds                box    { DIM };
     std::vector<Point>    points;
 
 private:

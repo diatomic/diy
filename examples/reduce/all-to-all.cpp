@@ -103,9 +103,12 @@ int main(int argc, char* argv[])
   std::string               prefix      = "./DIY.XXXXXX";
   std::string               log_level   = "info";
 
-  Bounds domain;
-  domain.min[0] = domain.min[1] = domain.min[2] = 0;
-  domain.max[0] = domain.max[1] = domain.max[2] = 100.;
+  Bounds domain(DIM);
+  for (unsigned i = 0; i < DIM; ++i)
+  {
+      domain.min[i] = 0;
+      domain.max[i] = 100.;
+  }
 
   bool  verbose, help;
 

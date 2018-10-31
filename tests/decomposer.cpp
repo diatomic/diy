@@ -36,7 +36,7 @@ TEST_CASE("RegularDecomposer", "[decomposition]")
     SECTION("simple 3D decomposition")
     {
         int nblocks = 9;
-        diy::ContinuousBounds domain;
+        diy::ContinuousBounds domain(3);
         for(int i = 0; i < 3; ++i)
         {
             domain.min[i] = 0.;

@@ -123,7 +123,7 @@ int main(int argc, char* argv[])
                                   &Block::load);
 
     // set some global data bounds (their initialization is omitted in this example)
-    Bounds domain;
+    Bounds domain(dim);
 
     // assign blocks to processes
     diy::RoundRobinAssigner   assigner(world.size(), nblocks);

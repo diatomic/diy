@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
   shape.push_back(16);
   shape.push_back(16);
 
-  diy::DiscreteBounds box;
+  diy::DiscreteBounds box(2);
   box.min[0] = box.min[1] = 4;
   box.max[0] = box.max[1] = 7;
 
@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
 
   diy::mpi::io::file out(world, "out.npy", diy::mpi::io::file::wronly | diy::mpi::io::file::create);
   diy::io::NumPy     writer(out);
-  diy::DiscreteBounds full_box, sub_box;
+  diy::DiscreteBounds full_box(2), sub_box(2);
   full_box.min[0] = full_box.min[1] = 0;
   full_box.max[0] = full_box.max[1] = 3;
   sub_box.min[0] = sub_box.min[1] = 1;

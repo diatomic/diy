@@ -159,9 +159,9 @@ namespace diy
           if (id == 0)
             return new Link;
           else if (id == 1)
-            return new RegularGridLink(0, DiscreteBounds(), DiscreteBounds());
+            return new RegularGridLink(0, DiscreteBounds(0), DiscreteBounds(0));
           else if (id == 2)
-            return new RegularContinuousLink(0, ContinuousBounds(), ContinuousBounds());
+            return new RegularContinuousLink(0, ContinuousBounds(0), ContinuousBounds(0));
           else
             return 0;
       }

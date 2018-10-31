@@ -14,10 +14,8 @@ void create(int gid, const Bounds& core, const Bounds& bounds, const Bounds& dom
   const diy::RegularLink<Bounds>& l = static_cast<const diy::RegularLink<Bounds>&>(link);
   std::cout << "   "
             << "Creating block (" << gid << "): "
-            << core.min[0]   << ' ' << core.min[1]   << ' ' << core.min[2] << " - "
-            << core.max[0]   << ' ' << core.max[1]   << ' ' << core.max[2] << " : "
-            << bounds.min[0] << ' ' << bounds.min[1] << ' ' << bounds.min[2] << " - "
-            << bounds.max[0] << ' ' << bounds.max[1] << ' ' << bounds.max[2] << " : "
+            << core.min   << " - " << core.max   << " : "
+            << bounds.min << " - " << bounds.max << " : "
             << link.size()   << ' ' //<< std::endl
             //<< std::bitset<32>(l.direction(0))   << std::endl
             //<< std::bitset<32>(l.direction(0) & l.wrap()) << std::endl
@@ -28,14 +26,8 @@ void create(int gid, const Bounds& core, const Bounds& bounds, const Bounds& dom
   for (int i = 0; i < l.size(); ++i)
   {
       std::cout << "      " << l.target(i).gid
-                << "; direction = "
-                << l.direction(i)[0] << ' '
-                << l.direction(i)[1] << ' '
-                << l.direction(i)[2] << ' '
-                << "; wrap = "
-                << l.wrap(i)[0] << ' '
-                << l.wrap(i)[1] << ' '
-                << l.wrap(i)[2]
+                << "; direction = " << l.direction(i)
+                << "; wrap = "      << l.wrap(i)
                 << std::endl;
   }
 }
@@ -47,7 +39,7 @@ int main(int argc, char* argv[])
   diy::ContiguousAssigner   assigner(size, nblocks);
   //diy::RoundRobinAssigner   assigner(size, nblocks);
 
-  Bounds domain;
+  Bounds domain(3);
   domain.min[0] = domain.min[1] = domain.min[2] = 0;
   domain.max[0] = domain.max[1] = domain.max[2] = 255;
   //domain.max[0] = domain.max[1] = domain.max[2] = 128;
