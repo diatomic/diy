@@ -58,18 +58,23 @@ namespace diy
         using Parent::dimension;
         using Parent::operator[];
 
-              Direction(int dir = 0):
-                  DynamicPoint(4)           // if we are decoding the old constants, we assume 4 dimensional space
+              Direction(int dim, int dir):
+                  DynamicPoint(dim)
       {
-          for (size_t i = 0; i < DIY_MAX_DIM; ++i) (*this)[i] = 0;
-          if (dir & DIY_X0) (*this)[0] -= 1;
-          if (dir & DIY_X1) (*this)[0] += 1;
-          if (dir & DIY_Y0) (*this)[1] -= 1;
-          if (dir & DIY_Y1) (*this)[1] += 1;
-          if (dir & DIY_Z0) (*this)[2] -= 1;
-          if (dir & DIY_Z1) (*this)[2] += 1;
-          if (dir & DIY_T0) (*this)[3] -= 1;
-          if (dir & DIY_T1) (*this)[3] += 1;
+          if (dim > 0 && dir & DIY_X0) (*this)[0] -= 1;
+          if (dim > 0 && dir & DIY_X1) (*this)[0] += 1;
+          if (dim > 1 && dir & DIY_Y0) (*this)[1] -= 1;
+          if (dim > 1 && dir & DIY_Y1) (*this)[1] += 1;
+          if (dim > 2 && dir & DIY_Z0) (*this)[2] -= 1;
+          if (dim > 2 && dir & DIY_Z1) (*this)[2] += 1;
+          if (dim > 3 && dir & DIY_T0) (*this)[3] -= 1;
+          if (dim > 3 && dir & DIY_T1) (*this)[3] += 1;
+      }
+
+        DEPRECATED("Direction without dimension is deprecated")
+              Direction(int dir = 0):
+                  Direction(DIY_MAX_DIM, dir)       // if we are decoding the old constants, we assume DIY_MAX_DIM dimensional space
+      {
       }
 
       bool
