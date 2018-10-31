@@ -445,12 +445,6 @@ fill_bounds(Bounds& bounds,                  //!< (output) bounds
     bounds.max[i] = detail::BoundsHelper<Bounds>::to  (coords[i], divisions[i], domain.min[i], domain.max[i], share_face[i]);
   }
 
-  for (int i = dim; i < DIY_MAX_DIM; ++i)   // set the unused dimension to 0
-  {
-    bounds.min[i] = 0;
-    bounds.max[i] = 0;
-  }
-
   if (!add_ghosts)
     return;
 
