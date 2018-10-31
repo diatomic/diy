@@ -4,6 +4,7 @@
 #include <vector>
 #include <cassert>
 #include <diy/types.hpp>
+#include <diy/point.hpp>
 #include <diy/log.hpp>
 
 // D-dimensional point

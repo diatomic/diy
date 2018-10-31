@@ -3,7 +3,21 @@
 
 #include <iostream>
 #include "constants.h"
-#include "point.hpp"
+#include "dynamic-point.hpp"
+
+// From https://stackoverflow.com/a/21265197/44738
+#if defined(__cplusplus) && (__cplusplus >= 201402L)
+#  define DEPRECATED(msg) [[deprecated(#msg)]]
+#else
+#  if defined(__GNUC__) || defined(__clang__)
+#    define DEPRECATED(msg) __attribute__((deprecated(#msg)))
+#  elif defined(_MSC_VER)
+#    define DEPRECATED(msg) __declspec(deprecated(#msg))
+#  else
+#    pragma message("WARNING: You need to implement DEPRECATED for this compiler")
+#    define DEPRECATED(msg)
+#  endif
+#endif
 
 namespace diy
 {
@@ -19,11 +33,14 @@ namespace diy
     struct Bounds
     {
         using Coordinate = Coordinate_;
-        using Point      = diy::Point<Coordinate, DIY_MAX_DIM>;
+        using Point      = diy::DynamicPoint<Coordinate>;
 
         Point min, max;
 
-        Bounds() = default;
+        DEPRECATED("Default Bounds constructor should not be used; old behavior is preserved for compatibility. Pass explicitly the dimension of the Bounds instead.")
+        Bounds():
+            Bounds(DIY_MAX_DIM)                                             {}
+        Bounds(int dim): min(dim), max(dim)                                 {}
         Bounds(const Point& _min, const Point& _max) : min(_min), max(_max) {}
     };
     using DiscreteBounds   = Bounds<int>;
@@ -32,14 +49,17 @@ namespace diy
     //! Helper to create a 1-dimensional discrete domain with the specified extents
     inline
     diy::DiscreteBounds
-    interval(int from, int to)            { DiscreteBounds domain; domain.min[0] = from; domain.max[0] = to; return domain; }
+    interval(int from, int to)            { DiscreteBounds domain(1); domain.min[0] = from; domain.max[0] = to; return domain; }
 
-    struct Direction: public Point<int,DIY_MAX_DIM>
+    struct Direction: public DynamicPoint<int>
     {
-              Direction()                 { for (size_t i = 0; i < DIY_MAX_DIM; ++i) (*this)[i] = 0; }
-              Direction(std::initializer_list<int> lst):
-                Direction()               { size_t i = 0; for(int x : lst) (*this)[i++] = x; }
-              Direction(int dir)
+        using Parent = DynamicPoint<int>;
+
+        using Parent::dimension;
+        using Parent::operator[];
+
+              Direction(int dir = 0):
+                  DynamicPoint(4)           // if we are decoding the old constants, we assume 4 dimensional space
       {
           for (size_t i = 0; i < DIY_MAX_DIM; ++i) (*this)[i] = 0;
           if (dir & DIY_X0) (*this)[0] -= 1;
@@ -55,7 +75,7 @@ namespace diy
       bool
       operator==(const diy::Direction& y) const
       {
-        for (size_t i = 0; i < DIY_MAX_DIM; ++i)
+        for (size_t i = 0; i < dimension(); ++i)
             if ((*this)[i] != y[i]) return false;
         return true;
       }
@@ -64,7 +84,7 @@ namespace diy
       bool
       operator<(const diy::Direction& y) const
       {
-        for (size_t i = 0; i < DIY_MAX_DIM; ++i)
+        for (size_t i = 0; i < dimension(); ++i)
         {
             if ((*this)[i] < y[i]) return true;
             if ((*this)[i] > y[i]) return false;
@@ -89,6 +109,36 @@ namespace diy
     bool
     operator==(const diy::BlockID& x, const diy::BlockID& y)
     { return x.gid == y.gid; }
+
+    // Serialization
+    template<class C>
+    struct Serialization<Bounds<C>>
+    {
+        static void         save(BinaryBuffer& bb, const Bounds<C>& b)
+        {
+            diy::save(bb, b.min);
+            diy::save(bb, b.max);
+        }
+
+        static void         load(BinaryBuffer& bb, Bounds<C>& b)
+        {
+            diy::load(bb, b.min);
+            diy::load(bb, b.max);
+        }
+    };
+    template<>
+    struct Serialization<Direction>
+    {
+        static void         save(BinaryBuffer& bb, const Direction& d)
+        {
+            diy::save(bb, static_cast<const Direction::Parent&>(d));
+        }
+
+        static void         load(BinaryBuffer& bb, Direction& d)
+        {
+            diy::load(bb, static_cast<Direction::Parent&>(d));
+        }
+    };
 }
 
 #endif

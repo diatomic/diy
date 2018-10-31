@@ -303,7 +303,7 @@ decompose(int rank, const StaticAssigner& assigner, const Creator& create)
     DivisionsVector coords;
     gid_to_coords(gid, coords);
 
-    Bounds core, bounds;
+    Bounds core(dim), bounds(dim);
     fill_bounds(core,   coords);
     fill_bounds(bounds, coords, true);
 
@@ -364,7 +364,7 @@ decompose(int rank, const StaticAssigner& assigner, const Creator& create)
       BlockID bid; bid.gid = nhbr_gid; bid.proc = assigner.rank(nhbr_gid);
       link.add_neighbor(bid);
 
-      Bounds nhbr_bounds;
+      Bounds nhbr_bounds(dim);
       fill_bounds(nhbr_bounds, nhbr_coords);
       link.add_bounds(nhbr_bounds);
 
