@@ -293,7 +293,8 @@ TEST_CASE_METHOD(KDTreeFixture, "k-d tree is built", "[kdtree]")
   diy::ContiguousAssigner   assigner(world.size(), nblocks);
   //diy::RoundRobinAssigner   assigner(world.size(), nblocks);
 
-  Bounds domain { DIM };
+  int dim = DIM;
+  Bounds domain { dim };
   for (unsigned i = 0; i < DIM; ++i)
   {
       domain.min[i] = 0;

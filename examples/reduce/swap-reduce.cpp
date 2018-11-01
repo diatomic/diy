@@ -96,6 +96,8 @@ void redistribute(Block* b,                                 // local block
 
 int main(int argc, char* argv[])
 {
+    int   dim = DIM;
+
     diy::mpi::environment     env(argc, argv); // equivalent of MPI_Init(argc, argv)/MPI_Finalize()
     diy::mpi::communicator    world;           // equivalent of MPI_COMM_WORLD
 
@@ -107,7 +109,7 @@ int main(int argc, char* argv[])
     std::string               prefix      = "./DIY.XXXXXX"; // for saving block files out of core
 
     // set some global data bounds (defaults set before option parsing)
-    Bounds domain { DIM };
+    Bounds domain { dim };
     domain.min[0] = domain.min[1] = domain.min[2] = 0;
     domain.max[0] = domain.max[1] = domain.max[2] = 100.;
 
@@ -156,8 +158,6 @@ int main(int argc, char* argv[])
                                      &Block::save,
                                      &Block::load);
     AddBlock                  create(master, num_points); // object for adding new blocks to master
-
-    int   dim = DIM;
 
     // choice of contiguous or round robin assigner
     diy::ContiguousAssigner   assigner(world.size(), nblocks);
