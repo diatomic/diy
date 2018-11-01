@@ -5,30 +5,30 @@
 
 namespace diy
 {
-    template<class Bounds, class Point, class OutIter, class Rad>
-    void near(const RegularLink<Bounds>& link, const Point& p, Rad r, OutIter out, const Bounds& domain);
+    template<class Bounds, class Point, class OutIter, class Coordinate>
+    void near(const RegularLink<Bounds>& link, const Point& p, Coordinate r, OutIter out, const Bounds& domain);
 
     template<class Bounds, class Point, class OutIter>
     void in(const RegularLink<Bounds>& link, const Point& p, OutIter out, const Bounds& domain);
 
-    template<class Point, class Bounds>
-    double distance(int dim, const Bounds& bounds, const Point& p);
+    template<class Point, class Bounds, class Out = double>
+    Out distance(int dim, const Bounds& bounds, const Point& p);
 
-    template<class Bounds>
+    template<class Bounds, class Out = double>
     inline
-    double distance(int dim, const Bounds& bounds1, const Bounds& bounds2);
+    Out distance(int dim, const Bounds& bounds1, const Bounds& bounds2);
 
     template<class Bounds>
     void wrap_bounds(Bounds& bounds, Direction wrap_dir, const Bounds& domain, int dim);
 }
 
 //! Finds the neighbors within radius r of a target point.
-template<class Bounds, class Point, class OutIter, class Rad>
+template<class Bounds, class Point, class OutIter, class Coordinate>
 void
 diy::
 near(const RegularLink<Bounds>& link,  //!< neighbors
      const Point& p,                   //!< target point (must be in current block)
-     Rad r,                            //!< target radius (>= 0.0)
+     Coordinate r,                     //!< target radius (>= 0.0)
      OutIter out,                      //!< insert iterator for output set of neighbors
      const Bounds& domain)             //!< global domain bounds
 {
@@ -47,8 +47,8 @@ near(const RegularLink<Bounds>& link,  //!< neighbors
 }
 
 //! Find the distance between point `p` and box `bounds`.
-template<class Point, class Bounds>
-double
+template<class Point, class Bounds, class Out = double>
+Out
 diy::
 distance(int dim, const Bounds& bounds, const Point& p)
 {
@@ -69,8 +69,8 @@ distance(int dim, const Bounds& bounds, const Point& p)
     return sqrt(res);
 }
 
-template<class Bounds>
-double
+template<class Bounds, class Out = double>
+Out
 diy::
 distance(int dim, const Bounds& bounds1, const Bounds& bounds2)
 {
