@@ -51,7 +51,9 @@ class DynamicPoint: public chobo::small_vector<Coordinate_, static_size>
         DynamicPoint&       operator*=(Coordinate a)                { for (unsigned i = 0; i < dimension(); ++i) (*this)[i] *= a;     return *this; }
         DynamicPoint&       operator/=(Coordinate a)                { for (unsigned i = 0; i < dimension(); ++i) (*this)[i] /= a;     return *this; }
 
-        Coordinate          norm() const                            { return (*this)*(*this); }
+        DEPRECATED("Use norm2 instead")
+        Coordinate          norm() const                            { return norm2(); }
+        Coordinate          norm2() const                           { return (*this)*(*this); }
 
         std::ostream&       operator<<(std::ostream& out) const     { out << (*this)[0]; for (unsigned i = 1; i < dimension(); ++i) out << " " << (*this)[i]; return out; }
         std::istream&       operator>>(std::istream& in);
