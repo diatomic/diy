@@ -5,31 +5,30 @@
 
 namespace diy
 {
-    template<class Bounds, class Point, class OutIter>
-    void near(const RegularLink<Bounds>& link, const Point& p, float r, OutIter out,
-              const Bounds& domain);
+    template<class Bounds, class Point, class OutIter, class Rad>
+    void near(const RegularLink<Bounds>& link, const Point& p, Rad r, OutIter out, const Bounds& domain);
 
     template<class Bounds, class Point, class OutIter>
     void in(const RegularLink<Bounds>& link, const Point& p, OutIter out, const Bounds& domain);
 
     template<class Point, class Bounds>
-    float distance(int dim, const Bounds& bounds, const Point& p);
+    double distance(int dim, const Bounds& bounds, const Point& p);
 
     template<class Bounds>
     inline
-    float distance(int dim, const Bounds& bounds1, const Bounds& bounds2);
+    double distance(int dim, const Bounds& bounds1, const Bounds& bounds2);
 
     template<class Bounds>
     void wrap_bounds(Bounds& bounds, Direction wrap_dir, const Bounds& domain, int dim);
 }
 
 //! Finds the neighbors within radius r of a target point.
-template<class Bounds, class Point, class OutIter>
+template<class Bounds, class Point, class OutIter, class Rad>
 void
 diy::
 near(const RegularLink<Bounds>& link,  //!< neighbors
      const Point& p,                   //!< target point (must be in current block)
-     float r,                          //!< target radius (>= 0.0)
+     Rad r,                            //!< target radius (>= 0.0)
      OutIter out,                      //!< insert iterator for output set of neighbors
      const Bounds& domain)             //!< global domain bounds
 {
@@ -49,16 +48,16 @@ near(const RegularLink<Bounds>& link,  //!< neighbors
 
 //! Find the distance between point `p` and box `bounds`.
 template<class Point, class Bounds>
-float
+double
 diy::
 distance(int dim, const Bounds& bounds, const Point& p)
 {
-    float res = 0;
+    double res = 0;
     for (int i = 0; i < dim; ++i)
     {
         // avoids all the annoying case logic by finding
         // diff = max(bounds.min[i] - p[i], 0, p[i] - bounds.max[i])
-        float diff = 0, d;
+        double diff = 0, d;
 
         d = bounds.min[i] - p[i];
         if (d > diff) diff = d;
@@ -71,17 +70,17 @@ distance(int dim, const Bounds& bounds, const Point& p)
 }
 
 template<class Bounds>
-float
+double
 diy::
 distance(int dim, const Bounds& bounds1, const Bounds& bounds2)
 {
-    float res = 0;
+    double res = 0;
     for (int i = 0; i < dim; ++i)
     {
-        float diff = 0, d;
+        double diff = 0, d;
 
-        float d1 = bounds1.max[i] - bounds2.min[i];
-        float d2 = bounds2.max[i] - bounds1.min[i];
+        double d1 = bounds1.max[i] - bounds2.min[i];
+        double d2 = bounds2.max[i] - bounds1.min[i];
 
         if (d1 > 0 && d2 > 0)
             diff = 0;
