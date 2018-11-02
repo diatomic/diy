@@ -57,7 +57,7 @@ struct Block
             data[i] = i;
     }
     // block data
-    Bounds          bounds;
+    Bounds          bounds { 0 };
     vector<int>     data;
 private:
     Block()                                     {}
@@ -214,7 +214,7 @@ int main(int argc, char* argv[])
     AddBlock               create(master, num_points); // an object for adding new blocks to master
 
     // set some global data bounds
-    Bounds domain;
+    Bounds domain { dim };
     for (int i = 0; i < dim; ++i)
     {
         domain.min[i] = 0;

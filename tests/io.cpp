@@ -25,7 +25,7 @@ TEST_CASE("Test BOV", "[io]")
             diy::mpi::io::file out(world, "test.bin", diy::mpi::io::file::wronly | diy::mpi::io::file::create);
             diy::io::BOV writer(out, shape);
 
-            diy::DiscreteBounds sub_box;
+            diy::DiscreteBounds sub_box { 2 };
             sub_box.min[0] = 0; sub_box.min[1] = 0;
             sub_box.max[0] = 1; sub_box.max[1] = 2;
             writer.write(sub_box, &block1[0][0], sub_box);

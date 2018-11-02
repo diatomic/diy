@@ -8,7 +8,7 @@ void test(int n, int k)
 {
     int dim = 2;
 
-    diy::DiscreteBounds global_bounds;
+    diy::DiscreteBounds global_bounds(dim);
     global_bounds.min[0] = global_bounds.min[1] = 0;
     global_bounds.max[0] = global_bounds.min[1] = 1023;
 

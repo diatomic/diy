@@ -303,7 +303,7 @@ decompose(int rank, const StaticAssigner& assigner, const Creator& create)
     DivisionsVector coords;
     gid_to_coords(gid, coords);
 
-    Bounds core, bounds;
+    Bounds core(dim), bounds(dim);
     fill_bounds(core,   coords);
     fill_bounds(bounds, coords, true);
 
@@ -325,7 +325,7 @@ decompose(int rank, const StaticAssigner& assigner, const Creator& create)
       if (all(offsets, 0)) continue;      // skip ourselves
 
       DivisionsVector     nhbr_coords(dim);
-      Direction           dir, wrap_dir;
+      Direction           dir(dim,0), wrap_dir(dim,0);
       bool                inbounds = true;
       for (int k = 0; k < dim; ++k)
       {
@@ -364,7 +364,7 @@ decompose(int rank, const StaticAssigner& assigner, const Creator& create)
       BlockID bid; bid.gid = nhbr_gid; bid.proc = assigner.rank(nhbr_gid);
       link.add_neighbor(bid);
 
-      Bounds nhbr_bounds;
+      Bounds nhbr_bounds(dim);
       fill_bounds(nhbr_bounds, nhbr_coords);
       link.add_bounds(nhbr_bounds);
 
@@ -443,12 +443,6 @@ fill_bounds(Bounds& bounds,                  //!< (output) bounds
   {
     bounds.min[i] = detail::BoundsHelper<Bounds>::from(coords[i], divisions[i], domain.min[i], domain.max[i], share_face[i]);
     bounds.max[i] = detail::BoundsHelper<Bounds>::to  (coords[i], divisions[i], domain.min[i], domain.max[i], share_face[i]);
-  }
-
-  for (int i = dim; i < DIY_MAX_DIM; ++i)   // set the unused dimension to 0
-  {
-    bounds.min[i] = 0;
-    bounds.max[i] = 0;
   }
 
   if (!add_ghosts)

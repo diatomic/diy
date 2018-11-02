@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
   diy::ContiguousAssigner   assigner(size, nblocks);
   //diy::RoundRobinAssigner   assigner(size, nblocks);
 
-  Bounds domain;
+  Bounds domain(3);
   domain.min[0] = domain.min[1] = domain.min[2] = 0;
   domain.max[0] = domain.max[1] = domain.max[2] = 255;
   //domain.max[0] = domain.max[1] = domain.max[2] = 128;

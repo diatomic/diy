@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
     int                       nblocks = 32;            // total number of blocks in global domain
     diy::ContiguousAssigner   assigner(size, nblocks);
 
-    Bounds domain;                                     // global data size
+    Bounds domain(3);                                   // global data size
     domain.min[0] = domain.min[1] = domain.min[2] = 0;
     domain.max[0] = domain.max[1] = domain.max[2] = 255;
 

@@ -140,10 +140,15 @@ void          verify_block(Block* b,
 
 TEST_CASE_METHOD(SwapReduceFixture, "point sorting", "[swap-reduce]")
 {
+    int   dim = DIM;
+
     // set some global data bounds (defaults set before option parsing)
-    Bounds domain;
-    domain.min[0] = domain.min[1] = domain.min[2] = 0;
-    domain.max[0] = domain.max[1] = domain.max[2] = 100.;
+    Bounds domain(dim);
+    for (int i = 0; i < dim; ++i)
+    {
+        domain.min[i] = 0;
+        domain.max[i] = 100.;
+    }
 
     // diy initialization
     diy::FileStorage          storage(prefix);            // used for blocks moved out of core
@@ -156,8 +161,6 @@ TEST_CASE_METHOD(SwapReduceFixture, "point sorting", "[swap-reduce]")
                                      &Block::save,
                                      &Block::load);
     AddBlock                  create(master, num_points); // object for adding new blocks to master
-
-    int   dim = DIM;
 
     // choice of contiguous or round robin assigner
     diy::ContiguousAssigner   assigner(world.size(), nblocks);

@@ -33,7 +33,7 @@ near(const RegularLink<Bounds>& link,  //!< neighbors
      OutIter out,                      //!< insert iterator for output set of neighbors
      const Bounds& domain)             //!< global domain bounds
 {
-  Bounds neigh_bounds; // neighbor block bounds
+  Bounds neigh_bounds {0}; // neighbor block bounds
 
   // for all neighbors of this block
   for (int n = 0; n < link.size(); n++)
@@ -104,7 +104,7 @@ in(const RegularLink<Bounds>& link,  //!< neighbors
    OutIter out,                      //!< insert iterator for output set of neighbors
    const Bounds& domain)             //!< global domain bounds
 {
-  Bounds neigh_bounds; // neighbor block bounds
+  Bounds neigh_bounds {0}; // neighbor block bounds
 
   // for all neighbors of this block
   for (int n = 0; n < link.size(); n++)

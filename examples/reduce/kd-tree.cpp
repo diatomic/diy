@@ -81,7 +81,7 @@ struct Block
       }
   }
 
-  Bounds                domain;
+  Bounds                domain { DIM };
   std::vector<Point>    points;
 
   std::vector<Bounds>   block_bounds;                       // all block bounds, debugging purposes only
@@ -308,9 +308,12 @@ int main(int argc, char* argv[])
   diy::ContiguousAssigner   assigner(world.size(), nblocks);
   //diy::RoundRobinAssigner   assigner(world.size(), nblocks);
 
-  Bounds domain;
-  domain.min[0] = domain.min[1] = domain.min[2] = 0;
-  domain.max[0] = domain.max[1] = domain.max[2] = 1000;
+  Bounds domain(DIM);
+  for (unsigned i = 0; i < DIM; ++i)
+  {
+      domain.min[i] = 0;
+      domain.max[i] = 1000;
+  }
 
   // initially fill the blocks with random points anywhere in the domain
   std::vector<int> gids;

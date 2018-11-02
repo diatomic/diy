@@ -3,6 +3,9 @@ include_directories         (${CMAKE_SOURCE_DIR}/examples/reduce)   # needed for
 
 add_executable              (kd-tree-test           kd-tree.cpp)
 target_link_libraries       (kd-tree-test           ${libraries})
+if                          (MSVC AND NOT(MSVC_VERSION LESS 1400))
+    set_source_files_properties (kd-tree.cpp PROPERTIES COMPILE_FLAGS "/bigobj")
+endif                       ()
 
 add_executable              (decomposer-test        decomposer.cpp)
 target_link_libraries       (decomposer-test        ${libraries})
