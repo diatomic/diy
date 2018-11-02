@@ -99,10 +99,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">  <span class="keyword">const</span> <a name="_a2"></a><a class="code" href="classdiy_1_1_regular_link.html">diy::RegularLink&lt;Bounds&gt;</a>&amp; l = <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classdiy_1_1_regular_link.html">diy::RegularLink&lt;Bounds&gt;</a>&amp;<span class="keyword">&gt;</span>(link);</div>
 <div class="line">  std::cout &lt;&lt; <span class="stringliteral">&quot;   &quot;</span></div>
 <div class="line">            &lt;&lt; <span class="stringliteral">&quot;Creating block (&quot;</span> &lt;&lt; gid &lt;&lt; <span class="stringliteral">&quot;): &quot;</span></div>
-<div class="line">            &lt;&lt; core.min[0]   &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; core.min[1]   &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; core.min[2] &lt;&lt; <span class="stringliteral">&quot; - &quot;</span></div>
-<div class="line">            &lt;&lt; core.max[0]   &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; core.max[1]   &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; core.max[2] &lt;&lt; <span class="stringliteral">&quot; : &quot;</span></div>
-<div class="line">            &lt;&lt; bounds.min[0] &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; bounds.min[1] &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; bounds.min[2] &lt;&lt; <span class="stringliteral">&quot; - &quot;</span></div>
-<div class="line">            &lt;&lt; bounds.max[0] &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; bounds.max[1] &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; bounds.max[2] &lt;&lt; <span class="stringliteral">&quot; : &quot;</span></div>
+<div class="line">            &lt;&lt; core.min   &lt;&lt; <span class="stringliteral">&quot; - &quot;</span> &lt;&lt; core.max   &lt;&lt; <span class="stringliteral">&quot; : &quot;</span></div>
+<div class="line">            &lt;&lt; bounds.min &lt;&lt; <span class="stringliteral">&quot; - &quot;</span> &lt;&lt; bounds.max &lt;&lt; <span class="stringliteral">&quot; : &quot;</span></div>
 <div class="line">            &lt;&lt; link.<a name="a3"></a>size()   &lt;&lt; <span class="charliteral">&#39; &#39;</span> <span class="comment">//&lt;&lt; std::endl</span></div>
 <div class="line">            <span class="comment">//&lt;&lt; std::bitset&lt;32&gt;(l.direction(0))   &lt;&lt; std::endl</span></div>
 <div class="line">            <span class="comment">//&lt;&lt; std::bitset&lt;32&gt;(l.direction(0) &amp; l.wrap()) &lt;&lt; std::endl</span></div>
@@ -113,14 +111,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; l.<a name="a4"></a>size(); ++i)</div>
 <div class="line">  {</div>
 <div class="line">      std::cout &lt;&lt; <span class="stringliteral">&quot;      &quot;</span> &lt;&lt; l.<a name="a5"></a>target(i).gid</div>
-<div class="line">                &lt;&lt; <span class="stringliteral">&quot;; direction = &quot;</span></div>
-<div class="line">                &lt;&lt; l.<a name="a6"></a>direction(i)[0] &lt;&lt; <span class="charliteral">&#39; &#39;</span></div>
-<div class="line">                &lt;&lt; l.direction(i)[1] &lt;&lt; <span class="charliteral">&#39; &#39;</span></div>
-<div class="line">                &lt;&lt; l.direction(i)[2] &lt;&lt; <span class="charliteral">&#39; &#39;</span></div>
-<div class="line">                &lt;&lt; <span class="stringliteral">&quot;; wrap = &quot;</span></div>
-<div class="line">                &lt;&lt; l.<a name="a7"></a>wrap(i)[0] &lt;&lt; <span class="charliteral">&#39; &#39;</span></div>
-<div class="line">                &lt;&lt; l.wrap(i)[1] &lt;&lt; <span class="charliteral">&#39; &#39;</span></div>
-<div class="line">                &lt;&lt; l.wrap(i)[2]</div>
+<div class="line">                &lt;&lt; <span class="stringliteral">&quot;; direction = &quot;</span> &lt;&lt; l.<a name="a6"></a>direction(i)</div>
+<div class="line">                &lt;&lt; <span class="stringliteral">&quot;; wrap = &quot;</span>      &lt;&lt; l.<a name="a7"></a>wrap(i)</div>
 <div class="line">                &lt;&lt; std::endl;</div>
 <div class="line">  }</div>
 <div class="line">}</div>
@@ -132,8 +124,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">  <a name="_a8"></a><a class="code" href="classdiy_1_1_contiguous_assigner.html">diy::ContiguousAssigner</a>   assigner(size, nblocks);</div>
 <div class="line">  <span class="comment">//diy::RoundRobinAssigner   assigner(size, nblocks);</span></div>
 <div class="line"></div>
-<div class="line">  Bounds domain;</div>
-<div class="line">  domain.<a name="a9"></a>min[0] = domain.min[1] = domain.min[2] = 0;</div>
+<div class="line">  Bounds domain(3);</div>
+<div class="line">  domain.min[0] = domain.min[1] = domain.min[2] = 0;</div>
 <div class="line">  domain.max[0] = domain.max[1] = domain.max[2] = 255;</div>
 <div class="line">  <span class="comment">//domain.max[0] = domain.max[1] = domain.max[2] = 128;</span></div>
 <div class="line"></div>
@@ -160,14 +152,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">    diy::RegularDecomposer&lt;Bounds&gt;::CoordinateVector    ghosts;</div>
 <div class="line">    ghosts.push_back(1); ghosts.push_back(2);</div>
 <div class="line"></div>
-<div class="line">    <a name="a10"></a><a class="code" href="group___decomposition.html#gada52dd59060aac8b76281bec95e5f099">diy::decompose</a>(3, rank, domain, assigner, create, share_face, wrap, ghosts);</div>
+<div class="line">    <a name="a9"></a><a class="code" href="group___decomposition.html#gada52dd59060aac8b76281bec95e5f099">diy::decompose</a>(3, rank, domain, assigner, create, share_face, wrap, ghosts);</div>
 <div class="line">  }</div>
 <div class="line">}</div>
 <div class="line"></div>
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Oct 24 2018 20:17:44 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Nov 2 2018 20:15:31 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

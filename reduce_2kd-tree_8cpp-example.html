@@ -166,7 +166,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">      }</div>
 <div class="line">  }</div>
 <div class="line"></div>
-<div class="line">  Bounds                domain;</div>
+<div class="line">  Bounds                domain { DIM };</div>
 <div class="line">  std::vector&lt;Point&gt;    points;</div>
 <div class="line"></div>
 <div class="line">  std::vector&lt;Bounds&gt;   block_bounds;                       <span class="comment">// all block bounds, debugging purposes only</span></div>
@@ -393,9 +393,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">  <a name="_a31"></a><a class="code" href="classdiy_1_1_contiguous_assigner.html">diy::ContiguousAssigner</a>   assigner(world.size(), nblocks);</div>
 <div class="line">  <span class="comment">//diy::RoundRobinAssigner   assigner(world.size(), nblocks);</span></div>
 <div class="line"></div>
-<div class="line">  Bounds domain;</div>
-<div class="line">  domain.min[0] = domain.min[1] = domain.min[2] = 0;</div>
-<div class="line">  domain.max[0] = domain.max[1] = domain.max[2] = 1000;</div>
+<div class="line">  Bounds domain(DIM);</div>
+<div class="line">  <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; DIM; ++i)</div>
+<div class="line">  {</div>
+<div class="line">      domain.min[i] = 0;</div>
+<div class="line">      domain.max[i] = 1000;</div>
+<div class="line">  }</div>
 <div class="line"></div>
 <div class="line">  <span class="comment">// initially fill the blocks with random points anywhere in the domain</span></div>
 <div class="line">  std::vector&lt;int&gt; gids;</div>
@@ -441,7 +444,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Oct 24 2018 20:17:44 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Nov 2 2018 20:15:31 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

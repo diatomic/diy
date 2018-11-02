@@ -338,7 +338,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    std::vector&lt;float&gt;  splits(link-&gt;size());</div>
 <div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; link-&gt;size(); ++i)</div>
 <div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    {</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;        <span class="keywordtype">float</span> split; <a class="code" href="structdiy_1_1_direction.html">diy::Direction</a> dir;</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;        <span class="keywordtype">float</span> split; <a class="code" href="structdiy_1_1_direction.html">diy::Direction</a> dir(dim_,0);</div>
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;</div>
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        <span class="keywordtype">int</span> in_gid = link-&gt;target(i).gid;</div>
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        <span class="keywordflow">while</span>(srp.incoming(in_gid))</div>
@@ -381,7 +381,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;                <span class="keywordflow">if</span> (wrap)</div>
 <div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;                    new_link.add_wrap(find_wrap(new_link.bounds(), bounds, domain));</div>
 <div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;                <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;                    new_link.add_wrap(<a class="code" href="structdiy_1_1_direction.html">diy::Direction</a>());</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;                    new_link.add_wrap(<a class="code" href="structdiy_1_1_direction.html">diy::Direction</a>(dim_,0));</div>
 <div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;            }</div>
 <div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;        } <span class="keywordflow">else</span> <span class="comment">// non-aligned side</span></div>
 <div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;        {</div>
@@ -402,7 +402,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;                    <span class="keywordflow">if</span> (wrap)</div>
 <div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;                        new_link.add_wrap(find_wrap(new_link.bounds(), bounds, domain));</div>
 <div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;                    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;                        new_link.add_wrap(<a class="code" href="structdiy_1_1_direction.html">diy::Direction</a>());</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;                        new_link.add_wrap(<a class="code" href="structdiy_1_1_direction.html">diy::Direction</a>(dim_, 0));</div>
 <div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;                }</div>
 <div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;            }</div>
 <div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;        }</div>
@@ -417,16 +417,16 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;    update_neighbor_bounds(nbr_bounds, find_split(new_link.bounds(), nbr_bounds), dim, !lower);</div>
 <div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;    new_link.add_bounds(nbr_bounds);</div>
 <div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;    new_link.add_wrap(<a class="code" href="structdiy_1_1_direction.html">diy::Direction</a>());    <span class="comment">// dual block cannot be wrapped</span></div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;    new_link.add_wrap(<a class="code" href="structdiy_1_1_direction.html">diy::Direction</a>(dim_,0));    <span class="comment">// dual block cannot be wrapped</span></div>
 <div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;</div>
 <div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;    <span class="keywordflow">if</span> (lower)</div>
 <div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;    {</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;        <a class="code" href="structdiy_1_1_direction.html">diy::Direction</a> right;</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;        <a class="code" href="structdiy_1_1_direction.html">diy::Direction</a> right(dim_,0);</div>
 <div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;        right[dim] = 1;</div>
 <div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;        new_link.add_direction(right);</div>
 <div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;    } <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    {</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;        <a class="code" href="structdiy_1_1_direction.html">diy::Direction</a> left;</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;        <a class="code" href="structdiy_1_1_direction.html">diy::Direction</a> left(dim_,0);</div>
 <div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;        left[dim] = -1;</div>
 <div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;        new_link.add_direction(left);</div>
 <div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;    }</div>
@@ -648,7 +648,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;diy::detail::KDTreePartition&lt;Block,Point&gt;::</div>
 <div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;find_wrap(<span class="keyword">const</span> Bounds&amp; bounds, <span class="keyword">const</span> Bounds&amp; nbr_bounds, <span class="keyword">const</span> Bounds&amp; domain)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;    <a class="code" href="structdiy_1_1_direction.html">diy::Direction</a> wrap;</div>
+<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;    <a class="code" href="structdiy_1_1_direction.html">diy::Direction</a> wrap(dim_,0);</div>
 <div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; dim_; ++i)</div>
 <div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;    {</div>
 <div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;        <span class="keywordflow">if</span> (bounds.min[i] == domain.min[i] &amp;&amp; nbr_bounds.max[i] == domain.max[i])</div>
@@ -665,7 +665,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="structdiy_1_1_reduce_proxy_html"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html">diy::ReduceProxy</a></div><div class="ttdoc">Enables communication within a group during a reduction. DIY creates the ReduceProxy for you in diy::...</div><div class="ttdef"><b>Definition:</b> reduce.hpp:15</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_proxy_html_ad7af65dcf357c32fe550b82a872d8692"><div class="ttname"><a href="structdiy_1_1_master_1_1_proxy.html#ad7af65dcf357c32fe550b82a872d8692">diy::Master::Proxy::dequeue</a></div><div class="ttdeci">void dequeue(int from, T &amp;x, void(*load)(BinaryBuffer &amp;, T &amp;)=&amp;::diy::load&lt; T &gt;) const </div><div class="ttdoc">Dequeue data whose size can be determined automatically (e.g., STL vector) and that was previously en...</div><div class="ttdef"><b>Definition:</b> proxy.hpp:48</div></div>
 <div class="ttc" id="structdiy_1_1_reduce_proxy_html_aa38bbd6145d035a99562a1a5a3d92375"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">diy::ReduceProxy::round</a></div><div class="ttdeci">unsigned round() const </div><div class="ttdoc">returns current round number </div><div class="ttdef"><b>Definition:</b> reduce.hpp:66</div></div>
-<div class="ttc" id="structdiy_1_1_block_i_d_html"><div class="ttname"><a href="structdiy_1_1_block_i_d.html">diy::BlockID</a></div><div class="ttdef"><b>Definition:</b> types.hpp:10</div></div>
+<div class="ttc" id="structdiy_1_1_block_i_d_html"><div class="ttname"><a href="structdiy_1_1_block_i_d.html">diy::BlockID</a></div><div class="ttdef"><b>Definition:</b> types.hpp:11</div></div>
 <div class="ttc" id="structdiy_1_1_regular_decomposer_html"><div class="ttname"><a href="structdiy_1_1_regular_decomposer.html">diy::RegularDecomposer</a></div><div class="ttdoc">Decomposes a regular (discrete or continuous) domain into even blocks; creates Links with Bounds alon...</div><div class="ttdef"><b>Definition:</b> decomposition.hpp:75</div></div>
 <div class="ttc" id="classdiy_1_1_assigner_html_a272d33bcc94394f39880603084b55f38"><div class="ttname"><a href="classdiy_1_1_assigner.html#a272d33bcc94394f39880603084b55f38">diy::Assigner::rank</a></div><div class="ttdeci">virtual int rank(int gid) const =0</div><div class="ttdoc">returns the process rank of the block with global id gid (need not be local) </div></div>
 <div class="ttc" id="structdiy_1_1_regular_all_reduce_partners_html"><div class="ttname"><a href="structdiy_1_1_regular_all_reduce_partners.html">diy::RegularAllReducePartners</a></div><div class="ttdoc">Allreduce (reduction with results broadcasted to all blocks) is implemented as two merge reductions...</div><div class="ttdef"><b>Definition:</b> all-reduce.hpp:20</div></div>
@@ -674,16 +674,16 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="classdiy_1_1_master_html"><div class="ttname"><a href="classdiy_1_1_master.html">diy::Master</a></div><div class="ttdef"><b>Definition:</b> master.hpp:36</div></div>
 <div class="ttc" id="classdiy_1_1_link_html"><div class="ttname"><a href="classdiy_1_1_link.html">diy::Link</a></div><div class="ttdef"><b>Definition:</b> link.hpp:15</div></div>
 <div class="ttc" id="classdiy_1_1_regular_link_html"><div class="ttname"><a href="classdiy_1_1_regular_link.html">diy::RegularLink</a></div><div class="ttdef"><b>Definition:</b> link.hpp:51</div></div>
-<div class="ttc" id="structdiy_1_1_bounds_html"><div class="ttname"><a href="structdiy_1_1_bounds.html">diy::Bounds</a></div><div class="ttdef"><b>Definition:</b> types.hpp:19</div></div>
-<div class="ttc" id="namespacediy_html_ad1fd3af6d561c31897636040e023a101"><div class="ttname"><a href="namespacediy.html#ad1fd3af6d561c31897636040e023a101">diy::interval</a></div><div class="ttdeci">diy::DiscreteBounds interval(int from, int to)</div><div class="ttdoc">Helper to create a 1-dimensional discrete domain with the specified extents. </div><div class="ttdef"><b>Definition:</b> types.hpp:35</div></div>
-<div class="ttc" id="structdiy_1_1_direction_html"><div class="ttname"><a href="structdiy_1_1_direction.html">diy::Direction</a></div><div class="ttdef"><b>Definition:</b> types.hpp:37</div></div>
+<div class="ttc" id="structdiy_1_1_bounds_html"><div class="ttname"><a href="structdiy_1_1_bounds.html">diy::Bounds</a></div><div class="ttdef"><b>Definition:</b> types.hpp:20</div></div>
+<div class="ttc" id="namespacediy_html_ad1fd3af6d561c31897636040e023a101"><div class="ttname"><a href="namespacediy.html#ad1fd3af6d561c31897636040e023a101">diy::interval</a></div><div class="ttdeci">diy::DiscreteBounds interval(int from, int to)</div><div class="ttdoc">Helper to create a 1-dimensional discrete domain with the specified extents. </div><div class="ttdef"><b>Definition:</b> types.hpp:39</div></div>
+<div class="ttc" id="structdiy_1_1_direction_html"><div class="ttname"><a href="structdiy_1_1_direction.html">diy::Direction</a></div><div class="ttdef"><b>Definition:</b> types.hpp:41</div></div>
 <div class="ttc" id="structdiy_1_1_reduce_proxy_html_ab3cba8511e114ecfd3e84a25f30f6bd9"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html#ab3cba8511e114ecfd3e84a25f30f6bd9">diy::ReduceProxy::assigner</a></div><div class="ttdeci">const Assigner &amp; assigner() const </div><div class="ttdoc">returns the assigner </div><div class="ttdef"><b>Definition:</b> reduce.hpp:74</div></div>
 <div class="ttc" id="structdiy_1_1_regular_swap_partners_html"><div class="ttname"><a href="structdiy_1_1_regular_swap_partners.html">diy::RegularSwapPartners</a></div><div class="ttdoc">Partners for swap-reduce. </div><div class="ttdef"><b>Definition:</b> swap.hpp:16</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_proxy_html_a05bcb6fd6968e054c0b2f818c6cd24de"><div class="ttname"><a href="structdiy_1_1_master_1_1_proxy.html#a05bcb6fd6968e054c0b2f818c6cd24de">diy::Master::Proxy::enqueue</a></div><div class="ttdeci">void enqueue(const BlockID &amp;to, const T &amp;x, void(*save)(BinaryBuffer &amp;, const T &amp;)=&amp;::diy::save&lt; T &gt;) const </div><div class="ttdoc">Enqueue data whose size can be determined automatically, e.g., an STL vector. </div><div class="ttdef"><b>Definition:</b> proxy.hpp:26</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Oct 24 2018 20:17:44 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Nov 2 2018 20:15:31 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

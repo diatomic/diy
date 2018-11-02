@@ -243,9 +243,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"></div>
 <div class="line">      <span class="comment">// read values from a file</span></div>
 <div class="line">      b-&gt;values.resize(block_size);</div>
-<div class="line">      <a name="_a15"></a><a class="code" href="structdiy_1_1_bounds.html">diy::DiscreteBounds</a> block_bounds;</div>
-<div class="line">      block_bounds.<a name="a16"></a>min[0] =  gid      * (block_size / chunk_size);</div>
-<div class="line">      block_bounds.<a name="a17"></a>max[0] = (gid + 1) * (block_size / chunk_size) - 1;</div>
+<div class="line">      <a name="_a15"></a><a class="code" href="structdiy_1_1_bounds.html">diy::DiscreteBounds</a> block_bounds(1);</div>
+<div class="line">      block_bounds.min[0] =  gid      * (block_size / chunk_size);</div>
+<div class="line">      block_bounds.max[0] = (gid + 1) * (block_size / chunk_size) - 1;</div>
 <div class="line"></div>
 <div class="line">      reader.read(block_bounds, &amp;b-&gt;values[0], <span class="keyword">true</span>, chunk_size);</div>
 <div class="line"></div>
@@ -256,14 +256,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">      std::cout &lt;&lt; <span class="stringliteral">&quot;Array loaded&quot;</span> &lt;&lt; std::endl;</div>
 <div class="line">  }</div>
 <div class="line"></div>
-<div class="line">  <a name="a18"></a><a class="code" href="group___algorithms.html#gad7301f5d7bb62b79ca679affdf874ace">diy::sort</a>(master, assigner,</div>
+<div class="line">  <a name="a16"></a><a class="code" href="group___algorithms.html#gad7301f5d7bb62b79ca679affdf874ace">diy::sort</a>(master, assigner,</div>
 <div class="line">            &amp;ValueBlock::values,</div>
 <div class="line">            &amp;ValueBlock::samples,</div>
 <div class="line">            num_samples,</div>
 <div class="line">            k);</div>
 <div class="line"></div>
 <div class="line">  <span class="keywordflow">if</span> (print || verify)</div>
-<div class="line">    master.foreach([nblocks](ValueBlock* b, <span class="keyword">const</span> <a name="_a19"></a><a class="code" href="structdiy_1_1_master_1_1_proxy_with_link.html">diy::Master::ProxyWithLink</a>&amp; cp) { set_min_max(b, cp, nblocks); });</div>
+<div class="line">    master.foreach([nblocks](ValueBlock* b, <span class="keyword">const</span> <a name="_a17"></a><a class="code" href="structdiy_1_1_master_1_1_proxy_with_link.html">diy::Master::ProxyWithLink</a>&amp; cp) { set_min_max(b, cp, nblocks); });</div>
 <div class="line"></div>
 <div class="line">  <span class="keywordflow">if</span> (print)</div>
 <div class="line">  {</div>
@@ -279,7 +279,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">    <span class="keyword">typedef</span> <a class="code" href="structdiy_1_1_master_1_1_proxy_with_link.html">diy::Master::ProxyWithLink</a>      Proxy;</div>
 <div class="line">    <span class="keywordtype">int</span>     idx   = master.loaded_block();</div>
 <div class="line">    Proxy   proxy = master.proxy(idx);</div>
-<div class="line">    <span class="keywordtype">size_t</span>  total = proxy.<a name="a20"></a><a class="code" href="group___communication.html#gae5ffa2d35209fbe7b2e9161e9fb79d96">get</a>&lt;<span class="keywordtype">size_t</span>&gt;();</div>
+<div class="line">    <span class="keywordtype">size_t</span>  total = proxy.<a name="a18"></a><a class="code" href="group___communication.html#gae5ffa2d35209fbe7b2e9161e9fb79d96">get</a>&lt;<span class="keywordtype">size_t</span>&gt;();</div>
 <div class="line">    std::cout &lt;&lt; <span class="stringliteral">&quot;Total values: &quot;</span> &lt;&lt; total &lt;&lt; <span class="stringliteral">&quot; vs &quot;</span> &lt;&lt; nblocks * num_values &lt;&lt; std::endl;</div>
 <div class="line"></div>
 <div class="line">    <span class="keywordflow">if</span> (world.rank() == 0)</div>
@@ -292,7 +292,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Oct 24 2018 20:17:44 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Nov 2 2018 20:15:31 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

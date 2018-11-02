@@ -13,6 +13,9 @@ var searchData=
   ['dummystream',['DummyStream',['../structfmt_1_1internal_1_1_dummy_stream.html',1,'fmt::internal']]],
   ['duplicate',['duplicate',['../classdiy_1_1mpi_1_1communicator.html#a5be9b0dcfecee6e8ee54cb934f35af13',1,'diy::mpi::communicator']]],
   ['dynamicassigner',['DynamicAssigner',['../classdiy_1_1_dynamic_assigner.html',1,'diy']]],
+  ['dynamicpoint',['DynamicPoint',['../classdiy_1_1_dynamic_point.html',1,'diy']]],
+  ['dynamicpoint_3c_20coordinate_20_3e',['DynamicPoint&lt; Coordinate &gt;',['../classdiy_1_1_dynamic_point.html',1,'diy']]],
+  ['dynamicpoint_3c_20int_20_3e',['DynamicPoint&lt; int &gt;',['../classdiy_1_1_dynamic_point.html',1,'diy']]],
   ['decomposition',['decomposition',['../md_docs_detail_decomposition.html',1,'']]],
   ['mpi',['mpi',['../namespacediy_1_1mpi.html',1,'diy']]]
 ];

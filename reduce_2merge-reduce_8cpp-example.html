@@ -142,7 +142,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">            data[i] = i;</div>
 <div class="line">    }</div>
 <div class="line">    <span class="comment">// block data</span></div>
-<div class="line">    Bounds          bounds;</div>
+<div class="line">    Bounds          bounds { 0 };</div>
 <div class="line">    vector&lt;int&gt;     data;</div>
 <div class="line"><span class="keyword">private</span>:</div>
 <div class="line">    Block()                                     {}</div>
@@ -299,7 +299,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">    AddBlock               create(master, num_points); <span class="comment">// an object for adding new blocks to master</span></div>
 <div class="line"></div>
 <div class="line">    <span class="comment">// set some global data bounds</span></div>
-<div class="line">    Bounds domain;</div>
+<div class="line">    Bounds domain { dim };</div>
 <div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; dim; ++i)</div>
 <div class="line">    {</div>
 <div class="line">        domain.min[i] = 0;</div>
@@ -337,7 +337,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Oct 24 2018 20:17:44 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Nov 2 2018 20:15:31 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

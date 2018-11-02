@@ -188,9 +188,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">  std::string               prefix      = <span class="stringliteral">&quot;./DIY.XXXXXX&quot;</span>;</div>
 <div class="line">  std::string               log_level   = <span class="stringliteral">&quot;info&quot;</span>;</div>
 <div class="line"></div>
-<div class="line">  Bounds domain;</div>
-<div class="line">  domain.<a name="a18"></a>min[0] = domain.min[1] = domain.min[2] = 0;</div>
-<div class="line">  domain.max[0] = domain.max[1] = domain.max[2] = 100.;</div>
+<div class="line">  Bounds domain(DIM);</div>
+<div class="line">  <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; DIM; ++i)</div>
+<div class="line">  {</div>
+<div class="line">      domain.min[i] = 0;</div>
+<div class="line">      domain.max[i] = 100.;</div>
+<div class="line">  }</div>
 <div class="line"></div>
 <div class="line">  <span class="keywordtype">bool</span>  verbose, help;</div>
 <div class="line"></div>
@@ -220,7 +223,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"></div>
 <div class="line">  <span class="keywordflow">if</span> (!ops.parse(argc,argv) || help)</div>
 <div class="line">  {</div>
-<div class="line">      <span class="keywordflow">if</span> (world.<a name="a19"></a>rank() == 0)</div>
+<div class="line">      <span class="keywordflow">if</span> (world.<a name="a18"></a>rank() == 0)</div>
 <div class="line">      {</div>
 <div class="line">          std::cout &lt;&lt; <span class="stringliteral">&quot;Usage: &quot;</span> &lt;&lt; argv[0] &lt;&lt; <span class="stringliteral">&quot; [OPTIONS]\n&quot;</span>;</div>
 <div class="line">          std::cout &lt;&lt; <span class="stringliteral">&quot;Generates random particles in the domain and redistributes them into correct blocks.\n&quot;</span>;</div>
@@ -231,33 +234,33 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"></div>
 <div class="line">  diy::create_logger(log_level);</div>
 <div class="line"></div>
-<div class="line">  <a name="_a20"></a><a class="code" href="classdiy_1_1_file_storage.html">diy::FileStorage</a>          storage(prefix);</div>
-<div class="line">  <a name="_a21"></a><a class="code" href="classdiy_1_1_master.html">diy::Master</a>               master(world,</div>
+<div class="line">  <a name="_a19"></a><a class="code" href="classdiy_1_1_file_storage.html">diy::FileStorage</a>          storage(prefix);</div>
+<div class="line">  <a name="_a20"></a><a class="code" href="classdiy_1_1_master.html">diy::Master</a>               master(world,</div>
 <div class="line">                                   threads,</div>
 <div class="line">                                   mem_blocks,</div>
 <div class="line">                                   &amp;Block::create,</div>
 <div class="line">                                   &amp;Block::destroy,</div>
 <div class="line">                                   &amp;storage,</div>
-<div class="line">                                   &amp;<a name="a22"></a><a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">Block::save</a>,</div>
-<div class="line">                                   &amp;<a name="a23"></a><a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">Block::load</a>);</div>
+<div class="line">                                   &amp;<a name="a21"></a><a class="code" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">Block::save</a>,</div>
+<div class="line">                                   &amp;<a name="a22"></a><a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">Block::load</a>);</div>
 <div class="line"></div>
 <div class="line">  <span class="keywordtype">int</span>   dim = DIM;</div>
 <div class="line"></div>
-<div class="line">  <a name="_a24"></a><a class="code" href="classdiy_1_1_contiguous_assigner.html">diy::ContiguousAssigner</a>   assigner(world.size(), nblocks);</div>
+<div class="line">  <a name="_a23"></a><a class="code" href="classdiy_1_1_contiguous_assigner.html">diy::ContiguousAssigner</a>   assigner(world.size(), nblocks);</div>
 <div class="line">  <span class="comment">//diy::RoundRobinAssigner   assigner(world.size(), nblocks);</span></div>
 <div class="line">  AddBlock      create(master, num_points);</div>
 <div class="line"></div>
 <div class="line">  Decomposer    decomposer(dim, domain, nblocks);</div>
 <div class="line">  decomposer.decompose(world.rank(), assigner, create);</div>
-<div class="line">  <a name="a25"></a><a class="code" href="group___communication.html#ga3dfb1bdb9c078d9f18fc6953295a0208">diy::all_to_all</a>(master, assigner, Redistribute(decomposer), k);</div>
+<div class="line">  <a name="a24"></a><a class="code" href="group___communication.html#ga3dfb1bdb9c078d9f18fc6953295a0208">diy::all_to_all</a>(master, assigner, Redistribute(decomposer), k);</div>
 <div class="line"></div>
-<div class="line">  master.foreach([verbose](Block* b, <span class="keyword">const</span> <a name="_a26"></a><a class="code" href="structdiy_1_1_master_1_1_proxy_with_link.html">diy::Master::ProxyWithLink</a>&amp; cp) { b-&gt;print_block(cp, verbose); });</div>
+<div class="line">  master.foreach([verbose](Block* b, <span class="keyword">const</span> <a name="_a25"></a><a class="code" href="structdiy_1_1_master_1_1_proxy_with_link.html">diy::Master::ProxyWithLink</a>&amp; cp) { b-&gt;print_block(cp, verbose); });</div>
 <div class="line">  master.foreach(&amp;Block::verify_block);</div>
 <div class="line">}</div>
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Oct 24 2018 20:17:44 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Nov 2 2018 20:15:31 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

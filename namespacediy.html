@@ -121,6 +121,10 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_regular_decomposer.html">RegularDecomposer</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decomposes a regular (discrete or continuous) domain into even blocks; creates Links with <a class="el" href="structdiy_1_1_bounds.html">Bounds</a> along the way.  <a href="structdiy_1_1_regular_decomposer.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1_dynamic_point.html">DynamicPoint</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_serialization_3_01_dynamic_point_3_01_c_00_01s___01_4_01_4.html">Serialization&lt; DynamicPoint&lt; C, s_ &gt; &gt;</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_grid.html">Grid</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_grid_ref.html">GridRef</a></td></tr>
@@ -210,6 +214,10 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_bounds_value.html">BoundsValue</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_serialization_3_01_bounds_3_01_c_01_4_01_4.html">Serialization&lt; Bounds&lt; C &gt; &gt;</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_serialization_3_01_direction_01_4.html">Serialization&lt; Direction &gt;</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -274,6 +282,18 @@ Functions</h2></td></tr>
 <tr class="memitem:gab7b4ad7a00db7746971f9a5a6e593917"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group___decomposition.html#gab7b4ad7a00db7746971f9a5a6e593917">decompose</a> (int dim, int rank, const <a class="el" href="structdiy_1_1_bounds.html">Bounds</a> &amp;domain, const <a class="el" href="classdiy_1_1_static_assigner.html">StaticAssigner</a> &amp;assigner, <a class="el" href="classdiy_1_1_master.html">Master</a> &amp;master, const typename <a class="el" href="structdiy_1_1_regular_decomposer.html">RegularDecomposer</a>&lt; <a class="el" href="structdiy_1_1_bounds.html">Bounds</a> &gt;::Updater &amp;update, typename <a class="el" href="structdiy_1_1_regular_decomposer.html">RegularDecomposer</a>&lt; <a class="el" href="structdiy_1_1_bounds.html">Bounds</a> &gt;::BoolVector share_face=typename <a class="el" href="structdiy_1_1_regular_decomposer.html">RegularDecomposer</a>&lt; <a class="el" href="structdiy_1_1_bounds.html">Bounds</a> &gt;::BoolVector(), typename <a class="el" href="structdiy_1_1_regular_decomposer.html">RegularDecomposer</a>&lt; <a class="el" href="structdiy_1_1_bounds.html">Bounds</a> &gt;::BoolVector wrap=typename <a class="el" href="structdiy_1_1_regular_decomposer.html">RegularDecomposer</a>&lt; <a class="el" href="structdiy_1_1_bounds.html">Bounds</a> &gt;::BoolVector(), typename <a class="el" href="structdiy_1_1_regular_decomposer.html">RegularDecomposer</a>&lt; <a class="el" href="structdiy_1_1_bounds.html">Bounds</a> &gt;::CoordinateVector ghosts=typename <a class="el" href="structdiy_1_1_regular_decomposer.html">RegularDecomposer</a>&lt; <a class="el" href="structdiy_1_1_bounds.html">Bounds</a> &gt;::CoordinateVector(), typename <a class="el" href="structdiy_1_1_regular_decomposer.html">RegularDecomposer</a>&lt; <a class="el" href="structdiy_1_1_bounds.html">Bounds</a> &gt;::DivisionsVector divs=typename <a class="el" href="structdiy_1_1_regular_decomposer.html">RegularDecomposer</a>&lt; <a class="el" href="structdiy_1_1_bounds.html">Bounds</a> &gt;::DivisionsVector())</td></tr>
 <tr class="memdesc:gab7b4ad7a00db7746971f9a5a6e593917"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a decomposition (modify links) of an existing set of blocks that were added to the master previously.  <a href="group___decomposition.html#gab7b4ad7a00db7746971f9a5a6e593917">More...</a><br/></td></tr>
 <tr class="separator:gab7b4ad7a00db7746971f9a5a6e593917"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adeaf152c921d5ee104a05416faf01c65"><td class="memTemplParams" colspan="2"><a class="anchor" id="adeaf152c921d5ee104a05416faf01c65"></a>
+template&lt;class Coordinate , size_t s_&gt; </td></tr>
+<tr class="memitem:adeaf152c921d5ee104a05416faf01c65"><td class="memTemplItemLeft" align="right" valign="top">Coordinate&#160;</td><td class="memTemplItemRight" valign="bottom"><b>norm2</b> (const <a class="el" href="classdiy_1_1_dynamic_point.html">DynamicPoint</a>&lt; Coordinate, s_ &gt; &amp;p)</td></tr>
+<tr class="separator:adeaf152c921d5ee104a05416faf01c65"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28c89dbe3b91b5a0b77c246bae9132e5"><td class="memTemplParams" colspan="2"><a class="anchor" id="a28c89dbe3b91b5a0b77c246bae9132e5"></a>
+template&lt;class C , size_t s_&gt; </td></tr>
+<tr class="memitem:a28c89dbe3b91b5a0b77c246bae9132e5"><td class="memTemplItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;out, const <a class="el" href="classdiy_1_1_dynamic_point.html">DynamicPoint</a>&lt; C, s_ &gt; &amp;p)</td></tr>
+<tr class="separator:a28c89dbe3b91b5a0b77c246bae9132e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af240c8e9cc82d8800c59b6417b5906db"><td class="memTemplParams" colspan="2"><a class="anchor" id="af240c8e9cc82d8800c59b6417b5906db"></a>
+template&lt;class C , size_t s_&gt; </td></tr>
+<tr class="memitem:af240c8e9cc82d8800c59b6417b5906db"><td class="memTemplItemLeft" align="right" valign="top">std::istream &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>operator&gt;&gt;</b> (std::istream &amp;<a class="el" href="namespacediy.html#a861d8601719a75414c57d6aa6a99e0fc">in</a>, <a class="el" href="classdiy_1_1_dynamic_point.html">DynamicPoint</a>&lt; C, s_ &gt; &amp;p)</td></tr>
+<tr class="separator:af240c8e9cc82d8800c59b6417b5906db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a16cab344283b63a1c7dbc3c8b6fea314"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a16cab344283b63a1c7dbc3c8b6fea314"></a>
 std::shared_ptr&lt; <a class="el" href="structdiy_1_1spd_1_1logger.html">spd::logger</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>get_logger</b> ()</td></tr>
 <tr class="separator:a16cab344283b63a1c7dbc3c8b6fea314"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -502,7 +522,7 @@ template&lt;class Bounds , class Point , class OutIter &gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Oct 24 2018 20:17:45 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Nov 2 2018 20:15:32 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

@@ -208,7 +208,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">                                  &amp;<a class="code" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">Block::load</a>);</div>
 <div class="line"></div>
 <div class="line">    <span class="comment">// set some global data bounds (their initialization is omitted in this example)</span></div>
-<div class="line">    Bounds domain;</div>
+<div class="line">    Bounds domain(dim);</div>
 <div class="line"></div>
 <div class="line">    <span class="comment">// assign blocks to processes</span></div>
 <div class="line">    <a name="_a20"></a><a class="code" href="classdiy_1_1_round_robin_assigner.html">diy::RoundRobinAssigner</a>   assigner(world.size(), nblocks);</div>
@@ -247,7 +247,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Oct 24 2018 20:17:44 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Nov 2 2018 20:15:31 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

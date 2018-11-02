@@ -99,7 +99,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">  shape.push_back(16);</div>
 <div class="line">  shape.push_back(16);</div>
 <div class="line"></div>
-<div class="line">  <a name="_a2"></a><a class="code" href="structdiy_1_1_bounds.html">diy::DiscreteBounds</a> box;</div>
+<div class="line">  <a name="_a2"></a><a class="code" href="structdiy_1_1_bounds.html">diy::DiscreteBounds</a> box(2);</div>
 <div class="line">  box.<a name="a3"></a>min[0] = box.min[1] = 4;</div>
 <div class="line">  box.<a name="a4"></a>max[0] = box.max[1] = 7;</div>
 <div class="line"></div>
@@ -125,7 +125,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"></div>
 <div class="line">  <a class="code" href="classdiy_1_1mpi_1_1io_1_1file.html">diy::mpi::io::file</a> out(world, <span class="stringliteral">&quot;out.npy&quot;</span>, diy::mpi::io::file::wronly | diy::mpi::io::file::create);</div>
 <div class="line">  <a class="code" href="classdiy_1_1io_1_1_num_py.html">diy::io::NumPy</a>     writer(out);</div>
-<div class="line">  <a class="code" href="structdiy_1_1_bounds.html">diy::DiscreteBounds</a> full_box, sub_box;</div>
+<div class="line">  <a class="code" href="structdiy_1_1_bounds.html">diy::DiscreteBounds</a> full_box(2), sub_box(2);</div>
 <div class="line">  full_box.min[0] = full_box.min[1] = 0;</div>
 <div class="line">  full_box.max[0] = full_box.max[1] = 3;</div>
 <div class="line">  sub_box.min[0] = sub_box.min[1] = 1;</div>
@@ -138,7 +138,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Oct 24 2018 20:17:44 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Nov 2 2018 20:15:31 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
