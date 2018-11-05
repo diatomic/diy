@@ -233,6 +233,26 @@ namespace diy
   }
 }
 
+template<>
+struct diy::Serialization<diy::AMRLink::Description>
+{
+    static void         save(diy::BinaryBuffer& bb, const diy::AMRLink::Description& x)
+    {
+        diy::save(bb, x.level);
+        diy::save(bb, x.refinement);
+        diy::save(bb, x.core);
+        diy::save(bb, x.bounds);
+    }
+
+    static void         load(diy::BinaryBuffer& bb, diy::AMRLink::Description& x)
+    {
+        diy::load(bb, x.level);
+        diy::load(bb, x.refinement);
+        diy::load(bb, x.core);
+        diy::load(bb, x.bounds);
+    }
+};
+
 
 void
 diy::LinkFactory::
