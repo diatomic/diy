@@ -20,12 +20,10 @@ namespace diy
     Out distance(int dim, const Bounds& bounds, const Point& p);
 
     template<class Bounds, class Out = double>
-    inline
     Out distance(const Bounds& bounds1, const Bounds& bounds2);
 
     template<class Bounds, class Out = double>
     DEPRECATED("Use distance(const Bounds& bounds1, const Bounds& bounds2) instead.")
-    inline
     Out distance(int dim, const Bounds& bounds1, const Bounds& bounds2);
 
     template<class Bounds>
@@ -66,12 +64,12 @@ Out
 diy::
 distance(const Bounds& bounds, const Point& p)
 {
-    double res = 0;
+    Out res = 0;
     for (int i = 0; i < p.size(); ++i)
     {
         // avoids all the annoying case logic by finding
         // diff = max(bounds.min[i] - p[i], 0, p[i] - bounds.max[i])
-        double diff = 0, d;
+        Out diff = 0, d;
 
         d = bounds.min[i] - p[i];
         if (d > diff) diff = d;
@@ -90,12 +88,12 @@ Out
 diy::
 distance(int dim, const Bounds& bounds, const Point& p)
 {
-    double res = 0;
+    Out res = 0;
     for (int i = 0; i < dim; ++i)
     {
         // avoids all the annoying case logic by finding
         // diff = max(bounds.min[i] - p[i], 0, p[i] - bounds.max[i])
-        double diff = 0, d;
+        Out diff = 0, d;
 
         d = bounds.min[i] - p[i];
         if (d > diff) diff = d;
@@ -112,13 +110,13 @@ Out
 diy::
 distance(const Bounds& bounds1, const Bounds& bounds2)
 {
-    double res = 0;
+    Out res = 0;
     for (int i = 0; i < bounds1.min.size(); ++i)   // assume min, max of both bounds have same size
     {
-        double diff = 0, d;
+        Out diff = 0, d;
 
-        double d1 = bounds1.max[i] - bounds2.min[i];
-        double d2 = bounds2.max[i] - bounds1.min[i];
+        Out d1 = bounds1.max[i] - bounds2.min[i];
+        Out d2 = bounds2.max[i] - bounds1.min[i];
 
         if (d1 > 0 && d2 > 0)
             diff = 0;
@@ -138,13 +136,13 @@ Out
 diy::
 distance(int dim, const Bounds& bounds1, const Bounds& bounds2)
 {
-    double res = 0;
+    Out res = 0;
     for (int i = 0; i < dim; ++i)
     {
-        double diff = 0, d;
+        Out diff = 0, d;
 
-        double d1 = bounds1.max[i] - bounds2.min[i];
-        double d2 = bounds2.max[i] - bounds1.min[i];
+        Out d1 = bounds1.max[i] - bounds2.min[i];
+        Out d2 = bounds2.max[i] - bounds1.min[i];
 
         if (d1 > 0 && d2 > 0)
             diff = 0;
