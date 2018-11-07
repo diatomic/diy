@@ -3,7 +3,7 @@ var searchData=
   ['namedarg',['NamedArg',['../structfmt_1_1internal_1_1_named_arg.html',1,'fmt::internal']]],
   ['namedargwithtype',['NamedArgWithType',['../structfmt_1_1internal_1_1_named_arg_with_type.html',1,'fmt::internal']]],
   ['nblocks',['nblocks',['../classdiy_1_1_assigner.html#a61ea8499c8c28934f94e18e635e06436',1,'diy::Assigner::nblocks()'],['../structdiy_1_1_reduce_proxy.html#ab340a062e8e96bfb7428186e6f3046a8',1,'diy::ReduceProxy::nblocks()']]],
-  ['near',['near',['../namespacediy.html#a2f1f55e20353c603b621bb3e61cee3e5',1,'diy']]],
+  ['near',['near',['../namespacediy.html#a3c23b7187b5855ad507c063595e99918',1,'diy']]],
   ['neverskip',['NeverSkip',['../structdiy_1_1_master_1_1_never_skip.html',1,'diy::Master']]],
   ['not',['Not',['../structfmt_1_1internal_1_1_not.html',1,'fmt::internal']]],
   ['not_3c_20false_20_3e',['Not&lt; false &gt;',['../structfmt_1_1internal_1_1_not_3_01false_01_4.html',1,'fmt::internal']]],

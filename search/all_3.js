@@ -7,7 +7,7 @@ var searchData=
   ['dim',['dim',['../structdiy_1_1_regular_all_reduce_partners.html#a2c548f8b9f13930ac81d2033cade8455',1,'diy::RegularAllReducePartners::dim()'],['../structdiy_1_1_regular_broadcast_partners.html#af15c2f456f39ea39adcde74c2664c308',1,'diy::RegularBroadcastPartners::dim()']]],
   ['dimk',['DimK',['../structdiy_1_1_regular_partners_1_1_dim_k.html',1,'diy::RegularPartners']]],
   ['direction',['Direction',['../structdiy_1_1_direction.html',1,'diy']]],
-  ['distance',['distance',['../namespacediy.html#aaa426685de12b51b4a3f283471a0a62b',1,'diy']]],
+  ['distance',['distance',['../namespacediy.html#ad33dccf99ac841c574ff29770888f423',1,'diy::distance(const Bounds &amp;bounds, const Point &amp;p)'],['../namespacediy.html#a0e8a1b0cc525bc453973cf005b198b8e',1,'diy::distance(int dim, const Bounds &amp;bounds, const Point &amp;p)']]],
   ['diy',['diy',['../namespacediy.html',1,'']]],
   ['dummyint',['DummyInt',['../structfmt_1_1internal_1_1_dummy_int.html',1,'fmt::internal']]],
   ['dummystream',['DummyStream',['../structfmt_1_1internal_1_1_dummy_stream.html',1,'fmt::internal']]],
