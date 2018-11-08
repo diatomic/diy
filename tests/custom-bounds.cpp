@@ -18,13 +18,6 @@ typedef diy::RegularContinuousLink     RCLink;
 typedef diy::Bounds<double>            Bounds;
 typedef diy::RegularLink<Bounds>       RCLink;
 
-template<>
-struct diy::RegularLinkSelector<Bounds>
-{
-    typedef RCLink type;
-    static const size_t id = 10;
-};
-
 #endif
 
 typedef diy::RegularDecomposer<Bounds> Decomposer;

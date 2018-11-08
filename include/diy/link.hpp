@@ -59,14 +59,6 @@ namespace diy
   using RegularGridLink         = RegularLink<DiscreteBounds>;
   using RegularContinuousLink   = RegularLink<ContinuousBounds>;
 
-  // Selector between regular discrete and contious links given bounds type
-  template<class Bounds_>
-  struct RegularLinkSelector
-  {
-      using type = RegularLink<Bounds_>;
-  };
-
-
   // for a regular decomposition, it makes sense to address the neighbors by direction
   // and store local and neighbor bounds
   template<class Bounds_>
