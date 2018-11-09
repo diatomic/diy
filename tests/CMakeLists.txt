@@ -96,18 +96,17 @@ add_test                    (NAME serialization-test
                              COMMAND serialization-test
                             )
 
-add_test                    (NAME custom-bounds-test
-                             COMMAND custom-bounds-test
-                            )
-add_test                    (NAME custom-bounds-load-test
-                             COMMAND custom-bounds-load-test
-                             DEPENDS custom-bounds-test
-                            )
-
 if                          (mpi)
     # currently, I/O is only supported when built with MPI support.
     add_test                (NAME io-test
                              COMMAND io-test
+                            )
+    add_test                (NAME custom-bounds-test
+                             COMMAND custom-bounds-test
+                            )
+    add_test                (NAME custom-bounds-load-test
+                             COMMAND custom-bounds-load-test
+                             DEPENDS custom-bounds-test
                             )
 endif                       (mpi)
 
