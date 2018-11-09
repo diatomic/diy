@@ -40,17 +40,20 @@ target_link_libraries       (rexchange-test         ${libraries})
 add_executable              (iexchange-test         iexchange.cpp)
 target_link_libraries       (iexchange-test         ${libraries})
 
-add_executable              (grid-test         grid.cpp)
-target_link_libraries       (grid-test         ${libraries})
+add_executable              (grid-test              grid.cpp)
+target_link_libraries       (grid-test              ${libraries})
 
-add_executable              (serialization-test serialization.cpp)
-target_link_libraries       (serialization-test ${libraries})
+add_executable              (serialization-test     serialization.cpp)
+target_link_libraries       (serialization-test     ${libraries})
 
-add_executable              (two-masters         two-masters.cpp)
-target_link_libraries       (two-masters         ${libraries})
+add_executable              (two-masters            two-masters.cpp)
+target_link_libraries       (two-masters            ${libraries})
 
 add_executable              (shared-output         shared-output.cpp)
 target_link_libraries       (shared-output         ${libraries})
+
+add_executable              (custom-bounds-test    custom-bounds.cpp)
+target_link_libraries       (custom-bounds-test    ${libraries})
 
 foreach                     (b 2 4 8 64)
     add_test                (NAME kd-tree-test-b${b}
@@ -78,6 +81,10 @@ add_test                    (NAME grid-test
 
 add_test                    (NAME serialization-test
                              COMMAND serialization-test
+                            )
+
+add_test                    (NAME custom-bounds-test
+                             COMMAND custom-bounds-test
                             )
 
 if                          (mpi)
