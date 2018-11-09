@@ -148,6 +148,12 @@ namespace diy
       inline static void    save(BinaryBuffer& bb, const Link* l);
       inline static Link*   load(BinaryBuffer& bb);
   };
+
+  // Instantiate the common types to register them
+  template class RegularLink<Bounds<int>>;
+  template class RegularLink<Bounds<float>>;
+  template class RegularLink<Bounds<double>>;
+  template class RegularLink<Bounds<long>>;
 }
 
 

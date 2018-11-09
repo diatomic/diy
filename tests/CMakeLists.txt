@@ -58,6 +58,11 @@ target_link_libraries       (custom-bounds-test    ${libraries})
 add_executable              (custom-bounds-load-test    custom-bounds-load.cpp)
 target_link_libraries       (custom-bounds-load-test    ${libraries})
 
+# Test whether our explicit template instantiation violates the one-definition
+# rule. Only need to compile, won't run it below.
+add_executable              (odr-link-test          custom-bounds.cpp link.cpp)
+target_link_libraries       (odr-link-test          ${libraries})
+
 foreach                     (b 2 4 8 64)
     add_test                (NAME kd-tree-test-b${b}
                              COMMAND kd-tree-test -b ${b}
