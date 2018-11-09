@@ -112,4 +112,3 @@ int main(int argc, char** argv)
     // debug: print the blocks
     read_master.foreach(&Block::print_data);
 }
-

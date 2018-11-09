@@ -3,9 +3,6 @@ include_directories         (${CMAKE_SOURCE_DIR}/examples/reduce)   # needed for
 
 add_executable              (kd-tree-test           kd-tree.cpp)
 target_link_libraries       (kd-tree-test           ${libraries})
-if                          (MSVC AND NOT(MSVC_VERSION LESS 1400))
-    set_source_files_properties (kd-tree.cpp PROPERTIES COMPILE_FLAGS "/bigobj")
-endif                       ()
 
 add_executable              (decomposer-test        decomposer.cpp)
 target_link_libraries       (decomposer-test        ${libraries})
@@ -63,6 +60,14 @@ target_link_libraries       (custom-bounds-load-test    ${libraries})
 add_executable              (odr-link-test          custom-bounds.cpp link.cpp)
 target_link_libraries       (odr-link-test          ${libraries})
 
+if                          (MSVC AND NOT(MSVC_VERSION LESS 1400))
+    set_source_files_properties (kd-tree.cpp            PROPERTIES COMPILE_FLAGS "/bigobj")
+    set_source_files_properties (merge-swap-reduce.cpp  PROPERTIES COMPILE_FLAGS "/bigobj")
+    set_source_files_properties (swap-reduce.cpp        PROPERTIES COMPILE_FLAGS "/bigobj")
+endif                       ()
+
+
+## Run the tests
 foreach                     (b 2 4 8 64)
     add_test                (NAME kd-tree-test-b${b}
                              COMMAND kd-tree-test -b ${b}
