@@ -55,6 +55,9 @@ target_link_libraries       (shared-output         ${libraries})
 add_executable              (custom-bounds-test    custom-bounds.cpp)
 target_link_libraries       (custom-bounds-test    ${libraries})
 
+add_executable              (custom-bounds-load-test    custom-bounds-load.cpp)
+target_link_libraries       (custom-bounds-load-test    ${libraries})
+
 foreach                     (b 2 4 8 64)
     add_test                (NAME kd-tree-test-b${b}
                              COMMAND kd-tree-test -b ${b}
@@ -85,6 +88,10 @@ add_test                    (NAME serialization-test
 
 add_test                    (NAME custom-bounds-test
                              COMMAND custom-bounds-test
+                            )
+add_test                    (NAME custom-bounds-load-test
+                             COMMAND custom-bounds-load-test
+                             DEPENDS custom-bounds-test
                             )
 
 if                          (mpi)
