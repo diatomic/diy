@@ -8,28 +8,8 @@
 #include <string>
 #include <unordered_map>
 
-#include <cstdlib>
-
-#if !defined(_WIN32)
-#include <cxxabi.h>
-#endif
-
 namespace diy
 {
-
-namespace detail
-{
-    std::string demangle(const char *name)
-    {
-#if !defined(_WIN32)
-      int status = -1;
-      std::unique_ptr<char, void (*)(void *)> res { abi::__cxa_demangle(name, NULL, NULL, &status), std::free };
-      return (status == 0) ? res.get() : name;
-#else
-      return name;
-#endif
-    }
-} // detail
 
 template <class Base, class... Args>
 class Factory
@@ -41,7 +21,7 @@ class Factory
             return data().at(s)(std::forward<T>(args)...);
         }
 
-        virtual std::string id() const          { return detail::demangle(typeid(Base).name()); }
+        virtual std::string id() const          { return typeid(Base).name(); }
 
         template <class T>
         struct Registrar: Base
@@ -50,7 +30,7 @@ class Factory
 
             static bool registerT()
             {
-                const auto name = detail::demangle(typeid(T).name());
+                const auto name = typeid(T).name();
                 Factory::data()[name] = [](Args... args) -> Base*
                 {
                     return new T(std::forward<Args>(args)...);
@@ -59,7 +39,7 @@ class Factory
             }
             static bool registered;
 
-            std::string id() const override     { return detail::demangle(typeid(T).name()); }
+            std::string id() const override     { return typeid(T).name(); }
 
             private:
                 Registrar(): Base(Key{}) { (void)registered; }
