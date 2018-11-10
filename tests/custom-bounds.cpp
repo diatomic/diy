@@ -13,7 +13,7 @@ using namespace std;
 typedef diy::ContinuousBounds          Bounds;
 typedef diy::RegularContinuousLink     RCLink;
 
-#else                                   // templated bounds TODO: not working yet
+#else
 
 typedef diy::Bounds<double>            Bounds;
 typedef diy::RegularLink<Bounds>       RCLink;
