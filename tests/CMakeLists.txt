@@ -55,11 +55,6 @@ target_link_libraries       (custom-bounds-test    ${libraries})
 add_executable              (custom-bounds-load-test    custom-bounds-load.cpp)
 target_link_libraries       (custom-bounds-load-test    ${libraries})
 
-# Test whether our explicit template instantiation violates the one-definition
-# rule. Only need to compile, won't run it below.
-add_executable              (odr-link-test          custom-bounds.cpp link.cpp)
-target_link_libraries       (odr-link-test          ${libraries})
-
 if                          (MSVC AND NOT(MSVC_VERSION LESS 1400))
     set_source_files_properties (kd-tree.cpp            PROPERTIES COMPILE_FLAGS "/bigobj")
     set_source_files_properties (merge-swap-reduce.cpp  PROPERTIES COMPILE_FLAGS "/bigobj")
