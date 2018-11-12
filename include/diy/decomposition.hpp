@@ -74,9 +74,9 @@ namespace detail
   template<class Bounds_>
   struct RegularDecomposer
   {
-    typedef         Bounds_                                         Bounds;
-    typedef         typename BoundsValue<Bounds>::type              Coordinate;
-    typedef         typename RegularLinkSelector<Bounds>::type      Link;
+    using Bounds     = Bounds_;
+    using Coordinate = typename BoundsValue<Bounds>::type;
+    using Link       = RegularLink<Bounds>;
 
     using Creator = std::function<void(int,      Bounds, Bounds, Bounds, Link)>;
     using Updater = std::function<void(int, int, Bounds, Bounds, Bounds, Link)>;

@@ -3,9 +3,6 @@ include_directories         (${CMAKE_SOURCE_DIR}/examples/reduce)   # needed for
 
 add_executable              (kd-tree-test           kd-tree.cpp)
 target_link_libraries       (kd-tree-test           ${libraries})
-if                          (MSVC AND NOT(MSVC_VERSION LESS 1400))
-    set_source_files_properties (kd-tree.cpp PROPERTIES COMPILE_FLAGS "/bigobj")
-endif                       ()
 
 add_executable              (decomposer-test        decomposer.cpp)
 target_link_libraries       (decomposer-test        ${libraries})
@@ -40,18 +37,32 @@ target_link_libraries       (rexchange-test         ${libraries})
 add_executable              (iexchange-test         iexchange.cpp)
 target_link_libraries       (iexchange-test         ${libraries})
 
-add_executable              (grid-test         grid.cpp)
-target_link_libraries       (grid-test         ${libraries})
+add_executable              (grid-test              grid.cpp)
+target_link_libraries       (grid-test              ${libraries})
 
-add_executable              (serialization-test serialization.cpp)
-target_link_libraries       (serialization-test ${libraries})
+add_executable              (serialization-test     serialization.cpp)
+target_link_libraries       (serialization-test     ${libraries})
 
-add_executable              (two-masters         two-masters.cpp)
-target_link_libraries       (two-masters         ${libraries})
+add_executable              (two-masters            two-masters.cpp)
+target_link_libraries       (two-masters            ${libraries})
 
 add_executable              (shared-output         shared-output.cpp)
 target_link_libraries       (shared-output         ${libraries})
 
+add_executable              (custom-bounds-test    custom-bounds.cpp)
+target_link_libraries       (custom-bounds-test    ${libraries})
+
+add_executable              (custom-bounds-load-test    custom-bounds-load.cpp)
+target_link_libraries       (custom-bounds-load-test    ${libraries})
+
+if                          (MSVC AND NOT(MSVC_VERSION LESS 1400))
+    set_source_files_properties (kd-tree.cpp            PROPERTIES COMPILE_FLAGS "/bigobj")
+    set_source_files_properties (merge-swap-reduce.cpp  PROPERTIES COMPILE_FLAGS "/bigobj")
+    set_source_files_properties (swap-reduce.cpp        PROPERTIES COMPILE_FLAGS "/bigobj")
+endif                       ()
+
+
+## Run the tests
 foreach                     (b 2 4 8 64)
     add_test                (NAME kd-tree-test-b${b}
                              COMMAND kd-tree-test -b ${b}
@@ -84,6 +95,13 @@ if                          (mpi)
     # currently, I/O is only supported when built with MPI support.
     add_test                (NAME io-test
                              COMMAND io-test
+                            )
+    add_test                (NAME custom-bounds-test
+                             COMMAND custom-bounds-test
+                            )
+    add_test                (NAME custom-bounds-load-test
+                             COMMAND custom-bounds-load-test
+                             DEPENDS custom-bounds-test
                             )
 endif                       (mpi)
 

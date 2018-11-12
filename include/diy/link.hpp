@@ -9,14 +9,22 @@
 #include "serialization.hpp"
 #include "assigner.hpp"
 
+#include "factory.hpp"
+
 namespace diy
 {
   // Local view of a distributed representation of a cover, a completely unstructured link
-  class Link
+  class Link: public Factory<Link>
   {
     public:
       using Neighbors = std::vector<BlockID>;
 
+                Link(Key)                           {}  // for Factory
+                Link()                              = default;
+                Link(const Link&)                   = default;
+                Link(Link&&)                        = default;
+      Link&     operator=(const Link&)              = default;
+      Link&     operator=(Link&&)                   = default;
       virtual   ~Link()                             {}  // need to be able to delete derived classes
 
       int       size() const                        { return static_cast<int>(neighbors_.size()); }
@@ -41,8 +49,6 @@ namespace diy
       virtual void  save(BinaryBuffer& bb) const    { diy::save(bb, neighbors_); }
       virtual void  load(BinaryBuffer& bb)          { diy::load(bb, neighbors_); }
 
-      virtual size_t id() const                     { return 0; }
-
     private:
       Neighbors neighbors_;
   };
@@ -50,32 +56,13 @@ namespace diy
   template<class Bounds_>
   class RegularLink;
 
-  typedef       RegularLink<DiscreteBounds>         RegularGridLink;
-  typedef       RegularLink<ContinuousBounds>       RegularContinuousLink;
-
-  // Selector between regular discrete and contious links given bounds type
-  template<class Bounds_>
-  struct RegularLinkSelector;
-
-  template<>
-  struct RegularLinkSelector<DiscreteBounds>
-  {
-    typedef     RegularGridLink         type;
-    static const size_t id = 1;
-  };
-
-  template<>
-  struct RegularLinkSelector<ContinuousBounds>
-  {
-    typedef     RegularContinuousLink   type;
-    static const size_t id = 2;
-  };
-
+  using RegularGridLink         = RegularLink<DiscreteBounds>;
+  using RegularContinuousLink   = RegularLink<ContinuousBounds>;
 
   // for a regular decomposition, it makes sense to address the neighbors by direction
   // and store local and neighbor bounds
   template<class Bounds_>
-  class RegularLink: public Link
+  class RegularLink: public Link::Registrar<RegularLink<Bounds_>>
   {
     public:
       typedef   Bounds_                             Bounds;
@@ -84,6 +71,8 @@ namespace diy
       typedef   std::vector<Direction>              DirVec;
 
     public:
+                RegularLink():
+                  dim_(0), core_(0), bounds_(0)               {}        // for Factory
                 RegularLink(int dim, const Bounds& core__, const Bounds& bounds__):
                   dim_(dim), core_(core__), bounds_(bounds__) {}
 
@@ -134,8 +123,6 @@ namespace diy
           diy::load(bb, wrap_);
       }
 
-      virtual size_t id() const                         { return RegularLinkSelector<Bounds>::id; }
-
     private:
       int       dim_;
 
@@ -153,22 +140,26 @@ namespace diy
   struct LinkFactory
   {
     public:
-      static Link*          create(size_t id)
+      static Link*          create(std::string name)
       {
-          // not pretty, but will do for now
-          if (id == 0)
-            return new Link;
-          else if (id == 1)
-            return new RegularGridLink(0, DiscreteBounds(0), DiscreteBounds(0));
-          else if (id == 2)
-            return new RegularContinuousLink(0, ContinuousBounds(0), ContinuousBounds(0));
-          else
-            return 0;
+          return Link::make(name);
       }
 
       inline static void    save(BinaryBuffer& bb, const Link* l);
       inline static Link*   load(BinaryBuffer& bb);
   };
+
+  namespace detail
+  {
+      inline void instantiate_common_regular_links()
+      {
+          // Instantiate the common types to register them
+          RegularLink<Bounds<int>>      rl_int;
+          RegularLink<Bounds<float>>    rl_float;
+          RegularLink<Bounds<double>>   rl_double;
+          RegularLink<Bounds<long>>     rl_long;
+      }
+  }
 }
 
 
@@ -184,7 +175,7 @@ diy::Link*
 diy::LinkFactory::
 load(BinaryBuffer& bb)
 {
-    size_t id;
+    std::string id;
     diy::load(bb, id);
     Link* l = create(id);
     l->load(bb);
