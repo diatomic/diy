@@ -125,6 +125,8 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_serialization_3_01_dynamic_point_3_01_c_00_01s___01_4_01_4.html">Serialization&lt; DynamicPoint&lt; C, s_ &gt; &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1_factory.html">Factory</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_grid.html">Grid</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_grid_ref.html">GridRef</a></td></tr>
@@ -134,12 +136,6 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1_link.html">Link</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1_regular_link.html">RegularLink</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_regular_link_selector.html">RegularLinkSelector</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_regular_link_selector_3_01_discrete_bounds_01_4.html">RegularLinkSelector&lt; DiscreteBounds &gt;</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_regular_link_selector_3_01_continuous_bounds_01_4.html">RegularLinkSelector&lt; ContinuousBounds &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_link_factory.html">LinkFactory</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -224,14 +220,12 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a99e753f7ea01a7f0acff31ec527ab373"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a99e753f7ea01a7f0acff31ec527ab373"></a>
 typedef <a class="el" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Communicator</b></td></tr>
 <tr class="separator:a99e753f7ea01a7f0acff31ec527ab373"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4150e46f5b07a2ae5fb79b57bd2cc972"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4150e46f5b07a2ae5fb79b57bd2cc972"></a>
-typedef <a class="el" href="classdiy_1_1_regular_link.html">RegularLink</a><br class="typebreak"/>
-&lt; <a class="el" href="structdiy_1_1_bounds.html">DiscreteBounds</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>RegularGridLink</b></td></tr>
-<tr class="separator:a4150e46f5b07a2ae5fb79b57bd2cc972"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1936bc7f7126e7c2e7b5ba87fabf0be4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1936bc7f7126e7c2e7b5ba87fabf0be4"></a>
-typedef <a class="el" href="classdiy_1_1_regular_link.html">RegularLink</a><br class="typebreak"/>
-&lt; <a class="el" href="structdiy_1_1_bounds.html">ContinuousBounds</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>RegularContinuousLink</b></td></tr>
-<tr class="separator:a1936bc7f7126e7c2e7b5ba87fabf0be4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa36079437dbda1911a18a28f58f50833"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa36079437dbda1911a18a28f58f50833"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>RegularGridLink</b> = <a class="el" href="classdiy_1_1_regular_link.html">RegularLink</a>&lt; <a class="el" href="structdiy_1_1_bounds.html">DiscreteBounds</a> &gt;</td></tr>
+<tr class="separator:aa36079437dbda1911a18a28f58f50833"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeb7b33d9f41b06fe1e229d25907746b0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aeb7b33d9f41b06fe1e229d25907746b0"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>RegularContinuousLink</b> = <a class="el" href="classdiy_1_1_regular_link.html">RegularLink</a>&lt; <a class="el" href="structdiy_1_1_bounds.html">ContinuousBounds</a> &gt;</td></tr>
+<tr class="separator:aeb7b33d9f41b06fe1e229d25907746b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a731d1a44974253fe318d4f8be9c8f9ca"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a731d1a44974253fe318d4f8be9c8f9ca"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>fast_mutex</b> = tthread::fast_mutex</td></tr>
 <tr class="separator:a731d1a44974253fe318d4f8be9c8f9ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -535,7 +529,7 @@ template&lt;class Bounds , class Point , class OutIter , class Coordinate &gt; <
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Nov 7 2018 17:57:28 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Nov 12 2018 18:58:37 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

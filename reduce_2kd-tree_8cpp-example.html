@@ -248,7 +248,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">  <span class="comment">// verify neighbor bounds</span></div>
 <div class="line">  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; link-&gt;size(); ++i)</div>
 <div class="line">  {</div>
-<div class="line">      <span class="keywordtype">int</span> nbr_gid = link-&gt;<a name="a10"></a>target(i).<a name="a11"></a>gid;</div>
+<div class="line">      <span class="keywordtype">int</span> nbr_gid = link-&gt;target(i).gid;</div>
 <div class="line">      <span class="keywordflow">if</span> (link-&gt;bounds(i) != b-&gt;block_bounds[nbr_gid])</div>
 <div class="line">      {</div>
 <div class="line">          fmt::print(stderr, <span class="stringliteral">&quot;Warning: bounds don&#39;t match {} -&gt; {}\n&quot;</span>, cp.gid(), link-&gt;target(i).gid);</div>
@@ -312,22 +312,22 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">}</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// for debugging: everybody sends their bounds to everybody else</span></div>
-<div class="line"><span class="keywordtype">void</span> exchange_bounds(<span class="keywordtype">void</span>* b_, <span class="keyword">const</span> <a name="_a12"></a><a class="code" href="structdiy_1_1_reduce_proxy.html">diy::ReduceProxy</a>&amp; srp)</div>
+<div class="line"><span class="keywordtype">void</span> exchange_bounds(<span class="keywordtype">void</span>* b_, <span class="keyword">const</span> <a name="_a10"></a><a class="code" href="structdiy_1_1_reduce_proxy.html">diy::ReduceProxy</a>&amp; srp)</div>
 <div class="line">{</div>
 <div class="line">  Block*   b   = <span class="keyword">static_cast&lt;</span>Block*<span class="keyword">&gt;</span>(b_);</div>
 <div class="line"></div>
-<div class="line">  <span class="keywordflow">if</span> (srp.<a name="a13"></a><a class="code" href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">round</a>() == 0)</div>
-<div class="line">      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; srp.<a name="a14"></a><a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().<a name="a15"></a>size(); ++i)</div>
+<div class="line">  <span class="keywordflow">if</span> (srp.<a name="a11"></a><a class="code" href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">round</a>() == 0)</div>
+<div class="line">      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; srp.<a name="a12"></a><a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().<a name="a13"></a>size(); ++i)</div>
 <div class="line">      {</div>
-<div class="line">          RCLink* link = <span class="keyword">static_cast&lt;</span>RCLink*<span class="keyword">&gt;</span>(srp.<a name="a16"></a>master()-&gt;<a name="a17"></a>link(srp.master()-&gt;<a name="a18"></a><a class="code" href="classdiy_1_1_master.html#a87bc338b26092730c23983ee40104230">lid</a>(srp.gid())));</div>
-<div class="line">          srp.<a name="a19"></a><a class="code" href="structdiy_1_1_master_1_1_proxy.html#a05bcb6fd6968e054c0b2f818c6cd24de">enqueue</a>(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().target(i), link-&gt;bounds());</div>
+<div class="line">          RCLink* link = <span class="keyword">static_cast&lt;</span>RCLink*<span class="keyword">&gt;</span>(srp.<a name="a14"></a>master()-&gt;<a name="a15"></a>link(srp.master()-&gt;<a name="a16"></a><a class="code" href="classdiy_1_1_master.html#a87bc338b26092730c23983ee40104230">lid</a>(srp.gid())));</div>
+<div class="line">          srp.<a name="a17"></a><a class="code" href="structdiy_1_1_master_1_1_proxy.html#a05bcb6fd6968e054c0b2f818c6cd24de">enqueue</a>(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().<a name="a18"></a>target(i), link-&gt;bounds());</div>
 <div class="line">      }</div>
 <div class="line">  <span class="keywordflow">else</span></div>
 <div class="line">  {</div>
-<div class="line">      b-&gt;block_bounds.resize(srp.<a name="a20"></a><a class="code" href="structdiy_1_1_reduce_proxy.html#a4468710ba18007a4be74aa46b9e98386">in_link</a>().size());</div>
+<div class="line">      b-&gt;block_bounds.resize(srp.<a name="a19"></a><a class="code" href="structdiy_1_1_reduce_proxy.html#a4468710ba18007a4be74aa46b9e98386">in_link</a>().size());</div>
 <div class="line">      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a4468710ba18007a4be74aa46b9e98386">in_link</a>().size(); ++i)</div>
 <div class="line">      {</div>
-<div class="line">        assert(i == srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a4468710ba18007a4be74aa46b9e98386">in_link</a>().target(i).gid);</div>
+<div class="line">        assert(i == srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a4468710ba18007a4be74aa46b9e98386">in_link</a>().target(i).<a name="a20"></a>gid);</div>
 <div class="line">        srp.<a name="a21"></a><a class="code" href="structdiy_1_1_master_1_1_proxy.html#ad7af65dcf357c32fe550b82a872d8692">dequeue</a>(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a4468710ba18007a4be74aa46b9e98386">in_link</a>().target(i).gid, b-&gt;block_bounds[i]);</div>
 <div class="line">      }</div>
 <div class="line">  }</div>
@@ -444,7 +444,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Nov 7 2018 17:57:27 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Nov 12 2018 18:58:36 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

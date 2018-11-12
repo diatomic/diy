@@ -109,21 +109,20 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a570927140c6567a89b51bdb03e7c2330"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a570927140c6567a89b51bdb03e7c2330"></a>
-typedef Bounds_&#160;</td><td class="memItemRight" valign="bottom"><b>Bounds</b></td></tr>
-<tr class="separator:a570927140c6567a89b51bdb03e7c2330"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a920ce79023c009d1d4a0869b4bdc186b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a920ce79023c009d1d4a0869b4bdc186b"></a>
-typedef <a class="el" href="structdiy_1_1_bounds_value.html">BoundsValue</a>&lt; Bounds &gt;::type&#160;</td><td class="memItemRight" valign="bottom"><b>Coordinate</b></td></tr>
-<tr class="separator:a920ce79023c009d1d4a0869b4bdc186b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abef6a4d58fc70932dbc373a57807bd77"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abef6a4d58fc70932dbc373a57807bd77"></a>
-typedef <a class="el" href="structdiy_1_1_regular_link_selector.html">RegularLinkSelector</a><br class="typebreak"/>
-&lt; Bounds &gt;::type&#160;</td><td class="memItemRight" valign="bottom"><b>Link</b></td></tr>
-<tr class="separator:abef6a4d58fc70932dbc373a57807bd77"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9194d38a3a3583a91d6734dc4ae7bbd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae9194d38a3a3583a91d6734dc4ae7bbd"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>Bounds</b> = Bounds_</td></tr>
+<tr class="separator:ae9194d38a3a3583a91d6734dc4ae7bbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a184b0fa132ee3798db3f5ba07d58bf20"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a184b0fa132ee3798db3f5ba07d58bf20"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>Coordinate</b> = typename <a class="el" href="structdiy_1_1_bounds_value.html">BoundsValue</a>&lt; Bounds &gt;::type</td></tr>
+<tr class="separator:a184b0fa132ee3798db3f5ba07d58bf20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21cd03ebb8c9bd0754e81536d1af0882"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a21cd03ebb8c9bd0754e81536d1af0882"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>Link</b> = <a class="el" href="classdiy_1_1_regular_link.html">RegularLink</a>&lt; Bounds &gt;</td></tr>
+<tr class="separator:a21cd03ebb8c9bd0754e81536d1af0882"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a53d6802d480d1237b0a5237015dc709c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a53d6802d480d1237b0a5237015dc709c"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>Creator</b> = std::function&lt; void(int, Bounds, Bounds, Bounds, Link)&gt;</td></tr>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>Creator</b> = std::function&lt; void(int, Bounds, Bounds, Bounds, <a class="el" href="classdiy_1_1_regular_link.html">Link</a>)&gt;</td></tr>
 <tr class="separator:a53d6802d480d1237b0a5237015dc709c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abd90027671d39101e6949aa319317f97"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abd90027671d39101e6949aa319317f97"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>Updater</b> = std::function&lt; void(int, int, Bounds, Bounds, Bounds, Link)&gt;</td></tr>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>Updater</b> = std::function&lt; void(int, int, Bounds, Bounds, Bounds, <a class="el" href="classdiy_1_1_regular_link.html">Link</a>)&gt;</td></tr>
 <tr class="separator:abd90027671d39101e6949aa319317f97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae12dbdd10d25d4c6f1c9905736c6680d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae12dbdd10d25d4c6f1c9905736c6680d"></a>
 typedef std::vector&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>BoolVector</b></td></tr>
@@ -229,7 +228,7 @@ DivisionsVector&#160;</td><td class="memItemRight" valign="bottom"><b>divisions<
 struct diy::RegularDecomposer&lt; Bounds_ &gt;</h3>
 
 <p>Decomposes a regular (discrete or continuous) domain into even blocks; creates Links with <a class="el" href="structdiy_1_1_bounds.html">Bounds</a> along the way. </p>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="decomposition_2regular-decomposer-long_8cpp-example.html#_a13">decomposition/regular-decomposer-long.cpp</a>, <a class="el" href="decomposition_2regular-decomposer-short_8cpp-example.html#_a13">decomposition/regular-decomposer-short.cpp</a>, <a class="el" href="reduce_2all-to-all_8cpp-example.html#_a2">reduce/all-to-all.cpp</a>, <a class="el" href="reduce_2merge-reduce_8cpp-example.html#_a24">reduce/merge-reduce.cpp</a>, <a class="el" href="reduce_2sort_8cpp-example.html#_a3">reduce/sort.cpp</a>, and <a class="el" href="reduce_2swap-reduce_8cpp-example.html#_a24">reduce/swap-reduce.cpp</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="decomposition_2regular-decomposer-long_8cpp-example.html#_a12">decomposition/regular-decomposer-long.cpp</a>, <a class="el" href="decomposition_2regular-decomposer-short_8cpp-example.html#_a12">decomposition/regular-decomposer-short.cpp</a>, <a class="el" href="reduce_2all-to-all_8cpp-example.html#_a2">reduce/all-to-all.cpp</a>, <a class="el" href="reduce_2merge-reduce_8cpp-example.html#_a24">reduce/merge-reduce.cpp</a>, <a class="el" href="reduce_2sort_8cpp-example.html#_a3">reduce/sort.cpp</a>, and <a class="el" href="reduce_2swap-reduce_8cpp-example.html#_a24">reduce/swap-reduce.cpp</a>.</dd>
 </dl></div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a9447fd42149c22e1f896c01b54069dc1"></a>
 <div class="memitem">
@@ -315,7 +314,7 @@ template&lt;class Bounds_&gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Nov 7 2018 17:57:28 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Nov 12 2018 18:58:37 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

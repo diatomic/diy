@@ -26,6 +26,8 @@
 ./classdiy_1_1_external_storage-members.html
 ./classdiy_1_1_external_storage.html
 ./classdiy_1_1_external_storage.png
+./classdiy_1_1_factory-members.html
+./classdiy_1_1_factory.html
 ./classdiy_1_1_file_storage-members.html
 ./classdiy_1_1_file_storage.html
 ./classdiy_1_1_file_storage.png
@@ -184,6 +186,7 @@
 ./examples.html
 ./execution_8hpp_source.html
 ./extra.css
+./factory_8hpp_source.html
 ./files.html
 ./format_8h_source.html
 ./ftv2blank.png
@@ -468,6 +471,9 @@
 ./structdiy_1_1_direction.png
 ./structdiy_1_1_dynamic_point_1_1rebind-members.html
 ./structdiy_1_1_dynamic_point_1_1rebind.html
+./structdiy_1_1_factory_1_1_registrar-members.html
+./structdiy_1_1_factory_1_1_registrar.html
+./structdiy_1_1_factory_1_1_registrar.png
 ./structdiy_1_1_grid-members.html
 ./structdiy_1_1_grid.html
 ./structdiy_1_1_grid.png
@@ -551,11 +557,6 @@
 ./structdiy_1_1_regular_broadcast_partners.png
 ./structdiy_1_1_regular_decomposer-members.html
 ./structdiy_1_1_regular_decomposer.html
-./structdiy_1_1_regular_link_selector.html
-./structdiy_1_1_regular_link_selector_3_01_continuous_bounds_01_4-members.html
-./structdiy_1_1_regular_link_selector_3_01_continuous_bounds_01_4.html
-./structdiy_1_1_regular_link_selector_3_01_discrete_bounds_01_4-members.html
-./structdiy_1_1_regular_link_selector_3_01_discrete_bounds_01_4.html
 ./structdiy_1_1_regular_merge_partners-members.html
 ./structdiy_1_1_regular_merge_partners.html
 ./structdiy_1_1_regular_merge_partners.png

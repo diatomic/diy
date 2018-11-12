@@ -119,7 +119,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">                      &lt;&lt; link-&gt;bounds().min[2] &lt;&lt; <span class="stringliteral">&quot; - &quot;</span></div>
 <div class="line">                      &lt;&lt; link-&gt;bounds().max[0] &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; link-&gt;bounds().max[1] &lt;&lt; <span class="charliteral">&#39; &#39;</span></div>
 <div class="line">                      &lt;&lt; link-&gt;bounds().max[2] &lt;&lt; <span class="stringliteral">&quot; : &quot;</span></div>
-<div class="line">                      &lt;&lt; link-&gt;<a name="a7"></a>size()   &lt;&lt; <span class="charliteral">&#39; &#39;</span> <span class="comment">//&lt;&lt; std::endl</span></div>
+<div class="line">                      &lt;&lt; link-&gt;size()   &lt;&lt; <span class="charliteral">&#39; &#39;</span> <span class="comment">//&lt;&lt; std::endl</span></div>
 <div class="line">                      &lt;&lt; std::dec</div>
 <div class="line">                      &lt;&lt; std::endl;</div>
 <div class="line">        }</div>
@@ -127,20 +127,20 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"></div>
 <div class="line"><span class="keywordtype">int</span> main(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>* argv[])</div>
 <div class="line">{</div>
-<div class="line">    <a name="_a8"></a><a class="code" href="structdiy_1_1mpi_1_1environment.html">diy::mpi::environment</a>     env(argc, argv);         <span class="comment">// diy equivalent of MPI_Init</span></div>
-<div class="line">    <a name="_a9"></a><a class="code" href="classdiy_1_1mpi_1_1communicator.html">diy::mpi::communicator</a>    world;                   <span class="comment">// diy equivalent of MPI communicator</span></div>
+<div class="line">    <a name="_a7"></a><a class="code" href="structdiy_1_1mpi_1_1environment.html">diy::mpi::environment</a>     env(argc, argv);         <span class="comment">// diy equivalent of MPI_Init</span></div>
+<div class="line">    <a name="_a8"></a><a class="code" href="classdiy_1_1mpi_1_1communicator.html">diy::mpi::communicator</a>    world;                   <span class="comment">// diy equivalent of MPI communicator</span></div>
 <div class="line"></div>
 <div class="line">    <span class="keywordtype">int</span>                       size    = 8;             <span class="comment">// total number of MPI processes</span></div>
 <div class="line">    <span class="keywordtype">int</span>                       nblocks = 32;            <span class="comment">// total number of blocks in global domain</span></div>
-<div class="line">    <a name="_a10"></a><a class="code" href="classdiy_1_1_contiguous_assigner.html">diy::ContiguousAssigner</a>   assigner(size, nblocks);</div>
+<div class="line">    <a name="_a9"></a><a class="code" href="classdiy_1_1_contiguous_assigner.html">diy::ContiguousAssigner</a>   assigner(size, nblocks);</div>
 <div class="line"></div>
 <div class="line">    Bounds domain(3);                                   <span class="comment">// global data size</span></div>
 <div class="line">    domain.min[0] = domain.min[1] = domain.min[2] = 0;</div>
 <div class="line">    domain.max[0] = domain.max[1] = domain.max[2] = 255;</div>
 <div class="line"></div>
-<div class="line">    <span class="keywordtype">int</span> rank = world.<a name="a11"></a>rank();                           <span class="comment">// MPI rank of this process</span></div>
+<div class="line">    <span class="keywordtype">int</span> rank = world.<a name="a10"></a>rank();                           <span class="comment">// MPI rank of this process</span></div>
 <div class="line">    std::cout &lt;&lt; <span class="stringliteral">&quot;Rank &quot;</span> &lt;&lt; rank &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt; std::endl;</div>
-<div class="line">    <a name="_a12"></a><a class="code" href="classdiy_1_1_master.html">diy::Master</a> master(world,</div>
+<div class="line">    <a name="_a11"></a><a class="code" href="classdiy_1_1_master.html">diy::Master</a> master(world,</div>
 <div class="line">                       1,                              <span class="comment">// one thread</span></div>
 <div class="line">                       -1,                             <span class="comment">// all blocks in memory</span></div>
 <div class="line">                       &amp;Block::create,</div>
@@ -167,7 +167,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"></div>
 <div class="line">    <span class="comment">// either create the regular decomposer and call its decompose function</span></div>
 <div class="line">    <span class="comment">// (having the decomposer available is useful for its other member functions</span></div>
-<div class="line">    <a name="_a13"></a><a class="code" href="structdiy_1_1_regular_decomposer.html">diy::RegularDecomposer&lt;Bounds&gt;</a> decomposer(3,</div>
+<div class="line">    <a name="_a12"></a><a class="code" href="structdiy_1_1_regular_decomposer.html">diy::RegularDecomposer&lt;Bounds&gt;</a> decomposer(3,</div>
 <div class="line">                                              domain,</div>
 <div class="line">                                              nblocks,</div>
 <div class="line">                                              share_face,</div>
@@ -181,7 +181,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Nov 7 2018 17:57:27 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Nov 12 2018 18:58:36 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

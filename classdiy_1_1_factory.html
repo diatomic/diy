@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>DIY: diy::RegularLinkSelector&lt; ContinuousBounds &gt; Struct Template Reference</title>
+<title>DIY: diy::Factory&lt; Base, Args &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -87,38 +87,52 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="namespacediy.html">diy</a></li><li class="navelem"><a class="el" href="structdiy_1_1_regular_link_selector_3_01_continuous_bounds_01_4.html">RegularLinkSelector< ContinuousBounds ></a></li>  </ul>
+<li class="navelem"><a class="el" href="namespacediy.html">diy</a></li><li class="navelem"><a class="el" href="classdiy_1_1_factory.html">Factory</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#pub-types">Public Types</a> &#124;
-<a href="#pub-static-attribs">Static Public Attributes</a> &#124;
-<a href="structdiy_1_1_regular_link_selector_3_01_continuous_bounds_01_4-members.html">List of all members</a>  </div>
+<a href="#nested-classes">Classes</a> &#124;
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="classdiy_1_1_factory-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">diy::RegularLinkSelector&lt; ContinuousBounds &gt; Struct Template Reference</div>  </div>
+<div class="title">diy::Factory&lt; Base, Args &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
-Public Types</h2></td></tr>
-<tr class="memitem:ab4ef6515bddea09757efb10dffd94704"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab4ef6515bddea09757efb10dffd94704"></a>
-typedef <a class="el" href="classdiy_1_1_regular_link.html">RegularContinuousLink</a>&#160;</td><td class="memItemRight" valign="bottom"><b>type</b></td></tr>
-<tr class="separator:ab4ef6515bddea09757efb10dffd94704"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_factory_1_1_registrar.html">Registrar</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
-Static Public Attributes</h2></td></tr>
-<tr class="memitem:a7b3a983931382c7c3d09541907fe98cd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7b3a983931382c7c3d09541907fe98cd"></a>
-static const size_t&#160;</td><td class="memItemRight" valign="bottom"><b>id</b> = 2</td></tr>
-<tr class="separator:a7b3a983931382c7c3d09541907fe98cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a4831a3137f3afc9041afa976e5225383"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4831a3137f3afc9041afa976e5225383"></a>
+virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><b>id</b> () const </td></tr>
+<tr class="separator:a4831a3137f3afc9041afa976e5225383"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a31e8966cefb22341510beb6aabd6618d"><td class="memTemplParams" colspan="2"><a class="anchor" id="a31e8966cefb22341510beb6aabd6618d"></a>
+template&lt;class... T&gt; </td></tr>
+<tr class="memitem:a31e8966cefb22341510beb6aabd6618d"><td class="memTemplItemLeft" align="right" valign="top">static Base *&#160;</td><td class="memTemplItemRight" valign="bottom"><b>make</b> (const std::string &amp;s, T &amp;&amp;...args)</td></tr>
+<tr class="separator:a31e8966cefb22341510beb6aabd6618d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:a1743571731be68c52168bede2413015f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1743571731be68c52168bede2413015f"></a>
+friend&#160;</td><td class="memItemRight" valign="bottom"><b>Base</b></td></tr>
+<tr class="separator:a1743571731be68c52168bede2413015f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<hr/>The documentation for this struct was generated from the following file:<ul>
-<li>include/diy/<a class="el" href="link_8hpp_source.html">link.hpp</a></li>
+<hr/>The documentation for this class was generated from the following file:<ul>
+<li>include/diy/<a class="el" href="factory_8hpp_source.html">factory.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Nov 7 2018 17:57:28 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Nov 12 2018 18:58:37 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
