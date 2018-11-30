@@ -1,5 +1,5 @@
-#ifndef DIY_COVER_HPP
-#define DIY_COVER_HPP
+#ifndef DIY_LINK_HPP
+#define DIY_LINK_HPP
 
 #include <vector>
 #include <map>
@@ -99,7 +99,7 @@ namespace diy
 
       void      swap(RegularLink& other)                { Link::swap(other); dir_map_.swap(other.dir_map_); dir_vec_.swap(other.dir_vec_); nbr_bounds_.swap(other.nbr_bounds_); std::swap(dim_, other.dim_); wrap_.swap(other.wrap_); std::swap(core_, other.core_); std::swap(bounds_, other.bounds_); }
 
-      void      save(BinaryBuffer& bb) const
+      void      save(BinaryBuffer& bb) const override
       {
           Link::save(bb);
           diy::save(bb, dim_);
@@ -111,7 +111,7 @@ namespace diy
           diy::save(bb, wrap_);
       }
 
-      void      load(BinaryBuffer& bb)
+      void      load(BinaryBuffer& bb) override
       {
           Link::load(bb);
           diy::load(bb, dim_);
@@ -135,7 +135,88 @@ namespace diy
       std::vector<Direction>    wrap_;
   };
 
-  // Other cover candidates: KDTreeLink, AMRGridLink
+  struct AMRLink: public Link::Registrar<AMRLink>
+  {
+    public:
+      using Bounds      = DiscreteBounds;
+      using Directions  = std::vector<Direction>;
+      using Point       = Bounds::Point;
+
+      struct Description
+      {
+          int       level       { -1 };
+          Point     refinement  { 0 };      // refinement of this level w.r.t. level 0
+          Bounds    core        { 0 };
+          Bounds    bounds      { 0 };      // with ghosts
+
+                    Description() = default;
+                    Description(int level_, Point refinement_, Bounds core_, Bounds bounds_):
+                        level(level_), refinement(refinement_), core(core_), bounds(bounds_)    {}
+      };
+      using Descriptions = std::vector<Description>;
+
+    public:
+                    AMRLink(int dim, int level, Point refinement, const Bounds& core, const Bounds& bounds):
+                        dim_(dim), local_ { level, refinement, core, bounds }               {}
+                    AMRLink(int dim, int level, int refinement, const Bounds& core, const Bounds& bounds):
+                        AMRLink(dim, level, refinement * Point::one(dim), core, bounds)     {}
+                    AMRLink(): AMRLink(0, -1, 0, Bounds(0), Bounds(0))                      {}        // for Factory
+
+      // dimension
+      int           dimension() const                       { return dim_; }
+
+      // local information
+      int           level() const                           { return local_.level; }
+      int           level(int i) const                      { return nbr_descriptions_[i].level; }
+      Point         refinement() const                      { return local_.refinement; }
+      Point         refinement(int i) const                 { return nbr_descriptions_[i].refinement; }
+
+      // wrap
+      void          add_wrap(Direction dir)                 { wrap_.push_back(dir); }
+      const Directions&
+                    wrap() const                            { return wrap_; }
+
+      // bounds
+      const Bounds& core() const                            { return local_.core; }
+      Bounds&       core()                                  { return local_.core; }
+      const Bounds& bounds() const                          { return local_.bounds; }
+      Bounds&       bounds()                                { return local_.bounds; }
+      const Bounds& core(int i) const                       { return nbr_descriptions_[i].core; }
+      const Bounds& bounds(int i) const                     { return nbr_descriptions_[i].bounds; }
+      void          add_bounds(int level_,
+                               Point refinement_,
+                               const Bounds& core_,
+                               const Bounds& bounds_)       { nbr_descriptions_.emplace_back(Description {level_, refinement_, core_, bounds_}); }
+      void          add_bounds(int level_,
+                               int refinement_,
+                               const Bounds& core_,
+                               const Bounds& bounds_)       { add_bounds(level_, refinement_ * Point::one(dim_), core_, bounds_); }
+
+      void          save(BinaryBuffer& bb) const override
+      {
+          Link::save(bb);
+          diy::save(bb, dim_);
+          diy::save(bb, local_);
+          diy::save(bb, nbr_descriptions_);
+          diy::save(bb, wrap_);
+      }
+
+      void          load(BinaryBuffer& bb) override
+      {
+          Link::load(bb);
+          diy::load(bb, dim_);
+          diy::load(bb, local_);
+          diy::load(bb, nbr_descriptions_);
+          diy::load(bb, wrap_);
+      }
+
+    private:
+        int                         dim_;
+
+        Description                 local_;
+        Descriptions                nbr_descriptions_;
+        Directions                  wrap_;
+  };
 
   struct LinkFactory
   {
@@ -160,6 +241,26 @@ namespace diy
           RegularLink<Bounds<long>>     rl_long;
       }
   }
+
+    template<>
+    struct Serialization<diy::AMRLink::Description>
+    {
+        static void         save(diy::BinaryBuffer& bb, const diy::AMRLink::Description& x)
+        {
+            diy::save(bb, x.level);
+            diy::save(bb, x.refinement);
+            diy::save(bb, x.core);
+            diy::save(bb, x.bounds);
+        }
+
+        static void         load(diy::BinaryBuffer& bb, diy::AMRLink::Description& x)
+        {
+            diy::load(bb, x.level);
+            diy::load(bb, x.refinement);
+            diy::load(bb, x.core);
+            diy::load(bb, x.bounds);
+        }
+    };
 }
 
 
@@ -214,4 +315,4 @@ direction(Direction dir) const
     return it->second;
 }
 
-#endif
+#endif      // DIY_LINK_HPP

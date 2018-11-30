@@ -5,5 +5,6 @@
 - Make geometry functions in `include/diy/pick.hpp` generic with respect to the
   floating point type.
 - Change `LinkFactory` mechanism to make link serialization generic.
+- Add `AMRLink` in `include/diy/link.hpp`
 
 # Version 3.5.0
