@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['rebind',['rebind',['../structdiy_1_1_dynamic_point_1_1rebind.html',1,'diy::DynamicPoint']]],
   ['rebind',['rebind',['../structdiy_1_1_point_1_1rebind.html',1,'diy::Point']]],
+  ['rebind',['rebind',['../structdiy_1_1_dynamic_point_1_1rebind.html',1,'diy::DynamicPoint']]],
   ['rebind',['rebind',['../structdiy_1_1_grid_1_1rebind.html',1,'diy::Grid']]],
   ['recursive_5fmutex',['recursive_mutex',['../structdiy_1_1recursive__mutex.html',1,'diy']]],
   ['reduceproxy',['ReduceProxy',['../structdiy_1_1_reduce_proxy.html',1,'diy']]],

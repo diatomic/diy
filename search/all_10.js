@@ -10,6 +10,7 @@ var searchData=
   ['serialization',['Serialization',['../group___serialization.html',1,'']]],
   ['serialization_3c_20bounds_3c_20c_20_3e_20_3e',['Serialization&lt; Bounds&lt; C &gt; &gt;',['../structdiy_1_1_serialization_3_01_bounds_3_01_c_01_4_01_4.html',1,'diy']]],
   ['serialization_3c_20direction_20_3e',['Serialization&lt; Direction &gt;',['../structdiy_1_1_serialization_3_01_direction_01_4.html',1,'diy']]],
+  ['serialization_3c_20diy_3a_3aamrlink_3a_3adescription_20_3e',['Serialization&lt; diy::AMRLink::Description &gt;',['../structdiy_1_1_serialization_3_01diy_1_1_a_m_r_link_1_1_description_01_4.html',1,'diy']]],
   ['serialization_3c_20dynamicpoint_3c_20c_2c_20s_5f_20_3e_20_3e',['Serialization&lt; DynamicPoint&lt; C, s_ &gt; &gt;',['../structdiy_1_1_serialization_3_01_dynamic_point_3_01_c_00_01s___01_4_01_4.html',1,'diy']]],
   ['serialization_3c_20io_3a_3adetail_3a_3agidoffsetcount_20_3e',['Serialization&lt; io::detail::GidOffsetCount &gt;',['../structdiy_1_1_serialization_3_01io_1_1detail_1_1_gid_offset_count_01_4.html',1,'diy']]],
   ['serialization_3c_20memorybuffer_20_3e',['Serialization&lt; MemoryBuffer &gt;',['../structdiy_1_1_serialization_3_01_memory_buffer_01_4.html',1,'diy']]],
@@ -44,6 +45,6 @@ var searchData=
   ['stringvalue_3c_20signed_20char_20_3e',['StringValue&lt; signed char &gt;',['../structfmt_1_1internal_1_1_value_1_1_string_value.html',1,'fmt::internal::Value']]],
   ['stringvalue_3c_20unsigned_20char_20_3e',['StringValue&lt; unsigned char &gt;',['../structfmt_1_1internal_1_1_value_1_1_string_value.html',1,'fmt::internal::Value']]],
   ['stringvalue_3c_20wchar_5ft_20_3e',['StringValue&lt; wchar_t &gt;',['../structfmt_1_1internal_1_1_value_1_1_string_value.html',1,'fmt::internal::Value']]],
-  ['systemerror',['SystemError',['../classfmt_1_1_system_error.html#a307c40b2542f53d7426b09319255d35c',1,'fmt::SystemError']]],
-  ['systemerror',['SystemError',['../classfmt_1_1_system_error.html',1,'fmt']]]
+  ['systemerror',['SystemError',['../classfmt_1_1_system_error.html',1,'fmt']]],
+  ['systemerror',['SystemError',['../classfmt_1_1_system_error.html#a307c40b2542f53d7426b09319255d35c',1,'fmt::SystemError']]]
 ];

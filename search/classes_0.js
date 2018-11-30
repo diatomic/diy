@@ -2,6 +2,7 @@ var searchData=
 [
   ['alignspec',['AlignSpec',['../structfmt_1_1_align_spec.html',1,'fmt']]],
   ['aligntypespec',['AlignTypeSpec',['../structfmt_1_1_align_type_spec.html',1,'fmt']]],
+  ['amrlink',['AMRLink',['../structdiy_1_1_a_m_r_link.html',1,'diy']]],
   ['arg',['Arg',['../structfmt_1_1internal_1_1_arg.html',1,'fmt::internal']]],
   ['argarray',['ArgArray',['../structfmt_1_1internal_1_1_arg_array.html',1,'fmt::internal']]],
   ['argarray_3c_20n_2c_20false_20_3e',['ArgArray&lt; N, false &gt;',['../structfmt_1_1internal_1_1_arg_array_3_01_n_00_01false_01_4.html',1,'fmt::internal']]],

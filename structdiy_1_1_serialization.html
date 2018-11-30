@@ -130,13 +130,14 @@ struct diy::Serialization&lt; T &gt;</h3>
 
 <p>Main interface to serialization, meant to be specialized for the types that require special handling. <code><a class="el" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b" title="Saves x to bb by calling diy::Serialization&lt;T&gt;::save(bb,x). ">diy::save()</a></code> and <code><a class="el" href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1" title="Loads x from bb by calling diy::Serialization&lt;T&gt;::load(bb,x). ">diy::load()</a></code> call the static member functions of this class. </p>
 <p>The default (unspecialized) version copies <code>sizeof(T)</code> bytes from <code>&amp;x</code> to or from <code>bb</code> via its <code><a class="el" href="structdiy_1_1_binary_buffer.html#a9d0ab30fe4978c730176a52ccd142cc3" title="copy count bytes from x into the buffer ">diy::BinaryBuffer::save_binary()</a></code> and <code><a class="el" href="structdiy_1_1_binary_buffer.html#a53b5ba450ddf8b6e9b262c552b2ef673" title="copy count bytes into x from the buffer ">diy::BinaryBuffer::load_binary()</a></code> functions. This works out perfectly for plain old data (e.g., simple structs). To save a more complicated type, one has to specialize <code><a class="el" href="structdiy_1_1_serialization.html" title="Main interface to serialization, meant to be specialized for the types that require special handling...">diy::Serialization</a>&lt;T&gt;</code> for that type. Specializations are already provided for <code>std::vector&lt;T&gt;</code>, <code>std::map&lt;K,V&gt;</code>, and <code>std::pair&lt;T,U&gt;</code>. As a result one can quickly add a specialization of one's own </p>
-</div><hr/>The documentation for this struct was generated from the following file:<ul>
+</div><hr/>The documentation for this struct was generated from the following files:<ul>
+<li>include/diy/<a class="el" href="dynamic-point_8hpp_source.html">dynamic-point.hpp</a></li>
 <li>include/diy/<a class="el" href="serialization_8hpp_source.html">serialization.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Nov 12 2018 18:58:37 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Nov 30 2018 22:28:46 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

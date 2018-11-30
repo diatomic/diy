@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['description',['Description',['../structdiy_1_1_a_m_r_link_1_1_description.html',1,'diy::AMRLink']]],
   ['dimk',['DimK',['../structdiy_1_1_regular_partners_1_1_dim_k.html',1,'diy::RegularPartners']]],
   ['direction',['Direction',['../structdiy_1_1_direction.html',1,'diy']]],
   ['dummyint',['DummyInt',['../structfmt_1_1internal_1_1_dummy_int.html',1,'fmt::internal']]],
