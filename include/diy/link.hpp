@@ -140,19 +140,27 @@ namespace diy
     public:
       using Bounds      = DiscreteBounds;
       using Directions  = std::vector<Direction>;
+      using Point       = Bounds::Point;
 
       struct Description
       {
-          int       level;
-          int       refinement;         // refinement of this level w.r.t. level 0
-          Bounds    core;
-          Bounds    bounds;             // with ghosts
+          int       level       { -1 };
+          Point     refinement  { 0 };      // refinement of this level w.r.t. level 0
+          Bounds    core        { 0 };
+          Bounds    bounds      { 0 };      // with ghosts
+
+                    Description() = default;
+                    Description(int level_, Point refinement_, Bounds core_, Bounds bounds_):
+                        level(level_), refinement(refinement_), core(core_), bounds(bounds_)    {}
       };
       using Descriptions = std::vector<Description>;
 
     public:
+                    AMRLink(int dim, int level, Point refinement, const Bounds& core, const Bounds& bounds):
+                        dim_(dim), local_ { level, refinement, core, bounds }               {}
                     AMRLink(int dim, int level, int refinement, const Bounds& core, const Bounds& bounds):
-                        dim_(dim), local_ { level, refinement, core, bounds }           {}
+                        AMRLink(dim, level, refinement * Point::one(dim), core, bounds)     {}
+                    AMRLink(): AMRLink(0, -1, 0, Bounds(0), Bounds(0))                      {}        // for Factory
 
       // dimension
       int           dimension() const                       { return dim_; }
@@ -160,8 +168,8 @@ namespace diy
       // local information
       int           level() const                           { return local_.level; }
       int           level(int i) const                      { return nbr_descriptions_[i].level; }
-      int           refinement() const                      { return local_.refinement; }
-      int           refinement(int i) const                 { return nbr_descriptions_[i].refinement; }
+      Point         refinement() const                      { return local_.refinement; }
+      Point         refinement(int i) const                 { return nbr_descriptions_[i].refinement; }
 
       // wrap
       void          add_wrap(Direction dir)                 { wrap_.push_back(dir); }
@@ -176,9 +184,13 @@ namespace diy
       const Bounds& core(int i) const                       { return nbr_descriptions_[i].core; }
       const Bounds& bounds(int i) const                     { return nbr_descriptions_[i].bounds; }
       void          add_bounds(int level_,
-                               int refinement_,
+                               Point refinement_,
                                const Bounds& core_,
                                const Bounds& bounds_)       { nbr_descriptions_.emplace_back(Description {level_, refinement_, core_, bounds_}); }
+      void          add_bounds(int level_,
+                               int refinement_,
+                               const Bounds& core_,
+                               const Bounds& bounds_)       { add_bounds(level_, refinement_ * Point::one(dim_), core_, bounds_); }
 
       void          save(BinaryBuffer& bb) const override
       {
@@ -197,8 +209,6 @@ namespace diy
           diy::load(bb, nbr_descriptions_);
           diy::load(bb, wrap_);
       }
-
-      virtual size_t id() const override                    { return 3; }
 
     private:
         int                         dim_;
