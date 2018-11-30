@@ -4,7 +4,6 @@
 #include <iostream>
 #include "constants.h"
 #include "dynamic-point.hpp"
-#include "serialization.hpp"
 
 namespace diy
 {

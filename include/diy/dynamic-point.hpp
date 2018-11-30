@@ -3,11 +3,10 @@
 
 #include <string>
 #include <sstream>
+#include <vector>
 
 #include "constants.h"
 #include "chobo/small_vector.hpp"
-
-#include "serialization.hpp"
 
 namespace diy
 {
@@ -38,8 +37,8 @@ class DynamicPoint: public chobo::small_vector<Coordinate_, static_size>
 
         unsigned            dimension() const                       { return Parent::size(); }
 
-        DynamicPoint        zero(int dim)                           { return DynamicPoint(dim, 0); }
-        DynamicPoint        one(int dim)                            { return DynamicPoint(dim, 1); }
+        static DynamicPoint zero(int dim)                           { return DynamicPoint(dim, 0); }
+        static DynamicPoint one(int dim)                            { return DynamicPoint(dim, 1); }
 
         DynamicPoint        drop(int dim) const                     { DynamicPoint p(dimension() - 1); unsigned c = 0; for (unsigned i = 0; i < dimension();   ++i) { if (i == dim) continue; p[c++] = (*this)[i]; } return p; }
         DynamicPoint        lift(int dim, Coordinate x) const       { DynamicPoint p(dimension() + 1); for (unsigned i = 0; i < dimension()+1; ++i) { if (i < dim) p[i] = (*this)[i]; else if (i == dim) p[i] = x; else if (i > dim) p[i] = (*this)[i-1]; } return p; }
@@ -115,8 +114,15 @@ std::istream&
 operator>>(std::istream& in, DynamicPoint<C,s_>& p)
 { return p.operator>>(in); }
 
-
 // Serialization
+template<class T>
+struct Serialization;
+struct BinaryBuffer;
+template<class T> void save(BinaryBuffer&, const T&);
+template<class T> void load(BinaryBuffer&, T&);
+template<class T> void save(BinaryBuffer&, const T*, size_t);
+template<class T> void load(BinaryBuffer&, T*, size_t);
+
 template<class C, size_t s_>
 struct Serialization<DynamicPoint<C, s_>>
 {
