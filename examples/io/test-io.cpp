@@ -45,8 +45,7 @@ int main(int argc, char* argv[])
   full_box.max[0] = full_box.max[1] = 3;
   sub_box.min[0] = sub_box.min[1] = 1;
   sub_box.max[0] = sub_box.max[1] = 2;
-  //writer.write_header<float>(2, full_box);
+  writer.write_header<float>(2, full_box);
   //writer.write(full_box, &data2[0]);
-  writer.write_header<float>(2, sub_box);
   writer.write(full_box, &data2[0], sub_box);
 }
