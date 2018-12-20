@@ -58,10 +58,10 @@ TEST_CASE("Test MPI-IO", "[io]")
     }
 }
 
-int main()
+int main(int argc, char** argv)
 {
   diy::mpi::environment env;
 
   Catch::Session session;
-  return session.run();
+  return session.run(argc, argv);
 }
