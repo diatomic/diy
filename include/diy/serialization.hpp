@@ -460,7 +460,7 @@ append_binary(const char* x, size_t count)
         } else
         {
             std::vector<char> tmp;
-            tmp.reserve(new_size * growth_multiplier());
+            tmp.reserve(new_size * static_cast<size_t>(growth_multiplier()));
             tmp.resize(cur_size);
 
             for (size_t i = 0; i < tmp.size(); ++i)
