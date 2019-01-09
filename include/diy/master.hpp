@@ -689,6 +689,7 @@ iexchange_(const    ICallback<Block>&   f,
            bool                         fine)
 {
     auto scoped = prof.scoped("iexchange");
+    DIY_UNUSED(scoped);
 
     // prepare for next round
     incoming_.erase(exchange_round_);
@@ -744,6 +745,7 @@ diy::Master::
 comm_exchange(GidSendOrder& gid_order, IExchangeInfo* iexchange)
 {
     auto scoped = prof.scoped("comm-exchange");
+    DIY_UNUSED(scoped);
 
     send_outgoing_queues(gid_order, false, iexchange);
 
@@ -852,6 +854,7 @@ diy::Master::
 icommunicate(IExchangeInfo* iexchange)
 {
     auto scoped = prof.scoped("icommunicate");
+    DIY_UNUSED(scoped);
 
     log->debug("Entering icommunicate()");
 
@@ -910,6 +913,7 @@ send_outgoing_queues(GidSendOrder&   gid_order,
                      IExchangeInfo*  iexchange)
 {
     auto scoped = prof.scoped("send-outgoing-queues");
+    DIY_UNUSED(scoped);
 
     if (iexchange)                                      // for iexchange, send queues from a single block
     {
@@ -1136,6 +1140,7 @@ diy::Master::
 check_incoming_queues(IExchangeInfo* iexchange)
 {
     auto scoped = prof.scoped("check-incoming-queues");
+    DIY_UNUSED(scoped);
 
     mpi::optional<mpi::status> ostatus = comm_.iprobe(mpi::any_source, tags::queue);
     while (ostatus)
