@@ -897,8 +897,6 @@ send_queue(int              from_gid,
         send_different_rank(from_gid, to_gid, to_proc, out_queue, remote, iexchange);
 }
 
-#if 1           // new version that only checks current queue for iexchange
-
 void
 diy::Master::
 send_outgoing_queues(GidSendOrder&   gid_order,
@@ -943,56 +941,6 @@ send_outgoing_queues(GidSendOrder&   gid_order,
         }
     }
 }
-
-# else      // original version that checks all queues
-
-void
-diy::Master::
-send_outgoing_queues(GidSendOrder&   gid_order,
-                     bool            remote,                     // TODO: are remote and iexchange mutually exclusive? If so, use single enum?
-                     IExchangeInfo*  iexchange)
-{
-    auto scoped = prof.scoped("send-outgoing-queues");
-
-    while (inflight_sends().size() < gid_order.limit && !gid_order.empty())
-    {
-        int from = gid_order.pop();
-
-        // move external queues going to our rank
-        move_external_local(from);
-
-        if (outgoing_[from].external != -1)
-            load_outgoing(from);
-
-        OutgoingQueues& outgoing = outgoing_[from].queues;
-        for (OutgoingQueues::iterator it = outgoing.begin(); it != outgoing.end(); ++it)
-        {
-            BlockID to_proc = it->first;
-            int     to      = to_proc.gid;
-            int     proc    = to_proc.proc;
-            log->debug("Processing queue:      {} <- {} of size {}", to, from, outgoing_[from].queues[to_proc].size());
-
-            // skip empty queues and hold queues shorter than some limit for some time
-            if ( iexchange &&
-                    (!it->second.size() || iexchange->hold(it->second.size())) )
-            {
-                log->debug("Skipping/holding empty/short queue:      {} <- {} of size {}\n", to, from, outgoing_[from].queues[to_proc].size());
-                continue;
-            }
-
-            // sending to same rank: simply swap buffers
-            if (iexchange)
-                iexchange->time_stamp_send();       // hold time begins counting from now
-            if (proc == comm_.rank())
-                send_same_rank(from, to, it->second, iexchange);
-            else
-                send_different_rank(from, to, proc, it->second, remote, iexchange);
-
-        }                                       // for (OutgoingQueues::iterator it ...
-    }                                           // while (inflight_sends().size() ...
-}
-
-#endif
 
 void
 diy::Master::
