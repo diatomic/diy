@@ -44,6 +44,9 @@ namespace diy
         using Parent::dimension;
         using Parent::operator[];
 
+        // enable inherited ctor
+        using Parent::Parent;
+
         // DM: This breaks the old behavior. Ideally, we'd explicitly deprecate
         //     this, but we need the default constructor in Serialization.  I
         //     believe I've fixed all uses of this In DIY proper. Hopefully, no
