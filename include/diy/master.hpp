@@ -704,35 +704,10 @@ iexchange_(const    ICallback<Block>&   f,
             bool done = f(block<Block>(i), cp);
             prof >> "callback";
 
-            int nundeq_after = 0;
-            int nunenq_after = 0;
-            for (size_t j = 0; j < cp.link()->size(); j++)
-            {
-                if (cp.incoming(cp.link()->target(j).gid))
-                    ++nundeq_after;
-                if (cp.outgoing(cp.link()->target(j)).size())
-                    ++nunenq_after;
-            }
-
-            done &= (nundeq_after == 0);
-            done &= (nunenq_after == 0);
+            done &= cp.empty_queues();
 
             prof << "work-counting";
-            int gid = cp.gid();
-            if (iexchange.done[gid] != done)
-            {
-                iexchange.done[gid] = done;
-                if (done)
-                {
-                    int work = iexchange.dec_work();
-                    log->debug("[{}] Decrementing work when switching done after callback, for {}: work = {}\n", comm_.rank(), gid, work);
-                }
-                else
-                {
-                    int work = iexchange.inc_work();
-                    log->debug("[{}] Incrementing work when switching done after callback, for {}: work = {}\n", comm_.rank(), gid, work);
-                }
-            }
+            iexchange.update_done(cp.gid(), done);
             prof >> "work-counting";
         }
 

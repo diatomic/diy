@@ -99,6 +99,8 @@ namespace diy
     OutgoingQueues*     outgoing() const                                { return outgoing_; }
     MemoryBuffer&       outgoing(const BlockID& to) const               { return (*outgoing_)[to]; }
 
+    inline bool         empty_queues() const;
+
 /**
  * \ingroup Communication
  * \brief Post an all-reduce collective using an existing communication proxy.
@@ -191,6 +193,22 @@ incoming(std::vector<int>& v) const
   for (IncomingQueues::const_iterator it = incoming_->begin(); it != incoming_->end(); ++it)
     v.push_back(it->first);
 }
+
+bool
+diy::Master::Proxy::
+empty_queues() const
+{
+    for (auto& x : *incoming())
+        if (x.second)
+            return false;
+
+    for (auto& x : *outgoing())
+        if (x.second.size())
+            return false;
+
+    return true;
+}
+
 
 template<class T, class Op>
 void

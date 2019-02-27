@@ -70,6 +70,9 @@ namespace diy
       inline bool       all_done();                             // get global all done status
       inline void       reset_work();                           // reset global work counter
       inline int        add_work(int work);                     // add work to global work counter
+
+      inline void       update_done(int gid, bool done_);
+
       int               inc_work()                              { return add_work(1); }   // increment global work counter
       int               dec_work()                              { return add_work(-1); }  // decremnent global work counter
 
@@ -145,6 +148,26 @@ not_done(int gid)
         log->debug("[{}] Incrementing work when switching done (on receipt): work = {}\n", gid, work);
     } else
         log->debug("[{}] Not done, no need to increment work\n", gid);
+}
+
+void
+diy::Master::IExchangeInfo::
+update_done(int gid, bool done_)
+{
+    if (done[gid] != done_)
+    {
+        done[gid] = done_;
+        if (done_)
+        {
+            int work = dec_work();
+            log->debug("[{}] Decrementing work when switching done after callback, for {}: work = {}\n", comm.rank(), gid, work);
+        }
+        else
+        {
+            int work = inc_work();
+            log->debug("[{}] Incrementing work when switching done after callback, for {}: work = {}\n", comm.rank(), gid, work);
+        }
+    }
 }
 
 diy::Master::InFlightRecv&
