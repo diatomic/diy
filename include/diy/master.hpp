@@ -92,7 +92,6 @@ namespace diy
       struct MessageInfo;
       struct InFlightSend;
       struct InFlightRecv;
-      struct tags;
 
       struct GidSendOrder;
       struct IExchangeInfo;
@@ -285,7 +284,7 @@ namespace diy
       // Communicator functionality
       inline void       comm_exchange(GidSendOrder& gid_order, IExchangeInfo*    iexchange = 0);
       inline void       rcomm_exchange();    // possibly called in between block computations
-      inline bool       nudge();
+      inline bool       nudge(IExchangeInfo* iexchange = 0);
       inline void       send_queue(int from_gid, int to_gid, int to_proc, MemoryBuffer& out_queue, bool remote, IExchangeInfo* iexchange);
       inline void       send_outgoing_queues(GidSendOrder&   gid_order,
                                              bool            remote,
@@ -306,6 +305,11 @@ namespace diy
 
       // debug
       inline void       show_incoming_records() const;
+
+      struct tags       { enum {
+                                    queue,
+                                    iexchange
+                                }; };
 
     private:
       std::vector<Link*>    links_;
@@ -346,6 +350,7 @@ namespace diy
   { bool operator()(int i, const Master& master) const   { return !master.has_incoming(i); } };
 }
 
+#include "detail/master/iexchange.hpp"
 #include "detail/master/communication.hpp"
 #include "detail/master/collectives.hpp"
 #include "detail/master/commands.hpp"
@@ -688,9 +693,6 @@ iexchange_(const    ICallback<Block>&   f,
 
     IExchangeInfo iexchange(size(), comm_, min_queue_size, max_hold_time, fine);
     iexchange.add_work(size());                 // start with one work unit for each block
-    comm_.barrier();                            // make sure that everyone's original work is accounted for
-
-    int global_work_ = -1;
 
     do
     {
@@ -706,16 +708,20 @@ iexchange_(const    ICallback<Block>&   f,
 
             done &= cp.empty_queues();
 
+            log->debug("Done: {}", done);
+
             prof << "work-counting";
             iexchange.update_done(cp.gid(), done);
             prof >> "work-counting";
         }
 
-        prof << "global-work";
-        global_work_ = iexchange.global_work();
-        prof >> "global-work";
-    } while (global_work_ > 0);
-    log->debug("[{}] ==== Leaving iexchange ====\n", iexchange.comm.rank());
+        prof << "control";
+        iexchange.control();
+        prof >> "control";
+    } while (!iexchange.all_done());
+    log->info("[{}] ==== Leaving iexchange ====\n", iexchange.comm.rank());
+
+    comm_.barrier();
 
     outgoing_.clear();
 }
@@ -729,7 +735,7 @@ comm_exchange(GidSendOrder& gid_order, IExchangeInfo* iexchange)
 
     send_outgoing_queues(gid_order, false, iexchange);
 
-    while(nudge());                   // kick requests
+    while(nudge(iexchange));                // kick requests
 
     if (!iexchange || !iexchange->shortcut())
         check_incoming_queues(iexchange);
@@ -867,8 +873,9 @@ send_queue(int              from_gid,
            IExchangeInfo*   iexchange)
 {
     // skip empty queues and hold queues shorter than some limit for some time
-    if ( iexchange && (!out_queue.size() || iexchange->hold(out_queue.size())) )
+    if ( iexchange && (out_queue.size() == 0 || iexchange->hold(out_queue.size())) )
         return;
+    log->debug("[{}] Sending queue: {} <- {} of size {}, iexchange = {}", comm_.rank(), to_gid, from_gid, out_queue.size(), iexchange ? 1 : 0);
 
     if (iexchange)
         iexchange->time_stamp_send();       // hold time begins counting from now
@@ -1040,8 +1047,8 @@ send_different_rank(int from, int to, int proc, MemoryBuffer& bb, bool remote, I
         {
             if (iexchange)
             {
-                int work = iexchange->inc_work();
-                log->debug("[{}] Incrementing work when sending queue: work = {}\n", comm_.rank(), work);
+                iexchange->inc_work();
+                log->debug("[{}] Incrementing work when sending queue\n", comm_.rank());
             }
             inflight_send.request = comm_.issend(proc, tags::queue, buffer->buffer);
         }
@@ -1068,8 +1075,8 @@ send_different_rank(int from, int to, int proc, MemoryBuffer& bb, bool remote, I
             // add one unit of work for the entire large message (upon sending the head, not the individual pieces below)
             if (iexchange)
             {
-                int work = iexchange->inc_work();
-                log->debug("[{}] Incrementing work when sending the first piece: work = {}\n", comm_.rank(), work);
+                iexchange->inc_work();
+                log->debug("[{}] Incrementing work when sending the leading piece\n", comm_.rank());
             }
             inflight_send.request = comm_.issend(proc, tags::queue, hb->buffer);
         }
@@ -1090,7 +1097,14 @@ send_different_rank(int from, int to, int proc, MemoryBuffer& bb, bool remote, I
 
             inflight_send.info = info;
             if (remote || iexchange)
+            {
+                if (iexchange)
+                {
+                    iexchange->inc_work();
+                    log->debug("[{}] Incrementing work when sending non-leading piece\n", comm_.rank());
+                }
                 inflight_send.request = comm_.issend(proc, tags::queue, window);
+            }
             else
                 inflight_send.request = comm_.isend(proc, tags::queue, window);
             inflight_send.message = buffer;
@@ -1109,9 +1123,13 @@ check_incoming_queues(IExchangeInfo* iexchange)
     {
         InFlightRecv& ir = inflight_recv(ostatus->source());
 
-        ir.recv(comm_, *ostatus);     // possibly partial recv, in case of a multi-piece message
+        if (iexchange)
+            iexchange->inc_work();                      // increment work before sender's issend request can complete (so we are now responsible for the queue)
+        bool first_message = ir.recv(comm_, *ostatus);  // possibly partial recv, in case of a multi-piece message
+        if (!first_message && iexchange)
+            iexchange->dec_work();
 
-        if (ir.done)                 // all pieces assembled
+        if (ir.done)                // all pieces assembled
         {
             assert(ir.info.round >= exchange_round_);
             IncomingRound* in = &incoming_[ir.info.round];
@@ -1171,7 +1189,7 @@ flush(bool remote)
 
 bool
 diy::Master::
-nudge()
+nudge(IExchangeInfo* iexchange)
 {
   bool success = false;
   for (InFlightSendsList::iterator it = inflight_sends().begin(); it != inflight_sends().end();)
@@ -1181,6 +1199,11 @@ nudge()
     {
       success = true;
       it = inflight_sends().erase(it);
+      if (iexchange)
+      {
+          log->debug("[{}] message left, decrementing work", iexchange->comm.rank());
+          iexchange->dec_work();                // this message is receiver's responsibility now
+      }
     }
     else
     {
@@ -1217,48 +1240,6 @@ show_incoming_records() const
       }
     }
   }
-}
-
-// return global work status (for debugging)
-int
-diy::Master::IExchangeInfo::
-global_work()
-{
-    int global_work;
-    global_work_->fetch(global_work, 0, 0);
-    global_work_->flush_local(0);
-    return global_work;
-}
-
-// get global all done status
-bool
-diy::Master::IExchangeInfo::
-all_done()
-{
-    return global_work() == 0;
-}
-
-// reset global work counter
-void
-diy::Master::IExchangeInfo::
-reset_work()
-{
-    int val = 0;
-    global_work_->replace(val, 0, 0);
-    global_work_->flush(0);
-}
-
-// add arbitrary units of work to global work counter
-int
-diy::Master::IExchangeInfo::
-add_work(int work)
-{
-    int global_work;                                               // unused
-    global_work_->fetch_and_op(&work, &global_work, 0, 0, MPI_SUM);
-    global_work_->flush(0);
-    if (global_work + work < 0)
-        throw std::runtime_error(fmt::format("error: attempting to subtract {} units of work when global_work prior to subtraction = {}", work, global_work));
-    return global_work + work;
 }
 
 #endif
