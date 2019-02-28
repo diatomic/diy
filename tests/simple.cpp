@@ -160,11 +160,14 @@ int main(int argc, char* argv[])
   SimpleFixture::nblocks = std::max(world.size(), 2);
   bool help;
 
+  std::string log_level   = "info";
+
   // get command line arguments
   using namespace opts;
   Options ops;
   ops >> Option('b', "blocks", SimpleFixture::nblocks, "number of blocks")
       >> Option('t', "thread", SimpleFixture::threads, "number of threads")
+      >> Option('l', "log",    log_level,              "log level")
       >> Option('h', "help",   help,                   "show help");
   if (!ops.parse(argc,argv) || help)
   {
@@ -174,6 +177,8 @@ int main(int argc, char* argv[])
       return 1;
     }
   }
+
+  diy::create_logger(log_level);
 
   return session.run();
 }
