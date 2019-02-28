@@ -1,10 +1,11 @@
 namespace diy
 {
-    struct Master::tags             { enum { queue, piece }; };
+    struct Master::tags             { enum { queue }; };
 
     struct Master::MessageInfo
     {
         int from, to;
+        int nparts;
         int round;
     };
 
@@ -19,7 +20,7 @@ namespace diy
     struct Master::InFlightRecv
     {
         MemoryBuffer    message;
-        MessageInfo     info { -1, -1, -1 };
+        MessageInfo     info { -1, -1, -1, -1 };
         bool            done = false;
 
         inline void     recv(mpi::communicator& comm, const mpi::status& status);
@@ -193,19 +194,15 @@ recv(mpi::communicator& comm, const mpi::status& status)
         MemoryBuffer bb;
         comm.recv(status.source(), status.tag(), bb.buffer);
 
-        if (status.tag() == tags::piece)     // first piece is the header
+        diy::load_back(bb, info);
+        info.nparts--;
+        if (info.nparts > 0)        // multi-part message
         {
             size_t msg_size;
             diy::load(bb, msg_size);
-            diy::load(bb, info);
-
             message.buffer.reserve(msg_size);
-        }
-        else    // tags::queue
-        {
-            diy::load_back(bb, info);
+        } else
             message.swap(bb);
-        }
     }
     else
     {
@@ -218,9 +215,11 @@ recv(mpi::communicator& comm, const mpi::status& status)
         window.count = count;
 
         comm.recv(status.source(), status.tag(), window);
+
+        info.nparts--;
     }
 
-    if (status.tag() == tags::queue)
+    if (info.nparts == 0)
         done = true;
 }
 

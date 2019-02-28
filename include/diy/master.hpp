@@ -1026,7 +1026,7 @@ send_different_rank(int from, int to, int proc, MemoryBuffer& bb, bool remote, I
     std::shared_ptr<MemoryBuffer> buffer = std::make_shared<MemoryBuffer>();
     buffer->swap(bb);
 
-    MessageInfo info{from, to, exchange_round_};
+    MessageInfo info{from, to, 1, exchange_round_};
     // size fits in one message
     if (Serialization<MemoryBuffer>::size(*buffer) + Serialization<MessageInfo>::size(info) <= MAX_MPI_MESSAGE_COUNT)
     {
@@ -1052,6 +1052,7 @@ send_different_rank(int from, int to, int proc, MemoryBuffer& bb, bool remote, I
     else // large message gets broken into chunks
     {
         int npieces = static_cast<int>((buffer->size() + MAX_MPI_MESSAGE_COUNT - 1)/MAX_MPI_MESSAGE_COUNT);
+        info.nparts += npieces;
 
         // first send the head
         std::shared_ptr<MemoryBuffer> hb = std::make_shared<MemoryBuffer>();
@@ -1070,18 +1071,16 @@ send_different_rank(int from, int to, int proc, MemoryBuffer& bb, bool remote, I
                 int work = iexchange->inc_work();
                 log->debug("[{}] Incrementing work when sending the first piece: work = {}\n", comm_.rank(), work);
             }
-            inflight_send.request = comm_.issend(proc, tags::piece, hb->buffer);
+            inflight_send.request = comm_.issend(proc, tags::queue, hb->buffer);
         }
         else
-            inflight_send.request = comm_.isend(proc, tags::piece, hb->buffer);
+            inflight_send.request = comm_.isend(proc, tags::queue, hb->buffer);
         inflight_send.message = hb;
 
         // send the message pieces
         size_t msg_buff_idx = 0;
         for (int i = 0; i < npieces; ++i, msg_buff_idx += MAX_MPI_MESSAGE_COUNT)
         {
-            int tag = (i == (npieces - 1)) ? tags::queue : tags::piece;     // last piece is marked as queue, to indicate that we are done
-
             detail::VectorWindow<char> window;
             window.begin = &buffer->buffer[msg_buff_idx];
             window.count = std::min(MAX_MPI_MESSAGE_COUNT, buffer->size() - msg_buff_idx);
@@ -1091,9 +1090,9 @@ send_different_rank(int from, int to, int proc, MemoryBuffer& bb, bool remote, I
 
             inflight_send.info = info;
             if (remote || iexchange)
-                inflight_send.request = comm_.issend(proc, tag, window);
+                inflight_send.request = comm_.issend(proc, tags::queue, window);
             else
-                inflight_send.request = comm_.isend(proc, tag, window);
+                inflight_send.request = comm_.isend(proc, tags::queue, window);
             inflight_send.message = buffer;
         }
     }   // large message broken into pieces
@@ -1105,7 +1104,7 @@ check_incoming_queues(IExchangeInfo* iexchange)
 {
     auto scoped = prof.scoped("check-incoming-queues");
 
-    mpi::optional<mpi::status> ostatus = comm_.iprobe(mpi::any_source, mpi::any_tag);
+    mpi::optional<mpi::status> ostatus = comm_.iprobe(mpi::any_source, tags::queue);
     while (ostatus)
     {
         InFlightRecv& ir = inflight_recv(ostatus->source());
@@ -1124,7 +1123,7 @@ check_incoming_queues(IExchangeInfo* iexchange)
             ir.reset();
         }
 
-        ostatus = comm_.iprobe(mpi::any_source, mpi::any_tag);
+        ostatus = comm_.iprobe(mpi::any_source, tags::queue);
     }
 }
 
