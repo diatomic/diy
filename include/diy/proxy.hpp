@@ -135,6 +135,7 @@ namespace diy
     CollectivesList*    collectives() const                             { return collectives_; }
 
     Master*             master() const                                  { return master_; }
+    IExchangeInfo*      iexchange() const                               { return iexchange_; }
 
     private:
       int               gid_;
