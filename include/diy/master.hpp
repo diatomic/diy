@@ -1014,7 +1014,7 @@ send_same_rank(int from, int to, MemoryBuffer& bb, IExchangeInfo* iexchange)
             in_bb.append_binary(&bb.buffer[0], bb.size());
             bb.wipe();
         }
-        in_qr.size = bb.size();
+        in_qr.size = in_bb.size();
         in_qr.external = -1;
     }
 
