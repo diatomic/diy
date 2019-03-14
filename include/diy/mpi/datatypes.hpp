@@ -23,7 +23,7 @@ namespace detail
   template<>  inline MPI_Datatype  get_mpi_datatype<cpp_type>() { return mpi_type; }  \
   template<>  struct is_mpi_datatype<cpp_type>                  { typedef true_type type; };    \
   template<>  struct is_mpi_datatype< std::vector<cpp_type> >   { typedef true_type type; };    \
-  template<unsigned D>  \
+  template<size_t D>  \
               struct is_mpi_datatype< std::array<cpp_type,D> >  { typedef true_type type; };
 
   DIY_MPI_DATATYPE_MAP(char,                  MPI_BYTE);
@@ -59,7 +59,7 @@ namespace detail
     static int                  count(const VecU& x)    { return x.empty() ? 0 : (static_cast<int>(x.size()) * mpi_datatype<U>::count(x[0])); }
   };
 
-  template<class U, unsigned D>
+  template<class U, size_t D>
   struct mpi_datatype< std::array<U,D> >
   {
     typedef     std::array<U,D> ArrayU;
