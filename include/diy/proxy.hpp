@@ -30,7 +30,7 @@ namespace diy
     {
         OutgoingQueues& out = *outgoing_; save(out[to], x);
 
-        if (iexchange_ && iexchange_->fine())
+        if (iexchange_)
             iexchange_->set_shortcut(gid_, to);
 
         // TODO: for now, negative min_queue_size or max_hold_time indicates don't do fine-grain icommunicate at all
@@ -260,6 +260,9 @@ enqueue(const BlockID& to, const T* x, size_t n,
     else
         for (size_t i = 0; i < n; ++i)
             save(bb, x[i]);
+
+    if (iexchange_)
+        iexchange_->set_shortcut(gid_, to);
 
     if (iexchange_ && iexchange_->fine())
     {

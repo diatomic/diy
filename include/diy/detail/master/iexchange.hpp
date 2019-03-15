@@ -108,6 +108,9 @@ namespace diy
       BlockID                             block_id;             // block id of target of most recent enqueue
 
       bool                                fine_ = false;
+
+      // debug
+      double                              dud_start_time;
     };
 }
 
@@ -234,6 +237,9 @@ control()
     // initiate down-up-down protocol
     if (subtree_work_ == 0 && comm.rank() == 0 && down_up_down_ == 0)
     {
+        // debug
+        dud_start_time = MPI_Wtime();
+
         down_up_down_ = 1;
         reset_child_confirmations();
         if (child_confirmations)

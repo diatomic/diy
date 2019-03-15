@@ -35,6 +35,14 @@ namespace diy
   // which is hidden from blocks via a communicator proxy.
   class Master
   {
+      // debug
+      double send_outgoing_time     = 0.0;              // send outgoing queues time
+      double check_incoming_time    = 0.0;              // check incoming queues time
+      double order_gids_time        = 0.0;              // order_gids time
+      double consensus_time         = 0.0;              // consensus time
+      double callback_time          = 0.0;              // callback time
+      double icomm_time             = 0.0;              // icommunicate time
+
     public:
       struct ProcessBlock;
 
@@ -694,16 +702,22 @@ iexchange_(const    ICallback<Block>&   f,
     IExchangeInfo iexchange(size(), comm_, min_queue_size, max_hold_time, fine);
     iexchange.add_work(size());                 // start with one work unit for each block
 
+    // debug
+    double t0;                                  // temp. start times
+
     do
     {
         for (size_t i = 0; i < size(); i++)     // for all blocks
         {
-
+            t0 = MPI_Wtime();                       // debug
             icommunicate(&iexchange);            // TODO: separate comm thread std::thread t(icommunicate);
+            icomm_time += (MPI_Wtime() - t0);       // debug
             ProxyWithLink cp = proxy(i, &iexchange);
 
             prof << "callback";
+            t0 = MPI_Wtime();                       // debug
             bool done = f(block<Block>(i), cp);
+            callback_time += (MPI_Wtime() - t0);    // debug
             prof >> "callback";
 
             done &= cp.empty_queues();
@@ -711,17 +725,29 @@ iexchange_(const    ICallback<Block>&   f,
             log->debug("Done: {}", done);
 
             prof << "work-counting";
+            t0 = MPI_Wtime();                       // debug
             iexchange.update_done(cp.gid(), done);
+            consensus_time += (MPI_Wtime() - t0);   // debug
             prof >> "work-counting";
         }
 
         prof << "control";
+        t0 = MPI_Wtime();                           // debug
         iexchange.control();
+        consensus_time += (MPI_Wtime() - t0);       // debug
         prof >> "control";
     } while (!iexchange.all_done());
     log->info("[{}] ==== Leaving iexchange ====\n", iexchange.comm.rank());
 
     comm_.barrier();
+
+    // debug
+    if (iexchange.comm.rank() == 0)
+    {
+        fmt::print(stderr, "icomm_time = {} send_outgoing_time = {} check_incoming_time = {} order_gids_time = {} callback_time = {} consensus_time = {}\n",
+                icomm_time, send_outgoing_time, check_incoming_time, order_gids_time, callback_time, consensus_time);
+        fmt::print(stderr, "Down-up-down time = {}\n", MPI_Wtime() - iexchange.dud_start_time);
+    }
 
     outgoing_.clear();
 }
@@ -733,12 +759,18 @@ comm_exchange(GidSendOrder& gid_order, IExchangeInfo* iexchange)
 {
     auto scoped = prof.scoped("comm-exchange");
 
+    double t0 = MPI_Wtime();                        // debug
     send_outgoing_queues(gid_order, false, iexchange);
+    send_outgoing_time += (MPI_Wtime() - t0);       // debug
 
     while(nudge(iexchange));                // kick requests
 
     if (!iexchange || !iexchange->shortcut())
+    {
+        t0 = MPI_Wtime();                           // debug
         check_incoming_queues(iexchange);
+        check_incoming_time += (MPI_Wtime() - t0);  // debug
+    }
 }
 
 /* Remote communicator */
@@ -849,8 +881,13 @@ icommunicate(IExchangeInfo* iexchange)
     // debug
 //     log->info("out_queues_limit: {}", out_queues_limit);
 
-    // exchange
+    // order gids
+
+    double t0 = MPI_Wtime();                        // debug
     auto gid_order = order_gids();
+    order_gids_time += (MPI_Wtime() - t0);          // debug
+
+    // exchange
     comm_exchange(gid_order, iexchange);
 
     // cleanup
