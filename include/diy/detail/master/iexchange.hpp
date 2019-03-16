@@ -15,14 +15,13 @@ namespace diy
                             n(0),
                             min_queue_size_(0),
                             max_hold_time_(0),
-                            gid(-1),
+                            from_gid(-1),
                             fine_(false)                                          {}
                         IExchangeInfo(size_t n_, mpi::communicator comm_, size_t min_queue_size, size_t max_hold_time, bool fine):
                             n(n_),
                             comm(comm_),
                             min_queue_size_(min_queue_size),
                             max_hold_time_(max_hold_time),
-                            gid(-1),
                             fine_(fine)                                           { time_stamp_send(); }
 
       inline void       not_done(int gid);
@@ -70,12 +69,6 @@ namespace diy
       bool              hold(size_t queue_size)                 { return min_queue_size_ >= 0 && max_hold_time_ >= 0 &&
                                                                          queue_size < min_queue_size_ && hold_time() < max_hold_time_; }
       size_t            hold_time()                             { return std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - time_last_send).count(); }
-      bool              shortcut()                              { return gid >= 0; }
-      void              clear_shortcut()                        { gid = -1; }
-      void              set_shortcut(int gid_,
-                                     BlockID to_block)          { gid = gid_; block_id = to_block; }
-
-
       bool              fine() const                            { return fine_; }
 
       struct type       { enum {
@@ -98,14 +91,10 @@ namespace diy
       std::shared_ptr<spd::logger>        log = get_logger();
       Time                                time_last_send;       // time of last send from any queue in send_outgoing_queues()
 
-      // TODO: for now, negative min_queue_size or max_hold_time indicates don't do fine-grain icommunicate at all
       int                                 min_queue_size_;      // minimum short message size (bytes)
       int                                 max_hold_time_;       // maximum short message hold time (milliseconds)
 
-      // the following 2 members are for short-cutting send_outgoing_queues
-      // gid = -1 means ignore gid and block_id and don't shortcut send_outgoing_queues
-      int                                 gid;                  // gid of most recent enqueue
-      BlockID                             block_id;             // block id of target of most recent enqueue
+      int                                 from_gid;             // gid of current block, for shortcut sending of only this block's queues
 
       bool                                fine_ = false;
 

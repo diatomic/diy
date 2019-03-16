@@ -462,8 +462,9 @@ append_binary(const char* x, size_t count)
             tmp.reserve(new_size * growth_multiplier());
             tmp.resize(cur_size);
 
-            for (size_t i = 0; i < tmp.size(); ++i)
-                tmp[i] = buffer[position++];
+//             for (size_t i = 0; i < tmp.size(); ++i)
+//                 tmp[i] = buffer[position++];
+            std::copy_n(&buffer[position], tmp.size(), &tmp[0]);
 
             buffer.swap(tmp);
             position = 0;

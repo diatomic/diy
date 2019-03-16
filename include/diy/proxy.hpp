@@ -30,15 +30,10 @@ namespace diy
     {
         OutgoingQueues& out = *outgoing_; save(out[to], x);
 
-        if (iexchange_)
-            iexchange_->set_shortcut(gid_, to);
-
-        // TODO: for now, negative min_queue_size or max_hold_time indicates don't do fine-grain icommunicate at all
-        if (iexchange_ && iexchange_->fine() && iexchange_->min_queue_size_ >= 0 && iexchange_->max_hold_time_ >= 0)
+        if (iexchange_ && iexchange_->fine())
         {
-            GidSendOrder gid_order;             // uninitialized, not needed for shortcut
+            GidSendOrder gid_order;             // uninitialized, not needed
             master()->comm_exchange(gid_order, iexchange_);
-            iexchange_->clear_shortcut();
         }
     }
 
@@ -261,15 +256,10 @@ enqueue(const BlockID& to, const T* x, size_t n,
         for (size_t i = 0; i < n; ++i)
             save(bb, x[i]);
 
-    if (iexchange_)
-        iexchange_->set_shortcut(gid_, to);
-
     if (iexchange_ && iexchange_->fine())
     {
-        iexchange_->set_shortcut(gid_, to);
-        GidSendOrder gid_order;             // uninitialized, not needed for shortcut
+        GidSendOrder gid_order;             // uninitialized, not needed
         master()->comm_exchange(gid_order, iexchange_);
-        iexchange_->clear_shortcut();
     }
 }
 

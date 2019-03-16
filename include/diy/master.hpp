@@ -709,6 +709,8 @@ iexchange_(const    ICallback<Block>&   f,
     {
         for (size_t i = 0; i < size(); i++)     // for all blocks
         {
+            iexchange.from_gid = gid(i);       // for shortcut sending only from current block during icommunicate
+
             t0 = MPI_Wtime();                       // debug
             icommunicate(&iexchange);            // TODO: separate comm thread std::thread t(icommunicate);
             icomm_time += (MPI_Wtime() - t0);       // debug
@@ -763,14 +765,12 @@ comm_exchange(GidSendOrder& gid_order, IExchangeInfo* iexchange)
     send_outgoing_queues(gid_order, false, iexchange);
     send_outgoing_time += (MPI_Wtime() - t0);       // debug
 
-    while(nudge(iexchange));                // kick requests
+    while(nudge(iexchange))                         // kick requests
+        ;
 
-    if (!iexchange || !iexchange->shortcut())
-    {
-        t0 = MPI_Wtime();                           // debug
-        check_incoming_queues(iexchange);
-        check_incoming_time += (MPI_Wtime() - t0);  // debug
-    }
+    t0 = MPI_Wtime();                           // debug
+    check_incoming_queues(iexchange);
+    check_incoming_time += (MPI_Wtime() - t0);  // debug
 }
 
 /* Remote communicator */
@@ -931,16 +931,18 @@ send_outgoing_queues(GidSendOrder&   gid_order,
 {
     auto scoped = prof.scoped("send-outgoing-queues");
 
-    if (iexchange && iexchange->shortcut())             // shortcut mode for iexchange: send single outgoing queue
+    if (iexchange)                                      // for iexchange, send queues from a single block
     {
-        BlockID to_block    = iexchange->block_id;
-        int     from_gid    = iexchange->gid;
-        int     to_gid      = iexchange->block_id.gid;
-        int     to_proc     = iexchange->block_id.proc;
+        OutgoingQueues& outgoing = outgoing_[iexchange->from_gid].queues;
+        for (OutgoingQueues::iterator it = outgoing.begin(); it != outgoing.end(); ++it)
+        {
+            BlockID to_block    = it->first;
+            int     to_gid      = to_block.gid;
+            int     to_proc     = to_block.proc;
 
-        log->debug("Processing queue:      {} <- {} of size {}", to_gid, from_gid, outgoing_[from_gid].queues[to_block].size());
-        send_queue(from_gid, to_gid, to_proc, outgoing_[from_gid].queues[to_block], remote, iexchange);
-        iexchange->clear_shortcut();
+            log->debug("Processing queue:      {} <- {} of size {}", to_gid, iexchange->from_gid, outgoing_[iexchange->from_gid].queues[to_block].size());
+            send_queue(iexchange->from_gid, to_gid, to_proc, it->second, remote, iexchange);
+        }
     }
     else                                                // normal mode: send all outgoing queues
     {
