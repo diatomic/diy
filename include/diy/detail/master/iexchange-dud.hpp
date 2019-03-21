@@ -9,11 +9,9 @@ namespace diy
         };
 
                         IExchangeInfoDUD():
-                            IExchangeInfo(mpi::communicator(), false, 0, 0),
-                            n(0)                                        {}
-                        IExchangeInfoDUD(size_t n_, mpi::communicator comm_, size_t min_queue_size, size_t max_hold_time, bool fine):
-                            IExchangeInfo(comm_, fine, min_queue_size, max_hold_time),
-                            n(n_)                                       { time_stamp_send(); }
+                            IExchangeInfo(mpi::communicator(), false, 0, 0)                 {}
+                        IExchangeInfoDUD(mpi::communicator comm_, size_t min_queue_size, size_t max_hold_time, bool fine):
+                            IExchangeInfo(comm_, fine, min_queue_size, max_hold_time)       { time_stamp_send(); }
 
       inline void       not_done(int gid) override;
       inline void       update_done(int gid, bool done_) override;
@@ -60,7 +58,6 @@ namespace diy
                                     done,
                                     abort
                                 }; };
-      size_t                              n;
       std::unordered_map<int, bool>       done;                 // gid -> done
 
       int                                 local_work_   = 0, last_local_work_message_   = 0;

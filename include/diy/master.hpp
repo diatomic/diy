@@ -701,7 +701,7 @@ iexchange_(const    ICallback<Block>&   f,
     incoming_.erase(exchange_round_);
     ++exchange_round_;
 
-    IExchangeInfoDUD iexchange(size(), comm_, min_queue_size, max_hold_time, fine);
+    IExchangeInfoDUD iexchange(comm_, min_queue_size, max_hold_time, fine);
     iexchange.add_work(size());                 // start with one work unit for each block
 
     // debug
