@@ -39,6 +39,7 @@ namespace diy
       double send_outgoing_time     = 0.0;              // send outgoing queues time
       double check_incoming_time    = 0.0;              // check incoming queues time
       double order_gids_time        = 0.0;              // order_gids time
+      double control_time           = 0.0;              // control time
       double consensus_time         = 0.0;              // consensus time
       double callback_time          = 0.0;              // callback time
       double icomm_time             = 0.0;              // icommunicate time
@@ -103,6 +104,7 @@ namespace diy
 
       struct GidSendOrder;
       struct IExchangeInfo;
+      struct IExchangeInfoDUD;
 
       // forward declarations, defined in detail/master/collectives.hpp
       struct Collective;
@@ -699,7 +701,7 @@ iexchange_(const    ICallback<Block>&   f,
     incoming_.erase(exchange_round_);
     ++exchange_round_;
 
-    IExchangeInfo iexchange(size(), comm_, min_queue_size, max_hold_time, fine);
+    IExchangeInfoDUD iexchange(size(), comm_, min_queue_size, max_hold_time, fine);
     iexchange.add_work(size());                 // start with one work unit for each block
 
     // debug
@@ -712,7 +714,7 @@ iexchange_(const    ICallback<Block>&   f,
             iexchange.from_gid = gid(i);       // for shortcut sending only from current block during icommunicate
 
             t0 = MPI_Wtime();                       // debug
-            icommunicate(&iexchange);            // TODO: separate comm thread std::thread t(icommunicate);
+            icommunicate(&iexchange);               // TODO: separate comm thread std::thread t(icommunicate);
             icomm_time += (MPI_Wtime() - t0);       // debug
             ProxyWithLink cp = proxy(i, &iexchange);
 
@@ -729,26 +731,26 @@ iexchange_(const    ICallback<Block>&   f,
             prof << "work-counting";
             t0 = MPI_Wtime();                       // debug
             iexchange.update_done(cp.gid(), done);
-            consensus_time += (MPI_Wtime() - t0);   // debug
+            control_time += (MPI_Wtime() - t0);   // debug
             prof >> "work-counting";
         }
 
         prof << "control";
         t0 = MPI_Wtime();                           // debug
         iexchange.control();
-        consensus_time += (MPI_Wtime() - t0);       // debug
+        control_time += (MPI_Wtime() - t0);       // debug
         prof >> "control";
     } while (!iexchange.all_done());
     log->info("[{}] ==== Leaving iexchange ====\n", iexchange.comm.rank());
 
-    comm_.barrier();
+    comm_.barrier();        // TODO: this is only necessary for DUD
 
     // debug
     if (iexchange.comm.rank() == 0)
     {
-        fmt::print(stderr, "icomm_time = {} send_outgoing_time = {} check_incoming_time = {} order_gids_time = {} callback_time = {} consensus_time = {}\n",
-                icomm_time, send_outgoing_time, check_incoming_time, order_gids_time, callback_time, consensus_time);
-        fmt::print(stderr, "Down-up-down time = {}\n", MPI_Wtime() - iexchange.dud_start_time);
+        fmt::print(stderr, "icomm_time = {} send_outgoing_time = {} check_incoming_time = {} order_gids_time = {} callback_time = {} control_time = {}\n",
+                icomm_time, send_outgoing_time, check_incoming_time, order_gids_time, callback_time, control_time);
+        fmt::print(stderr, "consensus_time = {}\n", MPI_Wtime() - iexchange.consensus_start_time());
     }
 
     outgoing_.clear();
