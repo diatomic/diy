@@ -18,8 +18,8 @@ namespace diy
 
       inline bool       all_done() override;                             // get global all done status
       inline void       add_work(int work) override;                     // add work to global work counter
-      inline void       update_subtree(int diff) override;
       inline void       control() override;
+      inline void       update_subtree(int diff);
       inline bool       process_work_update();
       inline void       check_for_abort();
       inline void       abort(int trial);

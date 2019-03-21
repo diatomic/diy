@@ -17,7 +17,6 @@ namespace diy
 
       virtual bool      all_done() =0;                             // get global all done status
       virtual void      add_work(int work) =0;                     // add work to global work counter
-      virtual void      update_subtree(int diff) =0;
       virtual void      control() =0;
       virtual double    consensus_start_time() =0;
 
@@ -45,3 +44,4 @@ namespace diy
 }
 
 #include "iexchange-dud.hpp"
+#include "iexchange-collective.hpp"
