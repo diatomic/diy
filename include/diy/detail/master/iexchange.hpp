@@ -12,8 +12,8 @@ namespace diy
                             max_hold_time_(max_hold_time)   {}
       virtual           ~IExchangeInfo()                    {}
 
-      virtual void      not_done(int gid)  =0;
-      virtual void      update_done(int gid, bool done_) =0;
+      void              not_done(int gid)                       { update_done(gid, false); }
+      inline void       update_done(int gid, bool done_);
 
       virtual bool      all_done() =0;                             // get global all done status
       virtual void      add_work(int work) =0;                     // add work to global work counter
@@ -31,6 +31,8 @@ namespace diy
       bool              fine() const                            { return fine_; }
 
       mpi::communicator                   comm;
+      std::unordered_map<int, bool>       done;                 // gid -> done
+
       bool                                fine_ = false;
 
       std::shared_ptr<spd::logger>        log = get_logger();
@@ -42,6 +44,21 @@ namespace diy
       int                                 from_gid = -1;        // gid of current block, for shortcut sending of only this block's queues
     };
 }
+
+void
+diy::Master::IExchangeInfo::
+update_done(int gid, bool done_)
+{
+    if (done[gid] != done_)
+    {
+        done[gid] = done_;
+        if (done_)
+            dec_work();
+        else
+            inc_work();
+    }
+}
+
 
 #include "iexchange-dud.hpp"
 #include "iexchange-collective.hpp"

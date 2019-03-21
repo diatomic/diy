@@ -7,16 +7,11 @@ namespace diy
                         IExchangeInfoCollective(mpi::communicator comm_, size_t min_queue_size, size_t max_hold_time, bool fine):
                             IExchangeInfo(comm_, fine, min_queue_size, max_hold_time)       { time_stamp_send(); }
 
-      inline void       not_done(int gid) override;
-      inline void       update_done(int gid, bool done_) override;
-
       inline bool       all_done() override;                    // get global all done status
       inline void       add_work(int work) override;            // add work to global work counter
       inline void       control() override;
 
       double            consensus_start_time() override         { return ibarrier_start_time; }
-
-      std::unordered_map<int, bool>       done;                 // gid -> done
 
       int               local_work_ = 0;
       int               dirty = 0;
@@ -29,28 +24,6 @@ namespace diy
       double            ibarrier_start_time;
       bool              first_ibarrier = true;
     };
-}
-
-
-void
-diy::Master::IExchangeInfoCollective::
-not_done(int gid)
-{
-    update_done(gid, false);
-}
-
-void
-diy::Master::IExchangeInfoCollective::
-update_done(int gid, bool done_)
-{
-    if (done[gid] != done_)
-    {
-        done[gid] = done_;
-        if (done_)
-            dec_work();
-        else
-            inc_work();
-    }
 }
 
 bool

@@ -13,9 +13,6 @@ namespace diy
                         IExchangeInfoDUD(mpi::communicator comm_, size_t min_queue_size, size_t max_hold_time, bool fine):
                             IExchangeInfo(comm_, fine, min_queue_size, max_hold_time)       { time_stamp_send(); }
 
-      inline void       not_done(int gid) override;
-      inline void       update_done(int gid, bool done_) override;
-
       inline bool       all_done() override;                             // get global all done status
       inline void       add_work(int work) override;                     // add work to global work counter
       inline void       control() override;
@@ -74,35 +71,6 @@ namespace diy
     };
 }
 
-void
-diy::Master::IExchangeInfoDUD::
-not_done(int gid)
-{
-    if (down_up_down_ > 0)
-        log->info("Marking {} not done, current state = {}", gid, done[gid]);
-
-    update_done(gid, false);
-}
-
-void
-diy::Master::IExchangeInfoDUD::
-update_done(int gid, bool done_)
-{
-    if (done[gid] != done_)
-    {
-        done[gid] = done_;
-        if (done_)
-        {
-            dec_work();
-            log->debug("[{}] Decrementing work when switching done after callback, for {}\n", comm.rank(), gid);
-        }
-        else
-        {
-            inc_work();
-            log->debug("[{}] Incrementing work when switching done after callback, for {}\n", comm.rank(), gid);
-        }
-    }
-}
 
 // get global all done status
 bool
