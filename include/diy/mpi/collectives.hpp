@@ -231,6 +231,40 @@ namespace mpi
 #endif
     }
 
+    static request iall_reduce(const communicator& comm, const T& in, T& out, const Op&)
+    {
+#ifndef DIY_NO_MPI
+      request r;
+      MPI_Iallreduce(address(in), address(out), count(in), datatype(in),
+                     detail::mpi_op<Op>::get(),
+                     comm, &r.r);
+      return r;
+#else
+      DIY_UNUSED(comm);
+      DIY_UNUSED(in);
+      DIY_UNUSED(out);
+      DIY_UNSUPPORTED_MPI_CALL(MPI_Iallreduce);
+#endif
+    }
+
+    static request iall_reduce(const communicator& comm, const std::vector<T>& in, std::vector<T>& out, const Op&)
+    {
+#ifndef DIY_NO_MPI
+      request r;
+      out.resize(in.size());
+      MPI_Iallreduce(address(in), address(out), count(in),
+                     datatype(in),
+                     detail::mpi_op<Op>::get(),
+                     comm, &r.r);
+      return r;
+#else
+      DIY_UNUSED(comm);
+      DIY_UNUSED(in);
+      DIY_UNUSED(out);
+      DIY_UNSUPPORTED_MPI_CALL(MPI_Iallreduce);
+#endif
+    }
+
     static void scan(const communicator& comm, const T& in, T& out, const Op&)
     {
 #ifndef DIY_NO_MPI
@@ -265,6 +299,12 @@ namespace mpi
 #endif
     }
   };
+
+  //! iBarrier; standalone function version for completeness
+  request   ibarrier(const communicator& comm)
+  {
+    return comm.ibarrier();
+  }
 
   //! Broadcast to all processes in `comm`.
   template<class T>
@@ -360,6 +400,21 @@ namespace mpi
   {
     Collectives<T, Op>::all_reduce(comm, in, out, op);
   }
+
+  //! iall_reduce
+  template<class T, class Op>
+  request   iall_reduce(const communicator& comm, const T& in, T& out, const Op& op)
+  {
+    return Collectives<T, Op>::iall_reduce(comm, in, out, op);
+  }
+
+  //! Same as above, but for vectors.
+  template<class T, class Op>
+  request   iall_reduce(const communicator& comm, const std::vector<T>& in, std::vector<T>& out, const Op& op)
+  {
+    return Collectives<T, Op>::iall_reduce(comm, in, out, op);
+  }
+
 
   //! scan
   template<class T, class Op>
