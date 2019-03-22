@@ -709,6 +709,7 @@ iexchange_(const    ICallback<Block>&   f,
     // debug
     double t0;                                  // temp. start times
 
+    std::map<int, bool> done_result;
     do
     {
         for (size_t i = 0; i < size(); i++)     // for all blocks
@@ -720,14 +721,16 @@ iexchange_(const    ICallback<Block>&   f,
             icomm_time += (MPI_Wtime() - t0);       // debug
             ProxyWithLink cp = proxy(i, &iexchange);
 
-            if (iexchange.done[cp.gid()] && cp.empty_incoming_queues())
-                continue;
-
-            prof << "callback";
-            t0 = MPI_Wtime();                       // debug
-            bool done = f(block<Block>(i), cp);
-            callback_time += (MPI_Wtime() - t0);    // debug
-            prof >> "callback";
+            bool done = done_result[cp.gid()];
+            if (!done || !cp.empty_incoming_queues())
+            {
+                prof << "callback";
+                t0 = MPI_Wtime();                       // debug
+                done = f(block<Block>(i), cp);
+                callback_time += (MPI_Wtime() - t0);    // debug
+                prof >> "callback";
+            }
+            done_result[cp.gid()] = done;
 
             done &= cp.empty_queues();
 
