@@ -720,6 +720,9 @@ iexchange_(const    ICallback<Block>&   f,
             icomm_time += (MPI_Wtime() - t0);       // debug
             ProxyWithLink cp = proxy(i, &iexchange);
 
+            if (iexchange.done[cp.gid()] && cp.empty_incoming_queues())
+                continue;
+
             prof << "callback";
             t0 = MPI_Wtime();                       // debug
             bool done = f(block<Block>(i), cp);

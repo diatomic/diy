@@ -94,6 +94,8 @@ namespace diy
     OutgoingQueues*     outgoing() const                                { return outgoing_; }
     MemoryBuffer&       outgoing(const BlockID& to) const               { return (*outgoing_)[to]; }
 
+    inline bool         empty_incoming_queues() const;
+    inline bool         empty_outgoing_queues() const;
     inline bool         empty_queues() const;
 
 /**
@@ -192,17 +194,29 @@ incoming(std::vector<int>& v) const
 
 bool
 diy::Master::Proxy::
-empty_queues() const
+empty_incoming_queues() const
 {
     for (auto& x : *incoming())
         if (x.second)
             return false;
+    return true;
+}
 
+bool
+diy::Master::Proxy::
+empty_outgoing_queues() const
+{
     for (auto& x : *outgoing())
         if (x.second.size())
             return false;
-
     return true;
+}
+
+bool
+diy::Master::Proxy::
+empty_queues() const
+{
+    return empty_incoming_queues() && empty_outgoing_queues();
 }
 
 
