@@ -46,6 +46,8 @@ namespace diy
       Neighbors&
                 neighbors()                         { return neighbors_; }
 
+      virtual Link* clone() const                   { return new Link(*this); }
+
       virtual void  save(BinaryBuffer& bb) const    { diy::save(bb, neighbors_); }
       virtual void  load(BinaryBuffer& bb)          { diy::load(bb, neighbors_); }
 
@@ -98,6 +100,8 @@ namespace diy
       void          add_bounds(const Bounds& bounds__)  { nbr_bounds_.push_back(bounds__); }
 
       void      swap(RegularLink& other)                { Link::swap(other); dir_map_.swap(other.dir_map_); dir_vec_.swap(other.dir_vec_); nbr_bounds_.swap(other.nbr_bounds_); std::swap(dim_, other.dim_); wrap_.swap(other.wrap_); std::swap(core_, other.core_); std::swap(bounds_, other.bounds_); }
+
+      Link*     clone() const override                  { return new RegularLink(*this); }
 
       void      save(BinaryBuffer& bb) const override
       {
@@ -191,6 +195,8 @@ namespace diy
                                int refinement_,
                                const Bounds& core_,
                                const Bounds& bounds_)       { add_bounds(level_, refinement_ * Point::one(dim_), core_, bounds_); }
+
+      Link*         clone() const override                  { return new AMRLink(*this); }
 
       void          save(BinaryBuffer& bb) const override
       {
