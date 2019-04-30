@@ -5,7 +5,6 @@ var searchData=
   ['iexchange_5f',['iexchange_',['../classdiy_1_1_master.html#af3a1e07acdca4253fb09f5829f52df71',1,'diy::Master']]],
   ['iexchangeinfo',['IExchangeInfo',['../structdiy_1_1_master_1_1_i_exchange_info.html',1,'diy::Master']]],
   ['immediate_20mode',['Immediate Mode',['../group___immediate.html',1,'']]],
-  ['in',['in',['../namespacediy.html#a861d8601719a75414c57d6aa6a99e0fc',1,'diy']]],
   ['in_5flink',['in_link',['../structdiy_1_1_reduce_proxy.html#a4468710ba18007a4be74aa46b9e98386',1,'diy::ReduceProxy']]],
   ['incomingqueuesrecords',['IncomingQueuesRecords',['../structdiy_1_1_master_1_1_incoming_queues_records.html',1,'diy::Master']]],
   ['incominground',['IncomingRound',['../structdiy_1_1_master_1_1_incoming_round.html',1,'diy::Master']]],

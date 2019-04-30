@@ -1166,7 +1166,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l01093"></a><span class="lineno"> 1093</span>&#160;        <span class="keywordflow">if</span> (ir.done)                 <span class="comment">// all pieces assembled</span></div>
 <div class="line"><a name="l01094"></a><span class="lineno"> 1094</span>&#160;        {</div>
 <div class="line"><a name="l01095"></a><span class="lineno"> 1095</span>&#160;            assert(ir.info.round &gt;= exchange_round_);</div>
-<div class="line"><a name="l01096"></a><span class="lineno"> 1096</span>&#160;            IncomingRound* <a class="code" href="namespacediy.html#a861d8601719a75414c57d6aa6a99e0fc">in</a> = &amp;incoming_[ir.info.round];</div>
+<div class="line"><a name="l01096"></a><span class="lineno"> 1096</span>&#160;            IncomingRound* in = &amp;incoming_[ir.info.round];</div>
 <div class="line"><a name="l01097"></a><span class="lineno"> 1097</span>&#160;</div>
 <div class="line"><a name="l01098"></a><span class="lineno"> 1098</span>&#160;            <span class="keywordtype">bool</span> unload = ((ir.info.round == exchange_round_) ? (block(lid(ir.info.to)) == 0) : (limit_ != -1))</div>
 <div class="line"><a name="l01099"></a><span class="lineno"> 1099</span>&#160;                          &amp;&amp; queue_policy_-&gt;unload_incoming(*<span class="keyword">this</span>, ir.info.from, ir.info.to, ir.message.size());</div>
@@ -1333,7 +1333,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="classdiy_1_1_master_html_a87bc338b26092730c23983ee40104230"><div class="ttname"><a href="classdiy_1_1_master.html#a87bc338b26092730c23983ee40104230">diy::Master::lid</a></div><div class="ttdeci">int lid(int gid__) const </div><div class="ttdoc">return the local id of the local block with global id gid, or -1 if not local </div><div class="ttdef"><b>Definition:</b> master.hpp:203</div></div>
 <div class="ttc" id="classdiy_1_1_master_html_a57dc152e96dba39554399cf63e7b4fc9"><div class="ttname"><a href="classdiy_1_1_master.html#a57dc152e96dba39554399cf63e7b4fc9">diy::Master::Master</a></div><div class="ttdeci">Master(mpi::communicator comm, int threads__=1, int limit__=-1, CreateBlock create_=0, DestroyBlock destroy_=0, ExternalStorage *storage=0, SaveBlock save=0, LoadBlock load_=0, QueuePolicy *q_policy=new QueueSizePolicy(4096))</div><div class="ttdoc">The main DIY object. </div><div class="ttdef"><b>Definition:</b> master.hpp:349</div></div>
 <div class="ttc" id="classdiy_1_1_master_html_a5f80b0b60be6e6028907131985437dee"><div class="ttname"><a href="classdiy_1_1_master.html#a5f80b0b60be6e6028907131985437dee">diy::Master::foreach_</a></div><div class="ttdeci">void foreach_(const Callback&lt; Block &gt; &amp;f, const Skip &amp;s=NeverSkip())</div><div class="ttdoc">call f with every block </div><div class="ttdef"><b>Definition:</b> master.hpp:605</div></div>
-<div class="ttc" id="namespacediy_html_a861d8601719a75414c57d6aa6a99e0fc"><div class="ttname"><a href="namespacediy.html#a861d8601719a75414c57d6aa6a99e0fc">diy::in</a></div><div class="ttdeci">void in(const RegularLink&lt; Bounds &gt; &amp;link, const Point &amp;p, OutIter out, const Bounds &amp;domain)</div><div class="ttdoc">Finds the neighbor(s) containing the target point. </div><div class="ttdef"><b>Definition:</b> pick.hpp:163</div></div>
 <div class="ttc" id="classdiy_1_1_master_html_aeab2723bb0ecd4f7316b4805c1b53a61"><div class="ttname"><a href="classdiy_1_1_master.html#aeab2723bb0ecd4f7316b4805c1b53a61">diy::Master::add</a></div><div class="ttdeci">int add(int gid, void *b, Link *l)</div><div class="ttdoc">add a block </div><div class="ttdef"><b>Definition:</b> master.hpp:560</div></div>
 <div class="ttc" id="classdiy_1_1_master_html"><div class="ttname"><a href="classdiy_1_1_master.html">diy::Master</a></div><div class="ttdef"><b>Definition:</b> master.hpp:36</div></div>
 <div class="ttc" id="classdiy_1_1_link_html"><div class="ttname"><a href="classdiy_1_1_link.html">diy::Link</a></div><div class="ttdef"><b>Definition:</b> link.hpp:17</div></div>
@@ -1363,7 +1362,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 16 2019 21:28:12 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 30 2019 19:58:35 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

@@ -109,7 +109,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">    <span class="keywordtype">int</span> val = 42;</div>
 <div class="line">    <a name="a0"></a><a class="code" href="group___m_p_i.html#ga306425d8ccbecd1b6fd77ec0950c86a6">mpi::broadcast</a>(world, val, 0);</div>
 <div class="line"></div>
-<div class="line">    std::vector&lt;int&gt; <a class="code" href="namespacediy.html#a861d8601719a75414c57d6aa6a99e0fc">in</a>; in.push_back(4); in.push_back(5);</div>
+<div class="line">    std::vector&lt;int&gt; in; in.push_back(4); in.push_back(5);</div>
 <div class="line">    std::vector&lt;int&gt; total(in.size());</div>
 <div class="line">    <a name="a1"></a><a class="code" href="group___m_p_i.html#ga13ff29a892870f09695ff7fd3832e764">mpi::reduce</a>(world, in, total, 0, std::plus&lt;int&gt;());</div>
 <div class="line">    std::cout &lt;&lt; <span class="stringliteral">&quot;Sum:&quot;</span> &lt;&lt; std::endl;</div>
@@ -126,11 +126,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">    <a class="code" href="group___m_p_i.html#ga306425d8ccbecd1b6fd77ec0950c86a6">mpi::broadcast</a>(world, val, 0);</div>
 <div class="line">    std::cout &lt;&lt; <span class="stringliteral">&quot;Received broadcast: &quot;</span> &lt;&lt; val &lt;&lt; std::endl;</div>
 <div class="line"></div>
-<div class="line">    std::vector&lt;int&gt; <a class="code" href="namespacediy.html#a861d8601719a75414c57d6aa6a99e0fc">in</a>; in.push_back(14); in.push_back(9);</div>
+<div class="line">    std::vector&lt;int&gt; in; in.push_back(14); in.push_back(9);</div>
 <div class="line">    <a class="code" href="group___m_p_i.html#ga13ff29a892870f09695ff7fd3832e764">mpi::reduce</a>(world, in, 0, std::plus&lt;int&gt;());</div>
 <div class="line">  }</div>
 <div class="line"></div>
-<div class="line">  <span class="keywordtype">int</span> <a class="code" href="namespacediy.html#a861d8601719a75414c57d6aa6a99e0fc">in</a>   = 3 + world.rank()*2,</div>
+<div class="line">  <span class="keywordtype">int</span> in   = 3 + world.rank()*2,</div>
 <div class="line">      out;</div>
 <div class="line">  <a name="a2"></a><a class="code" href="group___m_p_i.html#ga76daf228be0f1f03f4bab95e9bd34f45">mpi::scan</a>(world, in, out, std::plus&lt;int&gt;());</div>
 <div class="line">  std::cout &lt;&lt; <span class="stringliteral">&quot;Scan (&quot;</span> &lt;&lt; world.rank() &lt;&lt; <span class="stringliteral">&quot;): &quot;</span> &lt;&lt; in &lt;&lt; <span class="stringliteral">&quot; -&gt; &quot;</span> &lt;&lt; out &lt;&lt; std::endl;</div>
@@ -153,7 +153,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 16 2019 21:28:11 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 30 2019 19:58:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
