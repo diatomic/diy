@@ -364,8 +364,12 @@ decompose(int rank, const StaticAssigner& assigner, const Creator& create)
       BlockID bid; bid.gid = nhbr_gid; bid.proc = assigner.rank(nhbr_gid);
       link.add_neighbor(bid);
 
+      Bounds nhbr_core(dim);
+      fill_bounds(nhbr_core, nhbr_coords);
+      link.add_core(nhbr_core);
+
       Bounds nhbr_bounds(dim);
-      fill_bounds(nhbr_bounds, nhbr_coords);
+      fill_bounds(nhbr_bounds, nhbr_coords, true);
       link.add_bounds(nhbr_bounds);
 
       link.add_direction(dir);

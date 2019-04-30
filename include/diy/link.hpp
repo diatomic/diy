@@ -96,7 +96,9 @@ namespace diy
       Bounds&       core()                              { return core_; }
       const Bounds& bounds() const                      { return bounds_; }
       Bounds&       bounds()                            { return bounds_; }
+      const Bounds& core(int i) const                   { return nbr_cores_[i]; }
       const Bounds& bounds(int i) const                 { return nbr_bounds_[i]; }
+      void          add_core(const Bounds& core__)      { nbr_cores_.push_back(core__); }
       void          add_bounds(const Bounds& bounds__)  { nbr_bounds_.push_back(bounds__); }
 
       void      swap(RegularLink& other)                { Link::swap(other); dir_map_.swap(other.dir_map_); dir_vec_.swap(other.dir_vec_); nbr_bounds_.swap(other.nbr_bounds_); std::swap(dim_, other.dim_); wrap_.swap(other.wrap_); std::swap(core_, other.core_); std::swap(bounds_, other.bounds_); }
@@ -111,6 +113,7 @@ namespace diy
           diy::save(bb, dir_vec_);
           diy::save(bb, core_);
           diy::save(bb, bounds_);
+          diy::save(bb, nbr_cores_);
           diy::save(bb, nbr_bounds_);
           diy::save(bb, wrap_);
       }
@@ -123,6 +126,7 @@ namespace diy
           diy::load(bb, dir_vec_);
           diy::load(bb, core_);
           diy::load(bb, bounds_);
+          diy::load(bb, nbr_cores_);
           diy::load(bb, nbr_bounds_);
           diy::load(bb, wrap_);
       }
@@ -135,6 +139,7 @@ namespace diy
 
       Bounds                    core_;
       Bounds                    bounds_;
+      std::vector<Bounds>       nbr_cores_;
       std::vector<Bounds>       nbr_bounds_;
       std::vector<Direction>    wrap_;
   };

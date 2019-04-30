@@ -163,7 +163,8 @@ diy::
 in(const RegularLink<Bounds>& link,  //!< neighbors
    const Point& p,                   //!< target point
    OutIter out,                      //!< insert iterator for output set of neighbors
-   const Bounds& domain)             //!< global domain bounds
+   const Bounds& domain,             //!< global domain bounds
+   bool core = true)                 //!< check against core (or bounds, if false)
 {
   Bounds neigh_bounds {0}; // neighbor block bounds
 
@@ -171,7 +172,11 @@ in(const RegularLink<Bounds>& link,  //!< neighbors
   for (int n = 0; n < link.size(); n++)
   {
     // wrap neighbor bounds, if necessary, otherwise bounds will be unchanged
-    neigh_bounds = link.bounds(n);
+    if (core)
+        neigh_bounds = link.core(n);
+    else
+        neigh_bounds = link.bounds(n);
+
     wrap_bounds(neigh_bounds, link.wrap(n), domain, link.dimension());
 
     if (distance(neigh_bounds, p) == 0)
