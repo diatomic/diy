@@ -1166,7 +1166,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l01093"></a><span class="lineno"> 1093</span>&#160;        <span class="keywordflow">if</span> (ir.done)                 <span class="comment">// all pieces assembled</span></div>
 <div class="line"><a name="l01094"></a><span class="lineno"> 1094</span>&#160;        {</div>
 <div class="line"><a name="l01095"></a><span class="lineno"> 1095</span>&#160;            assert(ir.info.round &gt;= exchange_round_);</div>
-<div class="line"><a name="l01096"></a><span class="lineno"> 1096</span>&#160;            IncomingRound* in = &amp;incoming_[ir.info.round];</div>
+<div class="line"><a name="l01096"></a><span class="lineno"> 1096</span>&#160;            IncomingRound* <a class="code" href="namespacediy.html#a80c48a0054904994a271642ebec51608">in</a> = &amp;incoming_[ir.info.round];</div>
 <div class="line"><a name="l01097"></a><span class="lineno"> 1097</span>&#160;</div>
 <div class="line"><a name="l01098"></a><span class="lineno"> 1098</span>&#160;            <span class="keywordtype">bool</span> unload = ((ir.info.round == exchange_round_) ? (block(lid(ir.info.to)) == 0) : (limit_ != -1))</div>
 <div class="line"><a name="l01099"></a><span class="lineno"> 1099</span>&#160;                          &amp;&amp; queue_policy_-&gt;unload_incoming(*<span class="keyword">this</span>, ir.info.from, ir.info.to, ir.message.size());</div>
@@ -1353,6 +1353,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="structdiy_1_1_master_1_1_in_flight_recvs_map_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_in_flight_recvs_map.html">diy::Master::InFlightRecvsMap</a></div><div class="ttdef"><b>Definition:</b> communication.hpp:30</div></div>
 <div class="ttc" id="classdiy_1_1_master_html_a076f054751e66766169feadf1e592489"><div class="ttname"><a href="classdiy_1_1_master.html#a076f054751e66766169feadf1e592489">diy::Master::local</a></div><div class="ttdeci">bool local(int gid__) const </div><div class="ttdoc">whether the block with global id gid is local </div><div class="ttdef"><b>Definition:</b> master.hpp:205</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_message_info_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_message_info.html">diy::Master::MessageInfo</a></div><div class="ttdef"><b>Definition:</b> communication.hpp:5</div></div>
+<div class="ttc" id="namespacediy_html_a80c48a0054904994a271642ebec51608"><div class="ttname"><a href="namespacediy.html#a80c48a0054904994a271642ebec51608">diy::in</a></div><div class="ttdeci">void in(const RegularLink&lt; Bounds &gt; &amp;link, const Point &amp;p, OutIter out, const Bounds &amp;domain, bool core=true)</div><div class="ttdoc">Finds the neighbor(s) containing the target point. </div><div class="ttdef"><b>Definition:</b> pick.hpp:163</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_in_flight_sends_list_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_in_flight_sends_list.html">diy::Master::InFlightSendsList</a></div><div class="ttdef"><b>Definition:</b> communication.hpp:33</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_in_flight_recv_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_in_flight_recv.html">diy::Master::InFlightRecv</a></div><div class="ttdef"><b>Definition:</b> communication.hpp:19</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_queue_size_policy_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_queue_size_policy.html">diy::Master::QueueSizePolicy</a></div><div class="ttdoc">Move queues out of core if their size exceeds a parameter given in the constructor. </div><div class="ttdef"><b>Definition:</b> master.hpp:82</div></div>
@@ -1362,7 +1363,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 30 2019 19:58:35 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed May 1 2019 18:25:59 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

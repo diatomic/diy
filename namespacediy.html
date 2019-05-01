@@ -290,7 +290,7 @@ template&lt;class C , size_t s_&gt; </td></tr>
 <tr class="separator:a28c89dbe3b91b5a0b77c246bae9132e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af240c8e9cc82d8800c59b6417b5906db"><td class="memTemplParams" colspan="2"><a class="anchor" id="af240c8e9cc82d8800c59b6417b5906db"></a>
 template&lt;class C , size_t s_&gt; </td></tr>
-<tr class="memitem:af240c8e9cc82d8800c59b6417b5906db"><td class="memTemplItemLeft" align="right" valign="top">std::istream &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>operator&gt;&gt;</b> (std::istream &amp;in, <a class="el" href="classdiy_1_1_dynamic_point.html">DynamicPoint</a>&lt; C, s_ &gt; &amp;p)</td></tr>
+<tr class="memitem:af240c8e9cc82d8800c59b6417b5906db"><td class="memTemplItemLeft" align="right" valign="top">std::istream &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>operator&gt;&gt;</b> (std::istream &amp;<a class="el" href="namespacediy.html#a80c48a0054904994a271642ebec51608">in</a>, <a class="el" href="classdiy_1_1_dynamic_point.html">DynamicPoint</a>&lt; C, s_ &gt; &amp;p)</td></tr>
 <tr class="separator:af240c8e9cc82d8800c59b6417b5906db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gafaac9aa4ccdc04930f612ca20341fc9b"><td class="memTemplParams" colspan="2"><a class="anchor" id="gafaac9aa4ccdc04930f612ca20341fc9b"></a>
 template&lt;class T &gt; </td></tr>
@@ -326,10 +326,10 @@ template&lt;class... Args&gt; </td></tr>
 <tr class="memitem:a3c23b7187b5855ad507c063595e99918"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacediy.html#a3c23b7187b5855ad507c063595e99918">near</a> (const <a class="el" href="classdiy_1_1_regular_link.html">RegularLink</a>&lt; <a class="el" href="structdiy_1_1_bounds.html">Bounds</a> &gt; &amp;link, const <a class="el" href="classdiy_1_1_point.html">Point</a> &amp;p, Coordinate r, OutIter out, const <a class="el" href="structdiy_1_1_bounds.html">Bounds</a> &amp;domain)</td></tr>
 <tr class="memdesc:a3c23b7187b5855ad507c063595e99918"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds the neighbors within radius r of a target point.  <a href="#a3c23b7187b5855ad507c063595e99918">More...</a><br/></td></tr>
 <tr class="separator:a3c23b7187b5855ad507c063595e99918"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a861d8601719a75414c57d6aa6a99e0fc"><td class="memTemplParams" colspan="2"><a class="anchor" id="a861d8601719a75414c57d6aa6a99e0fc"></a>
-template&lt;class Bounds , class Point , class OutIter &gt; </td></tr>
-<tr class="memitem:a861d8601719a75414c57d6aa6a99e0fc"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>in</b> (const <a class="el" href="classdiy_1_1_regular_link.html">RegularLink</a>&lt; <a class="el" href="structdiy_1_1_bounds.html">Bounds</a> &gt; &amp;link, const <a class="el" href="classdiy_1_1_point.html">Point</a> &amp;p, OutIter out, const <a class="el" href="structdiy_1_1_bounds.html">Bounds</a> &amp;domain)</td></tr>
-<tr class="separator:a861d8601719a75414c57d6aa6a99e0fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a80c48a0054904994a271642ebec51608"><td class="memTemplParams" colspan="2">template&lt;class Bounds , class Point , class OutIter &gt; </td></tr>
+<tr class="memitem:a80c48a0054904994a271642ebec51608"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacediy.html#a80c48a0054904994a271642ebec51608">in</a> (const <a class="el" href="classdiy_1_1_regular_link.html">RegularLink</a>&lt; <a class="el" href="structdiy_1_1_bounds.html">Bounds</a> &gt; &amp;link, const <a class="el" href="classdiy_1_1_point.html">Point</a> &amp;p, OutIter out, const <a class="el" href="structdiy_1_1_bounds.html">Bounds</a> &amp;domain, bool core=true)</td></tr>
+<tr class="memdesc:a80c48a0054904994a271642ebec51608"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds the neighbor(s) containing the target point.  <a href="#a80c48a0054904994a271642ebec51608">More...</a><br/></td></tr>
+<tr class="separator:a80c48a0054904994a271642ebec51608"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad33dccf99ac841c574ff29770888f423"><td class="memTemplParams" colspan="2"><a class="anchor" id="ad33dccf99ac841c574ff29770888f423"></a>
 template&lt;class Point , class Bounds , class Out  = double&gt; </td></tr>
 <tr class="memitem:ad33dccf99ac841c574ff29770888f423"><td class="memTemplItemLeft" align="right" valign="top">Out&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacediy.html#ad33dccf99ac841c574ff29770888f423">distance</a> (const <a class="el" href="structdiy_1_1_bounds.html">Bounds</a> &amp;bounds, const <a class="el" href="classdiy_1_1_point.html">Point</a> &amp;p)</td></tr>
@@ -366,7 +366,7 @@ template&lt;class C , unsigned D&gt; </td></tr>
 <tr class="separator:ac00652bfb42c53b4eaf1b882c8ab50ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9cf2d94838f7baae24f0c9c3858298b6"><td class="memTemplParams" colspan="2"><a class="anchor" id="a9cf2d94838f7baae24f0c9c3858298b6"></a>
 template&lt;class C , unsigned D&gt; </td></tr>
-<tr class="memitem:a9cf2d94838f7baae24f0c9c3858298b6"><td class="memTemplItemLeft" align="right" valign="top">std::istream &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>operator&gt;&gt;</b> (std::istream &amp;in, <a class="el" href="classdiy_1_1_point.html">Point</a>&lt; C, D &gt; &amp;p)</td></tr>
+<tr class="memitem:a9cf2d94838f7baae24f0c9c3858298b6"><td class="memTemplItemLeft" align="right" valign="top">std::istream &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>operator&gt;&gt;</b> (std::istream &amp;<a class="el" href="namespacediy.html#a80c48a0054904994a271642ebec51608">in</a>, <a class="el" href="classdiy_1_1_point.html">Point</a>&lt; C, D &gt; &amp;p)</td></tr>
 <tr class="separator:a9cf2d94838f7baae24f0c9c3858298b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga3dfb1bdb9c078d9f18fc6953295a0208"><td class="memTemplParams" colspan="2">template&lt;class Op &gt; </td></tr>
 <tr class="memitem:ga3dfb1bdb9c078d9f18fc6953295a0208"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group___communication.html#ga3dfb1bdb9c078d9f18fc6953295a0208">all_to_all</a> (<a class="el" href="classdiy_1_1_master.html">Master</a> &amp;master, const <a class="el" href="classdiy_1_1_assigner.html">Assigner</a> &amp;assigner, const Op &amp;op, int k=2)</td></tr>
@@ -421,6 +421,64 @@ template&lt;class Vertex , class Callback &gt; </td></tr>
 <h1><code>&lt;utils/traits.hpp&gt;</code> &mdash; Additional type traits </h1>
 <p>This module provides additional type traits and related functions, missing from the standard library. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="a80c48a0054904994a271642ebec51608"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Bounds , class Point , class OutIter &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void diy::in </td>
+          <td>(</td>
+          <td class="paramtype">const RegularLink&lt; Bounds &gt; &amp;&#160;</td>
+          <td class="paramname"><em>link</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Point &amp;&#160;</td>
+          <td class="paramname"><em>p</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OutIter&#160;</td>
+          <td class="paramname"><em>out</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Bounds &amp;&#160;</td>
+          <td class="paramname"><em>domain</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>core</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Finds the neighbor(s) containing the target point. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">link</td><td>neighbors </td></tr>
+    <tr><td class="paramname">p</td><td>target point </td></tr>
+    <tr><td class="paramname">out</td><td>insert iterator for output set of neighbors </td></tr>
+    <tr><td class="paramname">domain</td><td>global domain bounds </td></tr>
+    <tr><td class="paramname">core</td><td>check against core (or bounds, if false) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a3c23b7187b5855ad507c063595e99918"></a>
 <div class="memitem">
 <div class="memproto">
@@ -482,7 +540,7 @@ template&lt;class Bounds , class Point , class OutIter , class Coordinate &gt; <
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 30 2019 19:58:35 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed May 1 2019 18:25:59 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

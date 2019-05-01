@@ -104,7 +104,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="namespacediy.html#a3c23b7187b5855ad507c063595e99918">near</a>(<span class="keyword">const</span> RegularLink&lt;Bounds&gt;&amp; link, <span class="keyword">const</span> Point&amp; p, Coordinate r, OutIter out, <span class="keyword">const</span> Bounds&amp; domain);</div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">class</span> Bounds, <span class="keyword">class</span> Po<span class="keywordtype">int</span>, <span class="keyword">class</span> OutIter&gt;</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;    <span class="keywordtype">void</span> in(<span class="keyword">const</span> RegularLink&lt;Bounds&gt;&amp; link, <span class="keyword">const</span> Point&amp; p, OutIter out, <span class="keyword">const</span> Bounds&amp; domain);</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="namespacediy.html#a80c48a0054904994a271642ebec51608">in</a>(<span class="keyword">const</span> RegularLink&lt;Bounds&gt;&amp; link, <span class="keyword">const</span> Point&amp; p, OutIter out, <span class="keyword">const</span> Bounds&amp; domain, <span class="keywordtype">bool</span> core = <span class="keyword">true</span>);</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">class</span> Po<span class="keywordtype">int</span>, <span class="keyword">class</span> Bounds, <span class="keyword">class</span> Out = <span class="keywordtype">double</span>&gt;</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    Out <a class="code" href="namespacediy.html#ad33dccf99ac841c574ff29770888f423">distance</a>(<span class="keyword">const</span> Bounds&amp; bounds, <span class="keyword">const</span> Point&amp; p);</div>
@@ -249,14 +249,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;</div>
 <div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> Bounds, <span class="keyword">class</span> Po<span class="keywordtype">int</span>, <span class="keyword">class</span> OutIter&gt;</div>
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;<span class="keywordtype">void</span></div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;diy::</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;in(<span class="keyword">const</span> RegularLink&lt;Bounds&gt;&amp; link,  </div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;   <span class="keyword">const</span> Point&amp; p,                   </div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;<a class="code" href="namespacediy.html#a80c48a0054904994a271642ebec51608">diy::</a></div>
+<div class="line"><a name="l00163"></a><span class="lineno"><a class="line" href="namespacediy.html#a80c48a0054904994a271642ebec51608">  163</a></span>&#160;<a class="code" href="namespacediy.html#a80c48a0054904994a271642ebec51608">in</a>(<span class="keyword">const</span> <a class="code" href="classdiy_1_1_regular_link.html">RegularLink&lt;Bounds&gt;</a>&amp; link,  </div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;   <span class="keyword">const</span> <a class="code" href="classdiy_1_1_point.html">Point</a>&amp; p,                   </div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;   OutIter out,                      </div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;   <span class="keyword">const</span> Bounds&amp; domain,             </div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;   <span class="keywordtype">bool</span> core = <span class="keyword">true</span>)                 </div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;   <span class="keyword">const</span> <a class="code" href="structdiy_1_1_bounds.html">Bounds</a>&amp; domain,             </div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;   <span class="keywordtype">bool</span> core)                        </div>
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;{</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;  Bounds neigh_bounds {0}; <span class="comment">// neighbor block bounds</span></div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;  <a class="code" href="structdiy_1_1_bounds.html">Bounds</a> neigh_bounds {0}; <span class="comment">// neighbor block bounds</span></div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;</div>
 <div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;  <span class="comment">// for all neighbors of this block</span></div>
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> n = 0; n &lt; link.size(); n++)</div>
@@ -311,10 +311,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="classdiy_1_1_regular_link_html"><div class="ttname"><a href="classdiy_1_1_regular_link.html">diy::RegularLink</a></div><div class="ttdef"><b>Definition:</b> link.hpp:59</div></div>
 <div class="ttc" id="classdiy_1_1_point_html"><div class="ttname"><a href="classdiy_1_1_point.html">diy::Point</a></div><div class="ttdef"><b>Definition:</b> point.hpp:17</div></div>
 <div class="ttc" id="structdiy_1_1_bounds_html"><div class="ttname"><a href="structdiy_1_1_bounds.html">diy::Bounds</a></div><div class="ttdef"><b>Definition:</b> types.hpp:19</div></div>
+<div class="ttc" id="namespacediy_html_a80c48a0054904994a271642ebec51608"><div class="ttname"><a href="namespacediy.html#a80c48a0054904994a271642ebec51608">diy::in</a></div><div class="ttdeci">void in(const RegularLink&lt; Bounds &gt; &amp;link, const Point &amp;p, OutIter out, const Bounds &amp;domain, bool core=true)</div><div class="ttdoc">Finds the neighbor(s) containing the target point. </div><div class="ttdef"><b>Definition:</b> pick.hpp:163</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 30 2019 19:58:35 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed May 1 2019 18:25:59 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

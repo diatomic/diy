@@ -117,7 +117,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;        <span class="keywordtype">bool</span>            done = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;        <span class="keyword">inline</span> <span class="keywordtype">void</span>     recv(<a class="code" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a>&amp; comm, <span class="keyword">const</span> <a class="code" href="structdiy_1_1mpi_1_1status.html">mpi::status</a>&amp; status);</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;        <span class="keyword">inline</span> <span class="keywordtype">void</span>     place(<a class="code" href="structdiy_1_1_master_1_1_incoming_round.html">IncomingRound</a>* in, <span class="keywordtype">bool</span> unload, <a class="code" href="classdiy_1_1_external_storage.html">ExternalStorage</a>* storage, <a class="code" href="structdiy_1_1_master_1_1_i_exchange_info.html">IExchangeInfo</a>* iexchange);</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;        <span class="keyword">inline</span> <span class="keywordtype">void</span>     place(<a class="code" href="structdiy_1_1_master_1_1_incoming_round.html">IncomingRound</a>* <a class="code" href="namespacediy.html#a80c48a0054904994a271642ebec51608">in</a>, <span class="keywordtype">bool</span> unload, <a class="code" href="classdiy_1_1_external_storage.html">ExternalStorage</a>* storage, <a class="code" href="structdiy_1_1_master_1_1_i_exchange_info.html">IExchangeInfo</a>* iexchange);</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        <span class="keywordtype">void</span>            reset()     { *<span class="keyword">this</span> = <a class="code" href="structdiy_1_1_master_1_1_in_flight_recv.html">InFlightRecv</a>(); }</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    };</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
@@ -263,7 +263,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;<span class="comment">// once the InFlightRecv is done, place it either out of core or in the appropriate incoming queue</span></div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;<span class="keywordtype">void</span></div>
 <div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;diy::Master::InFlightRecv::</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;place(IncomingRound* in, <span class="keywordtype">bool</span> unload, ExternalStorage* storage, IExchangeInfo* iexchange)</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;place(IncomingRound* <a class="code" href="namespacediy.html#a80c48a0054904994a271642ebec51608">in</a>, <span class="keywordtype">bool</span> unload, ExternalStorage* storage, IExchangeInfo* iexchange)</div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;{</div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <span class="keywordtype">size_t</span> <a class="code" href="classdiy_1_1_master.html#acf5ddc5dbd765ce578571aa90c238b45">size</a>     = message.size();</div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    <span class="keywordtype">int</span> from        = info.from;</div>
@@ -311,12 +311,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="structdiy_1_1mpi_1_1request_html"><div class="ttname"><a href="structdiy_1_1mpi_1_1request.html">diy::mpi::request</a></div><div class="ttdef"><b>Definition:</b> request.hpp:5</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_in_flight_recvs_map_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_in_flight_recvs_map.html">diy::Master::InFlightRecvsMap</a></div><div class="ttdef"><b>Definition:</b> communication.hpp:30</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_message_info_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_message_info.html">diy::Master::MessageInfo</a></div><div class="ttdef"><b>Definition:</b> communication.hpp:5</div></div>
+<div class="ttc" id="namespacediy_html_a80c48a0054904994a271642ebec51608"><div class="ttname"><a href="namespacediy.html#a80c48a0054904994a271642ebec51608">diy::in</a></div><div class="ttdeci">void in(const RegularLink&lt; Bounds &gt; &amp;link, const Point &amp;p, OutIter out, const Bounds &amp;domain, bool core=true)</div><div class="ttdoc">Finds the neighbor(s) containing the target point. </div><div class="ttdef"><b>Definition:</b> pick.hpp:163</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_in_flight_sends_list_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_in_flight_sends_list.html">diy::Master::InFlightSendsList</a></div><div class="ttdef"><b>Definition:</b> communication.hpp:33</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_in_flight_recv_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_in_flight_recv.html">diy::Master::InFlightRecv</a></div><div class="ttdef"><b>Definition:</b> communication.hpp:19</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 30 2019 19:58:35 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed May 1 2019 18:25:59 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

@@ -135,7 +135,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;            {</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;                log-&gt;trace(<span class="stringliteral">&quot;    incoming size from {}: {}&quot;</span>, rp.in_link().target(i).gid, sz);</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;                <span class="keywordflow">if</span> (skip_self &amp;&amp; rp.in_link().target(i).gid == rp.gid()) <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;                MemoryBuffer&amp; in = rp.incoming(rp.in_link().target(i).gid);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;                MemoryBuffer&amp; <a class="code" href="namespacediy.html#a80c48a0054904994a271642ebec51608">in</a> = rp.incoming(rp.in_link().target(i).gid);</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;                sz += in.size() / <span class="keyword">sizeof</span>(T);</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;            }</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;            log-&gt;trace(<span class="stringliteral">&quot;    incoming size: {}&quot;</span>, sz);</div>
@@ -256,11 +256,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="group___serialization_html_gae54f4c5c6740fcf7627009bdcfe02aa1"><div class="ttname"><a href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a></div><div class="ttdeci">void load(BinaryBuffer &amp;, T &amp;)</div><div class="ttdoc">Loads x from bb by calling diy::Serialization&lt;T&gt;::load(bb,x). </div><div class="ttdef"><b>Definition:</b> serialization.hpp:110</div></div>
 <div class="ttc" id="group___serialization_html_gafaac9aa4ccdc04930f612ca20341fc9b"><div class="ttname"><a href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">diy::save</a></div><div class="ttdeci">void save(BinaryBuffer &amp;, const T &amp;)</div><div class="ttdoc">Saves x to bb by calling diy::Serialization&lt;T&gt;::save(bb,x). </div><div class="ttdef"><b>Definition:</b> serialization.hpp:106</div></div>
+<div class="ttc" id="namespacediy_html_a80c48a0054904994a271642ebec51608"><div class="ttname"><a href="namespacediy.html#a80c48a0054904994a271642ebec51608">diy::in</a></div><div class="ttdeci">void in(const RegularLink&lt; Bounds &gt; &amp;link, const Point &amp;p, OutIter out, const Bounds &amp;domain, bool core=true)</div><div class="ttdoc">Finds the neighbor(s) containing the target point. </div><div class="ttdef"><b>Definition:</b> pick.hpp:163</div></div>
 <div class="ttc" id="group___algorithms_html_gad7301f5d7bb62b79ca679affdf874ace"><div class="ttname"><a href="group___algorithms.html#gad7301f5d7bb62b79ca679affdf874ace">diy::sort</a></div><div class="ttdeci">void sort(Master &amp;master, const Assigner &amp;assigner, std::vector&lt; T &gt; Block::*values, std::vector&lt; T &gt; Block::*samples, size_t num_samples, const Cmp &amp;cmp, int k=2, bool samples_only=false)</div><div class="ttdoc">sample sort values of each block, store the boundaries between blocks in samples </div><div class="ttdef"><b>Definition:</b> algorithms.hpp:25</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 30 2019 19:58:35 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed May 1 2019 18:25:59 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
