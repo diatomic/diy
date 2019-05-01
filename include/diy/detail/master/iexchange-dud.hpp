@@ -48,7 +48,7 @@ namespace diy
       bool              incomplete() const                      { return subtree_work_ > 0 || !inflight_.empty(); }
       bool              stale() const                           { return subtree_work_ != last_subtree_work_message_ || local_work_ != last_local_work_message_; }
 
-      double            consensus_start_time() override         { return dud_start_time; }
+      Time              consensus_start_time() override         { return dud_start_time; }
 
       struct type       { enum {
                                     work_update = 0,
@@ -66,7 +66,7 @@ namespace diy
       int                                 child_confirmations = -1;
 
       // debug
-      double                              dud_start_time;
+      Time                                dud_start_time;
       bool                                first_dud = true;
     };
 }
@@ -168,7 +168,7 @@ control()
         // debug
         if (first_dud)
         {
-            dud_start_time = MPI_Wtime();
+            dud_start_time = Clock::now();
             first_dud = false;
         }
 

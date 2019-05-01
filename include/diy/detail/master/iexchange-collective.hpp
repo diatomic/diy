@@ -11,7 +11,7 @@ namespace diy
       inline void       add_work(int work) override;            // add work to global work counter
       inline void       control() override;
 
-      double            consensus_start_time() override         { return ibarrier_start_time; }
+      Time              consensus_start_time() override         { return ibarrier_start_time; }
 
       int               local_work_ = 0;
       int               dirty = 0;
@@ -21,7 +21,7 @@ namespace diy
       mpi::request      r;
 
       // debug
-      double            ibarrier_start_time;
+      Time              ibarrier_start_time;
       bool              first_ibarrier = true;
     };
 }
@@ -51,7 +51,7 @@ control()
         // debug
         if (first_ibarrier)
         {
-            ibarrier_start_time = MPI_Wtime();
+            ibarrier_start_time = Clock::now();
             first_ibarrier = false;
         }
 

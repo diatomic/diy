@@ -18,7 +18,7 @@ namespace diy
       virtual bool      all_done() =0;                             // get global all done status
       virtual void      add_work(int work) =0;                     // add work to global work counter
       virtual void      control() =0;
-      virtual double    consensus_start_time() =0;
+      virtual Time      consensus_start_time() =0;
 
       void              inc_work()                              { add_work(1); }   // increment work counter
       void              dec_work()                              { add_work(-1); }  // decremnent work counter

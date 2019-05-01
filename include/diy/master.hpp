@@ -758,7 +758,8 @@ iexchange_(const    ICallback<Block>&   f,
     {
         fmt::print(stderr, "icomm_time = {} send_outgoing_time = {} check_incoming_time = {} order_gids_time = {} callback_time = {} control_time = {}\n",
                 icomm_time, send_outgoing_time, check_incoming_time, order_gids_time, callback_time, control_time);
-        fmt::print(stderr, "consensus_time = {}\n", MPI_Wtime() - iexchange.consensus_start_time());
+        fmt::print(stderr, "consensus_time = {}\n",
+                   std::chrono::duration<double>(IExchangeInfo::Clock::now() - iexchange.consensus_start_time()).count());
     }
 
     outgoing_.clear();
