@@ -9,6 +9,7 @@
 #include <functional>
 #include <numeric>
 #include <memory>
+#include <chrono>
 
 #include "link.hpp"
 #include "collection.hpp"
@@ -36,13 +37,17 @@ namespace diy
   class Master
   {
       // debug
-      double send_outgoing_time     = 0.0;              // send outgoing queues time
-      double check_incoming_time    = 0.0;              // check incoming queues time
-      double order_gids_time        = 0.0;              // order_gids time
-      double control_time           = 0.0;              // control time
-      double consensus_time         = 0.0;              // consensus time
-      double callback_time          = 0.0;              // callback time
-      double icomm_time             = 0.0;              // icommunicate time
+      using   Clock    = std::chrono::high_resolution_clock;
+      using   Time     = Clock::time_point;
+      using   Duration = std::chrono::duration<double>;
+
+      Duration send_outgoing_time     = Duration::zero();              // send outgoing queues time
+      Duration check_incoming_time    = Duration::zero();              // check incoming queues time
+      Duration order_gids_time        = Duration::zero();              // order_gids time
+      Duration control_time           = Duration::zero();              // control time
+      Duration consensus_time         = Duration::zero();              // consensus time
+      Duration callback_time          = Duration::zero();              // callback time
+      Duration icomm_time             = Duration::zero();              // icommunicate time
 
     public:
       struct ProcessBlock;
@@ -707,7 +712,7 @@ iexchange_(const    ICallback<Block>&   f,
     iexchange.add_work(size());                 // start with one work unit for each block
 
     // debug
-    double t0;                                  // temp. start times
+    Time t0;                                  // temp. start times
 
     std::map<int, bool> done_result;
     do
@@ -716,18 +721,18 @@ iexchange_(const    ICallback<Block>&   f,
         {
             iexchange.from_gid = gid(i);       // for shortcut sending only from current block during icommunicate
 
-            t0 = MPI_Wtime();                       // debug
+            t0 = Clock::now();                       // debug
             icommunicate(&iexchange);               // TODO: separate comm thread std::thread t(icommunicate);
-            icomm_time += (MPI_Wtime() - t0);       // debug
+            icomm_time += (Clock::now() - t0);       // debug
             ProxyWithLink cp = proxy(i, &iexchange);
 
             bool done = done_result[cp.gid()];
             if (!done || !cp.empty_incoming_queues())
             {
                 prof << "callback";
-                t0 = MPI_Wtime();                       // debug
+                t0 = Clock::now();                       // debug
                 done = f(block<Block>(i), cp);
-                callback_time += (MPI_Wtime() - t0);    // debug
+                callback_time += (Clock::now() - t0);    // debug
                 prof >> "callback";
             }
             done_result[cp.gid()] = done;
@@ -737,16 +742,16 @@ iexchange_(const    ICallback<Block>&   f,
             log->debug("Done: {}", done);
 
             prof << "work-counting";
-            t0 = MPI_Wtime();                       // debug
+            t0 = Clock::now();                       // debug
             iexchange.update_done(cp.gid(), done);
-            control_time += (MPI_Wtime() - t0);   // debug
+            control_time += (Clock::now() - t0);   // debug
             prof >> "work-counting";
         }
 
         prof << "control";
-        t0 = MPI_Wtime();                           // debug
+        t0 = Clock::now();                           // debug
         iexchange.control();
-        control_time += (MPI_Wtime() - t0);       // debug
+        control_time += (Clock::now() - t0);       // debug
         prof >> "control";
     } while (!iexchange.all_done());
     log->info("[{}] ==== Leaving iexchange ====\n", iexchange.comm.rank());
@@ -757,9 +762,9 @@ iexchange_(const    ICallback<Block>&   f,
     if (iexchange.comm.rank() == 0)
     {
         fmt::print(stderr, "icomm_time = {} send_outgoing_time = {} check_incoming_time = {} order_gids_time = {} callback_time = {} control_time = {}\n",
-                icomm_time, send_outgoing_time, check_incoming_time, order_gids_time, callback_time, control_time);
+                icomm_time.count(), send_outgoing_time.count(), check_incoming_time.count(), order_gids_time.count(), callback_time.count(), control_time.count());
         fmt::print(stderr, "consensus_time = {}\n",
-                   std::chrono::duration<double>(IExchangeInfo::Clock::now() - iexchange.consensus_start_time()).count());
+                   Duration(IExchangeInfo::Clock::now() - iexchange.consensus_start_time()).count());
     }
 
     outgoing_.clear();
@@ -772,16 +777,16 @@ comm_exchange(GidSendOrder& gid_order, IExchangeInfo* iexchange)
 {
     auto scoped = prof.scoped("comm-exchange");
 
-    double t0 = MPI_Wtime();                        // debug
+    Time t0 = Clock::now();                        // debug
     send_outgoing_queues(gid_order, false, iexchange);
-    send_outgoing_time += (MPI_Wtime() - t0);       // debug
+    send_outgoing_time += (Clock::now() - t0);       // debug
 
     while(nudge(iexchange))                         // kick requests
         ;
 
-    t0 = MPI_Wtime();                           // debug
+    t0 = Clock::now();                           // debug
     check_incoming_queues(iexchange);
-    check_incoming_time += (MPI_Wtime() - t0);  // debug
+    check_incoming_time += (Clock::now() - t0);  // debug
 }
 
 /* Remote communicator */
@@ -894,9 +899,9 @@ icommunicate(IExchangeInfo* iexchange)
 
     // order gids
 
-    double t0 = MPI_Wtime();                        // debug
+    Time t0 = Clock::now();                        // debug
     auto gid_order = order_gids();
-    order_gids_time += (MPI_Wtime() - t0);          // debug
+    order_gids_time += (Clock::now() - t0);          // debug
 
     // exchange
     comm_exchange(gid_order, iexchange);
