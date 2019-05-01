@@ -10,7 +10,7 @@ namespace diy
     void near(const RegularLink<Bounds>& link, const Point& p, Coordinate r, OutIter out, const Bounds& domain);
 
     template<class Bounds, class Point, class OutIter>
-    void in(const RegularLink<Bounds>& link, const Point& p, OutIter out, const Bounds& domain);
+    void in(const RegularLink<Bounds>& link, const Point& p, OutIter out, const Bounds& domain, bool core = true);
 
     template<class Point, class Bounds, class Out = double>
     Out distance(const Bounds& bounds, const Point& p);
@@ -164,7 +164,7 @@ in(const RegularLink<Bounds>& link,  //!< neighbors
    const Point& p,                   //!< target point
    OutIter out,                      //!< insert iterator for output set of neighbors
    const Bounds& domain,             //!< global domain bounds
-   bool core = true)                 //!< check against core (or bounds, if false)
+   bool core)                        //!< check against core (or bounds, if false)
 {
   Bounds neigh_bounds {0}; // neighbor block bounds
 
