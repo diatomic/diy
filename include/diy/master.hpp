@@ -694,8 +694,8 @@ iexchange_(const    ICallback<Block>&   f,
     incoming_.erase(exchange_round_);
     ++exchange_round_;
 
-    //IExchangeInfoDUD iexchange(comm_, min_queue_size, max_hold_time, fine);
-    IExchangeInfoCollective iexchange(comm_, min_queue_size, max_hold_time, fine);
+    //IExchangeInfoDUD iexchange(comm_, min_queue_size, max_hold_time, fine, prof);
+    IExchangeInfoCollective iexchange(comm_, min_queue_size, max_hold_time, fine, prof);
     iexchange.add_work(size());                 // start with one work unit for each block
 
     std::map<int, bool> done_result;
@@ -732,7 +732,8 @@ iexchange_(const    ICallback<Block>&   f,
     } while (!iexchange.all_done());
     log->info("[{}] ==== Leaving iexchange ====\n", iexchange.comm.rank());
 
-    comm_.barrier();        // TODO: this is only necessary for DUD
+    //comm_.barrier();        // TODO: this is only necessary for DUD
+    prof >> "consensus-time";
 
     // debug
     if (iexchange.comm.rank() == 0)

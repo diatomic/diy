@@ -8,8 +8,7 @@ namespace diy
             mpi::request        request;
         };
 
-                        IExchangeInfoDUD(mpi::communicator comm_, size_t min_queue_size, size_t max_hold_time, bool fine):
-                            IExchangeInfo(comm_, fine, min_queue_size, max_hold_time)       { time_stamp_send(); }
+      using IExchangeInfo::IExchangeInfo;
 
       inline bool       all_done() override;                             // get global all done status
       inline void       add_work(int work) override;                     // add work to global work counter
@@ -46,8 +45,6 @@ namespace diy
       bool              incomplete() const                      { return subtree_work_ > 0 || !inflight_.empty(); }
       bool              stale() const                           { return subtree_work_ != last_subtree_work_message_ || local_work_ != last_local_work_message_; }
 
-      Time              consensus_start_time() override         { return dud_start_time; }
-
       struct type       { enum {
                                     work_update = 0,
                                     done,
@@ -64,8 +61,8 @@ namespace diy
       int                                 child_confirmations = -1;
 
       // debug
-      Time                                dud_start_time;
       bool                                first_dud = true;
+      using IExchangeInfo::prof;
     };
 }
 
@@ -166,7 +163,7 @@ control()
         // debug
         if (first_dud)
         {
-            dud_start_time = Clock::now();
+            prof << "consensus-time";
             first_dud = false;
         }
 

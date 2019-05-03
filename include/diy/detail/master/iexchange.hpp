@@ -5,12 +5,13 @@ namespace diy
       using   Clock   = std::chrono::high_resolution_clock;
       using   Time    = Clock::time_point;
 
-                        IExchangeInfo(mpi::communicator comm_, bool fine, size_t min_queue_size, size_t max_hold_time):
+                        IExchangeInfo(mpi::communicator comm_, size_t min_queue_size, size_t max_hold_time, bool fine, stats::Profiler& prof_):
                             comm(comm_),
                             fine_(fine),
                             min_queue_size_(min_queue_size),
-                            max_hold_time_(max_hold_time)   {}
-      virtual           ~IExchangeInfo()                    {}
+                            max_hold_time_(max_hold_time),
+                            prof(prof_)                         { time_stamp_send(); }
+      virtual           ~IExchangeInfo()                        {}
 
       void              not_done(int gid)                       { update_done(gid, false); }
       inline void       update_done(int gid, bool done_);
@@ -18,7 +19,6 @@ namespace diy
       virtual bool      all_done() =0;                             // get global all done status
       virtual void      add_work(int work) =0;                     // add work to global work counter
       virtual void      control() =0;
-      virtual Time      consensus_start_time() =0;
 
       void              inc_work()                              { add_work(1); }   // increment work counter
       void              dec_work()                              { add_work(-1); }  // decremnent work counter
@@ -42,6 +42,8 @@ namespace diy
       int                                 max_hold_time_;       // maximum short message hold time (milliseconds)
 
       int                                 from_gid = -1;        // gid of current block, for shortcut sending of only this block's queues
+
+      stats::Profiler&                    prof;
     };
 }
 
