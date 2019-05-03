@@ -735,14 +735,6 @@ iexchange_(const    ICallback<Block>&   f,
     //comm_.barrier();        // TODO: this is only necessary for DUD
     prof >> "consensus-time";
 
-    // debug
-    if (iexchange.comm.rank() == 0)
-    {
-        prof.totals().output(std::cerr);
-        //fmt::print(stderr, "consensus_time = {}\n",
-        //           Duration(IExchangeInfo::Clock::now() - iexchange.consensus_start_time()).count());
-    }
-
     outgoing_.clear();
 }
 

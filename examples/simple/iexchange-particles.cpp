@@ -130,4 +130,6 @@ int main(int argc, char* argv[])
 
     // one may also reduce the number of small messages as follows
 //     master.iexchange(&bounce, 16, 1000); // hold messages smaller than 16 bytes for up to 1000 milliseconds
+
+    master.prof.totals().output(std::cerr);
 }
