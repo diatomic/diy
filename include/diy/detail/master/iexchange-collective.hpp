@@ -2,8 +2,6 @@ namespace diy
 {
     struct Master::IExchangeInfoCollective: public IExchangeInfo
     {
-                        IExchangeInfoCollective():
-                            IExchangeInfo(mpi::communicator(), false, 0, 0)                 {}
                         IExchangeInfoCollective(mpi::communicator comm_, size_t min_queue_size, size_t max_hold_time, bool fine):
                             IExchangeInfo(comm_, fine, min_queue_size, max_hold_time)       { time_stamp_send(); }
 
