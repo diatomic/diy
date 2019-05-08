@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['scoped',['Scoped',['../structdiy_1_1stats_1_1_profiler_1_1_scoped.html',1,'diy::stats::Profiler']]],
+  ['scopedprofile',['ScopedProfile',['../structdiy_1_1stats_1_1_scoped_profile.html',1,'diy::stats']]],
   ['serialization',['Serialization',['../structdiy_1_1_serialization.html',1,'diy']]],
   ['serialization_3c_20bounds_3c_20c_20_3e_20_3e',['Serialization&lt; Bounds&lt; C &gt; &gt;',['../structdiy_1_1_serialization_3_01_bounds_3_01_c_01_4_01_4.html',1,'diy']]],
   ['serialization_3c_20direction_20_3e',['Serialization&lt; Direction &gt;',['../structdiy_1_1_serialization_3_01_direction_01_4.html',1,'diy']]],

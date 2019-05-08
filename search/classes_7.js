@@ -1,6 +1,8 @@
 var searchData=
 [
   ['iexchangeinfo',['IExchangeInfo',['../structdiy_1_1_master_1_1_i_exchange_info.html',1,'diy::Master']]],
+  ['iexchangeinfocollective',['IExchangeInfoCollective',['../structdiy_1_1_master_1_1_i_exchange_info_collective.html',1,'diy::Master']]],
+  ['iexchangeinfodud',['IExchangeInfoDUD',['../structdiy_1_1_master_1_1_i_exchange_info_d_u_d.html',1,'diy::Master']]],
   ['incomingqueuesrecords',['IncomingQueuesRecords',['../structdiy_1_1_master_1_1_incoming_queues_records.html',1,'diy::Master']]],
   ['incominground',['IncomingRound',['../structdiy_1_1_master_1_1_incoming_round.html',1,'diy::Master']]],
   ['inflightrecv',['InFlightRecv',['../structdiy_1_1_master_1_1_in_flight_recv.html',1,'diy::Master']]],

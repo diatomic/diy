@@ -13,6 +13,7 @@ var searchData=
   ['dummyint',['DummyInt',['../structfmt_1_1internal_1_1_dummy_int.html',1,'fmt::internal']]],
   ['dummystream',['DummyStream',['../structfmt_1_1internal_1_1_dummy_stream.html',1,'fmt::internal']]],
   ['duplicate',['duplicate',['../classdiy_1_1mpi_1_1communicator.html#a5be9b0dcfecee6e8ee54cb934f35af13',1,'diy::mpi::communicator']]],
+  ['durationaccumulator',['DurationAccumulator',['../structdiy_1_1stats_1_1_duration_accumulator.html',1,'diy::stats']]],
   ['dynamicassigner',['DynamicAssigner',['../classdiy_1_1_dynamic_assigner.html',1,'diy']]],
   ['dynamicpoint',['DynamicPoint',['../classdiy_1_1_dynamic_point.html',1,'diy']]],
   ['dynamicpoint_3c_20coordinate_20_3e',['DynamicPoint&lt; Coordinate &gt;',['../classdiy_1_1_dynamic_point.html',1,'diy']]],

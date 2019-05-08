@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>DIY: diy::stats::Profiler::Scoped Struct Reference</title>
+<title>DIY: diy::stats::DurationAccumulator Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -87,21 +87,65 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="namespacediy.html">diy</a></li><li class="navelem"><b>stats</b></li><li class="navelem"><a class="el" href="structdiy_1_1stats_1_1_profiler.html">Profiler</a></li><li class="navelem"><a class="el" href="structdiy_1_1stats_1_1_profiler_1_1_scoped.html">Scoped</a></li>  </ul>
+<li class="navelem"><a class="el" href="namespacediy.html">diy</a></li><li class="navelem"><b>stats</b></li><li class="navelem"><a class="el" href="structdiy_1_1stats_1_1_duration_accumulator.html">DurationAccumulator</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
+  <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="structdiy_1_1stats_1_1_duration_accumulator-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">diy::stats::Profiler::Scoped Struct Reference</div>  </div>
+<div class="title">diy::stats::DurationAccumulator Struct Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:aa1538a222ccc005a2a3fedebb2287d97"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa1538a222ccc005a2a3fedebb2287d97"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>Clock</b> = std::chrono::high_resolution_clock</td></tr>
+<tr class="separator:aa1538a222ccc005a2a3fedebb2287d97"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5fcff7494dcff2db036a5074b5d9895f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5fcff7494dcff2db036a5074b5d9895f"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>Time</b> = Clock::time_point</td></tr>
+<tr class="separator:a5fcff7494dcff2db036a5074b5d9895f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5cd950bb44d14741629a1e233fb7a1c5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5cd950bb44d14741629a1e233fb7a1c5"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>Duration</b> = Clock::duration</td></tr>
+<tr class="separator:a5cd950bb44d14741629a1e233fb7a1c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a5487ba1c96876464dcdae5eff6e1dc07"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5487ba1c96876464dcdae5eff6e1dc07"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::string name)</td></tr>
+<tr class="separator:a5487ba1c96876464dcdae5eff6e1dc07"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5fcb833874d461049c948df544e54c3c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5fcb833874d461049c948df544e54c3c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>operator&gt;&gt;</b> (std::string name)</td></tr>
+<tr class="separator:a5fcb833874d461049c948df544e54c3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aac38d4f71e89c63f86c38efbf2007099"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aac38d4f71e89c63f86c38efbf2007099"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>clear</b> ()</td></tr>
+<tr class="separator:aac38d4f71e89c63f86c38efbf2007099"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a975a2f71fd7d11b6fc403341e7e26652"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a975a2f71fd7d11b6fc403341e7e26652"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>output</b> (std::ostream &amp;out, std::string prefix=&quot;&quot;) const </td></tr>
+<tr class="separator:a975a2f71fd7d11b6fc403341e7e26652"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:a4ec82c28d13265a74bf9c277b9e5a54f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4ec82c28d13265a74bf9c277b9e5a54f"></a>
+std::unordered_map<br class="typebreak"/>
+&lt; std::string, Time &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>last</b></td></tr>
+<tr class="separator:a4ec82c28d13265a74bf9c277b9e5a54f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5b0b03948269a45bc4b72971136b140"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa5b0b03948269a45bc4b72971136b140"></a>
+std::unordered_map<br class="typebreak"/>
+&lt; std::string, Duration &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>duration</b></td></tr>
+<tr class="separator:aa5b0b03948269a45bc4b72971136b140"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
 <hr/>The documentation for this struct was generated from the following file:<ul>
 <li>include/diy/<a class="el" href="stats_8hpp_source.html">stats.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed May 1 2019 18:26:00 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed May 8 2019 17:47:31 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

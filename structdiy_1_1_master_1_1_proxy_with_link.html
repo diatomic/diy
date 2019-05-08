@@ -169,6 +169,15 @@ OutgoingQueues *&#160;</td><td class="memItemRight" valign="bottom"><b>outgoing<
 <tr class="memitem:a95822813073724a387523c52b2144a01 inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a95822813073724a387523c52b2144a01"></a>
 <a class="el" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>outgoing</b> (const <a class="el" href="structdiy_1_1_block_i_d.html">BlockID</a> &amp;to) const </td></tr>
 <tr class="separator:a95822813073724a387523c52b2144a01 inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c73135d0bb99b1b5af98d9a392aa3b5 inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8c73135d0bb99b1b5af98d9a392aa3b5"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>empty_incoming_queues</b> () const </td></tr>
+<tr class="separator:a8c73135d0bb99b1b5af98d9a392aa3b5 inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e4ba0a5ec50f4f4058b807cf99f8491 inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4e4ba0a5ec50f4f4058b807cf99f8491"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>empty_outgoing_queues</b> () const </td></tr>
+<tr class="separator:a4e4ba0a5ec50f4f4058b807cf99f8491 inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afeb655d7f6e08d8724a52867750f3dcb inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afeb655d7f6e08d8724a52867750f3dcb"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>empty_queues</b> () const </td></tr>
+<tr class="separator:afeb655d7f6e08d8724a52867750f3dcb inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gabce4381d1244875967dc3d127227bd45 inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memTemplParams" colspan="2">template&lt;class T , class Op &gt; </td></tr>
 <tr class="memitem:gabce4381d1244875967dc3d127227bd45 inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group___communication.html#gabce4381d1244875967dc3d127227bd45">all_reduce</a> (const T &amp;<a class="el" href="namespacediy.html#a80c48a0054904994a271642ebec51608">in</a>, Op op) const </td></tr>
 <tr class="memdesc:gabce4381d1244875967dc3d127227bd45 inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="mdescLeft">&#160;</td><td class="mdescRight">Post an all-reduce collective using an existing communication proxy. Available operators are: maximum&lt;T&gt;, minimum&lt;T&gt;, std::plus&lt;T&gt;, std::multiplies&lt;T&gt;, std::logical_and&lt;T&gt;, and std::logical_or&lt;T&gt;.  <a href="group___communication.html#gabce4381d1244875967dc3d127227bd45">More...</a><br/></td></tr>
@@ -194,6 +203,9 @@ template&lt;class T &gt; </td></tr>
 <tr class="memitem:aca265396aa03208bd8f2e6e8dbfb2fc2 inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aca265396aa03208bd8f2e6e8dbfb2fc2"></a>
 <a class="el" href="classdiy_1_1_master.html">Master</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>master</b> () const </td></tr>
 <tr class="separator:aca265396aa03208bd8f2e6e8dbfb2fc2 inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f73eccc55f9166c7809be56fa491b0d inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6f73eccc55f9166c7809be56fa491b0d"></a>
+<a class="el" href="structdiy_1_1_master_1_1_i_exchange_info.html">IExchangeInfo</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>iexchange</b> () const </td></tr>
+<tr class="separator:a6f73eccc55f9166c7809be56fa491b0d inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><dl><dt><b>Examples: </b></dt><dd><a class="el" href="decomposition_2regular-decomposer-long_8cpp-example.html#_a2">decomposition/regular-decomposer-long.cpp</a>, <a class="el" href="decomposition_2regular-decomposer-short_8cpp-example.html#_a2">decomposition/regular-decomposer-short.cpp</a>, <a class="el" href="decomposition_2test-direct-master_8cpp-example.html#_a1">decomposition/test-direct-master.cpp</a>, <a class="el" href="reduce_2all-done_8cpp-example.html#_a13">reduce/all-done.cpp</a>, <a class="el" href="reduce_2all-to-all_8cpp-example.html#_a25">reduce/all-to-all.cpp</a>, <a class="el" href="reduce_2kd-tree_8cpp-example.html#_a5">reduce/kd-tree.cpp</a>, <a class="el" href="reduce_2merge-reduce_8cpp-example.html#_a18">reduce/merge-reduce.cpp</a>, <a class="el" href="reduce_2sample-sort_8cpp-example.html#_a17">reduce/sample-sort.cpp</a>, <a class="el" href="reduce_2sort_8cpp-example.html#_a37">reduce/sort.cpp</a>, <a class="el" href="reduce_2swap-reduce_8cpp-example.html#_a26">reduce/swap-reduce.cpp</a>, <a class="el" href="simple_2read-blocks_8cpp-example.html#_a0">simple/read-blocks.cpp</a>, <a class="el" href="simple_2simple_8cpp-example.html#_a0">simple/simple.cpp</a>, and <a class="el" href="simple_2until-done_8cpp-example.html#_a3">simple/until-done.cpp</a>.</dd>
@@ -203,7 +215,7 @@ template&lt;class T &gt; </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed May 1 2019 18:26:00 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed May 8 2019 17:47:30 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

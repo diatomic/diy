@@ -123,6 +123,10 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:gabc00f424b0477721fa0840f80f1667a4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gabc00f424b0477721fa0840f80f1667a4"></a>
+<a class="el" href="structdiy_1_1mpi_1_1request.html">request</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___m_p_i.html#gabc00f424b0477721fa0840f80f1667a4">ibarrier</a> (const <a class="el" href="classdiy_1_1mpi_1_1communicator.html">communicator</a> &amp;comm)</td></tr>
+<tr class="memdesc:gabc00f424b0477721fa0840f80f1667a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">iBarrier; standalone function version for completeness <br/></td></tr>
+<tr class="separator:gabc00f424b0477721fa0840f80f1667a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga306425d8ccbecd1b6fd77ec0950c86a6"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga306425d8ccbecd1b6fd77ec0950c86a6"></a>
 template&lt;class T &gt; </td></tr>
 <tr class="memitem:ga306425d8ccbecd1b6fd77ec0950c86a6"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group___m_p_i.html#ga306425d8ccbecd1b6fd77ec0950c86a6">broadcast</a> (const <a class="el" href="classdiy_1_1mpi_1_1communicator.html">communicator</a> &amp;comm, T &amp;x, int root)</td></tr>
@@ -188,6 +192,16 @@ template&lt;class T , class Op &gt; </td></tr>
 <tr class="memitem:ga891f9e9f5bb623f051f31d5a5fdf39dc"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group___m_p_i.html#ga891f9e9f5bb623f051f31d5a5fdf39dc">all_reduce</a> (const <a class="el" href="classdiy_1_1mpi_1_1communicator.html">communicator</a> &amp;comm, const std::vector&lt; T &gt; &amp;<a class="el" href="namespacediy.html#a80c48a0054904994a271642ebec51608">in</a>, std::vector&lt; T &gt; &amp;out, const Op &amp;op)</td></tr>
 <tr class="memdesc:ga891f9e9f5bb623f051f31d5a5fdf39dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Same as above, but for vectors. <br/></td></tr>
 <tr class="separator:ga891f9e9f5bb623f051f31d5a5fdf39dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaee4d563e1da31931f3f9a753c0bf8c43"><td class="memTemplParams" colspan="2"><a class="anchor" id="gaee4d563e1da31931f3f9a753c0bf8c43"></a>
+template&lt;class T , class Op &gt; </td></tr>
+<tr class="memitem:gaee4d563e1da31931f3f9a753c0bf8c43"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structdiy_1_1mpi_1_1request.html">request</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group___m_p_i.html#gaee4d563e1da31931f3f9a753c0bf8c43">iall_reduce</a> (const <a class="el" href="classdiy_1_1mpi_1_1communicator.html">communicator</a> &amp;comm, const T &amp;<a class="el" href="namespacediy.html#a80c48a0054904994a271642ebec51608">in</a>, T &amp;out, const Op &amp;op)</td></tr>
+<tr class="memdesc:gaee4d563e1da31931f3f9a753c0bf8c43"><td class="mdescLeft">&#160;</td><td class="mdescRight">iall_reduce <br/></td></tr>
+<tr class="separator:gaee4d563e1da31931f3f9a753c0bf8c43"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf23e0861a174d509d2b3782153679335"><td class="memTemplParams" colspan="2"><a class="anchor" id="gaf23e0861a174d509d2b3782153679335"></a>
+template&lt;class T , class Op &gt; </td></tr>
+<tr class="memitem:gaf23e0861a174d509d2b3782153679335"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structdiy_1_1mpi_1_1request.html">request</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group___m_p_i.html#gaf23e0861a174d509d2b3782153679335">iall_reduce</a> (const <a class="el" href="classdiy_1_1mpi_1_1communicator.html">communicator</a> &amp;comm, const std::vector&lt; T &gt; &amp;<a class="el" href="namespacediy.html#a80c48a0054904994a271642ebec51608">in</a>, std::vector&lt; T &gt; &amp;out, const Op &amp;op)</td></tr>
+<tr class="memdesc:gaf23e0861a174d509d2b3782153679335"><td class="mdescLeft">&#160;</td><td class="mdescRight">Same as above, but for vectors. <br/></td></tr>
+<tr class="separator:gaf23e0861a174d509d2b3782153679335"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga76daf228be0f1f03f4bab95e9bd34f45"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga76daf228be0f1f03f4bab95e9bd34f45"></a>
 template&lt;class T , class Op &gt; </td></tr>
 <tr class="memitem:ga76daf228be0f1f03f4bab95e9bd34f45"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group___m_p_i.html#ga76daf228be0f1f03f4bab95e9bd34f45">scan</a> (const <a class="el" href="classdiy_1_1mpi_1_1communicator.html">communicator</a> &amp;comm, const T &amp;<a class="el" href="namespacediy.html#a80c48a0054904994a271642ebec51608">in</a>, T &amp;out, const Op &amp;op)</td></tr>
@@ -213,7 +227,7 @@ const int&#160;</td><td class="memItemRight" valign="bottom"><b>any_tag</b> = MP
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed May 1 2019 18:26:00 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed May 8 2019 17:47:31 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

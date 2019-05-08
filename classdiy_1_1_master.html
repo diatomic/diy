@@ -118,6 +118,10 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_master_1_1_i_exchange_info.html">IExchangeInfo</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_master_1_1_i_exchange_info_collective.html">IExchangeInfoCollective</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_master_1_1_i_exchange_info_d_u_d.html">IExchangeInfoDUD</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_master_1_1_incoming_queues_records.html">IncomingQueuesRecords</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_master_1_1_incoming_round.html">IncomingRound</a></td></tr>
@@ -151,8 +155,6 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move queues out of core if their size exceeds a parameter given in the constructor.  <a href="structdiy_1_1_master_1_1_queue_size_policy.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_master_1_1_skip_no_incoming.html">SkipNoIncoming</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_master_1_1tags.html">tags</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
@@ -308,15 +310,15 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1_master.html#a832ae002e1031fa1b0c8956d6baf94e8">exchange</a> (bool remote=false)</td></tr>
 <tr class="memdesc:a832ae002e1031fa1b0c8956d6baf94e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">exchange the queues between all the blocks (collective operation) <br/></td></tr>
 <tr class="separator:a832ae002e1031fa1b0c8956d6baf94e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af3a1e07acdca4253fb09f5829f52df71"><td class="memTemplParams" colspan="2"><a class="anchor" id="af3a1e07acdca4253fb09f5829f52df71"></a>
+<tr class="memitem:ad29f06b0e6a0d44eb3328a64a0bac38a"><td class="memTemplParams" colspan="2"><a class="anchor" id="ad29f06b0e6a0d44eb3328a64a0bac38a"></a>
 template&lt;class Block &gt; </td></tr>
-<tr class="memitem:af3a1e07acdca4253fb09f5829f52df71"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classdiy_1_1_master.html#af3a1e07acdca4253fb09f5829f52df71">iexchange_</a> (const ICallback&lt; Block &gt; &amp;f)</td></tr>
-<tr class="memdesc:af3a1e07acdca4253fb09f5829f52df71"><td class="mdescLeft">&#160;</td><td class="mdescRight">nonblocking exchange of the queues between all the blocks <br/></td></tr>
-<tr class="separator:af3a1e07acdca4253fb09f5829f52df71"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af51f3f6e9f09a23ae956f5af70dabaa8"><td class="memTemplParams" colspan="2"><a class="anchor" id="af51f3f6e9f09a23ae956f5af70dabaa8"></a>
+<tr class="memitem:ad29f06b0e6a0d44eb3328a64a0bac38a"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classdiy_1_1_master.html#ad29f06b0e6a0d44eb3328a64a0bac38a">iexchange_</a> (const ICallback&lt; Block &gt; &amp;f, size_t min_queue_size, size_t max_hold_time, bool fine)</td></tr>
+<tr class="memdesc:ad29f06b0e6a0d44eb3328a64a0bac38a"><td class="mdescLeft">&#160;</td><td class="mdescRight">nonblocking exchange of the queues between all the blocks <br/></td></tr>
+<tr class="separator:ad29f06b0e6a0d44eb3328a64a0bac38a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a60784593ed16e91f6c1d4c3097a14817"><td class="memTemplParams" colspan="2"><a class="anchor" id="a60784593ed16e91f6c1d4c3097a14817"></a>
 template&lt;class F &gt; </td></tr>
-<tr class="memitem:af51f3f6e9f09a23ae956f5af70dabaa8"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>iexchange</b> (const F &amp;f)</td></tr>
-<tr class="separator:af51f3f6e9f09a23ae956f5af70dabaa8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a60784593ed16e91f6c1d4c3097a14817"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>iexchange</b> (const F &amp;f, size_t min_queue_size=0, size_t max_hold_time=0, bool fine=false)</td></tr>
+<tr class="separator:a60784593ed16e91f6c1d4c3097a14817"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a35fce40575bd18371b882b0bd6087a07"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a35fce40575bd18371b882b0bd6087a07"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>process_collectives</b> ()</td></tr>
 <tr class="separator:a35fce40575bd18371b882b0bd6087a07"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -547,7 +549,7 @@ std::shared_ptr&lt; <a class="el" href="structdiy_1_1spd_1_1logger.html">spd::lo
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed May 1 2019 18:25:59 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed May 8 2019 17:47:30 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

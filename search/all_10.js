@@ -4,7 +4,7 @@ var searchData=
   ['save',['save',['../group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b',1,'diy::save(BinaryBuffer &amp;bb, const T &amp;x)'],['../group___serialization.html#ga2bb550bfd9b0617e3dbe6352ddfe3395',1,'diy::save(BinaryBuffer &amp;bb, const T *x, size_t n)']]],
   ['save_5fbinary',['save_binary',['../structdiy_1_1_binary_buffer.html#a9d0ab30fe4978c730176a52ccd142cc3',1,'diy::BinaryBuffer::save_binary()'],['../structdiy_1_1_memory_buffer.html#af84521a942f8316143db729254874025',1,'diy::MemoryBuffer::save_binary()']]],
   ['scan',['scan',['../group___m_p_i.html#ga76daf228be0f1f03f4bab95e9bd34f45',1,'diy::mpi']]],
-  ['scoped',['Scoped',['../structdiy_1_1stats_1_1_profiler_1_1_scoped.html',1,'diy::stats::Profiler']]],
+  ['scopedprofile',['ScopedProfile',['../structdiy_1_1stats_1_1_scoped_profile.html',1,'diy::stats']]],
   ['send',['send',['../classdiy_1_1mpi_1_1communicator.html#ac5f9c84d379538d3d2d1468df26963dc',1,'diy::mpi::communicator']]],
   ['serialization',['Serialization',['../structdiy_1_1_serialization.html',1,'diy']]],
   ['serialization',['Serialization',['../group___serialization.html',1,'']]],
