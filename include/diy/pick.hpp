@@ -171,12 +171,12 @@ in(const RegularLink<Bounds>& link,  //!< neighbors
   // for all neighbors of this block
   for (int n = 0; n < link.size(); n++)
   {
-    // wrap neighbor bounds, if necessary, otherwise bounds will be unchanged
     if (core)
         neigh_bounds = link.core(n);
     else
         neigh_bounds = link.bounds(n);
 
+    // wrap neighbor bounds, if necessary, otherwise bounds will be unchanged
     wrap_bounds(neigh_bounds, link.wrap(n), domain, link.dimension());
 
     if (distance(neigh_bounds, p) == 0)

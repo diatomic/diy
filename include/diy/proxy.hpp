@@ -29,8 +29,12 @@ namespace diy
                                ) const
     {
         OutgoingQueues& out = *outgoing_; save(out[to], x);
-        if (iexchange_)
-            master()->icommunicate(iexchange_);
+
+        if (iexchange_ && iexchange_->fine())
+        {
+            GidSendOrder gid_order;             // uninitialized, not needed
+            master()->comm_exchange(gid_order, iexchange_);
+        }
     }
 
     //! Enqueue data whose size is given explicitly by the user, e.g., an array.
@@ -90,6 +94,10 @@ namespace diy
     OutgoingQueues*     outgoing() const                                { return outgoing_; }
     MemoryBuffer&       outgoing(const BlockID& to) const               { return (*outgoing_)[to]; }
 
+    inline bool         empty_incoming_queues() const;
+    inline bool         empty_outgoing_queues() const;
+    inline bool         empty_queues() const;
+
 /**
  * \ingroup Communication
  * \brief Post an all-reduce collective using an existing communication proxy.
@@ -124,6 +132,7 @@ namespace diy
     CollectivesList*    collectives() const                             { return collectives_; }
 
     Master*             master() const                                  { return master_; }
+    IExchangeInfo*      iexchange() const                               { return iexchange_; }
 
     private:
       int               gid_;
@@ -183,6 +192,34 @@ incoming(std::vector<int>& v) const
     v.push_back(it->first);
 }
 
+bool
+diy::Master::Proxy::
+empty_incoming_queues() const
+{
+    for (auto& x : *incoming())
+        if (x.second)
+            return false;
+    return true;
+}
+
+bool
+diy::Master::Proxy::
+empty_outgoing_queues() const
+{
+    for (auto& x : *outgoing())
+        if (x.second.size())
+            return false;
+    return true;
+}
+
+bool
+diy::Master::Proxy::
+empty_queues() const
+{
+    return empty_incoming_queues() && empty_outgoing_queues();
+}
+
+
 template<class T, class Op>
 void
 diy::Master::Proxy::
@@ -233,8 +270,11 @@ enqueue(const BlockID& to, const T* x, size_t n,
         for (size_t i = 0; i < n; ++i)
             save(bb, x[i]);
 
-    if (iexchange_)
-        master()->icommunicate(iexchange_);
+    if (iexchange_ && iexchange_->fine())
+    {
+        GidSendOrder gid_order;             // uninitialized, not needed
+        master()->comm_exchange(gid_order, iexchange_);
+    }
 }
 
 template<class T>

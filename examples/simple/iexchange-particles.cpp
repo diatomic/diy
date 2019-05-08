@@ -78,7 +78,7 @@ bool bounce(Block*                              b,
 
 int main(int argc, char* argv[])
 {
-     //diy::create_logger("debug");
+//     diy::create_logger("trace");
 
     diy::mpi::environment     env(argc, argv);
     diy::mpi::communicator    world;
@@ -127,4 +127,9 @@ int main(int argc, char* argv[])
 
     // dequeue, enqueue, exchange all in one nonblocking routine
     master.iexchange(&bounce);
+
+    // one may also reduce the number of small messages as follows
+//     master.iexchange(&bounce, 16, 1000); // hold messages smaller than 16 bytes for up to 1000 milliseconds
+
+    master.prof.totals().output(std::cerr);
 }
