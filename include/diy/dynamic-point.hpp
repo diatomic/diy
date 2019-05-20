@@ -25,11 +25,11 @@ class DynamicPoint: public chobo::small_vector<Coordinate_, static_size>
                             DynamicPoint(int dim, Coordinate x = 0):
                                 Parent(dim, x)                      {}
         template<class T>   DynamicPoint(const DynamicPoint<T>& p)  { for (size_t i = 0; i < dimension(); ++i) (*this)[i] = p[i]; }
-        template<class T>   DynamicPoint(const T* a, int dim)       { for (unsigned i = 0; i < dim; ++i) (*this)[i] = a[i]; }
+        template<class T>   DynamicPoint(const T* a, int dim)       { for (size_t i = 0; i < static_cast<size_t>(dim); ++i) (*this)[i] = a[i]; }
         template<class T>   DynamicPoint(const std::vector<T>& a):
                                 Parent(a.begin(), a.end())          {}
                             DynamicPoint(std::initializer_list<Coordinate> lst):
-                                Parent(lst.size())                  { unsigned i = 0; for (Coordinate x : lst) (*this)[i++] = x; }
+                                Parent(lst.size())                  { size_t i = 0; for (Coordinate x : lst) (*this)[i++] = x; }
 
                             DynamicPoint(DynamicPoint&&)            =default;
                             DynamicPoint(const DynamicPoint&)       =default;
@@ -40,21 +40,21 @@ class DynamicPoint: public chobo::small_vector<Coordinate_, static_size>
         static DynamicPoint zero(int dim)                           { return DynamicPoint(dim, 0); }
         static DynamicPoint one(int dim)                            { return DynamicPoint(dim, 1); }
 
-        DynamicPoint        drop(int dim) const                     { DynamicPoint p(dimension() - 1); unsigned c = 0; for (unsigned i = 0; i < dimension();   ++i) { if (i == dim) continue; p[c++] = (*this)[i]; } return p; }
-        DynamicPoint        lift(int dim, Coordinate x) const       { DynamicPoint p(dimension() + 1); for (unsigned i = 0; i < dimension()+1; ++i) { if (i < dim) p[i] = (*this)[i]; else if (i == dim) p[i] = x; else if (i > dim) p[i] = (*this)[i-1]; } return p; }
+        DynamicPoint        drop(int dim) const                     { DynamicPoint p(dimension() - 1); size_t c = 0; for (size_t i = 0; i < dimension();   ++i) { if (i == dim) continue; p[c++] = (*this)[i]; } return p; }
+        DynamicPoint        lift(int dim, Coordinate x) const       { DynamicPoint p(dimension() + 1); for (size_t i = 0; i < dimension()+1; ++i) { if (i < dim) p[i] = (*this)[i]; else if (i == dim) p[i] = x; else if (i > dim) p[i] = (*this)[i-1]; } return p; }
 
         using Parent::operator[];
 
-        DynamicPoint&       operator+=(const DynamicPoint& y)       { for (unsigned i = 0; i < dimension(); ++i) (*this)[i] += y[i];  return *this; }
-        DynamicPoint&       operator-=(const DynamicPoint& y)       { for (unsigned i = 0; i < dimension(); ++i) (*this)[i] -= y[i];  return *this; }
-        DynamicPoint&       operator*=(Coordinate a)                { for (unsigned i = 0; i < dimension(); ++i) (*this)[i] *= a;     return *this; }
-        DynamicPoint&       operator/=(Coordinate a)                { for (unsigned i = 0; i < dimension(); ++i) (*this)[i] /= a;     return *this; }
+        DynamicPoint&       operator+=(const DynamicPoint& y)       { for (size_t i = 0; i < dimension(); ++i) (*this)[i] += y[i];  return *this; }
+        DynamicPoint&       operator-=(const DynamicPoint& y)       { for (size_t i = 0; i < dimension(); ++i) (*this)[i] -= y[i];  return *this; }
+        DynamicPoint&       operator*=(Coordinate a)                { for (size_t i = 0; i < dimension(); ++i) (*this)[i] *= a;     return *this; }
+        DynamicPoint&       operator/=(Coordinate a)                { for (size_t i = 0; i < dimension(); ++i) (*this)[i] /= a;     return *this; }
 
         DEPRECATED("Use norm2 instead")
         Coordinate          norm() const                            { return norm2(); }
         Coordinate          norm2() const                           { return (*this)*(*this); }
 
-        std::ostream&       operator<<(std::ostream& out) const     { out << (*this)[0]; for (unsigned i = 1; i < dimension(); ++i) out << " " << (*this)[i]; return out; }
+        std::ostream&       operator<<(std::ostream& out) const     { out << (*this)[0]; for (size_t i = 1; i < dimension(); ++i) out << " " << (*this)[i]; return out; }
         std::istream&       operator>>(std::istream& in);
 
         friend
