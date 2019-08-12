@@ -348,8 +348,7 @@ namespace diy
       std::shared_ptr<spd::logger>  log = get_logger();
       stats::Profiler               prof;
 #if defined(DIY_USE_CALIPER)
-      cali::Loop                    exchange_rounds_loop            { fmt::format("Master @ {}", static_cast<void*>(this)).c_str() };
-      cali::Loop::Iteration         exchange_rounds_loop_iteration  { exchange_rounds_loop.iteration(exchange_round_) };
+      cali::Annotation              exchange_round_annotation { "exchange-round" };
 #endif
   };
 
@@ -624,7 +623,7 @@ diy::Master::
 foreach_(const Callback<Block>& f, const Skip& skip)
 {
 #if defined(DIY_USE_CALIPER)
-    exchange_rounds_loop_iteration = exchange_rounds_loop.iteration(exchange_round_);
+    exchange_round_annotation.set(exchange_round_);
 #endif
 
     auto scoped = prof.scoped("foreach");
@@ -702,6 +701,10 @@ iexchange_(const    ICallback<Block>&   f,
     // prepare for next round
     incoming_.erase(exchange_round_);
     ++exchange_round_;
+#if defined(DIY_USE_CALIPER)
+    exchange_round_annotation.set(exchange_round_);
+#endif
+
 
     //IExchangeInfoDUD iexchange(comm_, min_queue_size, max_hold_time, fine, prof);
     IExchangeInfoCollective iexchange(comm_, min_queue_size, max_hold_time, fine, prof);
@@ -1191,6 +1194,10 @@ flush(bool remote)
   // prepare for next round
   incoming_.erase(exchange_round_);
   ++exchange_round_;
+#if defined(DIY_USE_CALIPER)
+  exchange_round_annotation.set(exchange_round_);
+#endif
+
 
   if (remote)
       rcomm_exchange();
