@@ -28,7 +28,7 @@ struct diy::Master::ProcessBlock
       int i   = blocks[cur];
       int gid = master.gid(i);
 #if defined(DIY_USE_CALIPER)
-      cali::Annotation::Guard g( cali::Annotation("block").set(gid) );
+      cali::Annotation::Guard g( cali::Annotation("diy.block").set(gid) );
 #endif
 
       if (master.block(i))

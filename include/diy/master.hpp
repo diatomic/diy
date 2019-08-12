@@ -348,7 +348,7 @@ namespace diy
       std::shared_ptr<spd::logger>  log = get_logger();
       stats::Profiler               prof;
 #if defined(DIY_USE_CALIPER)
-      cali::Annotation              exchange_round_annotation { "exchange-round" };
+      cali::Annotation              exchange_round_annotation { "diy.exchange-round" };
 #endif
   };
 
@@ -903,7 +903,7 @@ send_queue(int              from_gid,
            bool             remote,
            IExchangeInfo*   iexchange)
 {
-    cali::Annotation::Guard g( cali::Annotation("block").set(from_gid) );
+    cali::Annotation::Guard g( cali::Annotation("diy.block").set(from_gid) );
 
     // skip empty queues and hold queues shorter than some limit for some time
     if ( iexchange && (out_queue.size() == 0 || iexchange->hold(out_queue.size())) )

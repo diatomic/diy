@@ -41,7 +41,7 @@ if                          (caliper)
 
     find_package            (caliper)
     include_directories     (${caliper_INCLUDE_DIR})
-    set                     (libraries  ${libraries} caliper)
+    set                     (libraries  ${libraries} caliper caliper-mpi)
 endif()
 
 # C++11
