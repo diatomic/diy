@@ -347,6 +347,10 @@ namespace diy
     public:
       std::shared_ptr<spd::logger>  log = get_logger();
       stats::Profiler               prof;
+#if defined(DIY_USE_CALIPER)
+      cali::Loop                    exchange_rounds_loop            { fmt::format("Master @ {}", static_cast<void*>(this)).c_str() };
+      cali::Loop::Iteration         exchange_rounds_loop_iteration  { exchange_rounds_loop.iteration(exchange_round_) };
+#endif
   };
 
   struct Master::SkipNoIncoming
@@ -619,6 +623,10 @@ void
 diy::Master::
 foreach_(const Callback<Block>& f, const Skip& skip)
 {
+#if defined(DIY_USE_CALIPER)
+    exchange_rounds_loop_iteration = exchange_rounds_loop.iteration(exchange_round_);
+#endif
+
     auto scoped = prof.scoped("foreach");
     DIY_UNUSED(scoped);
 
