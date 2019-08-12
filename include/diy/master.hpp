@@ -900,6 +900,8 @@ send_queue(int              from_gid,
            bool             remote,
            IExchangeInfo*   iexchange)
 {
+    cali::Annotation::Guard g( cali::Annotation("block").set(from_gid) );
+
     // skip empty queues and hold queues shorter than some limit for some time
     if ( iexchange && (out_queue.size() == 0 || iexchange->hold(out_queue.size())) )
         return;
