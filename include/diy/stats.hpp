@@ -166,7 +166,25 @@ struct Profiler
         DurationAccumulator total;
 };
 #endif  // DIY_PROFILE
+
+// Annotations don't do anything without Caliper
+struct Annotation
+{
+    struct Guard
+    {
+                    Guard(Annotation& a)            {}
+    };
+
+                    Annotation(const char*)         {}
+
+    template<class T>
+    Annotation&     set(T)                          { return *this; }
+
+};
+
 #else   // DIY_USE_CALIPER
+
+using Annotation = cali::Annotation;
 
 struct Profiler
 {

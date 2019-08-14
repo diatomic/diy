@@ -347,9 +347,7 @@ namespace diy
     public:
       std::shared_ptr<spd::logger>  log = get_logger();
       stats::Profiler               prof;
-#if defined(DIY_USE_CALIPER)
-      cali::Annotation              exchange_round_annotation { "diy.exchange-round" };
-#endif
+      stats::Annotation             exchange_round_annotation { "diy.exchange-round" };
   };
 
   struct Master::SkipNoIncoming
@@ -622,9 +620,7 @@ void
 diy::Master::
 foreach_(const Callback<Block>& f, const Skip& skip)
 {
-#if defined(DIY_USE_CALIPER)
     exchange_round_annotation.set(exchange_round_);
-#endif
 
     auto scoped = prof.scoped("foreach");
     DIY_UNUSED(scoped);
@@ -701,10 +697,7 @@ iexchange_(const    ICallback<Block>&   f,
     // prepare for next round
     incoming_.erase(exchange_round_);
     ++exchange_round_;
-#if defined(DIY_USE_CALIPER)
     exchange_round_annotation.set(exchange_round_);
-#endif
-
 
     //IExchangeInfoDUD iexchange(comm_, min_queue_size, max_hold_time, fine, prof);
     IExchangeInfoCollective iexchange(comm_, min_queue_size, max_hold_time, fine, prof);
@@ -903,7 +896,7 @@ send_queue(int              from_gid,
            bool             remote,
            IExchangeInfo*   iexchange)
 {
-    cali::Annotation::Guard g( cali::Annotation("diy.block").set(from_gid) );
+    stats::Annotation::Guard g( stats::Annotation("diy.block").set(from_gid) );
 
     // skip empty queues and hold queues shorter than some limit for some time
     if ( iexchange && (out_queue.size() == 0 || iexchange->hold(out_queue.size())) )
@@ -1194,9 +1187,7 @@ flush(bool remote)
   // prepare for next round
   incoming_.erase(exchange_round_);
   ++exchange_round_;
-#if defined(DIY_USE_CALIPER)
   exchange_round_annotation.set(exchange_round_);
-#endif
 
 
   if (remote)
