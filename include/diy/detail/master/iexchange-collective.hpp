@@ -47,7 +47,9 @@ control()
         // debug
         if (first_ibarrier)
         {
+            prof >> "iexchange-control";        // consensus-time cannot nest in iexchange-control
             prof << "consensus-time";
+            prof << "iexchange-control";
             first_ibarrier = false;
         }
 
