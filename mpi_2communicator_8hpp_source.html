@@ -276,7 +276,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;<span class="preprocessor">#ifndef DIY_NO_MPI</span></div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;<span class="preprocessor"></span>    MPI_Comm newcomm;</div>
 <div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    MPI_Comm_dup(other.comm_, &amp;newcomm);</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    (*this) = std::move(<a class="code" href="classdiy_1_1mpi_1_1communicator.html">communicator</a>(newcomm,<span class="keyword">true</span>));</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    (*this) = <a class="code" href="classdiy_1_1mpi_1_1communicator.html">communicator</a>(newcomm,<span class="keyword">true</span>);</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;<span class="preprocessor"></span>}</div>
 <div class="ttc" id="classdiy_1_1mpi_1_1communicator_html_ae70d3de7299c172254852f1b0b133eed"><div class="ttname"><a href="classdiy_1_1mpi_1_1communicator.html#ae70d3de7299c172254852f1b0b133eed">diy::mpi::communicator::split</a></div><div class="ttdeci">communicator split(int color, int key=0) const </div><div class="ttdoc">split When keys are the same, the ties are broken by the rank in the original comm. </div><div class="ttdef"><b>Definition:</b> communicator.hpp:166</div></div>
@@ -297,7 +297,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Aug 19 2019 18:24:30 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Aug 19 2019 22:14:19 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
