@@ -101,8 +101,8 @@ if                          (mpi)
                             )
     add_test                (NAME custom-bounds-load-test
                              COMMAND custom-bounds-load-test
-                             DEPENDS custom-bounds-test
                             )
+    set_tests_properties    (custom-bounds-load-test PROPERTIES DEPENDS custom-bounds-test)
 endif                       (mpi)
 
 foreach                     (b 2 4 8 9 12 24 36 44 48 56 64)
