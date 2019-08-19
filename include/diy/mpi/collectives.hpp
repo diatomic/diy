@@ -301,13 +301,14 @@ namespace mpi
   };
 
   //! iBarrier; standalone function version for completeness
-  request   ibarrier(const communicator& comm)
+  inline request   ibarrier(const communicator& comm)
   {
     return comm.ibarrier();
   }
 
   //! Broadcast to all processes in `comm`.
   template<class T>
+  inline
   void      broadcast(const communicator& comm, T& x, int root)
   {
     Collectives<T,void*>::broadcast(comm, x, root);
@@ -315,6 +316,7 @@ namespace mpi
 
   //! Broadcast for vectors
   template<class T>
+  inline
   void      broadcast(const communicator& comm, std::vector<T>& x, int root)
   {
     Collectives<T,void*>::broadcast(comm, x, root);
@@ -331,6 +333,7 @@ namespace mpi
   //!  On `root` process, `out` is resized to `comm.size()` and filled with
   //! elements from the respective ranks.
   template<class T>
+  inline
   void      gather(const communicator& comm, const T& in, std::vector<T>& out, int root)
   {
     Collectives<T,void*>::gather(comm, in, out, root);
@@ -338,6 +341,7 @@ namespace mpi
 
   //! Same as above, but for vectors.
   template<class T>
+  inline
   void      gather(const communicator& comm, const std::vector<T>& in, std::vector< std::vector<T> >& out, int root)
   {
     Collectives<T,void*>::gather(comm, in, out, root);
@@ -345,6 +349,7 @@ namespace mpi
 
   //! Simplified version (without `out`) for use on non-root processes.
   template<class T>
+  inline
   void      gather(const communicator& comm, const T& in, int root)
   {
     Collectives<T,void*>::gather(comm, in, root);
@@ -352,6 +357,7 @@ namespace mpi
 
   //! Simplified version (without `out`) for use on non-root processes.
   template<class T>
+  inline
   void      gather(const communicator& comm, const std::vector<T>& in, int root)
   {
     Collectives<T,void*>::gather(comm, in, root);
@@ -361,6 +367,7 @@ namespace mpi
   //! `out` is resized to `comm.size()` and filled with
   //! elements from the respective ranks.
   template<class T>
+  inline
   void      all_gather(const communicator& comm, const T& in, std::vector<T>& out)
   {
     Collectives<T,void*>::all_gather(comm, in, out);
@@ -368,6 +375,7 @@ namespace mpi
 
   //! Same as above, but for vectors.
   template<class T>
+  inline
   void      all_gather(const communicator& comm, const std::vector<T>& in, std::vector< std::vector<T> >& out)
   {
     Collectives<T,void*>::all_gather(comm, in, out);
@@ -375,6 +383,7 @@ namespace mpi
 
   //! reduce
   template<class T, class Op>
+  inline
   void      reduce(const communicator& comm, const T& in, T& out, int root, const Op& op)
   {
     Collectives<T, Op>::reduce(comm, in, out, root, op);
@@ -382,6 +391,7 @@ namespace mpi
 
   //! Simplified version (without `out`) for use on non-root processes.
   template<class T, class Op>
+  inline
   void      reduce(const communicator& comm, const T& in, int root, const Op& op)
   {
     Collectives<T, Op>::reduce(comm, in, root, op);
@@ -389,6 +399,7 @@ namespace mpi
 
   //! all_reduce
   template<class T, class Op>
+  inline
   void      all_reduce(const communicator& comm, const T& in, T& out, const Op& op)
   {
     Collectives<T, Op>::all_reduce(comm, in, out, op);
@@ -396,6 +407,7 @@ namespace mpi
 
   //! Same as above, but for vectors.
   template<class T, class Op>
+  inline
   void      all_reduce(const communicator& comm, const std::vector<T>& in, std::vector<T>& out, const Op& op)
   {
     Collectives<T, Op>::all_reduce(comm, in, out, op);
@@ -403,6 +415,7 @@ namespace mpi
 
   //! iall_reduce
   template<class T, class Op>
+  inline
   request   iall_reduce(const communicator& comm, const T& in, T& out, const Op& op)
   {
     return Collectives<T, Op>::iall_reduce(comm, in, out, op);
@@ -410,6 +423,7 @@ namespace mpi
 
   //! Same as above, but for vectors.
   template<class T, class Op>
+  inline
   request   iall_reduce(const communicator& comm, const std::vector<T>& in, std::vector<T>& out, const Op& op)
   {
     return Collectives<T, Op>::iall_reduce(comm, in, out, op);
@@ -418,6 +432,7 @@ namespace mpi
 
   //! scan
   template<class T, class Op>
+  inline
   void      scan(const communicator& comm, const T& in, T& out, const Op& op)
   {
     Collectives<T, Op>::scan(comm, in, out, op);
@@ -425,6 +440,7 @@ namespace mpi
 
   //! all_to_all
   template<class T>
+  inline
   void      all_to_all(const communicator& comm, const std::vector<T>& in, std::vector<T>& out, int n = 1)
   {
     Collectives<T, void*>::all_to_all(comm, in, out, n);

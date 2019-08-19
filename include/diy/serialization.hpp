@@ -92,7 +92,8 @@ namespace diy
   template<class T>
   struct Serialization: public detail::Default
   {
-#if defined(__clang__) || (defined(__GNUC__) && __GNUC__ >= 5)
+#if (defined(__clang__) && !defined(__ppc64__)) || (defined(__GNUC__) && __GNUC__ >= 5)
+    //exempt power-pc clang variants due to: https://gitlab.kitware.com/vtk/vtk-m/issues/201
     static_assert(std::is_trivially_copyable<T>::value, "Default serialization works only for trivially copyable types");
 #endif
 
@@ -459,7 +460,7 @@ append_binary(const char* x, size_t count)
         } else
         {
             std::vector<char> tmp;
-            tmp.reserve(new_size * growth_multiplier());
+            tmp.reserve(new_size * static_cast<size_t>(growth_multiplier()));
             tmp.resize(cur_size);
 
             for (size_t i = 0; i < tmp.size(); ++i)

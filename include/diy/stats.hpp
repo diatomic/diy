@@ -13,6 +13,7 @@ namespace diy
 namespace stats
 {
 
+inline
 std::ostream&
 operator<<(std::ostream& out, const std::chrono::high_resolution_clock::duration& d)
 {
