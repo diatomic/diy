@@ -896,7 +896,9 @@ send_queue(int              from_gid,
            bool             remote,
            IExchangeInfo*   iexchange)
 {
-    stats::Annotation::Guard g( stats::Annotation("diy.block").set(from_gid) );
+    stats::Annotation::Guard gb( stats::Annotation("diy.block").set(from_gid) );
+    stats::Annotation::Guard gt( stats::Annotation("diy.to").set(to_gid) );
+    stats::Annotation::Guard gq( stats::Annotation("diy.q-size").set(stats::Variant(static_cast<uint64_t>(out_queue.size()))) );
 
     // skip empty queues and hold queues shorter than some limit for some time
     if ( iexchange && (out_queue.size() == 0 || iexchange->hold(out_queue.size())) )

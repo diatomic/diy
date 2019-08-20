@@ -10,6 +10,7 @@
 
 #if defined(DIY_USE_CALIPER)
 #include <caliper/cali.h>
+#include <caliper/common/Variant.h>
 #endif
 
 namespace diy
@@ -179,12 +180,19 @@ struct Annotation
 
     template<class T>
     Annotation&     set(T)                          { return *this; }
+};
+
+struct Variant
+{
+    template<class T>
+                    Variant(T)                      {}
 
 };
 
 #else   // DIY_USE_CALIPER
 
 using Annotation = cali::Annotation;
+using Variant    = cali::Variant;
 
 struct Profiler
 {
