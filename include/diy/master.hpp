@@ -709,6 +709,7 @@ iexchange_(const    ICallback<Block>&   f,
         for (size_t i = 0; i < size(); i++)     // for all blocks
         {
             iexchange.from_gid = gid(i);       // for shortcut sending only from current block during icommunicate
+            stats::Annotation::Guard g( stats::Annotation("diy.block").set(iexchange.from_gid) );
 
             icommunicate(&iexchange);               // TODO: separate comm thread std::thread t(icommunicate);
             ProxyWithLink cp = proxy(i, &iexchange);
