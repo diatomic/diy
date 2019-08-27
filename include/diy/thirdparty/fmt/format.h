@@ -33,6 +33,8 @@
 #ifndef FMT_FORMAT_H_
 #define FMT_FORMAT_H_
 
+#define FMT_HEADER_ONLY     // Added by diy for header-only usage
+
 #include <algorithm>
 #include <cerrno>
 #include <cmath>
