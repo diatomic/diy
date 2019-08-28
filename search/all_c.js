@@ -1,8 +1,15 @@
 var searchData=
 [
-  ['operator_3c_3c',['operator&lt;&lt;',['../classfmt_1_1_basic_writer.html#afb01c45f06b2c13027343b74ce973a40',1,'fmt::BasicWriter::operator&lt;&lt;(ULongLong value)'],['../classfmt_1_1_basic_writer.html#a90215ced4a6a9fcd5065f1ffd4105a4b',1,'fmt::BasicWriter::operator&lt;&lt;(long double value)'],['../classfmt_1_1_basic_writer.html#a4c7d6b3a40b4083f351de3f9ee0b3818',1,'fmt::BasicWriter::operator&lt;&lt;(char value)'],['../classfmt_1_1_basic_writer.html#a5f07d053b9f215b548ba3623e7a09212',1,'fmt::BasicWriter::operator&lt;&lt;(fmt::BasicStringRef&lt; Char &gt; value)']]],
-  ['operator_5b_5d',['operator[]',['../classfmt_1_1_arg_list.html#ad2c2672388e003aa70d9c948ac8140cd',1,'fmt::ArgList']]],
-  ['optional',['optional',['../structdiy_1_1mpi_1_1optional.html',1,'diy::mpi']]],
-  ['out_5flink',['out_link',['../structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9',1,'diy::ReduceProxy']]],
-  ['outgoingqueuesrecord',['OutgoingQueuesRecord',['../structdiy_1_1_master_1_1_outgoing_queues_record.html',1,'diy::Master']]]
+  ['named_5farg',['named_arg',['../structinternal_1_1named__arg.html',1,'internal']]],
+  ['named_5farg_5fbase',['named_arg_base',['../structinternal_1_1named__arg__base.html',1,'internal']]],
+  ['named_5farg_5fbase_3c_20char_5ftype_20_3e',['named_arg_base&lt; char_type &gt;',['../structinternal_1_1named__arg__base.html',1,'internal']]],
+  ['named_5fargument_5fid',['named_argument_id',['../structinternal_1_1format__part_1_1named__argument__id.html',1,'internal::format_part']]],
+  ['nblocks',['nblocks',['../classdiy_1_1_assigner.html#a61ea8499c8c28934f94e18e635e06436',1,'diy::Assigner::nblocks()'],['../structdiy_1_1_reduce_proxy.html#ab340a062e8e96bfb7428186e6f3046a8',1,'diy::ReduceProxy::nblocks()']]],
+  ['near',['near',['../namespacediy.html#a3c23b7187b5855ad507c063595e99918',1,'diy']]],
+  ['neverskip',['NeverSkip',['../structdiy_1_1_master_1_1_never_skip.html',1,'diy::Master']]],
+  ['null',['null',['../structinternal_1_1null.html',1,'internal']]],
+  ['num_5fwriter',['num_writer',['../structinternal_1_1basic__writer_1_1int__writer_1_1num__writer.html',1,'internal::basic_writer::int_writer']]],
+  ['numeric_5fspecs_5fchecker',['numeric_specs_checker',['../classinternal_1_1numeric__specs__checker.html',1,'internal']]],
+  ['numeric_5fspecs_5fchecker_3c_20handler_20_3e',['numeric_specs_checker&lt; Handler &gt;',['../classinternal_1_1numeric__specs__checker.html',1,'internal']]],
+  ['numpy',['NumPy',['../classdiy_1_1io_1_1_num_py.html',1,'diy::io']]]
 ];

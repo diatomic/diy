@@ -13,8 +13,8 @@ var searchData=
   ['regularmergepartners',['RegularMergePartners',['../structdiy_1_1_regular_merge_partners.html#ab1d3706a355ceeac5c5454d3a4f4f1f7',1,'diy::RegularMergePartners::RegularMergePartners(const Decomposer &amp;decomposer, int k, bool contiguous=true)'],['../structdiy_1_1_regular_merge_partners.html#a9ffbb27bb7d66e660d4e244f163bbd18',1,'diy::RegularMergePartners::RegularMergePartners(const DivisionVector &amp;divs, const KVSVector &amp;kvs, bool contiguous=true)']]],
   ['regularswappartners',['RegularSwapPartners',['../structdiy_1_1_regular_swap_partners.html#a23de46f6b30179af266e147312543c6a',1,'diy::RegularSwapPartners::RegularSwapPartners(const Decomposer &amp;decomposer, int k, bool contiguous=true)'],['../structdiy_1_1_regular_swap_partners.html#a9a2a18721741fd117f76c40c5106953f',1,'diy::RegularSwapPartners::RegularSwapPartners(const DivisionVector &amp;divs, const KVSVector &amp;kvs, bool contiguous=true)']]],
   ['release',['release',['../classdiy_1_1_master.html#a4e8f7b4f8af7041559385b54e82d0f1c',1,'diy::Master']]],
-  ['reserve',['reserve',['../classfmt_1_1_buffer.html#a7f46a3ce8d86abe35904f6654bd4ea1e',1,'fmt::Buffer']]],
-  ['resize',['resize',['../classfmt_1_1_buffer.html#a20f893164dc20e8ea8c77810d4ea8d59',1,'fmt::Buffer']]],
+  ['reserve',['reserve',['../classinternal_1_1buffer.html#a6aa946f91c0aeb68f06d3889ba9d5b48',1,'internal::buffer']]],
+  ['resize',['resize',['../classinternal_1_1buffer.html#a4d38f4fdc2d4ca913a5a13523b690893',1,'internal::buffer']]],
   ['round',['round',['../structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375',1,'diy::ReduceProxy']]],
   ['rounds',['rounds',['../structdiy_1_1_regular_all_reduce_partners.html#a2e293d418aa252920321004e2461097e',1,'diy::RegularAllReducePartners::rounds()'],['../structdiy_1_1_regular_broadcast_partners.html#a51402d889b532bef77c2d5f29ebaed5f',1,'diy::RegularBroadcastPartners::rounds()']]]
 ];

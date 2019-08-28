@@ -73,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -92,118 +92,152 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">ostream.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> Formatting library for C++ - std::ostream support</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> Copyright (c) 2012 - 2016, Victor Zverovich</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> All rights reserved.</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"> For the license information refer to format.h.</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment"> */</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#ifndef FMT_OSTREAM_H_</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define FMT_OSTREAM_H_</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;format.h&quot;</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;ostream&gt;</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="keyword">namespace </span>fmt {</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keyword">namespace </span>internal {</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> Char&gt;</div>
-<div class="line"><a name="l00021"></a><span class="lineno"><a class="line" href="classfmt_1_1internal_1_1_format_buf.html">   21</a></span>&#160;<span class="keyword">class </span><a class="code" href="classfmt_1_1internal_1_1_format_buf.html">FormatBuf</a> : <span class="keyword">public</span> std::basic_streambuf&lt;Char&gt; {</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  <span class="keyword">typedef</span> <span class="keyword">typename</span> std::basic_streambuf&lt;Char&gt;::int_type int_type;</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <span class="keyword">typedef</span> <span class="keyword">typename</span> std::basic_streambuf&lt;Char&gt;::traits_type traits_type;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <a class="code" href="classfmt_1_1_buffer.html">Buffer&lt;Char&gt;</a> &amp;buffer_;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <a class="code" href="classfmt_1_1internal_1_1_format_buf.html">FormatBuf</a>(<a class="code" href="classfmt_1_1_buffer.html">Buffer&lt;Char&gt;</a> &amp;buffer) : buffer_(buffer) {}</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; <span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="comment">// The put-area is actually always empty. This makes the implementation</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="comment">// simpler and has the advantage that the streambuf and the buffer are always</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="comment">// in sync and sputc never writes into uninitialized memory. The obvious</span></div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="comment">// disadvantage is that each call to sputc always results in a (virtual) call</span></div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="comment">// to overflow. There is no disadvantage here for sputn since this always</span></div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <span class="comment">// results in a call to xsputn.</span></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  int_type overflow(int_type ch = traits_type::eof()) FMT_OVERRIDE {</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keywordflow">if</span> (!traits_type::eq_int_type(ch, traits_type::eof()))</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;      buffer_.push_back(static_cast&lt;Char&gt;(ch));</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordflow">return</span> ch;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  }</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  std::streamsize xsputn(<span class="keyword">const</span> Char *s, std::streamsize count) FMT_OVERRIDE {</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    buffer_.<a class="code" href="classfmt_1_1_buffer.html#a7ca155741c43ec7c7edcea8dd28a2123">append</a>(s, s + count);</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordflow">return</span> count;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  }</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;};</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;Yes &amp;convert(std::ostream &amp;);</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
-<div class="line"><a name="l00053"></a><span class="lineno"><a class="line" href="structfmt_1_1internal_1_1_dummy_stream.html">   53</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structfmt_1_1internal_1_1_dummy_stream.html">DummyStream</a> : std::ostream {</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <a class="code" href="structfmt_1_1internal_1_1_dummy_stream.html">DummyStream</a>();  <span class="comment">// Suppress a bogus warning in MSVC.</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <span class="comment">// Hide all operator&lt;&lt; overloads from std::ostream.</span></div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <span class="keywordtype">void</span> operator&lt;&lt;(Null&lt;&gt;);</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;};</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;No &amp;operator&lt;&lt;(std::ostream &amp;, <span class="keywordtype">int</span>);</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00062"></a><span class="lineno"><a class="line" href="structfmt_1_1internal_1_1_convert_to_int_impl_3_01_t_00_01true_01_4.html">   62</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structfmt_1_1internal_1_1_convert_to_int_impl.html">ConvertToIntImpl</a>&lt;T, true&gt; {</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  <span class="comment">// Convert to int only if T doesn&#39;t have an overloaded operator&lt;&lt;.</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  <span class="keyword">enum</span> {</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    value = <span class="keyword">sizeof</span>(convert(get&lt;DummyStream&gt;() &lt;&lt; get&lt;T&gt;())) == <span class="keyword">sizeof</span>(No)</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  };</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;};</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="comment">// Write the content of w to os.</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;FMT_API <span class="keywordtype">void</span> write(std::ostream &amp;os, <a class="code" href="classfmt_1_1_basic_writer.html">Writer</a> &amp;w);</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;}  <span class="comment">// namespace internal</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment">// Formats a value.</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Char, <span class="keyword">typename</span> ArgFormatter_, <span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="keywordtype">void</span> format_arg(<a class="code" href="classfmt_1_1_basic_formatter.html">BasicFormatter&lt;Char, ArgFormatter_&gt;</a> &amp;f,</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;                <span class="keyword">const</span> Char *&amp;format_str, <span class="keyword">const</span> T &amp;value) {</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <a class="code" href="classfmt_1_1internal_1_1_memory_buffer.html">internal::MemoryBuffer&lt;Char, internal::INLINE_BUFFER_SIZE&gt;</a> buffer;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  <a class="code" href="classfmt_1_1internal_1_1_format_buf.html">internal::FormatBuf&lt;Char&gt;</a> format_buf(buffer);</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  std::basic_ostream&lt;Char&gt; output(&amp;format_buf);</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  output &lt;&lt; value;</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  <a class="code" href="classfmt_1_1_basic_string_ref.html">BasicStringRef&lt;Char&gt;</a> str(&amp;buffer[0], buffer.<a class="code" href="classfmt_1_1_buffer.html#a14fa72f0ddf584c14ffffb1446f598aa">size</a>());</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  <span class="keyword">typedef</span> <a class="code" href="classfmt_1_1internal_1_1_make_arg.html">internal::MakeArg&lt; BasicFormatter&lt;Char&gt;</a> &gt; MakeArg;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  format_str = f.<a class="code" href="classfmt_1_1_basic_formatter.html#a63acecbbf9681005f3c7eb4d42a54bf7">format</a>(format_str, MakeArg(str));</div>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">// Formatting library for C++ - std::ostream support</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">//</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">// Copyright (c) 2012 - present, Victor Zverovich</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">// All rights reserved.</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">//</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment">// For the license information refer to format.h.</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#ifndef FMT_OSTREAM_H_</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define FMT_OSTREAM_H_</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &lt;ostream&gt;</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;format.h&quot;</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;FMT_BEGIN_NAMESPACE</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">namespace </span>internal {</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;</div>
+<div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="classinternal_1_1formatbuf.html">   17</a></span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> Char&gt; <span class="keyword">class </span><a class="code" href="classinternal_1_1formatbuf.html">formatbuf</a> : <span class="keyword">public</span> std::basic_streambuf&lt;Char&gt; {</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <span class="keyword">using</span> int_type = <span class="keyword">typename</span> std::basic_streambuf&lt;Char&gt;::int_type;</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <span class="keyword">using</span> traits_type = <span class="keyword">typename</span> std::basic_streambuf&lt;Char&gt;::traits_type;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <a class="code" href="classinternal_1_1buffer.html">buffer&lt;Char&gt;</a>&amp; buffer_;</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <a class="code" href="classinternal_1_1formatbuf.html">formatbuf</a>(<a class="code" href="classinternal_1_1buffer.html">buffer&lt;Char&gt;</a>&amp; buf) : buffer_(buf) {}</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; <span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <span class="comment">// The put-area is actually always empty. This makes the implementation</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <span class="comment">// simpler and has the advantage that the streambuf and the buffer are always</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="comment">// in sync and sputc never writes into uninitialized memory. The obvious</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="comment">// disadvantage is that each call to sputc always results in a (virtual) call</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="comment">// to overflow. There is no disadvantage here for sputn since this always</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="comment">// results in a call to xsputn.</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  int_type overflow(int_type ch = traits_type::eof()) FMT_OVERRIDE {</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keywordflow">if</span> (!traits_type::eq_int_type(ch, traits_type::eof()))</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;      buffer_.push_back(static_cast&lt;Char&gt;(ch));</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keywordflow">return</span> ch;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  }</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  std::streamsize xsputn(<span class="keyword">const</span> Char* s, std::streamsize count) FMT_OVERRIDE {</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    buffer_.<a class="code" href="classinternal_1_1buffer.html#a0493c6d5ceedf88219624f59ea2fbf4c">append</a>(s, s + count);</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordflow">return</span> count;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  }</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;};</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
+<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="structinternal_1_1test__stream.html">   47</a></span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Char&gt; <span class="keyword">struct </span><a class="code" href="structinternal_1_1test__stream.html">test_stream</a> : std::basic_ostream&lt;Char&gt; {</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <span class="keyword">struct </span><a class="code" href="structinternal_1_1null.html">null</a>;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="comment">// Hide all operator&lt;&lt; from std::basic_ostream&lt;Char&gt;.</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <span class="keywordtype">void</span> operator&lt;&lt;(<a class="code" href="structinternal_1_1null.html">null</a>);</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;};</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="comment">// Checks if T has a user-defined operator&lt;&lt; (e.g. not a member of</span></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="comment">// std::ostream).</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno"><a class="line" href="classinternal_1_1is__streamable.html">   56</a></span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> Char&gt; <span class="keyword">class </span><a class="code" href="classinternal_1_1is__streamable.html">is_streamable</a> {</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <span class="keyword">template</span> &lt;<span class="keyword">typename</span> U&gt;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="keyword">static</span> decltype((<span class="keywordtype">void</span>)(std::declval&lt;<a class="code" href="structinternal_1_1test__stream.html">test_stream&lt;Char&gt;</a>&amp;&gt;()</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;                         &lt;&lt; std::declval&lt;U&gt;()),</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;                  std::true_type())</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  test(<span class="keywordtype">int</span>);</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  <span class="keyword">template</span> &lt;<span class="keyword">typename</span>&gt; <span class="keyword">static</span> std::false_type test(...);</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  <span class="keyword">using</span> result = decltype(test&lt;T&gt;(0));</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">bool</span> <a class="code" href="classinternal_1_1value.html">value</a> = result::value;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;};</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment">// Write the content of buf to os.</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Char&gt;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="keywordtype">void</span> write(std::basic_ostream&lt;Char&gt;&amp; os, <a class="code" href="classinternal_1_1buffer.html">buffer&lt;Char&gt;</a>&amp; buf) {</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  <span class="keyword">const</span> Char* buf_data = buf.<a class="code" href="classinternal_1_1buffer.html#aaaa371bd0a7aaad4af49363cb85fefb3">data</a>();</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  <span class="keyword">using</span> unsigned_streamsize = std::make_unsigned&lt;std::streamsize&gt;::type;</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  unsigned_streamsize size = buf.<a class="code" href="classinternal_1_1buffer.html#abac844b364cd93450a9c311807d15f80">size</a>();</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  unsigned_streamsize max_size =</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;      to_unsigned((std::numeric_limits&lt;std::streamsize&gt;::max)());</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  <span class="keywordflow">do</span> {</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    unsigned_streamsize n = size &lt;= max_size ? size : max_size;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    os.write(buf_data, static_cast&lt;std::streamsize&gt;(n));</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    buf_data += n;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    size -= n;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  } <span class="keywordflow">while</span> (size != 0);</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;}</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;FMT_API <span class="keywordtype">void</span> print(std::ostream &amp;os, CStringRef format_str, ArgList args);</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;FMT_VARIADIC(<span class="keywordtype">void</span>, print, std::ostream &amp;, CStringRef)</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;}  <span class="comment">// namespace fmt</span></div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="preprocessor">#ifdef FMT_HEADER_ONLY</span></div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="preprocessor"></span><span class="preprocessor"># include &quot;ostream.cc&quot;</span></div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="preprocessor">#endif  // FMT_OSTREAM_H_</span></div>
-<div class="ttc" id="structfmt_1_1internal_1_1_convert_to_int_impl_html"><div class="ttname"><a href="structfmt_1_1internal_1_1_convert_to_int_impl.html">fmt::internal::ConvertToIntImpl</a></div><div class="ttdef"><b>Definition:</b> format.h:1161</div></div>
-<div class="ttc" id="classfmt_1_1internal_1_1_make_arg_html"><div class="ttname"><a href="classfmt_1_1internal_1_1_make_arg.html">fmt::internal::MakeArg</a></div><div class="ttdef"><b>Definition:</b> format.h:1420</div></div>
-<div class="ttc" id="classfmt_1_1_basic_formatter_html_a63acecbbf9681005f3c7eb4d42a54bf7"><div class="ttname"><a href="classfmt_1_1_basic_formatter.html#a63acecbbf9681005f3c7eb4d42a54bf7">fmt::BasicFormatter::format</a></div><div class="ttdeci">void format(BasicCStringRef&lt; Char &gt; format_str)</div><div class="ttdef"><b>Definition:</b> format.h:3853</div></div>
-<div class="ttc" id="classfmt_1_1internal_1_1_format_buf_html"><div class="ttname"><a href="classfmt_1_1internal_1_1_format_buf.html">fmt::internal::FormatBuf</a></div><div class="ttdef"><b>Definition:</b> ostream.h:21</div></div>
-<div class="ttc" id="classfmt_1_1_buffer_html"><div class="ttname"><a href="classfmt_1_1_buffer.html">fmt::Buffer&lt; Char &gt;</a></div></div>
-<div class="ttc" id="classfmt_1_1_basic_formatter_html"><div class="ttname"><a href="classfmt_1_1_basic_formatter.html">fmt::BasicFormatter</a></div><div class="ttdef"><b>Definition:</b> format.h:454</div></div>
-<div class="ttc" id="structfmt_1_1internal_1_1_dummy_stream_html"><div class="ttname"><a href="structfmt_1_1internal_1_1_dummy_stream.html">fmt::internal::DummyStream</a></div><div class="ttdef"><b>Definition:</b> ostream.h:53</div></div>
-<div class="ttc" id="classfmt_1_1internal_1_1_memory_buffer_html"><div class="ttname"><a href="classfmt_1_1internal_1_1_memory_buffer.html">fmt::internal::MemoryBuffer</a></div><div class="ttdef"><b>Definition:</b> format.h:744</div></div>
-<div class="ttc" id="classfmt_1_1_buffer_html_a7ca155741c43ec7c7edcea8dd28a2123"><div class="ttname"><a href="classfmt_1_1_buffer.html#a7ca155741c43ec7c7edcea8dd28a2123">fmt::Buffer::append</a></div><div class="ttdeci">void append(const U *begin, const U *end)</div><div class="ttdef"><b>Definition:</b> format.h:729</div></div>
-<div class="ttc" id="classfmt_1_1_basic_string_ref_html"><div class="ttname"><a href="classfmt_1_1_basic_string_ref.html">fmt::BasicStringRef</a></div><div class="ttdef"><b>Definition:</b> format.h:482</div></div>
-<div class="ttc" id="classfmt_1_1_buffer_html_a14fa72f0ddf584c14ffffb1446f598aa"><div class="ttname"><a href="classfmt_1_1_buffer.html#a14fa72f0ddf584c14ffffb1446f598aa">fmt::Buffer::size</a></div><div class="ttdeci">std::size_t size() const </div><div class="ttdef"><b>Definition:</b> format.h:687</div></div>
-<div class="ttc" id="classfmt_1_1_basic_writer_html"><div class="ttname"><a href="classfmt_1_1_basic_writer.html">fmt::BasicWriter</a></div><div class="ttdef"><b>Definition:</b> format.h:439</div></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Char, <span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="keywordtype">void</span> format_value(buffer&lt;Char&gt;&amp; buf, <span class="keyword">const</span> T&amp; value) {</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  formatbuf&lt;Char&gt; format_buf(buf);</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  std::basic_ostream&lt;Char&gt; output(&amp;format_buf);</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  output.exceptions(std::ios_base::failbit | std::ios_base::badbit);</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  output &lt;&lt; value;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  buf.resize(buf.size());</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;}</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="comment">// Formats an object of type T that has an overloaded ostream operator&lt;&lt;.</span></div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> Char&gt;</div>
+<div class="line"><a name="l00099"></a><span class="lineno"><a class="line" href="structinternal_1_1fallback__formatter_3_01_t_00_01_char_00_01enable__if__t_3_01is__streamable_3_5182f96b213c85479e4fbfa710b29535.html">   99</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structinternal_1_1fallback__formatter.html">fallback_formatter</a>&lt;T, Char, enable_if_t&lt;<a class="code" href="classinternal_1_1is__streamable.html">is_streamable</a>&lt;T, Char&gt;::value&gt;&gt;</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    : <a class="code" href="structformatter.html">formatter</a>&lt;basic_string_view&lt;Char&gt;, Char&gt; {</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  <span class="keyword">template</span> &lt;<span class="keyword">typename</span> Context&gt;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  <span class="keyword">auto</span> format(<span class="keyword">const</span> T&amp; value, Context&amp; ctx) -&gt; decltype(ctx.out()) {</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <a class="code" href="classbasic__memory__buffer.html">basic_memory_buffer&lt;Char&gt;</a> <a class="code" href="classinternal_1_1buffer.html">buffer</a>;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    format_value(buffer, value);</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <a class="code" href="classbasic__string__view.html">basic_string_view&lt;Char&gt;</a> str(buffer.<a class="code" href="classinternal_1_1buffer.html#aaaa371bd0a7aaad4af49363cb85fefb3">data</a>(), buffer.<a class="code" href="classinternal_1_1buffer.html#abac844b364cd93450a9c311807d15f80">size</a>());</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="structformatter.html">formatter&lt;basic_string_view&lt;Char&gt;</a>, Char&gt;::format(str, ctx);</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  }</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;};</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;}  <span class="comment">// namespace internal</span></div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Char&gt;</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="keywordtype">void</span> vprint(std::basic_ostream&lt;Char&gt;&amp; os, <a class="code" href="classbasic__string__view.html">basic_string_view&lt;Char&gt;</a> format_str,</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;            <a class="code" href="classbasic__format__args.html">basic_format_args</a>&lt;<a class="code" href="classbasic__format__context.html">buffer_context&lt;Char&gt;</a>&gt; args) {</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  <a class="code" href="classbasic__memory__buffer.html">basic_memory_buffer&lt;Char&gt;</a> buffer;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  internal::vformat_to(buffer, format_str, args);</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  internal::write(os, buffer);</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;}</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> S, <span class="keyword">typename</span>... Args,</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;          <span class="keyword">typename</span> Char = enable_if_t&lt;internal::is_string&lt;S&gt;::value, char_t&lt;S&gt;&gt;&gt;</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;<span class="keywordtype">void</span> print(std::basic_ostream&lt;Char&gt;&amp; os, <span class="keyword">const</span> S&amp; format_str, Args&amp;&amp;... args) {</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  vprint(os, to_string_view(format_str),</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;         {internal::make_args_checked&lt;Args...&gt;(format_str, args...)});</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;}</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;FMT_END_NAMESPACE</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;<span class="preprocessor">#endif  // FMT_OSTREAM_H_</span></div>
+<div class="ttc" id="classbasic__memory__buffer_html"><div class="ttname"><a href="classbasic__memory__buffer.html">basic_memory_buffer&lt; Char &gt;</a></div></div>
+<div class="ttc" id="classinternal_1_1buffer_html"><div class="ttname"><a href="classinternal_1_1buffer.html">internal::buffer&lt; Char &gt;</a></div></div>
+<div class="ttc" id="structformatter_html"><div class="ttname"><a href="structformatter.html">formatter</a></div><div class="ttdef"><b>Definition:</b> core.h:485</div></div>
+<div class="ttc" id="classinternal_1_1buffer_html_a0493c6d5ceedf88219624f59ea2fbf4c"><div class="ttname"><a href="classinternal_1_1buffer.html#a0493c6d5ceedf88219624f59ea2fbf4c">internal::buffer::append</a></div><div class="ttdeci">void append(const U *begin, const U *end)</div><div class="ttdef"><b>Definition:</b> format.h:475</div></div>
+<div class="ttc" id="classinternal_1_1buffer_html_abac844b364cd93450a9c311807d15f80"><div class="ttname"><a href="classinternal_1_1buffer.html#abac844b364cd93450a9c311807d15f80">internal::buffer::size</a></div><div class="ttdeci">std::size_t size() const FMT_NOEXCEPT</div><div class="ttdef"><b>Definition:</b> core.h:541</div></div>
+<div class="ttc" id="classinternal_1_1value_html"><div class="ttname"><a href="classinternal_1_1value.html">internal::value</a></div><div class="ttdef"><b>Definition:</b> core.h:685</div></div>
+<div class="ttc" id="classbasic__string__view_html"><div class="ttname"><a href="classbasic__string__view.html">basic_string_view</a></div><div class="ttdef"><b>Definition:</b> core.h:243</div></div>
+<div class="ttc" id="classbasic__format__args_html"><div class="ttname"><a href="classbasic__format__args.html">basic_format_args</a></div><div class="ttdef"><b>Definition:</b> core.h:481</div></div>
+<div class="ttc" id="classinternal_1_1is__streamable_html"><div class="ttname"><a href="classinternal_1_1is__streamable.html">internal::is_streamable</a></div><div class="ttdef"><b>Definition:</b> ostream.h:56</div></div>
+<div class="ttc" id="structinternal_1_1test__stream_html"><div class="ttname"><a href="structinternal_1_1test__stream.html">internal::test_stream</a></div><div class="ttdef"><b>Definition:</b> ostream.h:47</div></div>
+<div class="ttc" id="classinternal_1_1formatbuf_html"><div class="ttname"><a href="classinternal_1_1formatbuf.html">internal::formatbuf</a></div><div class="ttdef"><b>Definition:</b> ostream.h:17</div></div>
+<div class="ttc" id="structinternal_1_1fallback__formatter_html"><div class="ttname"><a href="structinternal_1_1fallback__formatter.html">internal::fallback_formatter</a></div><div class="ttdef"><b>Definition:</b> core.h:609</div></div>
+<div class="ttc" id="structinternal_1_1null_html"><div class="ttname"><a href="structinternal_1_1null.html">internal::null</a></div><div class="ttdef"><b>Definition:</b> format.h:939</div></div>
+<div class="ttc" id="classinternal_1_1buffer_html_aaaa371bd0a7aaad4af49363cb85fefb3"><div class="ttname"><a href="classinternal_1_1buffer.html#aaaa371bd0a7aaad4af49363cb85fefb3">internal::buffer::data</a></div><div class="ttdeci">T * data() FMT_NOEXCEPT</div><div class="ttdef"><b>Definition:</b> core.h:547</div></div>
+<div class="ttc" id="classbasic__format__context_html"><div class="ttname"><a href="classbasic__format__context.html">basic_format_context</a></div><div class="ttdef"><b>Definition:</b> core.h:1026</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Aug 26 2019 20:41:10 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Aug 28 2019 20:59:30 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

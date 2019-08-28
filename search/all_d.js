@@ -1,13 +1,11 @@
 var searchData=
 [
-  ['parent',['Parent',['../structdiy_1_1_regular_all_reduce_partners.html#a296e604a311947574b84a05369f5ae5d',1,'diy::RegularAllReducePartners::Parent()'],['../structdiy_1_1_regular_broadcast_partners.html#ad4c035cc5144eeab1861bc481c6480db',1,'diy::RegularBroadcastPartners::Parent()']]],
-  ['parent_5fround',['parent_round',['../structdiy_1_1_regular_all_reduce_partners.html#a5549f231ac8e62d5611e398c243c1319',1,'diy::RegularAllReducePartners::parent_round()'],['../structdiy_1_1_regular_broadcast_partners.html#a2f8a25e60936d4a101d38064c1bf4958',1,'diy::RegularBroadcastPartners::parent_round()']]],
-  ['point',['Point',['../classdiy_1_1_point.html',1,'diy']]],
-  ['point_3c_20int_2c_20d_20_3e',['Point&lt; int, D &gt;',['../classdiy_1_1_point.html',1,'diy']]],
-  ['point_5fto_5fgid',['point_to_gid',['../structdiy_1_1_regular_decomposer.html#aa80f92b502081b4e130725c80d3f497a',1,'diy::RegularDecomposer']]],
-  ['probe',['probe',['../classdiy_1_1mpi_1_1communicator.html#aedd24dd693fc544b3742ff613f4621ec',1,'diy::mpi::communicator']]],
-  ['processblock',['ProcessBlock',['../structdiy_1_1_master_1_1_process_block.html',1,'diy::Master']]],
-  ['profiler',['Profiler',['../structdiy_1_1stats_1_1_profiler.html',1,'diy::stats']]],
-  ['proxy',['Proxy',['../structdiy_1_1_master_1_1_proxy.html',1,'diy::Master']]],
-  ['proxywithlink',['ProxyWithLink',['../structdiy_1_1_master_1_1_proxy_with_link.html',1,'diy::Master']]]
+  ['operator_28_29',['operator()',['../classarg__formatter.html#ac8ddd9b78934fc951916a30d46114ab1',1,'arg_formatter::operator()()'],['../classprintf__arg__formatter.html#a4e462c5b70ceef75a41261472aa56313',1,'printf_arg_formatter::operator()(const char *value)'],['../classprintf__arg__formatter.html#a880170cd3e3ace7546cb01268586ac77',1,'printf_arg_formatter::operator()(const wchar_t *value)'],['../classprintf__arg__formatter.html#a22c7d349112400ecf9a66005b1a0229e',1,'printf_arg_formatter::operator()(const void *value)'],['../classprintf__arg__formatter.html#a57ded50a248eab9775966e05330dfcb5',1,'printf_arg_formatter::operator()(typename basic_format_arg&lt; context_type &gt;::handle handle)']]],
+  ['operator_3d',['operator=',['../classbasic__memory__buffer.html#ae03c16a826d5ebaf1754467f40d0b7ba',1,'basic_memory_buffer']]],
+  ['optional',['optional',['../structdiy_1_1mpi_1_1optional.html',1,'diy::mpi']]],
+  ['out',['out',['../structformat__to__n__result.html#a90597c6c1d23c7301aef16e756c6263b',1,'format_to_n_result']]],
+  ['out_5flink',['out_link',['../structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9',1,'diy::ReduceProxy']]],
+  ['outgoingqueuesrecord',['OutgoingQueuesRecord',['../structdiy_1_1_master_1_1_outgoing_queues_record.html',1,'diy::Master']]],
+  ['output_5frange',['output_range',['../classinternal_1_1output__range.html',1,'internal']]],
+  ['output_5frange_3c_20std_3a_3aback_5finsert_5fiterator_3c_20buffer_3c_20t_20_3e_20_3e_2c_20t_20_3e',['output_range&lt; std::back_insert_iterator&lt; buffer&lt; T &gt; &gt;, T &gt;',['../classinternal_1_1output__range.html',1,'internal']]]
 ];
