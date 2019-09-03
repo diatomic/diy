@@ -8,6 +8,11 @@
 
 #include "log.hpp"
 
+#if defined(DIY_USE_CALIPER)
+#include <caliper/cali.h>
+#include <caliper/common/Variant.h>
+#endif
+
 namespace diy
 {
 namespace stats
@@ -74,6 +79,7 @@ struct  ScopedProfile
 };
 
 
+#if !defined(DIY_USE_CALIPER)
 #if defined(DIY_PROFILE)
 struct Profiler
 {
@@ -132,7 +138,7 @@ struct Profiler
         EventsVector            events;
         DurationAccumulator     total;
 };
-#else
+#else   // DIY_PROFILE
 struct Profiler
 {
     using   Scoped = ScopedProfile<Profiler>;
@@ -154,6 +160,58 @@ struct Profiler
 
     Scoped  scoped(std::string name)            { return Scoped(*this, name); }
 
+    const DurationAccumulator&
+            totals() const                      { return total; }
+
+    private:
+        DurationAccumulator total;
+};
+#endif  // DIY_PROFILE
+
+// Annotations don't do anything without Caliper
+struct Annotation
+{
+    struct Guard
+    {
+                    Guard(Annotation& a)            {}
+    };
+
+                    Annotation(const char*)         {}
+
+    template<class T>
+    Annotation&     set(T)                          { return *this; }
+};
+
+struct Variant
+{
+    template<class T>
+                    Variant(T)                      {}
+
+};
+
+#else   // DIY_USE_CALIPER
+
+using Annotation = cali::Annotation;
+using Variant    = cali::Variant;
+
+struct Profiler
+{
+    using   Scoped = ScopedProfile<Profiler>;
+
+    void    reset_time()                        {}
+
+    void    operator<<(std::string name)        { enter(name); }
+    void    operator>>(std::string name)        { exit(name); }
+
+    void    enter(std::string name)             { CALI_MARK_BEGIN(name.c_str()); }
+    void    exit(std::string name)              { CALI_MARK_END(name.c_str()); }
+
+    void    output(std::ostream& out, std::string = "") const {}
+    void    clear()                             {}
+
+    Scoped  scoped(std::string name)            { return Scoped(*this, name); }
+
+    // unused
     const DurationAccumulator&
             totals() const                      { return total; }
 

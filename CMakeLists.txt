@@ -6,6 +6,7 @@ include(CMakeDependentOption)
 cmake_dependent_option      (threads            "Build DIY with threading"                                  ON "NOT WIN32" OFF)
 option                      (log                "Build DIY with logging"                                    OFF)
 option                      (profile            "Build DIY with profiling"                                  OFF)
+option                      (caliper            "Build DIY with caliper"                                    OFF)
 option                      (mpi                "Build DIY with mpi"                                        ON)
 option                      (wrapped_mpi        "MPI compiler wrapper requires no further MPI libraries"    OFF)
 option                      (build_examples     "Build DIY examples"                                        ON)
@@ -33,6 +34,14 @@ endif()
 # Profiling
 if                          (profile)
     add_definitions         (-DDIY_PROFILE)
+endif()
+
+if                          (caliper)
+    add_definitions         (-DDIY_USE_CALIPER)
+
+    find_package            (caliper)
+    include_directories     (${caliper_INCLUDE_DIR})
+    set                     (libraries  ${libraries} caliper caliper-mpi)
 endif()
 
 # C++11

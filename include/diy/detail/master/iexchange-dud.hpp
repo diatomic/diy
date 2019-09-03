@@ -163,7 +163,9 @@ control()
         // debug
         if (first_dud)
         {
+            prof >> "iexchange-control";        // consensus-time cannot nest in iexchange-control
             prof << "consensus-time";
+            prof << "iexchange-control";
             first_dud = false;
         }
 
