@@ -10,5 +10,6 @@ var searchData=
   ['gridref',['GridRef',['../structdiy_1_1_grid_ref.html',1,'diy']]],
   ['grisu_5fshortest_5fhandler',['grisu_shortest_handler',['../structinternal_1_1grisu__shortest__handler.html',1,'internal']]],
   ['grow',['grow',['../classinternal_1_1buffer.html#a38f53be20945474be4f60b58b9b4cc54',1,'internal::buffer::grow()'],['../classinternal_1_1container__buffer.html#a9dc9c633e12053ddf07af13b30b378b3',1,'internal::container_buffer::grow()'],['../classbasic__memory__buffer.html#a2f01489b9805a99cdc93ab0aee6730eb',1,'basic_memory_buffer::grow()']]],
-  ['growth_5fmultiplier',['growth_multiplier',['../structdiy_1_1_memory_buffer.html#a5e2f70569226e09b8a0ca3c8319d93bc',1,'diy::MemoryBuffer']]]
+  ['growth_5fmultiplier',['growth_multiplier',['../structdiy_1_1_memory_buffer.html#a5e2f70569226e09b8a0ca3c8319d93bc',1,'diy::MemoryBuffer']]],
+  ['guard',['Guard',['../structdiy_1_1stats_1_1_annotation_1_1_guard.html',1,'diy::stats::Annotation']]]
 ];

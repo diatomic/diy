@@ -1,6 +1,7 @@
 var searchData=
 [
   ['amrlink',['AMRLink',['../structdiy_1_1_a_m_r_link.html',1,'diy']]],
+  ['annotation',['Annotation',['../structdiy_1_1stats_1_1_annotation.html',1,'diy::stats']]],
   ['ansi_5fcolor_5fescape',['ansi_color_escape',['../structinternal_1_1ansi__color__escape.html',1,'internal']]],
   ['arg_5fconverter',['arg_converter',['../classinternal_1_1arg__converter.html',1,'internal']]],
   ['arg_5fformatter',['arg_formatter',['../classarg__formatter.html',1,'']]],
