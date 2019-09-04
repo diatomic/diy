@@ -68,7 +68,9 @@ void remote_enq(
     int dest_gid            = (my_gid + 2) % assigner.nblocks();
     int dest_proc           = assigner.rank(dest_gid);
     diy::BlockID dest_block = {dest_gid, dest_proc};
-    cp.enqueue(dest_block, my_gid);
+    // same as cp.enqueue(dest_proc, my_gid), but using this variant for
+    // testing coverage.
+    cp.enqueue(dest_block, &my_gid, 1);
 }
 
 // dequeue remote data
@@ -85,7 +87,9 @@ void remote_deq(Block*                              b,
         {
             ++received;
             int recvd_data;
-            cp.dequeue(incoming_gids[i], recvd_data);
+            // same as cp.dequeue(incoming_gids[i], recvd_data), but using this variant for
+            // testing coverage.
+            cp.dequeue(incoming_gids[i], &recvd_data, 1);
             fmt::print(stderr, "Remote dequeue: gid {} received value {} from gid {}\n",
                     cp.gid(), recvd_data, incoming_gids[i]);
             CHECK(recvd_data == incoming_gids[i]);
