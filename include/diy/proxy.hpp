@@ -25,7 +25,7 @@ namespace diy
     template<class T>
     void                enqueue(const BlockID&  to,                                     //!< target block (gid,proc)
                                 const T&        x,                                      //!< data (eg. STL vector)
-                                void (*save)(BinaryBuffer&, const T&) = &::diy::save<T> //!< optional serialization function
+                                void (*save)(BinaryBuffer&, const T&) = &::diy::save    //!< optional serialization function
                                ) const
     {
         OutgoingQueues& out = *outgoing_; save(out[to], x);
@@ -42,7 +42,7 @@ namespace diy
     void                enqueue(const BlockID&  to,                                     //!< target block (gid,proc)
                                 const T*        x,                                      //!< pointer to the data (eg. address of start of vector)
                                 size_t          n,                                      //!< size in data elements (eg. ints)
-                                void (*save)(BinaryBuffer&, const T&) = &::diy::save<T> //!< optional serialization function
+                                void (*save)(BinaryBuffer&, const T&) = &::diy::save    //!< optional serialization function
                                ) const;
 
     //! Dequeue data whose size can be determined automatically (e.g., STL vector) and that was
@@ -51,7 +51,7 @@ namespace diy
     template<class T>
     void                dequeue(int             from,                                   //!< target block gid
                                 T&              x,                                      //!< data (eg. STL vector)
-                                void (*load)(BinaryBuffer&, T&) = &::diy::load<T>       //!< optional serialization function
+                                void (*load)(BinaryBuffer&, T&) = &::diy::load          //!< optional serialization function
                                ) const
     { IncomingQueues& in  = *incoming_; load(in[from], x); }
 
@@ -61,7 +61,7 @@ namespace diy
     void                dequeue(int             from,                                   //!< target block gid
                                 T*              x,                                      //!< pointer to the data (eg. address of start of vector)
                                 size_t          n,                                      //!< size in data elements (eg. ints)
-                                void (*load)(BinaryBuffer&, T&) = &::diy::load<T>       //!< optional serialization function
+                                void (*load)(BinaryBuffer&, T&) = &::diy::load          //!< optional serialization function
                                ) const;
 
     //! Dequeue data whose size can be determined automatically (e.g., STL vector) and that was
@@ -70,7 +70,7 @@ namespace diy
     template<class T>
     void                dequeue(const BlockID&  from,                                   //!< target block (gid,proc)
                                 T&              x,                                      //!< data (eg. STL vector)
-                                void (*load)(BinaryBuffer&, T&) = &::diy::load<T>       //!< optional serialization function
+                                void (*load)(BinaryBuffer&, T&) = &::diy::load          //!< optional serialization function
                                ) const                                  { dequeue(from.gid, x, load); }
 
     //! Dequeue an array of data whose size is given explicitly by the user.
@@ -79,12 +79,12 @@ namespace diy
     void                dequeue(const BlockID&  from,                                   //!< target block (gid,proc)
                                 T*              x,                                      //!< pointer to the data (eg. address of start of vector)
                                 size_t          n,                                      //!< size in data elements (eg. ints)
-                                void (*load)(BinaryBuffer&, T&) = &::diy::load<T>       //!< optional serialization function
+                                void (*load)(BinaryBuffer&, T&) = &::diy::load          //!< optional serialization function
                                ) const                                  { dequeue(from.gid, x, n, load); }
 
     template<class T>
     EnqueueIterator<T>  enqueuer(const T& x,
-                                 void (*save)(BinaryBuffer&, const T&) = &::diy::save<T>) const
+                                 void (*save)(BinaryBuffer&, const T&) = &::diy::save   ) const
     { return EnqueueIterator<T>(this, x, save); }
 
     IncomingQueues*     incoming() const                                { return incoming_; }
