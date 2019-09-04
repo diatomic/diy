@@ -297,7 +297,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    {</div>
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;        Histogram   histogram(bins_);</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;        add_histogram(b, srp, histogram);</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;        srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a05bcb6fd6968e054c0b2f818c6cd24de">enqueue</a>(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().target(0), histogram);</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;        srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a1752f60f14167a972c7e0519baa02e90">enqueue</a>(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().target(0), histogram);</div>
 <div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    }</div>
 <div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    {</div>
@@ -343,8 +343,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        <span class="keywordtype">int</span> in_gid = link-&gt;target(i).gid;</div>
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        <span class="keywordflow">while</span>(srp.incoming(in_gid))</div>
 <div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        {</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;            srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#ad7af65dcf357c32fe550b82a872d8692">dequeue</a>(in_gid, split);</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;            srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#ad7af65dcf357c32fe550b82a872d8692">dequeue</a>(in_gid, dir);</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;            srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a1c2d7f947714e9641175b7da68d8d19b">dequeue</a>(in_gid, split);</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;            srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a1c2d7f947714e9641175b7da68d8d19b">dequeue</a>(in_gid, dir);</div>
 <div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;</div>
 <div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;            <span class="comment">// reverse dir</span></div>
 <div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; dim_; ++j)</div>
@@ -450,8 +450,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;</div>
 <div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; link-&gt;size(); ++i)</div>
 <div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;    {</div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;        srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a05bcb6fd6968e054c0b2f818c6cd24de">enqueue</a>(link-&gt;target(i), split);</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;        srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a05bcb6fd6968e054c0b2f818c6cd24de">enqueue</a>(link-&gt;target(i), link-&gt;direction(i));</div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;        srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a1752f60f14167a972c7e0519baa02e90">enqueue</a>(link-&gt;target(i), split);</div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;        srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a1752f60f14167a972c7e0519baa02e90">enqueue</a>(link-&gt;target(i), link-&gt;direction(i));</div>
 <div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;    }</div>
 <div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;}</div>
 <div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;</div>
@@ -478,7 +478,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;        ++(histogram[loc]);</div>
 <div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;    }</div>
 <div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;    srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a05bcb6fd6968e054c0b2f818c6cd24de">enqueue</a>(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().target(0), histogram);</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;    srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a1752f60f14167a972c7e0519baa02e90">enqueue</a>(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().target(0), histogram);</div>
 <div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;}</div>
 <div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;</div>
 <div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> Block, <span class="keyword">class</span> Po<span class="keywordtype">int</span>&gt;</div>
@@ -492,7 +492,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;        <span class="keywordtype">int</span> nbr_gid = srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a4468710ba18007a4be74aa46b9e98386">in_link</a>().target(i).gid;</div>
 <div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;</div>
 <div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;        Histogram hist;</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;        srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#ad7af65dcf357c32fe550b82a872d8692">dequeue</a>(nbr_gid, hist);</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;        srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a1c2d7f947714e9641175b7da68d8d19b">dequeue</a>(nbr_gid, hist);</div>
 <div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 0; j &lt; hist.size(); ++j)</div>
 <div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;            histogram[j] += hist[j];</div>
 <div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;    }</div>
@@ -503,7 +503,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;diy::detail::KDTreePartition&lt;Block,Point&gt;::</div>
 <div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;receive_histogram(Block* b, <span class="keyword">const</span> <a class="code" href="structdiy_1_1_reduce_proxy.html">diy::ReduceProxy</a>&amp; srp, Histogram&amp; histogram)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;    srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#ad7af65dcf357c32fe550b82a872d8692">dequeue</a>(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a4468710ba18007a4be74aa46b9e98386">in_link</a>().target(0).gid, histogram);</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;    srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a1c2d7f947714e9641175b7da68d8d19b">dequeue</a>(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a4468710ba18007a4be74aa46b9e98386">in_link</a>().target(0).gid, histogram);</div>
 <div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;}</div>
 <div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;</div>
 <div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> Block, <span class="keyword">class</span> Po<span class="keywordtype">int</span>&gt;</div>
@@ -512,7 +512,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;forward_histogram(Block* b, <span class="keyword">const</span> <a class="code" href="structdiy_1_1_reduce_proxy.html">diy::ReduceProxy</a>&amp; srp, <span class="keyword">const</span> Histogram&amp; histogram)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;<span class="keyword"></span>{</div>
 <div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().size(); ++i)</div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;        srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a05bcb6fd6968e054c0b2f818c6cd24de">enqueue</a>(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().target(i), histogram);</div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;        srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a1752f60f14167a972c7e0519baa02e90">enqueue</a>(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().target(i), histogram);</div>
 <div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;}</div>
 <div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;</div>
 <div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> Block, <span class="keyword">class</span> Po<span class="keywordtype">int</span>&gt;</div>
@@ -567,7 +567,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;        pos = i;</div>
 <div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;      }</div>
 <div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;        srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a05bcb6fd6968e054c0b2f818c6cd24de">enqueue</a>(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().target(i), out_points[i]);</div>
+<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;        srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a1752f60f14167a972c7e0519baa02e90">enqueue</a>(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().target(i), out_points[i]);</div>
 <div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;    }</div>
 <div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;    <span class="keywordflow">if</span> (pos == 0)</div>
 <div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;        link-&gt;core().max[dim] = split;</div>
@@ -590,7 +590,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;          <span class="keywordflow">continue</span>;</div>
 <div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;</div>
 <div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;      std::vector&lt;Point&gt;   in_points;</div>
-<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;      srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#ad7af65dcf357c32fe550b82a872d8692">dequeue</a>(nbr_gid, in_points);</div>
+<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;      srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a1c2d7f947714e9641175b7da68d8d19b">dequeue</a>(nbr_gid, in_points);</div>
 <div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 0; j &lt; in_points.size(); ++j)</div>
 <div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;      {</div>
 <div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;        <span class="keywordflow">if</span> (in_points[j][dim] &lt; link-&gt;core().min[dim] || in_points[j][dim] &gt; link-&gt;core().max[dim])</div>
@@ -663,7 +663,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="structdiy_1_1_reduce_proxy_html_a930bd9ac87512bc08e20501d406946c9"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">diy::ReduceProxy::out_link</a></div><div class="ttdeci">const Link &amp; out_link() const </div><div class="ttdoc">returns outgoing link </div><div class="ttdef"><b>Definition:</b> reduce.hpp:70</div></div>
 <div class="ttc" id="structdiy_1_1_reduce_proxy_html"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html">diy::ReduceProxy</a></div><div class="ttdoc">Enables communication within a group during a reduction. DIY creates the ReduceProxy for you in diy::...</div><div class="ttdef"><b>Definition:</b> reduce.hpp:15</div></div>
-<div class="ttc" id="structdiy_1_1_master_1_1_proxy_html_ad7af65dcf357c32fe550b82a872d8692"><div class="ttname"><a href="structdiy_1_1_master_1_1_proxy.html#ad7af65dcf357c32fe550b82a872d8692">diy::Master::Proxy::dequeue</a></div><div class="ttdeci">void dequeue(int from, T &amp;x, void(*load)(BinaryBuffer &amp;, T &amp;)=&amp;::diy::load&lt; T &gt;) const </div><div class="ttdoc">Dequeue data whose size can be determined automatically (e.g., STL vector) and that was previously en...</div><div class="ttdef"><b>Definition:</b> proxy.hpp:52</div></div>
 <div class="ttc" id="structdiy_1_1_reduce_proxy_html_aa38bbd6145d035a99562a1a5a3d92375"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">diy::ReduceProxy::round</a></div><div class="ttdeci">unsigned round() const </div><div class="ttdoc">returns current round number </div><div class="ttdef"><b>Definition:</b> reduce.hpp:66</div></div>
 <div class="ttc" id="structdiy_1_1_block_i_d_html"><div class="ttname"><a href="structdiy_1_1_block_i_d.html">diy::BlockID</a></div><div class="ttdef"><b>Definition:</b> types.hpp:10</div></div>
 <div class="ttc" id="structdiy_1_1_regular_decomposer_html"><div class="ttname"><a href="structdiy_1_1_regular_decomposer.html">diy::RegularDecomposer</a></div><div class="ttdoc">Decomposes a regular (discrete or continuous) domain into even blocks; creates Links with Bounds alon...</div><div class="ttdef"><b>Definition:</b> decomposition.hpp:75</div></div>
@@ -673,17 +672,18 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="structdiy_1_1_reduce_proxy_html_a4468710ba18007a4be74aa46b9e98386"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html#a4468710ba18007a4be74aa46b9e98386">diy::ReduceProxy::in_link</a></div><div class="ttdeci">const Link &amp; in_link() const </div><div class="ttdoc">returns incoming link </div><div class="ttdef"><b>Definition:</b> reduce.hpp:68</div></div>
 <div class="ttc" id="classdiy_1_1_master_html"><div class="ttname"><a href="classdiy_1_1_master.html">diy::Master</a></div><div class="ttdef"><b>Definition:</b> master.hpp:37</div></div>
 <div class="ttc" id="classdiy_1_1_link_html"><div class="ttname"><a href="classdiy_1_1_link.html">diy::Link</a></div><div class="ttdef"><b>Definition:</b> link.hpp:17</div></div>
+<div class="ttc" id="structdiy_1_1_master_1_1_proxy_html_a1752f60f14167a972c7e0519baa02e90"><div class="ttname"><a href="structdiy_1_1_master_1_1_proxy.html#a1752f60f14167a972c7e0519baa02e90">diy::Master::Proxy::enqueue</a></div><div class="ttdeci">void enqueue(const BlockID &amp;to, const T &amp;x, void(*save)(BinaryBuffer &amp;, const T &amp;)=&amp;::diy::save) const </div><div class="ttdoc">Enqueue data whose size can be determined automatically, e.g., an STL vector. </div><div class="ttdef"><b>Definition:</b> proxy.hpp:26</div></div>
+<div class="ttc" id="structdiy_1_1_master_1_1_proxy_html_a1c2d7f947714e9641175b7da68d8d19b"><div class="ttname"><a href="structdiy_1_1_master_1_1_proxy.html#a1c2d7f947714e9641175b7da68d8d19b">diy::Master::Proxy::dequeue</a></div><div class="ttdeci">void dequeue(int from, T &amp;x, void(*load)(BinaryBuffer &amp;, T &amp;)=&amp;::diy::load) const </div><div class="ttdoc">Dequeue data whose size can be determined automatically (e.g., STL vector) and that was previously en...</div><div class="ttdef"><b>Definition:</b> proxy.hpp:52</div></div>
 <div class="ttc" id="classdiy_1_1_regular_link_html"><div class="ttname"><a href="classdiy_1_1_regular_link.html">diy::RegularLink</a></div><div class="ttdef"><b>Definition:</b> link.hpp:59</div></div>
 <div class="ttc" id="structdiy_1_1_bounds_html"><div class="ttname"><a href="structdiy_1_1_bounds.html">diy::Bounds</a></div><div class="ttdef"><b>Definition:</b> types.hpp:19</div></div>
 <div class="ttc" id="namespacediy_html_ad1fd3af6d561c31897636040e023a101"><div class="ttname"><a href="namespacediy.html#ad1fd3af6d561c31897636040e023a101">diy::interval</a></div><div class="ttdeci">diy::DiscreteBounds interval(int from, int to)</div><div class="ttdoc">Helper to create a 1-dimensional discrete domain with the specified extents. </div><div class="ttdef"><b>Definition:</b> types.hpp:38</div></div>
 <div class="ttc" id="structdiy_1_1_direction_html"><div class="ttname"><a href="structdiy_1_1_direction.html">diy::Direction</a></div><div class="ttdef"><b>Definition:</b> types.hpp:40</div></div>
 <div class="ttc" id="structdiy_1_1_reduce_proxy_html_ab3cba8511e114ecfd3e84a25f30f6bd9"><div class="ttname"><a href="structdiy_1_1_reduce_proxy.html#ab3cba8511e114ecfd3e84a25f30f6bd9">diy::ReduceProxy::assigner</a></div><div class="ttdeci">const Assigner &amp; assigner() const </div><div class="ttdoc">returns the assigner </div><div class="ttdef"><b>Definition:</b> reduce.hpp:74</div></div>
 <div class="ttc" id="structdiy_1_1_regular_swap_partners_html"><div class="ttname"><a href="structdiy_1_1_regular_swap_partners.html">diy::RegularSwapPartners</a></div><div class="ttdoc">Partners for swap-reduce. </div><div class="ttdef"><b>Definition:</b> swap.hpp:16</div></div>
-<div class="ttc" id="structdiy_1_1_master_1_1_proxy_html_a05bcb6fd6968e054c0b2f818c6cd24de"><div class="ttname"><a href="structdiy_1_1_master_1_1_proxy.html#a05bcb6fd6968e054c0b2f818c6cd24de">diy::Master::Proxy::enqueue</a></div><div class="ttdeci">void enqueue(const BlockID &amp;to, const T &amp;x, void(*save)(BinaryBuffer &amp;, const T &amp;)=&amp;::diy::save&lt; T &gt;) const </div><div class="ttdoc">Enqueue data whose size can be determined automatically, e.g., an STL vector. </div><div class="ttdef"><b>Definition:</b> proxy.hpp:26</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Sep 3 2019 19:04:17 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Sep 4 2019 20:34:01 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

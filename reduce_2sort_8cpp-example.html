@@ -200,7 +200,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">        ++(histogram[loc]);</div>
 <div class="line">    }</div>
 <div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; srp.<a name="a8"></a><a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().<a name="a9"></a>size(); ++i)</div>
-<div class="line">        srp.<a name="a10"></a><a class="code" href="structdiy_1_1_master_1_1_proxy.html#a05bcb6fd6968e054c0b2f818c6cd24de">enqueue</a>(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().<a name="a11"></a>target(i), histogram);</div>
+<div class="line">        srp.<a name="a10"></a><a class="code" href="structdiy_1_1_master_1_1_proxy.html#a1752f60f14167a972c7e0519baa02e90">enqueue</a>(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().<a name="a11"></a>target(i), histogram);</div>
 <div class="line">}</div>
 <div class="line"></div>
 <div class="line"><span class="keywordtype">void</span> receive_histogram(<span class="keywordtype">void</span>* b_, <span class="keyword">const</span> <a class="code" href="structdiy_1_1_reduce_proxy.html">diy::ReduceProxy</a>&amp; srp, Histogram&amp; histogram)</div>
@@ -211,7 +211,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">        <span class="keywordtype">int</span> nbr_gid = srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a4468710ba18007a4be74aa46b9e98386">in_link</a>().target(i).<a name="a13"></a>gid;</div>
 <div class="line"></div>
 <div class="line">        Histogram hist;</div>
-<div class="line">        srp.<a name="a14"></a><a class="code" href="structdiy_1_1_master_1_1_proxy.html#ad7af65dcf357c32fe550b82a872d8692">dequeue</a>(nbr_gid, hist);</div>
+<div class="line">        srp.<a name="a14"></a><a class="code" href="structdiy_1_1_master_1_1_proxy.html#a1c2d7f947714e9641175b7da68d8d19b">dequeue</a>(nbr_gid, hist);</div>
 <div class="line">        <span class="keywordflow">if</span> (histogram.size() &lt; hist.size())</div>
 <div class="line">            histogram.resize(hist.size());</div>
 <div class="line">        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 0; j &lt; hist.size(); ++j)</div>
@@ -225,7 +225,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">    receive_histogram(b_, srp, histogram);</div>
 <div class="line"></div>
 <div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().size(); ++i)</div>
-<div class="line">        srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a05bcb6fd6968e054c0b2f818c6cd24de">enqueue</a>(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().target(i), histogram);</div>
+<div class="line">        srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a1752f60f14167a972c7e0519baa02e90">enqueue</a>(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().target(i), histogram);</div>
 <div class="line">}</div>
 <div class="line"></div>
 <div class="line"></div>
@@ -274,7 +274,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">        pos = i;</div>
 <div class="line">      }</div>
 <div class="line">      <span class="keywordflow">else</span></div>
-<div class="line">        srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a05bcb6fd6968e054c0b2f818c6cd24de">enqueue</a>(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().target(i), out_values[i]);</div>
+<div class="line">        srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a1752f60f14167a972c7e0519baa02e90">enqueue</a>(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().target(i), out_values[i]);</div>
 <div class="line">    }</div>
 <div class="line">    splits.push_back(b-&gt;max);</div>
 <div class="line">    Value new_min = splits[pos];</div>
@@ -294,7 +294,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">          <span class="keywordflow">continue</span>;</div>
 <div class="line"></div>
 <div class="line">      std::vector&lt;Value&gt;    in_values;</div>
-<div class="line">      srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#ad7af65dcf357c32fe550b82a872d8692">dequeue</a>(nbr_gid, in_values);</div>
+<div class="line">      srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a1c2d7f947714e9641175b7da68d8d19b">dequeue</a>(nbr_gid, in_values);</div>
 <div class="line">      <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 0; j &lt; in_values.size(); ++j)</div>
 <div class="line">      {</div>
 <div class="line">        <span class="keywordflow">if</span> (in_values[j] &lt; b-&gt;min)</div>
@@ -516,7 +516,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Sep 3 2019 19:04:17 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Sep 4 2019 20:34:01 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

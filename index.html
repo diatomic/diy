@@ -91,7 +91,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>callback functions performed on each block by <code>master.foreach()</code>,</li>
 <li>message exchanges between the blocks by <code>master.exchange()</code></li>
 </ul>
-<p><code><a class="el" href="classdiy_1_1_master.html">diy::Master</a></code> owns the blocks, put into it using the <a class="el" href="classdiy_1_1_master.html#aeab2723bb0ecd4f7316b4805c1b53a61">add()</a> method. Its main two methods are foreach() and <a class="el" href="classdiy_1_1_master.html#a832ae002e1031fa1b0c8956d6baf94e8">exchange()</a>. foreach(f) calls back a function <code>f()</code> with every block. The function is responsible for performing computation and scheduling communication using <a class="el" href="structdiy_1_1_master_1_1_proxy.html#a05bcb6fd6968e054c0b2f818c6cd24de">enqueue()</a>/<a class="el" href="structdiy_1_1_master_1_1_proxy.html#ad7af65dcf357c32fe550b82a872d8692">dequeue()</a> operations. The actual communication is performed by <a class="el" href="classdiy_1_1_master.html#a832ae002e1031fa1b0c8956d6baf94e8">exchange()</a>.</p>
+<p><code><a class="el" href="classdiy_1_1_master.html">diy::Master</a></code> owns the blocks, put into it using the <a class="el" href="classdiy_1_1_master.html#aeab2723bb0ecd4f7316b4805c1b53a61">add()</a> method. Its main two methods are foreach() and <a class="el" href="classdiy_1_1_master.html#a832ae002e1031fa1b0c8956d6baf94e8">exchange()</a>. foreach(f) calls back a function <code>f()</code> with every block. The function is responsible for performing computation and scheduling communication using <a class="el" href="structdiy_1_1_master_1_1_proxy.html#a1752f60f14167a972c7e0519baa02e90">enqueue()</a>/<a class="el" href="structdiy_1_1_master_1_1_proxy.html#a1c2d7f947714e9641175b7da68d8d19b">dequeue()</a> operations. The actual communication is performed by <a class="el" href="classdiy_1_1_master.html#a832ae002e1031fa1b0c8956d6baf94e8">exchange()</a>.</p>
 <h2>Example </h2>
 <p>The callback functions <code>enqueue_local()</code> and <code>average()</code> in the example below are given the block pointer and a communication proxy for the message exchange between blocks. The callback functions typically enqueue or dequeue messages from the proxy. In this way, information can be received and sent during rounds of message exchange.</p>
 <div class="fragment"><div class="line"><span class="comment">// --- main program --- //</span></div>
@@ -154,7 +154,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Sep 3 2019 19:04:21 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Sep 4 2019 20:34:04 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
