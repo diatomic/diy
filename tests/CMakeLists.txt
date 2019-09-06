@@ -4,6 +4,9 @@ include_directories         (${CMAKE_SOURCE_DIR}/examples/reduce)   # needed for
 add_executable              (kd-tree-test           kd-tree.cpp)
 target_link_libraries       (kd-tree-test           ${libraries})
 
+add_executable              (kd-tree-test2          kd-tree-dense-points.cpp)
+target_link_libraries       (kd-tree-test2          ${libraries})
+
 add_executable              (decomposer-test        decomposer.cpp)
 target_link_libraries       (decomposer-test        ${libraries})
 
@@ -74,6 +77,14 @@ foreach                     (b 2 4 8 64)
     add_test                (NAME kd-tree-test-sampling-exponential-b${b}
                              COMMAND kd-tree-test -s -e -b ${b}
                             )
+endforeach                  ()
+
+foreach                     (b 2 4 8 16 32 64)
+    foreach                 (n 128 256 512)
+        add_test                (NAME kd-tree-test2-b${b}-n${n}
+                                 COMMAND kd-tree-test2 -b ${b} -f ${CMAKE_CURRENT_SOURCE_DIR}/kd-tree-dataset.csv
+                                )
+    endforeach              ()
 endforeach                  ()
 
 add_test                    (NAME decomposer-test
