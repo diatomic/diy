@@ -6,6 +6,7 @@ triggers:
 packages:
   - cmake
   - openmpi
+  - jq
 sources:
   - https://github.com/diatomic/diy
 secrets:
@@ -25,5 +26,5 @@ tasks:
   #    make test
   - dependents: |
       cd diy
-      conf/ci/builds.sr.ht/launch-dependents.sh
+      sh conf/ci/builds.sr.ht/launch-dependents.sh
 
