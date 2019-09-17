@@ -235,10 +235,7 @@ namespace diy
       inline void   process_collectives();
 
       inline
-      ProxyWithLink proxy(int i) const;
-
-      inline
-      ProxyWithLink proxy(int i, IExchangeInfo* iexchange) const;
+      ProxyWithLink proxy(int i, IExchangeInfo* iexchange = 0) const;
 
       //! return the number of local blocks
       unsigned int  size() const                        { return static_cast<unsigned int>(blocks_.size()); }
@@ -535,11 +532,6 @@ load_outgoing(int gid__)
       }
   }
 }
-
-diy::Master::ProxyWithLink
-diy::Master::
-proxy(int i) const
-{ return ProxyWithLink(Proxy(const_cast<Master*>(this), gid(i)), block(i), link(i)); }
 
 diy::Master::ProxyWithLink
 diy::Master::
