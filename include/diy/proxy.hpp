@@ -30,6 +30,18 @@ namespace diy
                 access->pop_front();
             }
         }
+
+        // move outgoing_ back into proxy, in case it's a multi-foreach round
+        if (!iexchange_)
+            for (auto& x : master_->outgoing(gid_))
+            {
+                auto access = x.second.access();
+                if (!access->empty())
+                {
+                    outgoing_.emplace(x.first, access->back().move());
+                    access->pop_back();
+                }
+            }
     }
 
     // delete copy constructor to avoid coping incoming_ and outgoing_ (plus it
@@ -43,10 +55,16 @@ namespace diy
                         ~Proxy()
     {
         auto& outgoing = master_->outgoing(gid_);
+        auto& incoming = master_->incoming(gid_);
 
         // copy out outgoing_
         for (auto& x : outgoing_)
             outgoing[x.first].access()->emplace_back(std::move(x.second));
+
+        // move incoming_ back into master, in case it's a multi-foreach round
+        if (!iexchange_)
+            for (auto& x : incoming_)
+                incoming[x.first].access()->emplace_front(std::move(x.second));
     }
 
     int                 gid() const                                     { return gid_; }
