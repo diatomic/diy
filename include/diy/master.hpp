@@ -660,6 +660,11 @@ iexchange_(const    ICallback<Block>&   f,
     auto scoped = prof.scoped("iexchange");
     DIY_UNUSED(scoped);
 
+#if !defined(DIY_NO_THREADS)
+    if (threads() < 2)
+        throw std::runtime_error("Cannot launch iexchange with less than 2 threads (need a communication thread)");
+#endif
+
     // prepare for next round
     incoming_.erase(exchange_round_);
     ++exchange_round_;
@@ -669,40 +674,69 @@ iexchange_(const    ICallback<Block>&   f,
     IExchangeInfoCollective iexchange(comm_, min_queue_size, max_hold_time, fine, prof);
     iexchange.add_work(size());                 // start with one work unit for each block
 
+#if !defined(DIY_NO_THREADS)
+    auto comm_thread = std::thread([this,&iexchange]()
+    {
+        while(!iexchange.all_done())
+        {
+            icommunicate(&iexchange);
+            iexchange.control();
+        }
+    });
+#endif
+
+    auto empty_incoming = [this](int gid)
+    {
+        for (auto& x : incoming(gid))
+            if (!x.second.access()->empty())
+                return false;
+        return true;
+    };
+
     std::map<int, bool> done_result;
     do
     {
         for (size_t i = 0; i < size(); i++)     // for all blocks
         {
-            iexchange.from_gid = gid(i);       // for shortcut sending only from current block during icommunicate
-            stats::Annotation::Guard g( stats::Annotation("diy.block").set(iexchange.from_gid) );
+            int gid = this->gid(i);
+            iexchange.from_gid = gid;       // for shortcut sending only from current block during icommunicate
+            stats::Annotation::Guard g( stats::Annotation("diy.block").set(gid) );
 
-            icommunicate(&iexchange);               // TODO: separate comm thread std::thread t(icommunicate);
-            ProxyWithLink cp = proxy(i, &iexchange);
-
-            bool done = done_result[cp.gid()];
-            if (!done || !cp.empty_incoming_queues())
+#if defined(DIY_NO_THREADS)
+            icommunicate(&iexchange);
+#endif
+            bool done = done_result[gid];
+            if (!done || !empty_incoming(gid))
             {
                 prof << "callback";
+                iexchange.inc_work();       // even if we remove the queues, when constructing the proxy, we still have work to do
+                ProxyWithLink cp = proxy(i, &iexchange);
                 done = f(block<Block>(i), cp);
+                iexchange.dec_work();
                 prof >> "callback";
             }
-            done_result[cp.gid()] = done;
-
-            done &= cp.empty_queues();
-
+            if (done_result[gid] ^ done)        // status changed
+            {
+                if (done)
+                    iexchange.dec_work();
+                else
+                    iexchange.inc_work();
+            }
+            done_result[gid] = done;
             log->debug("Done: {}", done);
-
-            prof << "work-counting";
-            iexchange.update_done(cp.gid(), done);
-            prof >> "work-counting";
         }
 
+#if defined(DIY_NO_THREADS)
         prof << "iexchange-control";
         iexchange.control();
         prof >> "iexchange-control";
+#endif
     } while (!iexchange.all_done());
     log->info("[{}] ==== Leaving iexchange ====\n", iexchange.comm.rank());
+
+#if !defined(DIY_NO_THREADS)
+    comm_thread.join();
+#endif
 
     //comm_.barrier();        // TODO: this is only necessary for DUD
     prof >> "consensus-time";
@@ -906,13 +940,16 @@ send_outgoing_queues(GidSendOrder&   gid_order,
             int     to_proc     = to_block.proc;
 
             auto access = x.second.access();
-            for (auto& qr : *access)
+            while (!access->empty())
             {
+                auto qr = std::move(access->front());
+                access->pop_front();
+                access.unlock();            // others can push on this queue, while we are working
                 assert(!qr.external());
                 log->debug("Processing queue:      {} <- {} of size {}", to_gid, iexchange->from_gid, qr.size());
                 send_queue(iexchange->from_gid, to_gid, to_proc, qr, remote, iexchange);
+                access.lock();
             }
-            access->clear();
         }
     }
     else                                                // normal mode: send all outgoing queues
@@ -972,9 +1009,6 @@ send_same_rank(int from, int to, QueueRecord& qr, IExchangeInfo* iexchange)
         }
     }
 
-    if (iexchange)
-        iexchange->not_done(to);
-
     ++current_incoming.received;
 }
 
@@ -1002,14 +1036,7 @@ send_different_rank(int from, int to, int proc, QueueRecord& qr, bool remote, IE
 
         inflight_send.info = info;
         if (remote || iexchange)
-        {
-            if (iexchange)
-            {
-                iexchange->inc_work();
-                log->debug("[{}] Incrementing work when sending queue\n", comm_.rank());
-            }
             inflight_send.request = comm_.issend(proc, tags::queue, buffer->buffer);
-        }
         else
             inflight_send.request = comm_.isend(proc, tags::queue, buffer->buffer);
         inflight_send.message = buffer;

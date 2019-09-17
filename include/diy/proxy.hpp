@@ -28,6 +28,8 @@ namespace diy
             {
                 incoming_.emplace(x.first, access->front().move());
                 access->pop_front();
+                if (iexchange_)
+                    iexchange_->dec_work();
             }
         }
 
@@ -59,7 +61,11 @@ namespace diy
 
         // copy out outgoing_
         for (auto& x : outgoing_)
+        {
             outgoing[x.first].access()->emplace_back(std::move(x.second));
+            if (iexchange_)
+                iexchange_->inc_work();
+        }
 
         // move incoming_ back into master, in case it's a multi-foreach round
         if (!iexchange_)

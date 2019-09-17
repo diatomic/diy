@@ -31,6 +31,8 @@ namespace diy
   struct lock_guard
   {
       lock_guard(T&)        {}
+      void lock()           {}
+      void unlock()         {}
   };
 
   namespace this_thread

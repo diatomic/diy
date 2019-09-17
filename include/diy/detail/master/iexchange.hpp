@@ -13,9 +13,6 @@ namespace diy
                             prof(prof_)                         { time_stamp_send(); }
       virtual           ~IExchangeInfo()                        {}
 
-      void              not_done(int gid)                       { update_done(gid, false); }
-      inline void       update_done(int gid, bool done_);
-
       virtual bool      all_done() =0;                             // get global all done status
       virtual void      add_work(int work) =0;                     // add work to global work counter
       virtual void      control() =0;
@@ -30,7 +27,6 @@ namespace diy
       bool              fine() const                            { return fine_; }
 
       mpi::communicator                   comm;
-      std::unordered_map<int, bool>       done;                 // gid -> done
 
       bool                                fine_ = false;
 
@@ -44,20 +40,6 @@ namespace diy
 
       stats::Profiler&                    prof;
     };
-}
-
-void
-diy::Master::IExchangeInfo::
-update_done(int gid, bool done_)
-{
-    if (done[gid] != done_)
-    {
-        done[gid] = done_;
-        if (done_)
-            dec_work();
-        else
-            inc_work();
-    }
 }
 
 

@@ -153,16 +153,5 @@ place(IncomingRound* in, bool unload, ExternalStorage* storage, IExchangeInfo* i
         access->back().unload(storage);
     }
 
-    if (iexchange)
-    {
-        auto log = get_logger();
-        log->debug("[{}] Received queue {} <- {}", iexchange->comm.rank(), to, from);
-
-        iexchange->not_done(to);
-
-        iexchange->dec_work();
-        log->debug("[{}] Decrementing work after receiving\n", to);
-    }
-
     ++(in->received);
 }

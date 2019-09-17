@@ -120,7 +120,7 @@ int main(int argc, char* argv[])
     diy::FileStorage          storage("./DIY.XXXXXX");
 
     diy::Master               master(world,
-                                     1,
+                                     2,
                                      -1,
                                      &create_block,
                                      &destroy_block,
