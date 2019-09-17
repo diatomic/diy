@@ -22,10 +22,61 @@ namespace diy
 
     template<class Mutex>
     using lock_guard = std::unique_lock<Mutex>;
+
+    template<class T, class U>
+    struct concurrent_map;
 }
 
 #endif
 
 #include "critical-resource.hpp"
+
+#if !defined(DIY_NO_THREADS)
+template<class T, class U>
+struct diy::concurrent_map
+{
+    using Map       = std::map<T,U>;
+    using SharedPtr = std::shared_ptr<lock_guard<fast_mutex>>;
+
+    template<class MapIterator>
+    struct iterator_
+    {
+        MapIterator     it;
+        SharedPtr       lock_ptr;
+
+                        iterator_(const MapIterator& it_, const SharedPtr& lock_ptr_ = SharedPtr()):
+                            it(it_), lock_ptr(lock_ptr_)                        {}
+
+        iterator_&      operator++()        { ++it; return *this; }
+        iterator_       operator++(int)     { iterator_ retval = *this; ++(*this); return retval; }
+
+        bool            operator==(const iterator_& other) const     { return it == other.it;}
+        bool            operator!=(const iterator_& other) const     { return !(*this == other); }
+
+        decltype(*it)               operator*() const   { return *it; }
+        decltype(it.operator->())   operator->() const  { return it.operator->(); }
+    };
+
+    using iterator       = iterator_<typename Map::iterator>;
+    using const_iterator = iterator_<typename Map::const_iterator>;
+
+    U&              operator[](const T& x)  { lock_guard<fast_mutex> l(mutex_); return map_[x]; }
+
+    iterator        begin()                 { auto p = std::make_shared<lock_guard<fast_mutex>>(mutex_); return iterator(map_.begin(), p); }
+    iterator        end()                   { return iterator(map_.end()); }
+
+    const_iterator  begin() const           { auto p = std::make_shared<lock_guard<fast_mutex>>(mutex_); return const_iterator(map_.begin(), p); }
+    const_iterator  end() const             { return const_iterator(map_.end()); }
+
+    iterator        find(const T& x)        { auto p = std::make_shared<lock_guard<fast_mutex>>(mutex_); return iterator(map_.find(x), p); }
+    const_iterator  find(const T& x) const  { auto p = std::make_shared<lock_guard<fast_mutex>>(mutex_); return const_iterator(map_.find(x), p); }
+
+    void            clear()                 { lock_guard<fast_mutex> l(mutex_); map_.clear(); }
+    bool            empty()                 { lock_guard<fast_mutex> l(mutex_); return map_.empty(); }
+
+    Map                 map_;
+    mutable fast_mutex  mutex_;
+};
+#endif
 
 #endif

@@ -134,11 +134,11 @@ namespace diy
 
       using RecordQueue = critical_resource<std::deque<QueueRecord>>;
 
-      using IncomingQueues = std::map<int,      RecordQueue>;       // gid  -> [(size, external, buffer), ...]
-      using OutgoingQueues = std::map<BlockID,  RecordQueue>;       // bid  -> [(size, external, buffer), ...]
+      using IncomingQueues = concurrent_map<int,      RecordQueue>;       // gid  -> [(size, external, buffer), ...]
+      using OutgoingQueues = concurrent_map<BlockID,  RecordQueue>;       // bid  -> [(size, external, buffer), ...]
 
-      using IncomingQueuesMap = std::map<int, IncomingQueues>;      // gid  -> {  gid -> [(size, external, buffer), ...]}
-      using OutgoingQueuesMap = std::map<int, OutgoingQueues>;      // gid  -> {  bid -> [(size, external, buffer), ...]}
+      using IncomingQueuesMap = concurrent_map<int, IncomingQueues>;      // gid  -> {  gid -> [(size, external, buffer), ...]}
+      using OutgoingQueuesMap = concurrent_map<int, OutgoingQueues>;      // gid  -> {  bid -> [(size, external, buffer), ...]}
 
       struct IncomingRound
       {
@@ -674,19 +674,24 @@ iexchange_(const    ICallback<Block>&   f,
     IExchangeInfoCollective iexchange(comm_, min_queue_size, max_hold_time, fine, prof);
     iexchange.add_work(size());                 // start with one work unit for each block
 
+    fast_mutex m;       // FIXME
 #if !defined(DIY_NO_THREADS)
-    auto comm_thread = std::thread([this,&iexchange]()
+    auto comm_thread = std::thread([this,&iexchange,&m]()
     {
         while(!iexchange.all_done())
         {
+            lock_guard<fast_mutex> lock(m);     // FIXME
             icommunicate(&iexchange);
             iexchange.control();
         }
     });
 #endif
 
-    auto empty_incoming = [this](int gid)
+    auto empty_incoming = [this,&m](int gid)
     {
+#if !defined(DIY_NO_THREADS)
+        lock_guard<fast_mutex> lock(m);     // FIXME
+#endif
         for (auto& x : incoming(gid))
             if (!x.second.access()->empty())
                 return false;
@@ -710,8 +715,13 @@ iexchange_(const    ICallback<Block>&   f,
             {
                 prof << "callback";
                 iexchange.inc_work();       // even if we remove the queues, when constructing the proxy, we still have work to do
-                ProxyWithLink cp = proxy(i, &iexchange);
-                done = f(block<Block>(i), cp);
+                {
+#if !defined(DIY_NO_THREADS)
+                    lock_guard<fast_mutex> lock(m);     // FIXME
+#endif
+                    ProxyWithLink cp = proxy(i, &iexchange);
+                    done = f(block<Block>(i), cp);
+                }   // NB: we need cp to go out of scope and copy out its queues before we can decrement the work
                 iexchange.dec_work();
                 prof >> "callback";
             }

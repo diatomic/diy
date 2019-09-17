@@ -35,6 +35,9 @@ namespace diy
       void unlock()         {}
   };
 
+  template<class T, class U>
+  using concurrent_map = std::map<T,U>;
+
   namespace this_thread
   {
       inline unsigned long int  get_id()    { return 0; }
