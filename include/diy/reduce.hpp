@@ -16,13 +16,13 @@ struct ReduceProxy: public Master::Proxy
 {
     typedef     std::vector<int>                            GIDVector;
 
-    ReduceProxy(const Master::Proxy&    proxy, //!< parent proxy
+    ReduceProxy(Master::Proxy&&         proxy, //!< parent proxy
                 void*                   block, //!< diy block
                 unsigned                round, //!< current round
                 const Assigner&         assigner, //!< assigner
                 const GIDVector&        incoming_gids, //!< incoming gids in this group
                 const GIDVector&        outgoing_gids): //!< outgoing gids in this group
-      Master::Proxy(proxy),
+      Master::Proxy(std::move(proxy)),
       block_(block),
       round_(round),
       assigner_(assigner)
@@ -46,13 +46,13 @@ struct ReduceProxy: public Master::Proxy
       }
     }
 
-    ReduceProxy(const Master::Proxy&    proxy, //!< parent proxy
+    ReduceProxy(Master::Proxy&&         proxy, //!< parent proxy
                 void*                   block, //!< diy block
                 unsigned                round, //!< current round
                 const Assigner&         assigner,
                 const Link&             in_link,
                 const Link&             out_link):
-      Master::Proxy(proxy),
+      Master::Proxy(std::move(proxy)),
       block_(block),
       round_(round),
       assigner_(assigner),
@@ -183,11 +183,11 @@ namespace detail
       if (round < partners.rounds())
           partners.outgoing(round, cp.gid(), outgoing_gids, *cp.master());        // send to the next round
 
-      ReduceProxy   rp(cp, b, round, assigner, incoming_gids, outgoing_gids);
+      ReduceProxy   rp(std::move(const_cast<Master::ProxyWithLink&>(cp)), b, round, assigner, incoming_gids, outgoing_gids);
       reduce(b, rp, partners);
 
       // touch the outgoing queues to make sure they exist
-      Master::Proxy::OutgoingQueues& outgoing = *cp.outgoing();
+      Master::Proxy::OutgoingQueues& outgoing = *rp.outgoing();
       if (outgoing.size() < (size_t) rp.out_link().size())
         for (BlockID target : rp.out_link().neighbors())
           outgoing[target];       // touch the outgoing queue, creating it if necessary

@@ -52,7 +52,7 @@ void local_sum(Block* b, const diy::Master::ProxyWithLink& cp)
 
 void verify(Block*, const diy::Master::ProxyWithLink& cp)
 {
-  for (auto in : *cp.incoming())
+  for (auto& in : *cp.incoming())
   {
     std::int64_t recvd_sum;
     std::vector<std::int64_t> buffer;

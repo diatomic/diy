@@ -118,8 +118,10 @@ namespace diy
         QueueRecord&    operator=(QueueRecord&&)        =default;
 
         bool            external() const                                                { return external_ != -1; }
-        MemoryBuffer&   buffer()                                                        { return buffer_; }
+        MemoryBuffer&&  move()                                                          { return std::move(buffer_); }
         size_t          size() const                                                    { if (external()) return size_; return buffer_.size(); }
+
+        void            reset()                                                         { buffer_.reset(); }
 
         void            unload(ExternalStorage* storage)                                { size_ = buffer_.size(); external_ = storage->put(buffer_); }
         void            load(ExternalStorage* storage)                                  { storage->get(external_, buffer_); external_ = -1; }
@@ -967,7 +969,7 @@ send_same_rank(int from, int to, QueueRecord& qr, IExchangeInfo* iexchange)
 
     if (!in_qr.external())
     {
-        in_qr.buffer().reset();
+        in_qr.reset();
 
         bool to_external = block(lid(to)) == 0;
         if (to_external)
@@ -991,13 +993,11 @@ send_different_rank(int from, int to, int proc, QueueRecord& qr, bool remote, IE
     auto scoped = prof.scoped("send-different-rank");
 
     assert(!qr.external());
-    MemoryBuffer& bb = qr.buffer();
 
     static const size_t MAX_MPI_MESSAGE_COUNT = INT_MAX;
 
     // sending to a different rank
-    std::shared_ptr<MemoryBuffer> buffer = std::make_shared<MemoryBuffer>();
-    buffer->swap(bb);
+    std::shared_ptr<MemoryBuffer> buffer = std::make_shared<MemoryBuffer>(qr.move());
 
     MessageInfo info{from, to, 1, exchange_round_};
     // size fits in one message

@@ -26,11 +26,19 @@ namespace diy
             auto access = x.second.access();
             if (!access->empty())
             {
-                incoming_.emplace(x.first, std::move(access->front().buffer()));
+                incoming_.emplace(x.first, access->front().move());
                 access->pop_front();
             }
         }
     }
+
+    // delete copy constructor to avoid coping incoming_ and outgoing_ (plus it
+    // won't work otherwise because MemoryBuffer has a deleted copy
+    // constructor)
+                        Proxy(const Proxy&)     =delete;
+                        Proxy(Proxy&&)          =default;
+    Proxy&              operator=(const Proxy&) =delete;
+    Proxy&              operator=(Proxy&&)      =default;
 
                         ~Proxy()
     {
@@ -193,10 +201,10 @@ namespace diy
 
   struct Master::ProxyWithLink: public Master::Proxy
   {
-            ProxyWithLink(const Proxy&    proxy,
+            ProxyWithLink(Proxy&&         proxy,
                           void*           block__,
                           Link*           link__):
-              Proxy(proxy),
+              Proxy(std::move(proxy)),
               block_(block__),
               link_(link__)                                         {}
 

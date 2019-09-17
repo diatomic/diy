@@ -33,10 +33,7 @@ namespace diy
                           position(position_)                       {}
 
                         MemoryBuffer(MemoryBuffer&&)                =default;
-                        // FIXME: I want to delete the copy constructor, but something is not letting me compile
-                        MemoryBuffer(const MemoryBuffer& other):
-                            position(other.position),
-                            buffer(other.buffer)                    {} // assert(size() == 0); }
+                        MemoryBuffer(const MemoryBuffer&)           =delete;
     MemoryBuffer&       operator=(MemoryBuffer&&)                   =default;
     MemoryBuffer&       operator=(const MemoryBuffer&)              =delete;
 
