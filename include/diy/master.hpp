@@ -674,24 +674,20 @@ iexchange_(const    ICallback<Block>&   f,
     IExchangeInfoCollective iexchange(comm_, min_queue_size, max_hold_time, fine, prof);
     iexchange.add_work(size());                 // start with one work unit for each block
 
-    fast_mutex m;       // FIXME
 #if !defined(DIY_NO_THREADS)
-    auto comm_thread = std::thread([this,&iexchange,&m]()
+    auto comm_thread = std::thread([this,&iexchange]()
     {
         while(!iexchange.all_done())
         {
-            lock_guard<fast_mutex> lock(m);     // FIXME
             icommunicate(&iexchange);
             iexchange.control();
+            //std::this_thread::sleep_for(std::chrono::microseconds(1));
         }
     });
 #endif
 
-    auto empty_incoming = [this,&m](int gid)
+    auto empty_incoming = [this](int gid)
     {
-#if !defined(DIY_NO_THREADS)
-        lock_guard<fast_mutex> lock(m);     // FIXME
-#endif
         for (auto& x : incoming(gid))
             if (!x.second.access()->empty())
                 return false;
@@ -701,6 +697,7 @@ iexchange_(const    ICallback<Block>&   f,
     std::map<int, bool> done_result;
     do
     {
+        size_t work_done = 0;
         for (size_t i = 0; i < size(); i++)     // for all blocks
         {
             int gid = this->gid(i);
@@ -716,14 +713,12 @@ iexchange_(const    ICallback<Block>&   f,
                 prof << "callback";
                 iexchange.inc_work();       // even if we remove the queues, when constructing the proxy, we still have work to do
                 {
-#if !defined(DIY_NO_THREADS)
-                    lock_guard<fast_mutex> lock(m);     // FIXME
-#endif
                     ProxyWithLink cp = proxy(i, &iexchange);
                     done = f(block<Block>(i), cp);
                 }   // NB: we need cp to go out of scope and copy out its queues before we can decrement the work
                 iexchange.dec_work();
                 prof >> "callback";
+                ++work_done;
             }
             if (done_result[gid] ^ done)        // status changed
             {
@@ -740,6 +735,9 @@ iexchange_(const    ICallback<Block>&   f,
         prof << "iexchange-control";
         iexchange.control();
         prof >> "iexchange-control";
+#else
+        //if (work_done == 0)
+        //    std::this_thread::sleep_for(std::chrono::microseconds(1));
 #endif
     } while (!iexchange.all_done());
     log->info("[{}] ==== Leaving iexchange ====\n", iexchange.comm.rank());
