@@ -42,6 +42,7 @@ if                          (MSVC AND NOT(MSVC_VERSION LESS 1400))
     set_source_files_properties (merge-swap-reduce.cpp  PROPERTIES COMPILE_FLAGS "/bigobj")
     set_source_files_properties (swap-reduce.cpp        PROPERTIES COMPILE_FLAGS "/bigobj")
     set_source_files_properties (rexchange.cpp          PROPERTIES COMPILE_FLAGS "/bigobj")
+    set_source_files_properties (simple.cpp             PROPERTIES COMPILE_FLAGS "/bigobj")
 endif                       ()
 
 
