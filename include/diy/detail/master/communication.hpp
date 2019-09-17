@@ -149,8 +149,8 @@ place(IncomingRound* in, bool unload, ExternalStorage* storage, IExchangeInfo* i
     }
     else if (!iexchange)
     {
-        in->map[to].queues[from].swap(message);
-        in->map[to].queues[from].reset();       // buffer position = 0
+        message.reset();    // buffer position = 0
+        in->map[to][from].access()->emplace_back(std::move(message));
     }
     else    // iexchange
     {
@@ -158,12 +158,13 @@ place(IncomingRound* in, bool unload, ExternalStorage* storage, IExchangeInfo* i
         log->debug("[{}] Received queue {} <- {}", iexchange->comm.rank(), to, from);
 
         iexchange->not_done(to);
-        in->map[to].queues[from].append_binary(&message.buffer[0], message.size());        // append instead of overwrite
+        message.reset();
+        in->map[to][from].access()->emplace_back(std::move(message));
 
         iexchange->dec_work();
         log->debug("[{}] Decrementing work after receiving\n", to);
     }
-    in->map[to].records[from] = QueueRecord(size, external);
+    in->map[to][from].access()->emplace_back(size, external);
 
     ++(in->received);
 }

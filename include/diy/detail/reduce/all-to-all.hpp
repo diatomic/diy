@@ -47,7 +47,7 @@ namespace detail
         ReduceProxy all_srp(srp, srp.block(), 0, srp.assigner(), empty_link, all_neighbors_link);
         op(b, all_srp);
 
-        Master::OutgoingQueues all_queues;
+        Master::Proxy::OutgoingQueues all_queues;
         all_queues.swap(*all_srp.outgoing());       // clears out the queues and stores them locally
 
         // enqueue outgoing
@@ -69,7 +69,7 @@ namespace detail
         // dequeue incoming + reorder into the correct order
         ReduceProxy all_srp(srp, srp.block(), 1, srp.assigner(), all_neighbors_link, empty_link);
 
-        Master::IncomingQueues all_incoming;
+        Master::Proxy::IncomingQueues all_incoming;
         all_incoming.swap(*srp.incoming());
 
         std::pair<int, int> range;      // all the ranges should be the same

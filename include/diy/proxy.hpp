@@ -10,14 +10,36 @@ namespace diy
     template <class T>
     struct EnqueueIterator;
 
+    using IncomingQueues = std::map<int,     MemoryBuffer>;
+    using OutgoingQueues = std::map<BlockID, MemoryBuffer>;
+
                         Proxy(Master* master__, int gid__,
                               IExchangeInfo*  iexchange__ = 0):
                           gid_(gid__),
                           master_(master__),
                           iexchange_(iexchange__),
-                          incoming_(&master__->incoming(gid__)),
-                          outgoing_(&master__->outgoing(gid__)),
-                          collectives_(&master__->collectives(gid__))   {}
+                          collectives_(&master__->collectives(gid__))
+    {
+        // fill incoming_
+        for (auto& x : master_->incoming(gid_))
+        {
+            auto access = x.second.access();
+            if (!access->empty())
+            {
+                incoming_.emplace(x.first, std::move(access->front().buffer()));
+                access->pop_front();
+            }
+        }
+    }
+
+                        ~Proxy()
+    {
+        auto& outgoing = master_->outgoing(gid_);
+
+        // copy out outgoing_
+        for (auto& x : outgoing_)
+            outgoing[x.first].access()->emplace_back(std::move(x.second));
+    }
 
     int                 gid() const                                     { return gid_; }
 
@@ -28,7 +50,7 @@ namespace diy
                                 void (*save)(BinaryBuffer&, const T&) = &::diy::save    //!< optional serialization function
                                ) const
     {
-        OutgoingQueues& out = *outgoing_; save(out[to], x);
+        save(outgoing_[to], x);
 
         if (iexchange_ && iexchange_->fine())
         {
@@ -53,7 +75,7 @@ namespace diy
                                 T&              x,                                      //!< data (eg. STL vector)
                                 void (*load)(BinaryBuffer&, T&) = &::diy::load          //!< optional serialization function
                                ) const
-    { IncomingQueues& in  = *incoming_; load(in[from], x); }
+    { load(incoming_[from], x); }
 
     //! Dequeue an array of data whose size is given explicitly by the user.
     //! In this case, the user needs to allocate the receive buffer prior to calling dequeue.
@@ -87,12 +109,12 @@ namespace diy
                                  void (*save)(BinaryBuffer&, const T&) = &::diy::save   ) const
     { return EnqueueIterator<T>(this, x, save); }
 
-    IncomingQueues*     incoming() const                                { return incoming_; }
-    MemoryBuffer&       incoming(int from) const                        { return (*incoming_)[from]; }
+    IncomingQueues*     incoming() const                                { return &incoming_; }
+    MemoryBuffer&       incoming(int from) const                        { return incoming_[from]; }
     inline void         incoming(std::vector<int>& v) const;            // fill v with every gid from which we have a message
 
-    OutgoingQueues*     outgoing() const                                { return outgoing_; }
-    MemoryBuffer&       outgoing(const BlockID& to) const               { return (*outgoing_)[to]; }
+    OutgoingQueues*     outgoing() const                                { return &outgoing_; }
+    MemoryBuffer&       outgoing(const BlockID& to) const               { return outgoing_[to]; }
 
     inline bool         empty_incoming_queues() const;
     inline bool         empty_outgoing_queues() const;
@@ -139,8 +161,11 @@ namespace diy
       Master*           master_;
       IExchangeInfo*    iexchange_;
 
-      IncomingQueues*   incoming_;
-      OutgoingQueues*   outgoing_;
+      // TODO: these are marked mutable to not have to undo consts on enqueue/dequeue, in case it breaks things;
+      //       eventually, implement this change
+      mutable IncomingQueues    incoming_;
+      mutable OutgoingQueues    outgoing_;
+
       CollectivesList*  collectives_;
   };
 
@@ -188,8 +213,8 @@ void
 diy::Master::Proxy::
 incoming(std::vector<int>& v) const
 {
-  for (IncomingQueues::const_iterator it = incoming_->begin(); it != incoming_->end(); ++it)
-    v.push_back(it->first);
+  for (auto& x : incoming_)
+    v.push_back(x.first);
 }
 
 bool
@@ -262,8 +287,7 @@ diy::Master::Proxy::
 enqueue(const BlockID& to, const T* x, size_t n,
         void (*save)(BinaryBuffer&, const T&)) const
 {
-    OutgoingQueues& out = *outgoing_;
-    BinaryBuffer&   bb  = out[to];
+    BinaryBuffer&   bb  = outgoing_[to];
     if (save == (void (*)(BinaryBuffer&, const T&)) &::diy::save<T>)
         diy::save(bb, x, n);       // optimized for unspecialized types
     else
@@ -283,8 +307,7 @@ diy::Master::Proxy::
 dequeue(int from, T* x, size_t n,
         void (*load)(BinaryBuffer&, T&)) const
 {
-    IncomingQueues& in = *incoming_;
-    BinaryBuffer&   bb = in[from];
+    BinaryBuffer&   bb = incoming_[from];
     if (load == (void (*)(BinaryBuffer&, T&)) &::diy::load<T>)
         diy::load(bb, x, n);       // optimized for unspecialized types
     else

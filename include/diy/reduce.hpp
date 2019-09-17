@@ -187,10 +187,10 @@ namespace detail
       reduce(b, rp, partners);
 
       // touch the outgoing queues to make sure they exist
-      Master::OutgoingQueues& outgoing = *cp.outgoing();
+      Master::Proxy::OutgoingQueues& outgoing = *cp.outgoing();
       if (outgoing.size() < (size_t) rp.out_link().size())
-        for (int j = 0; j < rp.out_link().size(); ++j)
-          outgoing[rp.out_link().target(j)];       // touch the outgoing queue, creating it if necessary
+        for (BlockID target : rp.out_link().neighbors())
+          outgoing[target];       // touch the outgoing queue, creating it if necessary
     }
 
     unsigned        round;
