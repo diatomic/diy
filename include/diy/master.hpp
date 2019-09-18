@@ -217,19 +217,13 @@ namespace diy
 
       //! nonblocking exchange of the queues between all the blocks
       template<class Block>
-      void          iexchange_(const ICallback<Block>&  f,
-                               size_t                   min_queue_size,
-                               size_t                   max_hold_time,
-                               bool                     fine);
+      void          iexchange_(const ICallback<Block>&  f);
 
       template<class F>
-      void          iexchange(const     F&      f,
-                              size_t            min_queue_size = 0,     // in bytes, queues smaller than min_queue_size will be held for up to max_hold_time
-                              size_t            max_hold_time  = 0,     // in milliseconds
-                              bool              fine           = false)
+      void          iexchange(const F& f)
       {
           using Block = typename detail::block_traits<F>::type;
-          iexchange_<Block>(f, min_queue_size, max_hold_time, fine);
+          iexchange_<Block>(f);
       }
 
       inline void   process_collectives();
@@ -652,10 +646,7 @@ touch_queues()
 template<class Block>
 void
 diy::Master::
-iexchange_(const    ICallback<Block>&   f,
-           size_t                       min_queue_size,
-           size_t                       max_hold_time,
-           bool                         fine)
+iexchange_(const ICallback<Block>& f)
 {
     auto scoped = prof.scoped("iexchange");
     DIY_UNUSED(scoped);
@@ -682,7 +673,7 @@ iexchange_(const    ICallback<Block>&   f,
     }
 
     //IExchangeInfoDUD iexchange(comm_, min_queue_size, max_hold_time, fine, prof);
-    IExchangeInfoCollective iexchange(comm_, min_queue_size, max_hold_time, fine, prof);
+    IExchangeInfoCollective iexchange(comm_, prof);
     iexchange.add_work(size());                 // start with one work unit for each block
 
 #if !defined(DIY_NO_THREADS)
@@ -712,7 +703,6 @@ iexchange_(const    ICallback<Block>&   f,
         for (size_t i = 0; i < size(); i++)     // for all blocks
         {
             int gid = this->gid(i);
-            iexchange.from_gid = gid;       // for shortcut sending only from current block during icommunicate
             stats::Annotation::Guard g( stats::Annotation("diy.block").set(gid) );
 
 #if defined(DIY_NO_THREADS)
@@ -917,16 +907,8 @@ send_queue(int              from_gid,
     stats::Annotation::Guard gq( stats::Annotation("diy.q-size").set(stats::Variant(static_cast<uint64_t>(qr.size()))) );
 
     // skip empty queues and hold queues shorter than some limit for some time
-    if (iexchange)
-    {
-        assert(qr.size() != 0);
-        if (iexchange->hold(qr.size()))
-            return;
-    }
+    assert(!iexchange || qr.size() != 0);
     log->debug("[{}] Sending queue: {} <- {} of size {}, iexchange = {}", comm_.rank(), to_gid, from_gid, qr.size(), iexchange ? 1 : 0);
-
-    if (iexchange)
-        iexchange->time_stamp_send();       // hold time begins counting from now
 
     if (to_proc == comm_.rank())            // sending to same rank, simply swap buffers
         send_same_rank(from_gid, to_gid, qr, iexchange);

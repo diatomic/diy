@@ -4,9 +4,8 @@ namespace diy
 {
     struct Master::IExchangeInfoCollective: public IExchangeInfo
     {
-      //using IExchangeInfo::IExchangeInfo;
-                        IExchangeInfoCollective(mpi::communicator comm_, size_t min_queue_size, size_t max_hold_time, bool fine, stats::Profiler& prof_):
-                            IExchangeInfo(comm_, min_queue_size, max_hold_time, fine, prof_)
+                        IExchangeInfoCollective(mpi::communicator comm_, stats::Profiler& prof_):
+                            IExchangeInfo(comm_, prof_)
       {
           local_work_ = 0;
           dirty = 0;

@@ -83,12 +83,6 @@ namespace diy
                                ) const
     {
         save(outgoing_[to], x);
-
-        if (iexchange_ && iexchange_->fine())
-        {
-            GidSendOrder gid_order;             // uninitialized, not needed
-            master()->comm_exchange(gid_order, iexchange_);
-        }
     }
 
     //! Enqueue data whose size is given explicitly by the user, e.g., an array.
@@ -325,12 +319,6 @@ enqueue(const BlockID& to, const T* x, size_t n,
     else
         for (size_t i = 0; i < n; ++i)
             save(bb, x[i]);
-
-    if (iexchange_ && iexchange_->fine())
-    {
-        GidSendOrder gid_order;             // uninitialized, not needed
-        master()->comm_exchange(gid_order, iexchange_);
-    }
 }
 
 template<class T>
