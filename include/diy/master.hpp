@@ -660,6 +660,10 @@ iexchange_(const    ICallback<Block>&   f,
     auto scoped = prof.scoped("iexchange");
     DIY_UNUSED(scoped);
 
+#if !defined(DIY_NO_THREADS) && !defined(DIY_USE_CALIPER)
+    static_assert(false, "Cannot use DIY's internal profiler; it's not thread safe. Use caliper.");
+#endif
+
 #if !defined(DIY_NO_THREADS)
     if (threads() < 2)
         throw std::runtime_error("Cannot launch iexchange with less than 2 threads (need a communication thread)");
