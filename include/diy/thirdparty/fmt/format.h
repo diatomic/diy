@@ -3007,7 +3007,7 @@ FMT_CONSTEXPR_DECL FMT_INLINE void parse_format_string(
     handler.on_text(begin, end);
     return;
   }
-  struct writer {
+  struct pfs_writer {
     FMT_CONSTEXPR void operator()(const Char* pbegin, const Char* pend) {
       if (pbegin == pend) return;
       for (;;) {
