@@ -20,18 +20,7 @@ namespace diy
                           iexchange_(iexchange__),
                           collectives_(&master__->collectives(gid__))
     {
-        // fill incoming_
-        for (auto& x : master_->incoming(gid_))
-        {
-            auto access = x.second.access();
-            if (!access->empty())
-            {
-                incoming_.emplace(x.first, access->front().move());
-                access->pop_front();
-                if (iexchange_)
-                    iexchange_->dec_work();
-            }
-        }
+        fill_incoming();
 
         // move outgoing_ back into proxy, in case it's a multi-foreach round
         if (!iexchange_)
@@ -74,6 +63,27 @@ namespace diy
     }
 
     int                 gid() const                                     { return gid_; }
+
+    bool                fill_incoming() const
+    {
+        bool exists = false;
+
+        // fill incoming_
+        for (auto& x : master_->incoming(gid_))
+        {
+            auto access = x.second.access();
+            if (!access->empty())
+            {
+                exists = true;
+                incoming_.emplace(x.first, access->front().move());
+                access->pop_front();
+                if (iexchange_)
+                    iexchange_->dec_work();
+            }
+        }
+
+        return exists;
+    }
 
     //! Enqueue data whose size can be determined automatically, e.g., an STL vector.
     template<class T>
