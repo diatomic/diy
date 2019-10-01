@@ -651,7 +651,7 @@ iexchange_(const ICallback<Block>& f)
     auto scoped = prof.scoped("iexchange");
     DIY_UNUSED(scoped);
 
-#if !defined(DIY_NO_THREADS) && !defined(DIY_USE_CALIPER)
+#if !defined(DIY_NO_THREADS) && (!defined(DIY_USE_CALIPER) && defined(DIY_PROFILE))
     static_assert(false, "Cannot use DIY's internal profiler; it's not thread safe. Use caliper.");
 #endif
 
