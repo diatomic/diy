@@ -68,6 +68,8 @@ namespace diy
     {
         bool exists = false;
 
+        incoming_.clear();
+
         // fill incoming_
         for (auto& x : master_->incoming(gid_))
         {
