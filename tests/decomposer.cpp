@@ -46,6 +46,14 @@ TEST_CASE("RegularDecomposer", "[decomposition]")
 
         diy::ContiguousAssigner assigner(nblocks, nblocks);
         decomposer.decompose(0, assigner, test);
+
+        // test the return-by-value gid_to_coords
+        auto coords = decomposer.gid_to_coords(2);
+        REQUIRE(coords == diy::RegularDecomposer<diy::ContinuousBounds>::DivisionsVector { 2, 0, 0 });
+
+        // test that gid_to_coords clears the vector
+        decomposer.gid_to_coords(3, coords);
+        REQUIRE(coords == diy::RegularDecomposer<diy::ContinuousBounds>::DivisionsVector { 0, 1, 0 });
     }
 
     SECTION("1D decomposition of an interval")

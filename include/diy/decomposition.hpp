@@ -123,6 +123,7 @@ namespace detail
     template<class Point>
     int             lowest_gid(const Point& p) const;
 
+    DivisionsVector gid_to_coords(int gid) const                                { DivisionsVector coords; gid_to_coords(gid, coords); return coords; }
     void            gid_to_coords(int gid, DivisionsVector& coords) const       { gid_to_coords(gid, coords, divisions); }
     int             coords_to_gid(const DivisionsVector& coords) const          { return coords_to_gid(coords, divisions); }
     void            fill_divisions(std::vector<int>& divisions) const;
@@ -411,6 +412,7 @@ void
 diy::RegularDecomposer<Bounds>::
 gid_to_coords(int gid, DivisionsVector& coords, const DivisionsVector& divisions)
 {
+  coords.clear();
   int dim = static_cast<int>(divisions.size());
   for (int i = 0; i < dim; ++i)
   {
