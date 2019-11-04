@@ -1,12 +1,19 @@
-add_subdirectory            (backward)
+if                          (UNIX)
+    add_subdirectory        (backward)
+endif                       ()
 
 include_directories         (${CMAKE_SOURCE_DIR}/examples)          # needed for opts.h
 include_directories         (${CMAKE_SOURCE_DIR}/examples/reduce)   # needed for swap-reduce-test
 
 function                    (compile_test target source)
-    add_executable          (${target} ${source} ${BACKWARD_ENABLE})
-    target_link_libraries   (${target} ${libraries})
-    add_backward            (${target})
+    if                      (UNIX)
+        add_executable          (${target} ${source} ${BACKWARD_ENABLE})
+        target_link_libraries   (${target} ${libraries})
+        add_backward            (${target})
+    else                    ()
+        add_executable          (${target} ${source})
+        target_link_libraries   (${target} ${libraries})
+    endif                   ()
 endfunction                 ()
 
 compile_test                (kd-tree-test           kd-tree.cpp)
