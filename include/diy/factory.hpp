@@ -42,6 +42,9 @@ class Factory
             std::string id() const override     { return typeid(T).name(); }
 
             private:
+#if defined(__INTEL_COMPILER)
+                __attribute__ ((used))
+#endif
                 Registrar(): Base(Key{}) { (void)registered; }
         };
 
