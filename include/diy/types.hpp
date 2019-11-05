@@ -66,11 +66,7 @@ namespace diy
           if (dim > 3 && dir & DIY_T1) (*this)[3] += 1;
       }
 
-        DEPRECATED("Direction without dimension is deprecated")
-              Direction(int dir):
-                  Direction(DIY_MAX_DIM, dir)       // if we are decoding the old constants, we assume DIY_MAX_DIM dimensional space
-      {
-      }
+      static Direction from_bits(int dir, int dim = DIY_MAX_DIM)    { return Direction(dim, dir); }
 
       bool
       operator==(const diy::Direction& y) const
