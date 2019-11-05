@@ -94,6 +94,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="structdiy_1_1_direction-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">diy::Direction Struct Reference</div>  </div>
@@ -168,9 +169,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a0a44e20eb9f5f03725c63ff9b214a016"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0a44e20eb9f5f03725c63ff9b214a016"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>Direction</b> (int dim, int dir)</td></tr>
 <tr class="separator:a0a44e20eb9f5f03725c63ff9b214a016"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abed6a8574f8b216e7bf4cd7180b7cc1a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abed6a8574f8b216e7bf4cd7180b7cc1a"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>Direction</b> (int dir)</td></tr>
-<tr class="separator:abed6a8574f8b216e7bf4cd7180b7cc1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2608af22e5278cb685e60ad4f2c6d3fc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2608af22e5278cb685e60ad4f2c6d3fc"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (const <a class="el" href="structdiy_1_1_direction.html">diy::Direction</a> &amp;y) const </td></tr>
 <tr class="separator:a2608af22e5278cb685e60ad4f2c6d3fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -411,8 +409,11 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>resize</b> (size_type
 void&#160;</td><td class="memItemRight" valign="bottom"><b>resize</b> (size_type n)</td></tr>
 <tr class="separator:ac7587c2bbced64edd82b5dc264699bd3 inherit pub_methods_structchobo_1_1small__vector"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
-Additional Inherited Members</h2></td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a7422d39042746807b3aa7bd84fb57353"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7422d39042746807b3aa7bd84fb57353"></a>
+static <a class="el" href="structdiy_1_1_direction.html">Direction</a>&#160;</td><td class="memItemRight" valign="bottom"><b>from_bits</b> (int dir, int dim=DIY_MAX_DIM)</td></tr>
+<tr class="separator:a7422d39042746807b3aa7bd84fb57353"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_static_methods_classdiy_1_1_dynamic_point"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_classdiy_1_1_dynamic_point')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="classdiy_1_1_dynamic_point.html">diy::DynamicPoint&lt; int &gt;</a></td></tr>
 <tr class="memitem:a617f96361376826b388a5b00cb5ee59e inherit pub_static_methods_classdiy_1_1_dynamic_point"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a617f96361376826b388a5b00cb5ee59e"></a>
 static <a class="el" href="classdiy_1_1_dynamic_point.html">DynamicPoint</a>&#160;</td><td class="memItemRight" valign="bottom"><b>zero</b> (int dim)</td></tr>
@@ -420,6 +421,9 @@ static <a class="el" href="classdiy_1_1_dynamic_point.html">DynamicPoint</a>&#16
 <tr class="memitem:aa466c8f86eb439ef16d0ed9e4113014f inherit pub_static_methods_classdiy_1_1_dynamic_point"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa466c8f86eb439ef16d0ed9e4113014f"></a>
 static <a class="el" href="classdiy_1_1_dynamic_point.html">DynamicPoint</a>&#160;</td><td class="memItemRight" valign="bottom"><b>one</b> (int dim)</td></tr>
 <tr class="separator:aa466c8f86eb439ef16d0ed9e4113014f inherit pub_static_methods_classdiy_1_1_dynamic_point"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
 <tr class="inherit_header pub_static_attribs_structchobo_1_1small__vector"><td colspan="2" onclick="javascript:toggleInherit('pub_static_attribs_structchobo_1_1small__vector')"><img src="closed.png" alt="-"/>&#160;Static Public Attributes inherited from <a class="el" href="structchobo_1_1small__vector.html">chobo::small_vector&lt; int, DIY_MAX_DIM &gt;</a></td></tr>
 <tr class="memitem:a36463f35abcb8863c784039793fffa75 inherit pub_static_attribs_structchobo_1_1small__vector"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a36463f35abcb8863c784039793fffa75"></a>
 static constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><b>static_capacity</b></td></tr>
@@ -434,7 +438,7 @@ static constexpr intptr_t&#160;</td><td class="memItemRight" valign="bottom"><b>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Oct 4 2019 19:26:56 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Nov 5 2019 20:44:22 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
