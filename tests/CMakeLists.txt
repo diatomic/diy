@@ -1,62 +1,41 @@
+if                          (UNIX)
+    add_subdirectory        (backward)
+endif                       ()
+
 include_directories         (${CMAKE_SOURCE_DIR}/examples)          # needed for opts.h
 include_directories         (${CMAKE_SOURCE_DIR}/examples/reduce)   # needed for swap-reduce-test
 
-add_executable              (kd-tree-test           kd-tree.cpp)
-target_link_libraries       (kd-tree-test           ${libraries})
+function                    (compile_test target source)
+    if                      (UNIX)
+        add_executable          (${target} ${source} ${BACKWARD_ENABLE})
+        target_link_libraries   (${target} ${libraries})
+        add_backward            (${target})
+    else                    ()
+        add_executable          (${target} ${source})
+        target_link_libraries   (${target} ${libraries})
+    endif                   ()
+endfunction                 ()
 
-add_executable              (kd-tree-test2          kd-tree-dense-points.cpp)
-target_link_libraries       (kd-tree-test2          ${libraries})
+compile_test                (kd-tree-test           kd-tree.cpp)
+compile_test                (kd-tree-test2          kd-tree-dense-points.cpp)
+compile_test                (decomposer-test        decomposer.cpp)
+compile_test                (partners-test          partners.cpp)
+compile_test                (swap-reduce-test       swap-reduce.cpp)
+compile_test                (merge-swap-reduce-test merge-swap-reduce.cpp)
+compile_test                (io-test                io.cpp)
+compile_test                (simple-test            simple.cpp)
+compile_test                (mpi-collectives-test   mpi-collectives.cpp)
+compile_test                (mpi-window-test        mpi-window.cpp)
+compile_test                (dynamic-assigner-test  dynamic-assigner.cpp)
+compile_test                (rexchange-test         rexchange.cpp)
+compile_test                (iexchange-test         iexchange.cpp)
+compile_test                (grid-test              grid.cpp)
+compile_test                (serialization-test     serialization.cpp)
+compile_test                (two-masters            two-masters.cpp)
+compile_test                (shared-output          shared-output.cpp)
+compile_test                (custom-bounds-test     custom-bounds.cpp)
+compile_test                (custom-bounds-load-test    custom-bounds-load.cpp)
 
-add_executable              (decomposer-test        decomposer.cpp)
-target_link_libraries       (decomposer-test        ${libraries})
-
-add_executable              (partners-test        partners.cpp)
-target_link_libraries       (partners-test        ${libraries})
-
-add_executable              (swap-reduce-test       swap-reduce.cpp)
-target_link_libraries       (swap-reduce-test       ${libraries})
-
-add_executable              (merge-swap-reduce-test merge-swap-reduce.cpp)
-target_link_libraries       (merge-swap-reduce-test ${libraries})
-
-add_executable              (io-test                io.cpp)
-target_link_libraries       (io-test                ${libraries})
-
-add_executable              (simple-test            simple.cpp)
-target_link_libraries       (simple-test            ${libraries})
-
-add_executable              (mpi-collectives-test   mpi-collectives.cpp)
-target_link_libraries       (mpi-collectives-test   ${libraries})
-
-add_executable              (mpi-window-test        mpi-window.cpp)
-target_link_libraries       (mpi-window-test        ${libraries})
-
-add_executable              (dynamic-assigner-test  dynamic-assigner.cpp)
-target_link_libraries       (dynamic-assigner-test  ${libraries})
-
-add_executable              (rexchange-test         rexchange.cpp)
-target_link_libraries       (rexchange-test         ${libraries})
-
-add_executable              (iexchange-test         iexchange.cpp)
-target_link_libraries       (iexchange-test         ${libraries})
-
-add_executable              (grid-test              grid.cpp)
-target_link_libraries       (grid-test              ${libraries})
-
-add_executable              (serialization-test     serialization.cpp)
-target_link_libraries       (serialization-test     ${libraries})
-
-add_executable              (two-masters            two-masters.cpp)
-target_link_libraries       (two-masters            ${libraries})
-
-add_executable              (shared-output         shared-output.cpp)
-target_link_libraries       (shared-output         ${libraries})
-
-add_executable              (custom-bounds-test    custom-bounds.cpp)
-target_link_libraries       (custom-bounds-test    ${libraries})
-
-add_executable              (custom-bounds-load-test    custom-bounds-load.cpp)
-target_link_libraries       (custom-bounds-load-test    ${libraries})
 
 if                          (MSVC AND NOT(MSVC_VERSION LESS 1400))
     set_source_files_properties (kd-tree.cpp            PROPERTIES COMPILE_FLAGS "/bigobj")
