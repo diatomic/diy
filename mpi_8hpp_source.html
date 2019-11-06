@@ -135,7 +135,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;environment(<span class="keywordtype">int</span> threading)</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;{</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor">#ifndef DIY_NO_MPI</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor"></span>  <span class="keywordtype">int</span> argc = 0; <span class="keywordtype">char</span>** argv;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor"></span>  <span class="keywordtype">int</span> argc = 0; <span class="keywordtype">char</span>** argv = { NULL };</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  MPI_Init_thread(&amp;argc, &amp;argv, threading, &amp;provided_threading);</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">#else</span></div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor"></span>  provided_threading = threading;</div>
@@ -166,7 +166,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 5 2019 21:04:32 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 6 2019 18:06:21 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
