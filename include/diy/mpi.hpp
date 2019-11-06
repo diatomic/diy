@@ -42,7 +42,7 @@ diy::mpi::environment::
 environment(int threading)
 {
 #ifndef DIY_NO_MPI
-  int argc = 0; char** argv;
+  int argc = 0; char** argv = { NULL };
   MPI_Init_thread(&argc, &argv, threading, &provided_threading);
 #else
   provided_threading = threading;

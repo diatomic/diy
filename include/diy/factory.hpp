@@ -37,11 +37,14 @@ class Factory
                 };
                 return true;
             }
-            static bool registered;
+            static volatile bool registered;
 
             std::string id() const override     { return typeid(T).name(); }
 
             private:
+#if defined(__INTEL_COMPILER)
+                __attribute__ ((used))
+#endif
                 Registrar(): Base(Key{}) { (void)registered; }
         };
 
@@ -67,7 +70,7 @@ class Factory
 
 template <class Base, class... Args>
 template <class T>
-bool Factory<Base, Args...>::Registrar<T>::registered = Factory<Base, Args...>::Registrar<T>::registerT();
+volatile bool Factory<Base, Args...>::Registrar<T>::registered = Factory<Base, Args...>::Registrar<T>::registerT();
 
 }
 
