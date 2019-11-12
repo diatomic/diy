@@ -655,11 +655,6 @@ iexchange_(const ICallback<Block>& f)
     static_assert(false, "Cannot use DIY's internal profiler; it's not thread safe. Use caliper.");
 #endif
 
-#if !defined(DIY_NO_THREADS)
-    if (threads() < 2)
-        throw std::runtime_error("Cannot launch iexchange with less than 2 threads (need a communication thread)");
-#endif
-
     // prepare for next round
     incoming_.erase(exchange_round_);
     ++exchange_round_;
@@ -676,17 +671,17 @@ iexchange_(const ICallback<Block>& f)
     IExchangeInfoCollective iexchange(comm_, prof);
     iexchange.add_work(size());                 // start with one work unit for each block
 
-#if !defined(DIY_NO_THREADS)
-    auto comm_thread = std::thread([this,&iexchange]()
-    {
-        while(!iexchange.all_done())
+    std::thread comm_thread;
+    if (threads() > 1)
+        comm_thread = std::thread([this,&iexchange]()
         {
-            icommunicate(&iexchange);
-            iexchange.control();
-            //std::this_thread::sleep_for(std::chrono::microseconds(1));
-        }
-    });
-#endif
+            while(!iexchange.all_done())
+            {
+                icommunicate(&iexchange);
+                iexchange.control();
+                //std::this_thread::sleep_for(std::chrono::microseconds(1));
+            }
+        });
 
     auto empty_incoming = [this](int gid)
     {
@@ -705,9 +700,8 @@ iexchange_(const ICallback<Block>& f)
             int gid = this->gid(i);
             stats::Annotation::Guard g( stats::Annotation("diy.block").set(gid) );
 
-#if defined(DIY_NO_THREADS)
-            icommunicate(&iexchange);
-#endif
+            if (threads() == 1)
+                icommunicate(&iexchange);
             bool done = done_result[gid];
             if (!done || !empty_incoming(gid))
             {
@@ -732,20 +726,20 @@ iexchange_(const ICallback<Block>& f)
             log->debug("Done: {}", done);
         }
 
-#if defined(DIY_NO_THREADS)
-        prof << "iexchange-control";
-        iexchange.control();
-        prof >> "iexchange-control";
-#else
+        if (threads() == 1)
+        {
+            prof << "iexchange-control";
+            iexchange.control();
+            prof >> "iexchange-control";
+        }
+        //else
         //if (work_done == 0)
         //    std::this_thread::sleep_for(std::chrono::microseconds(1));
-#endif
     } while (!iexchange.all_done());
     log->info("[{}] ==== Leaving iexchange ====\n", iexchange.comm.rank());
 
-#if !defined(DIY_NO_THREADS)
-    comm_thread.join();
-#endif
+    if (threads() > 1)
+        comm_thread.join();
 
     //comm_.barrier();        // TODO: this is only necessary for DUD
     prof >> "consensus-time";
