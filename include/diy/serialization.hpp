@@ -311,6 +311,29 @@ namespace diy
     }
   };
 
+  // save/load for std::deque
+  template<class T>
+  struct Serialization< std::deque<T> > {
+    typedef std::deque<T> deque;
+
+    static void save(BinaryBuffer& bb, const deque& q) {
+      size_t s = q.size();
+      diy::save(bb, q);
+      for (typename std::deque<T>::const_iterator it = q.begin(); it != q.end(); it ++)
+        diy::save(bb, *it);
+    }
+
+    static void load(BinaryBuffer& bb, deque& q) {
+      size_t s;
+      diy::load(bb, s);
+      for (int i = 0; i < s; i ++) {
+        T p;
+        diy::load(bb, p);
+        q.emplace_back(p);
+      }
+    }
+  };
+
   // save/load for std::pair<X,Y>
   template<class X, class Y>
   struct Serialization< std::pair<X,Y> >
