@@ -65,6 +65,38 @@ namespace diy
     size_t              position;
     std::vector<char>   buffer;
   };
+  
+ 
+  //! An alternative memory buffer based on std::string
+  struct StringBuffer : public BinaryBuffer {
+    std::string &str;
+    size_t pos; 
+
+    explicit StringBuffer(std::string& str_, size_t pos_=0) : str(str_), pos(pos_) {}
+    void clear() {str.clear(); pos = 0;}
+    void reset() {pos = 0;}
+
+    operator bool() const {return pos < str.size();}
+
+    inline void save_binary(const char *x, size_t count) {
+      if (pos + count > str.size()) str.resize(pos + count);
+      memcpy((char*)(str.data()+pos), x, count);
+      pos += count;
+    }
+
+    inline void append_binary(const char *x, size_t count) {
+      str.append(x, count);
+    }
+
+    inline void load_binary(char *x, size_t count) {
+      memcpy(x, str.data()+pos, count);
+      pos += count;
+    }
+
+    inline void load_binary_back(char *x, size_t count) {
+      memcpy(x, str.data()+str.size()-count, count);
+    }
+  };
 
   namespace detail
   {
@@ -126,6 +158,23 @@ namespace diy
 
   //@}
 
+  //! serialize a data structure into string
+  template <typename T> 
+  void serializeToString(const T& obj, std::string& buf)
+  {
+    buf.clear();
+    diy::StringBuffer bb(buf);
+    diy::save(bb, obj);
+  }
+
+  //! unserialize a data structure from string
+  template <typename T> 
+  void unserializeFromString(const std::string& buf, T& obj)
+  {
+    std::string buf1(buf);
+    diy::StringBuffer bb(buf1);
+    diy::load(bb, obj);
+  }
 
   namespace detail
   {
