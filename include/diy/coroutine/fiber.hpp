@@ -45,10 +45,6 @@ void co_switch(cothread_t cothread) {
   SwitchToFiber(cothread);
 }
 
-int co_serializable() {
-  return 0;
-}
-
 }
 
 }

@@ -20,7 +20,6 @@ inline cothread_t  co_active();
 inline cothread_t  co_create(unsigned int, void (*)(void));
 inline void        co_delete(cothread_t);
 inline void        co_switch(cothread_t);
-inline int         co_serializable();
 
 // "global variable" to pass an argument
 inline void*&      argument()

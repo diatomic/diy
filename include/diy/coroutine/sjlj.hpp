@@ -112,10 +112,6 @@ void co_switch(cothread_t cothread) {
   }
 }
 
-int co_serializable() {
-  return 0;
-}
-
 }
 
 }
