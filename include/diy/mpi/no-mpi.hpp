@@ -33,7 +33,6 @@ DIY_NO_MPI_DATATYPE(long long,             MPI_LONG_LONG_INT);
 DIY_NO_MPI_DATATYPE(unsigned long long,    MPI_UNSIGNED_LONG_LONG);
 DIY_NO_MPI_DATATYPE(float,                 MPI_FLOAT);
 DIY_NO_MPI_DATATYPE(double,                MPI_DOUBLE);
-#endif
 
 /* status type */
 struct MPI_Status
@@ -49,7 +48,7 @@ struct MPI_Status
 using MPI_Request = int;
 
 #define DIY_UNSUPPORTED_MPI_CALL(name) \
-  throw std::runtime_error("`" #name "` not supported when DIY_NO_MPI is defined.");
+  throw std::runtime_error("`" #name "` not supported when DIY_HAS_MPI is false.");
 
 /* define operations */
 using MPI_Op = int;
@@ -61,7 +60,7 @@ static const MPI_Op MPI_LAND = 0;
 static const MPI_Op MPI_LOR = 0;
 
 /* mpi i/o stuff */
-using MPI_Offset = size_t;
+using MPI_Offset = long long;
 using MPI_File = int;
 static const MPI_File MPI_FILE_NULL = 0;
 
@@ -76,7 +75,7 @@ static const int MPI_MODE_APPEND          = 128;
 static const int MPI_MODE_SEQUENTIAL      = 256;
 
 /* define window type */
-using MPI_Win = int;
+using MPI_Win = void*;
 
 /* window fence assertions */
 static const int MPI_MODE_NOSTORE       = 1;
@@ -88,3 +87,5 @@ static const int MPI_MODE_NOCHECK       = 16;
 /* window lock types */
 static const int MPI_LOCK_SHARED        = 1;
 static const int MPI_LOCK_EXCLUSIVE     = 2;
+
+#endif // DIY_MPI_NO_MPI_HPP

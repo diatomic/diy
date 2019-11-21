@@ -25,13 +25,13 @@ namespace mpi
 namespace detail
 {
     template<>
-        struct mpi_datatype<Elem>
-        {
-            static MPI_Datatype datatype()              { return MPI_BYTE; }
-            static const void*  address(Elem const& x)  { return &x; }
-            static void*        address(Elem& x)        { return &x; }
-            static int          count(Elem const&)      { return sizeof(Elem); }
-        };
+    struct mpi_datatype<Elem>
+    {
+        static diy::mpi::datatype datatype()              { return get_mpi_datatype<unsigned char>(); }
+        static const void*        address(Elem const& x)  { return &x; }
+        static void*              address(Elem& x)        { return &x; }
+        static int                count(Elem const&)      { return sizeof(Elem); }
+    };
 }
 }
 }
