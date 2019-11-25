@@ -39,7 +39,7 @@ foreach_exchange(const F& f, bool remote, unsigned int stack_size)
 template<class Block>
 void
 diy::Master::
-foreach_exchange_(const Callback<Block>& f, bool remote, unsigned int stack_size)
+foreach_exchange_(const CoroutineCallback<Block>& f, bool remote, unsigned int stack_size)
 {
     auto scoped = prof.scoped("foreach_exchange");
     DIY_UNUSED(scoped);
@@ -57,7 +57,13 @@ foreach_exchange_(const Callback<Block>& f, bool remote, unsigned int stack_size
         coroutines.push_back(c);
         proxies.emplace_back(make_unique<ProxyWithLink>(proxy(i)));
 
-        auto trampoline = [&f,this](int lid, const ProxyWithLink& cp){ f(block<Block>(lid), cp); };
+        auto trampoline = [&f,this](int lid, const ProxyWithLink& cp)
+        {
+            void*  const& b_ = blocks().reference(lid);
+            Block* const& b  = (Block* const&) b_;
+
+            f(b, cp);
+        };
         CoroutineArg arg { i, *proxies.back(), co_active(), this, trampoline };
         argument() = &arg;
 
@@ -73,6 +79,8 @@ foreach_exchange_(const Callback<Block>& f, bool remote, unsigned int stack_size
         {
             if (done[i] == true)
                 continue;
+
+            get(i);         // load block in case it's out of core
 
             cothread_t  c  = coroutines[i];
             auto&       cp = *proxies[i];

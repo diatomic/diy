@@ -43,6 +43,7 @@ namespace diy
       void*         release(int i);
 
       void*         find(int i) const               { return elements_[static_cast<size_t>(i)]; }                        // possibly returns 0, if the element is unloaded
+      void* const&  reference(int i) const          { return elements_[static_cast<size_t>(i)]; }
       void*         get(int i)                      { if (!find(i)) load(i); return find(i); }      // loads the element first, and then returns its address
 
       int           available() const               { int i = 0; for (; i < (int)size(); ++i) if (find(i) != 0) break; return i; }

@@ -89,6 +89,10 @@ namespace diy
       template<class Block>
       using Callback = std::function<void(Block*, const ProxyWithLink&)>;
 
+      // foreach_exchange callback
+      template<class Block>
+      using CoroutineCallback = std::function<void(Block* const&, const ProxyWithLink&)>;
+
       // iexchange callback
       template<class Block>
       using ICallback = std::function<bool(Block*, const ProxyWithLink&)>;
@@ -202,6 +206,10 @@ namespace diy
       inline void*  block(int i) const                  { return blocks_.find(i); }
       template<class Block>
       Block*        block(int i) const                  { return static_cast<Block*>(block(i)); }
+
+      const Collection&
+                    blocks() const                      { return blocks_; }
+
       //! return the `i`-th block, loading it if necessary
       void*         get(int i)                          { return blocks_.get(i); }
       template<class Block>
@@ -299,7 +307,7 @@ namespace diy
       void          launch_process_block_coroutine();
 
       template<class Block>
-      void          foreach_exchange_(const Callback<Block>& f, bool remote, unsigned int stack_size);
+      void          foreach_exchange_(const CoroutineCallback<Block>& f, bool remote, unsigned int stack_size);
 
       template<class F>
       void          foreach_exchange(const F& f, bool remote = false, unsigned int stack_size = 16*1024*1024);

@@ -177,7 +177,7 @@ int main(int argc, char* argv[])
         master.exchange();                   // exchange data between blocks in the link
         master.foreach(&average_neighbors);  // callback function executed on each local block
     } else
-        master.foreach_exchange([](Block* b, const diy::Master::ProxyWithLink& cp)
+        master.foreach_exchange([](Block* const& b, const diy::Master::ProxyWithLink& cp)
         {
             local_sum(b,cp);
             cp.yield();
