@@ -81,11 +81,13 @@ struct SimpleFixture
 {
   static int nblocks;
   static int threads;
+  static bool coroutines;
   diy::mpi::communicator world;
 };
 
 int SimpleFixture::nblocks = 0;
 int SimpleFixture::threads = 2;
+bool SimpleFixture::coroutines = false;
 
 TEST_CASE_METHOD(SimpleFixture, "Send/Recv Test", "[simple]")
 {
@@ -145,9 +147,18 @@ TEST_CASE_METHOD(SimpleFixture, "Send/Recv Test", "[simple]")
     master.add(gid, b, link);
   }
 
-  master.foreach(&local_sum);
-  master.exchange();
-  master.foreach(&verify);
+  if (!coroutines)
+  {
+      master.foreach(&local_sum);
+      master.exchange();
+      master.foreach(&verify);
+  } else
+      master.foreach_exchange([](Block* const& b, const diy::Master::ProxyWithLink& cp)
+      {
+          local_sum(b,cp);
+          cp.yield();
+          verify(b,cp);
+      });
 }
 
 int main(int argc, char* argv[])
@@ -168,6 +179,7 @@ int main(int argc, char* argv[])
   ops >> Option('b', "blocks", SimpleFixture::nblocks, "number of blocks")
       >> Option('t', "thread", SimpleFixture::threads, "number of threads")
       >> Option('l', "log",    log_level,              "log level")
+      >> Option('c', "coroutines",  SimpleFixture::coroutines, "use coroutines via foreach_exchange")
       >> Option('h', "help",   help,                   "show help");
   if (!ops.parse(argc,argv) || help)
   {
