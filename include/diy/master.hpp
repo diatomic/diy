@@ -22,6 +22,9 @@
 
 #include "thread.hpp"
 
+#include "coroutine.hpp"
+#include "utils.hpp"
+
 #include "detail/block_traits.hpp"
 
 #include "log.hpp"
@@ -289,6 +292,18 @@ namespace diy
       bool          immediate() const                   { return immediate_; }
       void          set_immediate(bool i)               { if (i && !immediate_) execute(); immediate_ = i; }
 
+      /** foreach_exchange **/
+      struct CoroutineArg;
+
+      inline static
+      void          launch_process_block_coroutine();
+
+      template<class Block>
+      void          foreach_exchange_(const Callback<Block>& f, bool remote, unsigned int stack_size);
+
+      template<class F>
+      void          foreach_exchange(const F& f, bool remote = false, unsigned int stack_size = 16*1024*1024);
+
     public:
       // Communicator functionality
       IncomingQueues&   incoming(int gid__)             { return incoming_[exchange_round_].map[gid__]; }
@@ -379,6 +394,7 @@ namespace diy
 #include "detail/master/commands.hpp"
 #include "proxy.hpp"
 #include "detail/master/execution.hpp"
+#include "detail/master/foreach_exchange.hpp"
 
 diy::Master::
 Master(mpi::communicator    comm,
