@@ -51,17 +51,16 @@ foreach_exchange_(const CoroutineCallback<Block>& f, bool remote, unsigned int s
     // setup coroutines and proxies
     std::vector<cothread_t>                     coroutines;
     std::vector<std::unique_ptr<ProxyWithLink>> proxies;
+    std::vector<Block*>                         blocks(size(), nullptr);
     for (int i = 0; i < size(); ++i)
     {
         cothread_t c = co_create(stack_size, &launch_process_block_coroutine);
         coroutines.push_back(c);
         proxies.emplace_back(make_unique<ProxyWithLink>(proxy(i)));
 
-        auto trampoline = [&f,this](int lid, const ProxyWithLink& cp)
+        auto trampoline = [&f,&blocks,this](int lid, const ProxyWithLink& cp)
         {
-            void*  const& b_ = blocks().reference(lid);
-            Block* const& b  = (Block* const&) b_;
-
+            Block* const& b = blocks[lid];
             f(b, cp);
         };
         CoroutineArg arg { i, *proxies.back(), co_active(), this, trampoline };
@@ -80,7 +79,7 @@ foreach_exchange_(const CoroutineCallback<Block>& f, bool remote, unsigned int s
             if (done[i] == true)
                 continue;
 
-            get(i);         // load block in case it's out of core
+            blocks[i] = get<Block>(i); // load block in case it's out of core
 
             cothread_t  c  = coroutines[i];
             auto&       cp = *proxies[i];
