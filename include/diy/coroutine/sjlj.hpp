@@ -3,6 +3,13 @@
   for SJLJ on other systems, one would want to rewrite springboard() and co_create() and hack the jmb_buf stack pointer.
 */
 
+#if __USE_FORTIFY_LEVEL
+#define DIY_USE_FORTIFY_LEVEL __USE_FORTIFY_LEVEL
+#undef __USE_FORTIFY_LEVEL
+#warning "diy::coroutine (sjlj.hpp) cannot be compiled with _FORTIFY_SOURCE; disabling."
+#endif
+
+
 //#define _BSD_SOURCE
 //#define _XOPEN_SOURCE 500
 #include <stdlib.h>
@@ -115,3 +122,8 @@ void co_switch(cothread_t cothread) {
 }
 
 }
+
+#if DIY_USE_FORTIFY_LEVEL
+#define __USE_FORTIFY_LEVEL DIY_USE_FORTIFY_LEVEL
+#undef DIY_USE_FORTIFY_LEVEL
+#endif
