@@ -37,7 +37,7 @@ inline Block::Point compute_median(const std::vector<Block::Point> &points)
 // merge-reduce callback to reduce the median
 void median_reduce(Block* b,                                  // local block
                    const diy::ReduceProxy& rp,                // communication proxy
-                   const diy::RegularMergePartners& partners) // partners of the current block
+                   const diy::RegularMergePartners&)          // partners of the current block
 {
     unsigned   round    = rp.round();               // current round number
 
@@ -117,8 +117,8 @@ void redistribute(void* b_,                                 // local block
     // sort points into vectors corresponding to neighbor blocks
     for (size_t i = 0; i < b->points.size(); ++i) // for all points
     {
-        int loc = floor((b->points[i][cur_dim] - b->box.min[cur_dim]) /
-                        (b->box.max[cur_dim] - b->box.min[cur_dim]) * group_size);
+        auto loc = static_cast<size_t>(floor((b->points[i][cur_dim] - b->box.min[cur_dim]) /
+                                             (b->box.max[cur_dim] - b->box.min[cur_dim]) * group_size));
         out_points[loc].push_back(b->points[i]);
     }
     int pos = -1;

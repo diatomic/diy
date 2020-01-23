@@ -229,7 +229,7 @@ namespace diy
       inline void   process_collectives();
 
       inline
-      ProxyWithLink proxy(int i, IExchangeInfo* iexchange = 0) const;
+      ProxyWithLink proxy(int i, IExchangeInfo* iex = 0) const;
 
       //! return the number of local blocks
       unsigned int  size() const                        { return static_cast<unsigned int>(blocks_.size()); }
@@ -287,25 +287,25 @@ namespace diy
 
     private:
       // Communicator functionality
-      inline void       comm_exchange(GidSendOrder& gid_order, IExchangeInfo*    iexchange = 0);
+      inline void       comm_exchange(GidSendOrder& gid_order, IExchangeInfo*    iex = 0);
       inline void       rcomm_exchange();    // possibly called in between block computations
-      inline bool       nudge(IExchangeInfo* iexchange = 0);
-      inline void       send_queue(int from_gid, int to_gid, int to_proc, QueueRecord& qr, bool remote, IExchangeInfo* iexchange);
+      inline bool       nudge(IExchangeInfo* iex = 0);
+      inline void       send_queue(int from_gid, int to_gid, int to_proc, QueueRecord& qr, bool remote, IExchangeInfo* iex);
       inline void       send_outgoing_queues(GidSendOrder&   gid_order,
                                              bool            remote,
-                                             IExchangeInfo*  iexchange = 0);
-      inline void       check_incoming_queues(IExchangeInfo* iexchange = 0);
+                                             IExchangeInfo*  iex = 0);
+      inline void       check_incoming_queues(IExchangeInfo* iex = 0);
       inline GidSendOrder
                         order_gids();
       inline void       touch_queues();
-      inline void       send_same_rank(int from, int to, QueueRecord& qr, IExchangeInfo* iexchange);
-      inline void       send_different_rank(int from, int to, int proc, QueueRecord& qr, bool remote, IExchangeInfo* iexchange);
+      inline void       send_same_rank(int from, int to, QueueRecord& qr, IExchangeInfo* iex);
+      inline void       send_different_rank(int from, int to, int proc, QueueRecord& qr, bool remote, IExchangeInfo* iex);
 
       inline InFlightRecv&         inflight_recv(int proc);
       inline InFlightSendsList&    inflight_sends();
 
       // iexchange commmunication
-      inline void       icommunicate(IExchangeInfo* iexchange);     // async communication
+      inline void       icommunicate(IExchangeInfo* iex);     // async communication
 
       struct tags       { enum {
                                     queue,
@@ -539,8 +539,8 @@ load_outgoing(int gid__)
 
 diy::Master::ProxyWithLink
 diy::Master::
-proxy(int i, IExchangeInfo* iexchange) const
-{ return ProxyWithLink(Proxy(const_cast<Master*>(this), gid(i), iexchange), block(i), link(i)); }
+proxy(int i, IExchangeInfo* iex) const
+{ return ProxyWithLink(Proxy(const_cast<Master*>(this), gid(i), iex), block(i), link(i)); }
 
 int
 diy::Master::
@@ -678,17 +678,17 @@ iexchange_(const ICallback<Block>& f)
     }
 
     //IExchangeInfoDUD iexchange(comm_, min_queue_size, max_hold_time, fine, prof);
-    IExchangeInfoCollective iexchange(comm_, prof);
-    iexchange.add_work(size());                 // start with one work unit for each block
+    IExchangeInfoCollective iex(comm_, prof);
+    iex.add_work(size());                 // start with one work unit for each block
 
     thread comm_thread;
     if (threads() > 1)
-        comm_thread = thread([this,&iexchange]()
+        comm_thread = thread([this,&iex]()
         {
-            while(!iexchange.all_done())
+            while(!iex.all_done())
             {
-                icommunicate(&iexchange);
-                iexchange.control();
+                icommunicate(&iex);
+                iex.control();
                 //std::this_thread::sleep_for(std::chrono::microseconds(1));
             }
         });
@@ -705,30 +705,30 @@ iexchange_(const ICallback<Block>& f)
     do
     {
         size_t work_done = 0;
-        for (size_t i = 0; i < size(); i++)     // for all blocks
+        for (int i = 0; i < static_cast<int>(size()); i++)     // for all blocks
         {
             int gid = this->gid(i);
             stats::Annotation::Guard g( stats::Annotation("diy.block").set(gid) );
 
             if (threads() == 1)
-                icommunicate(&iexchange);
+                icommunicate(&iex);
             bool done = done_result[gid];
             if (!done || !empty_incoming(gid))
             {
                 prof << "callback";
-                iexchange.inc_work();       // even if we remove the queues, when constructing the proxy, we still have work to do
+                iex.inc_work();       // even if we remove the queues, when constructing the proxy, we still have work to do
                 {
-                    ProxyWithLink cp = proxy(i, &iexchange);
+                    ProxyWithLink cp = proxy(i, &iex);
                     done = f(block<Block>(i), cp);
                     if (done_result[gid] ^ done)        // status changed
                     {
                         if (done)
-                            iexchange.dec_work();
+                            iex.dec_work();
                         else
-                            iexchange.inc_work();
+                            iex.inc_work();
                     }
                 }   // NB: we need cp to go out of scope and copy out its queues before we can decrement the work
-                iexchange.dec_work();
+                iex.dec_work();
                 prof >> "callback";
                 ++work_done;
             }
@@ -739,14 +739,14 @@ iexchange_(const ICallback<Block>& f)
         if (threads() == 1)
         {
             prof << "iexchange-control";
-            iexchange.control();
+            iex.control();
             prof >> "iexchange-control";
         }
         //else
         //if (work_done == 0)
         //    std::this_thread::sleep_for(std::chrono::microseconds(1));
-    } while (!iexchange.all_done());
-    log->info("[{}] ==== Leaving iexchange ====\n", iexchange.comm.rank());
+    } while (!iex.all_done());
+    log->info("[{}] ==== Leaving iexchange ====\n", iex.comm.rank());
 
     if (threads() > 1)
         comm_thread.join();
@@ -760,17 +760,17 @@ iexchange_(const ICallback<Block>& f)
 /* Communicator */
 void
 diy::Master::
-comm_exchange(GidSendOrder& gid_order, IExchangeInfo* iexchange)
+comm_exchange(GidSendOrder& gid_order, IExchangeInfo* iex)
 {
     auto scoped = prof.scoped("comm-exchange");
     DIY_UNUSED(scoped);
 
-    send_outgoing_queues(gid_order, false, iexchange);
+    send_outgoing_queues(gid_order, false, iex);
 
-    while(nudge(iexchange))                         // kick requests
+    while(nudge(iex))                         // kick requests
         ;
 
-    check_incoming_queues(iexchange);
+    check_incoming_queues(iex);
 }
 
 /* Remote communicator */
@@ -875,7 +875,7 @@ order_gids()
 // iexchange communicator
 void
 diy::Master::
-icommunicate(IExchangeInfo* iexchange)
+icommunicate(IExchangeInfo* iex)
 {
     auto scoped = prof.scoped("icommunicate");
     DIY_UNUSED(scoped);
@@ -885,7 +885,7 @@ icommunicate(IExchangeInfo* iexchange)
     auto gid_order = order_gids();
 
     // exchange
-    comm_exchange(gid_order, iexchange);
+    comm_exchange(gid_order, iex);
 
     // cleanup
 
@@ -904,32 +904,32 @@ send_queue(int              from_gid,
            int              to_proc,
            QueueRecord&     qr,
            bool             remote,
-           IExchangeInfo*   iexchange)
+           IExchangeInfo*   iex)
 {
     stats::Annotation::Guard gb( stats::Annotation("diy.block").set(from_gid) );
     stats::Annotation::Guard gt( stats::Annotation("diy.to").set(to_gid) );
     stats::Annotation::Guard gq( stats::Annotation("diy.q-size").set(stats::Variant(static_cast<uint64_t>(qr.size()))) );
 
     // skip empty queues and hold queues shorter than some limit for some time
-    assert(!iexchange || qr.size() != 0);
-    log->debug("[{}] Sending queue: {} <- {} of size {}, iexchange = {}", comm_.rank(), to_gid, from_gid, qr.size(), iexchange ? 1 : 0);
+    assert(!iex || qr.size() != 0);
+    log->debug("[{}] Sending queue: {} <- {} of size {}, iexchange = {}", comm_.rank(), to_gid, from_gid, qr.size(), iex ? 1 : 0);
 
     if (to_proc == comm_.rank())            // sending to same rank, simply swap buffers
-        send_same_rank(from_gid, to_gid, qr, iexchange);
+        send_same_rank(from_gid, to_gid, qr, iex);
     else                                    // sending to an actual message to a different rank
-        send_different_rank(from_gid, to_gid, to_proc, qr, remote, iexchange);
+        send_different_rank(from_gid, to_gid, to_proc, qr, remote, iex);
 }
 
 void
 diy::Master::
 send_outgoing_queues(GidSendOrder&   gid_order,
                      bool            remote,            // TODO: are remote and iexchange mutually exclusive? If so, use single enum?
-                     IExchangeInfo*  iexchange)
+                     IExchangeInfo*  iex)
 {
     auto scoped = prof.scoped("send-outgoing-queues");
     DIY_UNUSED(scoped);
 
-    if (iexchange)                                      // for iexchange, send queues from a single block
+    if (iex)                                      // for iex, send queues from a single block
     {
         for (int from : gid_order.list)
         {
@@ -948,7 +948,7 @@ send_outgoing_queues(GidSendOrder&   gid_order,
                     access.unlock();            // others can push on this queue, while we are working
                     assert(!qr.external());
                     log->debug("Processing queue:      {} <- {} of size {}", to_gid, from, qr.size());
-                    send_queue(from, to_gid, to_proc, qr, remote, iexchange);
+                    send_queue(from, to_gid, to_proc, qr, remote, iex);
                     access.lock();
                 }
             }
@@ -976,7 +976,7 @@ send_outgoing_queues(GidSendOrder&   gid_order,
                 // NB: send only front
                 auto& qr = access->front();
                 log->debug("Processing queue:      {} <- {} of size {}", to_gid, from_gid, qr.size());
-                send_queue(from_gid, to_gid, to_proc, qr, remote, iexchange);
+                send_queue(from_gid, to_gid, to_proc, qr, remote, iex);
                 access->pop_front();
             }
         }
@@ -985,7 +985,7 @@ send_outgoing_queues(GidSendOrder&   gid_order,
 
 void
 diy::Master::
-send_same_rank(int from, int to, QueueRecord& qr, IExchangeInfo* iexchange)
+send_same_rank(int from, int to, QueueRecord& qr, IExchangeInfo* iex)
 {
     auto scoped = prof.scoped("send-same-rank");
 
@@ -1016,7 +1016,7 @@ send_same_rank(int from, int to, QueueRecord& qr, IExchangeInfo* iexchange)
 
 void
 diy::Master::
-send_different_rank(int from, int to, int proc, QueueRecord& qr, bool remote, IExchangeInfo* iexchange)
+send_different_rank(int from, int to, int proc, QueueRecord& qr, bool remote, IExchangeInfo* iex)
 {
     auto scoped = prof.scoped("send-different-rank");
 
@@ -1037,7 +1037,7 @@ send_different_rank(int from, int to, int proc, QueueRecord& qr, bool remote, IE
         auto& inflight_send = inflight_sends().back();
 
         inflight_send.info = info;
-        if (remote || iexchange)
+        if (remote || iex)
             inflight_send.request = comm_.issend(proc, tags::queue, buffer->buffer);
         else
             inflight_send.request = comm_.isend(proc, tags::queue, buffer->buffer);
@@ -1053,23 +1053,27 @@ send_different_rank(int from, int to, int proc, QueueRecord& qr, bool remote, IE
         diy::save(*hb, buffer->size());
         diy::save(*hb, info);
 
-        inflight_sends().emplace_back();
-        auto& inflight_send = inflight_sends().back();
-
-        inflight_send.info = info;
-        if (remote || iexchange)
         {
-            // add one unit of work for the entire large message (upon sending the head, not the individual pieces below)
-            if (iexchange)
-            {
-                iexchange->inc_work();
-                log->debug("[{}] Incrementing work when sending the leading piece\n", comm_.rank());
-            }
-            inflight_send.request = comm_.issend(proc, tags::queue, hb->buffer);
+          inflight_sends().emplace_back();
+          auto& inflight_send = inflight_sends().back();
+
+          inflight_send.info = info;
+          if (remote || iex)
+          {
+              // add one unit of work for the entire large message (upon sending the head, not the individual pieces below)
+              if (iex)
+              {
+                  iex->inc_work();
+                  log->debug("[{}] Incrementing work when sending the leading piece\n", comm_.rank());
+              }
+              inflight_send.request = comm_.issend(proc, tags::queue, hb->buffer);
+          }
+          else
+          {
+              inflight_send.request = comm_.isend(proc, tags::queue, hb->buffer);
+          }
+          inflight_send.message = hb;
         }
-        else
-            inflight_send.request = comm_.isend(proc, tags::queue, hb->buffer);
-        inflight_send.message = hb;
 
         // send the message pieces
         size_t msg_buff_idx = 0;
@@ -1083,11 +1087,11 @@ send_different_rank(int from, int to, int proc, QueueRecord& qr, bool remote, IE
             auto& inflight_send = inflight_sends().back();
 
             inflight_send.info = info;
-            if (remote || iexchange)
+            if (remote || iex)
             {
-                if (iexchange)
+                if (iex)
                 {
-                    iexchange->inc_work();
+                    iex->inc_work();
                     log->debug("[{}] Incrementing work when sending non-leading piece\n", comm_.rank());
                 }
                 inflight_send.request = comm_.issend(proc, tags::queue, window);
@@ -1101,7 +1105,7 @@ send_different_rank(int from, int to, int proc, QueueRecord& qr, bool remote, IE
 
 void
 diy::Master::
-check_incoming_queues(IExchangeInfo* iexchange)
+check_incoming_queues(IExchangeInfo* iex)
 {
     auto scoped = prof.scoped("check-incoming-queues");
     DIY_UNUSED(scoped);
@@ -1111,11 +1115,11 @@ check_incoming_queues(IExchangeInfo* iexchange)
     {
         InFlightRecv& ir = inflight_recv(ostatus->source());
 
-        if (iexchange)
-            iexchange->inc_work();                      // increment work before sender's issend request can complete (so we are now responsible for the queue)
+        if (iex)
+            iex->inc_work();                      // increment work before sender's issend request can complete (so we are now responsible for the queue)
         bool first_message = ir.recv(comm_, *ostatus);  // possibly partial recv, in case of a multi-piece message
-        if (!first_message && iexchange)
-            iexchange->dec_work();
+        if (!first_message && iex)
+            iex->dec_work();
 
         if (ir.done)                // all pieces assembled
         {
@@ -1125,7 +1129,7 @@ check_incoming_queues(IExchangeInfo* iexchange)
             bool unload = ((ir.info.round == exchange_round_) ? (block(lid(ir.info.to)) == 0) : (limit_ != -1))
                           && queue_policy_->unload_incoming(*this, ir.info.from, ir.info.to, ir.message.size());
 
-            ir.place(in, unload, storage_, iexchange);
+            ir.place(in, unload, storage_, iex);
             ir.reset();
         }
 
@@ -1178,7 +1182,7 @@ flush(bool remote)
 
 bool
 diy::Master::
-nudge(IExchangeInfo* iexchange)
+nudge(IExchangeInfo* iex)
 {
   bool success = false;
   for (InFlightSendsList::iterator it = inflight_sends().begin(); it != inflight_sends().end();)
@@ -1188,10 +1192,10 @@ nudge(IExchangeInfo* iexchange)
     {
       success = true;
       it = inflight_sends().erase(it);
-      if (iexchange)
+      if (iex)
       {
-          log->debug("[{}] message left, decrementing work", iexchange->comm.rank());
-          iexchange->dec_work();                // this message is receiver's responsibility now
+          log->debug("[{}] message left, decrementing work", iex->comm.rank());
+          iex->dec_work();                // this message is receiver's responsibility now
       }
     }
     else

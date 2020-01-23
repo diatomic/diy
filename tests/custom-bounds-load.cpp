@@ -44,14 +44,14 @@ struct Block
                    int                                   nvals)
     {
         vals.resize(nvals);
-        for (auto i = 0; i < nvals; i++)
-            vals[i] = cp.gid() * nvals + i;
+        for (int i = 0; i < nvals; i++)
+            vals[static_cast<size_t>(i)] = cp.gid() * nvals + i;
     }
 
     void print_data(const diy::Master::ProxyWithLink&     cp)
     {
         fmt::print(stderr, "gid {}:\n", cp.gid());
-        for (auto i = 0; i < vals.size(); i++)
+        for (size_t i = 0; i < vals.size(); i++)
             fmt::print(stderr, "{} ", vals[i]);
         fmt::print(stderr, "\n");
     }
@@ -61,7 +61,7 @@ struct Block
     {
         int lid     = master.lid(cp.gid());
         Block* b    = static_cast<Block*>(read_master.block(lid));
-        for (auto i = 0; i < vals.size(); i++)
+        for (size_t i = 0; i < vals.size(); i++)
         {
             if (vals[i] != b->vals[i])
             {
@@ -81,7 +81,6 @@ int main(int argc, char** argv)
     int tot_blocks  = world.size();             // default number of global blocks
     int mem_blocks  = -1;                       // everything in core for now
     int num_threads = 1;                        // 1 thread for now
-    int dom_dim     = 3;                        // domain dimensionality
     int nvals       = 100;                      // number of values per block
 
     // get command line arguments
@@ -100,8 +99,8 @@ int main(int argc, char** argv)
 
     // read the results back
     diy::Master read_master(world,
-            1,
-            -1,
+            num_threads,
+            mem_blocks,
             &Block::create,
             &Block::destroy);
     diy::ContiguousAssigner   read_assigner(world.size(), -1);   // number of blocks set by read_blocks()

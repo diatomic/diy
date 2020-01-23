@@ -48,7 +48,7 @@ struct SortPartners
   bool          exchange_round(int round) const             { return rounds_[round].first; }
   int           sub_round(int round) const                  { return rounds_[round].second; }
 
-  inline bool   active(int round, int gid, const diy::Master&) const            { return true; }
+  inline bool   active(int, int, const diy::Master&) const  { return true; }
 
   inline void   incoming(int round, int gid, std::vector<int>& partners, const diy::Master& m) const
   {
@@ -86,7 +86,7 @@ struct SkipHistogram
         SkipHistogram(const SortPartners& partners_):
             partners(partners_)                                             {}
 
-  bool  operator()(int round, int lid, const diy::Master& master) const     { return round < (int) partners.rounds()  &&
+  bool  operator()(int round, int, const diy::Master&) const                { return round < (int) partners.rounds()  &&
                                                                                     !partners.exchange_round(round) &&
                                                                                      partners.sub_round(round) != 0; }
 
@@ -104,21 +104,21 @@ void compute_local_histogram(void* b_, const diy::ReduceProxy& srp)
     }
 
     // compute and enqueue local histogram
-    Histogram histogram(b->bins);
+    Histogram histogram(static_cast<size_t>(b->bins));
     float width = ((float)b->max - (float)b->min) / b->bins;
     for (size_t i = 0; i < b->values.size(); ++i)
     {
         Value x = b->values[i];
-        int loc = ((float)x - b->min) / width;
+        int loc = static_cast<int>(((float)x - b->min) / width);
         if (loc >= b->bins)
             loc = b->bins - 1;
-        ++(histogram[loc]);
+        ++(histogram[static_cast<size_t>(loc)]);
     }
     for (int i = 0; i < srp.out_link().size(); ++i)
         srp.enqueue(srp.out_link().target(i), histogram);
 }
 
-void receive_histogram(void* b_, const diy::ReduceProxy& srp, Histogram& histogram)
+void receive_histogram(void*, const diy::ReduceProxy& srp, Histogram& histogram)
 {
     // dequeue and add up the histograms
     for (int i = 0; i < srp.in_link().size(); ++i)
@@ -177,7 +177,7 @@ void enqueue_exchange(void* b_, const diy::ReduceProxy& srp, const Histogram& hi
     std::vector< std::vector<Value> > out_values(srp.out_link().size());
     for (size_t i = 0; i < b->values.size(); ++i)
     {
-      int loc = std::upper_bound(splits.begin(), splits.end(), b->values[i]) - splits.begin() - 1;
+      auto loc = std::upper_bound(splits.begin(), splits.end(), b->values[i]) - splits.begin() - 1;
       out_values[loc].push_back(b->values[i]);
     }
     int pos = -1;
@@ -324,7 +324,7 @@ int main(int argc, char* argv[])
 
   if (infile.empty())
   {
-    srand(time(0));
+    srand(static_cast<unsigned int>(time(0)));
 
     for (unsigned i = 0; i < gids.size(); ++i)
     {
@@ -367,10 +367,10 @@ int main(int argc, char* argv[])
     }
 
     std::vector<int> shape;
-    shape.push_back(sz / chunk_size);
+    shape.push_back(static_cast<int>(sz / chunk_size));
     diy::io::BOV reader(in, shape);
 
-    size_t block_size = sz / nblocks;
+    int block_size = static_cast<int>(sz) / nblocks;
 
     for (unsigned i = 0; i < gids.size(); ++i)
     {
@@ -379,7 +379,7 @@ int main(int argc, char* argv[])
       Link*           l   = new Link;
 
       // read values from a file
-      b->values.resize(block_size);
+      b->values.resize(static_cast<size_t>(block_size));
       diy::DiscreteBounds block_bounds(1);
       block_bounds.min[0] =  gid      * (block_size / chunk_size);
       block_bounds.max[0] = (gid + 1) * (block_size / chunk_size) - 1;

@@ -36,9 +36,9 @@ struct Block
     static
         void add(                               // add the block to the decomposition
             int              gid,               // block global id
-            const Bounds&    core,              // block bounds without any ghost added
-            const Bounds&    bounds,            // block bounds including any ghost region added
-            const Bounds&    domain,            // global data bounds
+            const Bounds&,                      // block bounds without any ghost added
+            const Bounds&,                      // block bounds including any ghost region added
+            const Bounds&,                      // global data bounds
             const RCLink&    link,              // neighborhood
             diy::Master&     master)            // diy master
     {
@@ -71,14 +71,14 @@ struct Block
                    int                                   nvals)
     {
         vals.resize(nvals);
-        for (auto i = 0; i < nvals; i++)
-            vals[i] = cp.gid() * nvals + i;
+        for (int i = 0; i < nvals; i++)
+            vals[static_cast<size_t>(i)] = cp.gid() * nvals + i;
     }
 
     void print_data(const diy::Master::ProxyWithLink&     cp)
     {
         fmt::print(stderr, "gid {}:\n", cp.gid());
-        for (auto i = 0; i < vals.size(); i++)
+        for (size_t i = 0; i < vals.size(); i++)
             fmt::print(stderr, "{} ", vals[i]);
         fmt::print(stderr, "\n");
     }
@@ -88,7 +88,7 @@ struct Block
     {
         int lid     = master.lid(cp.gid());
         Block* b    = static_cast<Block*>(read_master.block(lid));
-        for (auto i = 0; i < vals.size(); i++)
+        for (size_t i = 0; i < vals.size(); i++)
         {
             if (vals[i] != b->vals[i])
             {

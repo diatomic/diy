@@ -114,7 +114,7 @@ struct BasicOption
                         s(s_), l(l_), d(default_), t(type_), help(help_)                    {}
     virtual         ~BasicOption()                                                          {}
 
-    int             long_size() const                           { return l.size() + 1 + t.size(); }
+    int             long_size() const                           { return static_cast<int>(l.size() + 1 + t.size()); }
 
     void            output(std::ostream& out, int max_long) const
     {
@@ -172,7 +172,7 @@ struct OptionContainer: public BasicOption
         return oss.str();
     }
 
-    bool            set(std::string s) override             { return Converter<T>::convert(s, *var); }
+    bool            set(std::string str) override             { return Converter<T>::convert(str, *var); }
 
     T*  var;
 };
@@ -218,7 +218,7 @@ struct OptionContainer< std::vector<T> >: public BasicOption
         return oss.str();
     }
 
-    bool            set(std::string s) override
+    bool            set(std::string str) override
     {
         if (first)
         {
@@ -227,7 +227,7 @@ struct OptionContainer< std::vector<T> >: public BasicOption
         }
 
         T x;
-        bool result = Converter<T>::convert(s,x);
+        bool result = Converter<T>::convert(str,x);
         var->emplace_back(std::move(x));
         return result;
     }
@@ -425,7 +425,7 @@ Options::parse(int argc, char** argv)
                             unrecognized_option(argv[i]);
                         } else
                         {
-                            failed |= !opt_it->second->parse(argc, argv, i, last - argv[i], is_short);
+                            failed |= !opt_it->second->parse(argc, argv, i, static_cast<int>(last - argv[i]), is_short);
                         }
                     }
                 }

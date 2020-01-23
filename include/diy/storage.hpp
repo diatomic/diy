@@ -26,7 +26,7 @@ namespace diy
       virtual inline void save_binary(const char* x, size_t count) override   { fwrite(x, 1, count, file); head += count; }
       virtual inline void append_binary(const char* x, size_t count) override
       {
-          size_t temp_pos = ftell(file);
+          auto temp_pos = ftell(file);
           fseek(file, static_cast<long>(tail), SEEK_END);
           fwrite(x, 1, count, file);
           tail += count;

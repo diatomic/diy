@@ -111,8 +111,8 @@ int main(int argc, char *argv[])
   {
     std::vector<float> array(ArraySize);
 
-    const float step = 0.73;
-    float curval = 1.33 * static_cast<float>(i);
+    const float step = 0.73f;
+    float curval = 1.33f * static_cast<float>(i);
     for (auto& v : array)
     {
       v = curval;

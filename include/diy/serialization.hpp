@@ -115,7 +115,7 @@ namespace diy
 
     static void         save(BinaryBuffer& bb, const T& x)          { bb.save_binary((const char*)  &x, sizeof(T)); }
     static void         load(BinaryBuffer& bb, T& x)                { bb.load_binary((char*)        &x, sizeof(T)); }
-    static size_t       size(const T& x)                            { return sizeof(T); }
+    static size_t       size(const T&)                              { return sizeof(T); }
   };
 
   //! Saves `x` to `bb` by calling `diy::Serialization<T>::save(bb,x)`.

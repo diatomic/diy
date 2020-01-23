@@ -71,7 +71,7 @@ struct Block
         float min = domain.min[j];
         float max = domain.max[j];
         float u = float(rand() % 1024) / 1024;
-        float x = min - log(u) * 10 * log(2) / (max - min);     // median at min + (max - min) / 10
+        float x = min - std::log(u) * 10.0f * std::log(2.0f) / (max - min);     // median at min + (max - min) / 10
         if (x < min)
           points[i][j] = min;
         else if (x > max)

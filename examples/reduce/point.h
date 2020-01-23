@@ -65,7 +65,7 @@ struct PointBlock
     // when they are, there is no need for the block to be passed as the first argument
 
     // check that block values are in the block bounds (debug)
-    void          verify_block(const diy::Master::ProxyWithLink& cp) // communication proxy
+    void          verify_block(const diy::Master::ProxyWithLink&) // communication proxy
     {
         for (size_t i = 0; i < points.size(); ++i)
             for (unsigned j = 0; j < DIM; ++j)
@@ -118,7 +118,7 @@ struct AddPointBlock
     // this is the function that is needed for diy::decompose
     void  operator()(int gid,                // block global id
                      const Bounds& core,     // block bounds without any ghost added
-                     const Bounds& bounds,   // block bounds including any ghost region added
+                     const Bounds&,          // block bounds including any ghost region added
                      const Bounds& domain,   // global data bounds
                      const RCLink& link)     // neighborhood
         const

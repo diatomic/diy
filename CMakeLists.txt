@@ -44,6 +44,10 @@ if                          (caliper)
     set                     (libraries  ${libraries} caliper caliper-mpi)
 endif()
 
+if (MSVC)
+    add_definitions         (-D_CRT_SECURE_NO_WARNINGS)
+endif()
+
 # C++11
 set                         (CMAKE_CXX_STANDARD 11)
 set                         (CMAKE_CXX_COMPILE_FEATURES cxx_constexpr cxx_rvalue_references)

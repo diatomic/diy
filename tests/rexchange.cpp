@@ -30,7 +30,7 @@ void enq(Block* b, const diy::Master::ProxyWithLink& cp)
 {
     diy::Link* l = cp.link();
 
-    for (size_t i = 0; i < l->size(); ++i)
+    for (int i = 0; i < l->size(); ++i)
         cp.enqueue(l->target(i), b->count);
     b->count++;
 }
@@ -40,7 +40,7 @@ void deq(Block* b, const diy::Master::ProxyWithLink& cp)
 {
     diy::Link* l = cp.link();
 
-    for (size_t i = 0; i < l->size(); ++i)
+    for (int i = 0; i < l->size(); ++i)
     {
         int gid = l->target(i).gid;
         if (cp.incoming(gid).size())
@@ -58,7 +58,7 @@ void deq(Block* b, const diy::Master::ProxyWithLink& cp)
 // enqueue remote data
 // there is still a link, but you can send to any BlockID = (gid, proc)
 void remote_enq(
-        Block*                              b,
+        Block*,
         const diy::Master::ProxyWithLink&   cp,
         const diy::Assigner&                assigner)
 {
@@ -75,7 +75,7 @@ void remote_enq(
 
 // dequeue remote data
 // there is still a link, but exchange(remote = true) exchanged messages from any block
-void remote_deq(Block*                              b,
+void remote_deq(Block*,
                 const diy::Master::ProxyWithLink&   cp,
                 int                                 nblocks)       // only need nblocks for testing
 {

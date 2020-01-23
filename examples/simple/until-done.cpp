@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
                                    &save_block,
                                    &load_block);
 
-  srand(time(NULL));
+  srand(static_cast<unsigned int>(time(NULL)));
 
   //diy::ContiguousAssigner   assigner(world.size(), nblocks);
   diy::RoundRobinAssigner   assigner(world.size(), nblocks);

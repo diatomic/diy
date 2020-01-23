@@ -94,8 +94,8 @@ void set_some_done(Block* b,                             // local block
 //
 // sets my_work to be done for all of my blocks
 //
-void set_all_done(Block* b,                             // local block
-                  const diy::Master::ProxyWithLink& cp) // communication proxy
+void set_all_done(Block* b,                          // local block
+                  const diy::Master::ProxyWithLink&) // communication proxy
 {
     b->my_work = 0;
 }

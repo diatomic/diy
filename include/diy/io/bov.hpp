@@ -39,8 +39,9 @@ namespace io
             shape_.push_back(shape[i]);
             stride_.push_back(1);
         }
-        for (int i = shape_.size() - 2; i >=  0; --i)
+        for (auto i = shape_.size() - 2; i ==  0; --i)
           stride_[i] = stride_[i+1] * shape_[i+1];
+        stride_[0] = stride_[1] * shape_[1];
       }
 
       const Shape&  shape() const                                       { return shape_; }
@@ -72,7 +73,7 @@ diy::io::BOV::
 read(const DiscreteBounds& bounds, T* buffer, bool collective, int chunk) const
 {
 #ifndef DIY_NO_MPI
-  int dim   = shape_.size();
+  int dim   = static_cast<int>(shape_.size());
   int total = 1;
   std::vector<int> subsizes;
   for (int i = 0; i < dim; ++i)
@@ -131,10 +132,9 @@ diy::io::BOV::
 write(const DiscreteBounds& bounds, const T* buffer, const DiscreteBounds& core, bool collective, int chunk)
 {
 #ifndef DIY_NO_MPI
-  int dim   = shape_.size();
   std::vector<int> subsizes;
   std::vector<int> buffer_shape, buffer_start;
-  for (int i = 0; i < dim; ++i)
+  for (size_t i = 0; i < shape_.size(); ++i)
   {
     buffer_shape.push_back(bounds.max[i] - bounds.min[i] + 1);
     buffer_start.push_back(core.min[i] - bounds.min[i]);
@@ -154,6 +154,7 @@ write(const DiscreteBounds& bounds, const T* buffer, const DiscreteBounds& core,
     MPI_Type_commit(&T_type);
   }
 
+  auto dim = static_cast<int>(shape_.size());
   MPI_Datatype fileblk, subbuffer;
   MPI_Type_create_subarray(dim, (int*) &shape_[0],       &subsizes[0], (int*) &core.min[0],     MPI_ORDER_C, T_type, &fileblk);
   MPI_Type_create_subarray(dim, (int*) &buffer_shape[0], &subsizes[0], (int*) &buffer_start[0], MPI_ORDER_C, T_type, &subbuffer);

@@ -79,7 +79,7 @@ std::vector<PointT> read_csv(const char *filename)
     int i = 0;
     while (token != nullptr)
     {
-      p.coords[i++] = atof(token);
+      p.coords[i++] = std::strtof(token, nullptr);
       token = strtok(nullptr, ",");
     }
     points.push_back(p);

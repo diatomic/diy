@@ -5,10 +5,10 @@
 #include <diy/decomposition.hpp>
 
 void  test(int gid,                                         // block global id
-           const diy::ContinuousBounds& core,               // block bounds without any ghost added
+           const diy::ContinuousBounds&,                    // block bounds without any ghost added
            const diy::ContinuousBounds& bounds,             // block bounds including ghost region
-           const diy::ContinuousBounds& domain,             // global data bounds
-           const diy::RegularContinuousLink& link)          // neighborhood
+           const diy::ContinuousBounds&,                    // global data bounds
+           const diy::RegularContinuousLink&)               // neighborhood
 {
     REQUIRE(gid == 0);
     for (int i = 0; i < 3; ++i)
@@ -19,10 +19,10 @@ void  test(int gid,                                         // block global id
 }
 
 void  test_interval(int gid,
-                    const diy::DiscreteBounds& core,
+                    const diy::DiscreteBounds&,
                     const diy::DiscreteBounds& bounds,
-                    const diy::DiscreteBounds& domain,
-                    const diy::RegularGridLink& link)
+                    const diy::DiscreteBounds&,
+                    const diy::RegularGridLink&)
 {
     REQUIRE(bounds.min[0] == gid);
     REQUIRE(bounds.max[0] == gid);
