@@ -23,11 +23,15 @@ namespace diy
 
         Point min, max;
 
-        DEPRECATED("Default Bounds constructor should not be used; old behavior is preserved for compatibility. Pass explicitly the dimension of the Bounds instead.")
-        Bounds():
-            Bounds(DIY_MAX_DIM)                                             {}
         Bounds(int dim): min(dim), max(dim)                                 {}
         Bounds(const Point& _min, const Point& _max) : min(_min), max(_max) {}
+
+        private:
+            Bounds():
+                Bounds(0)                                                   {}
+
+            template<class T> friend class diy::Serialization;
+
     };
     using DiscreteBounds   = Bounds<int>;
     using ContinuousBounds = Bounds<float>;
