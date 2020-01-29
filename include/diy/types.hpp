@@ -30,7 +30,7 @@ namespace diy
             Bounds():
                 Bounds(0)                                                   {}
 
-            template<class T> friend class diy::Serialization;
+            template<class T> friend struct diy::Serialization;
 
     };
     using DiscreteBounds   = Bounds<int>;
