@@ -27,6 +27,8 @@ namespace diy
         Bounds(const Point& _min, const Point& _max) : min(_min), max(_max) {}
 
         private:
+            // make default constructor private to explicitly break old deprecated behavior;
+            // any call to the default constructor should be replaced by a call to Bounds(0)
             Bounds():
                 Bounds(0)                                                   {}
 
