@@ -230,7 +230,7 @@ void exchange_bounds(void* b_, const diy::ReduceProxy& srp)
       }
   else
   {
-      b->block_bounds.resize(srp.in_link().size());
+      b->block_bounds.resize(srp.in_link().size(), 0);
       for (int i = 0; i < srp.in_link().size(); ++i)
       {
         assert(i == srp.in_link().target(i).gid);

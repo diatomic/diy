@@ -206,7 +206,7 @@ namespace diy
     {
       size_t s;
       diy::load(bb, s);
-      v.resize(s);
+      v.resize(s, U());
       if (s > 0)
         diy::load(bb, &v[0], s);
     }
@@ -229,7 +229,7 @@ namespace diy
     {
       size_t s;
       diy::load(bb, s);
-      v.resize(s);
+      v.resize(s, U());
       if (s > 0)
         diy::load(bb, &v[0], s);
     }
