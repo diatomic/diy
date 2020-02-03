@@ -18,6 +18,8 @@ namespace diy
     template<class Function, class... Args>
     explicit            thread(Function&& f, Args&&... args)      { f(args...); }       // not ideal, since it doesn't support member functions
 
+    thread&             operator=(thread&&)                       = default;
+
     void                join()                                    {}
 
     static unsigned     hardware_concurrency()                    { return 1; }

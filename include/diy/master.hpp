@@ -671,9 +671,9 @@ iexchange_(const ICallback<Block>& f)
     IExchangeInfoCollective iexchange(comm_, prof);
     iexchange.add_work(size());                 // start with one work unit for each block
 
-    std::thread comm_thread;
+    thread comm_thread;
     if (threads() > 1)
-        comm_thread = std::thread([this,&iexchange]()
+        comm_thread = thread([this,&iexchange]()
         {
             while(!iexchange.all_done())
             {
