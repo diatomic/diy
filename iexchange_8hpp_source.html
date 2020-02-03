@@ -99,72 +99,34 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;      <span class="keyword">using</span>   Clock   = std::chrono::high_resolution_clock;</div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;      <span class="keyword">using</span>   Time    = Clock::time_point;</div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;                        <a class="code" href="structdiy_1_1_master_1_1_i_exchange_info.html">IExchangeInfo</a>(<a class="code" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a> comm_, <span class="keywordtype">size_t</span> min_queue_size, <span class="keywordtype">size_t</span> max_hold_time, <span class="keywordtype">bool</span> fine, <a class="code" href="structdiy_1_1stats_1_1_profiler.html">stats::Profiler</a>&amp; prof_):</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;                        <a class="code" href="structdiy_1_1_master_1_1_i_exchange_info.html">IExchangeInfo</a>(<a class="code" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a> comm_, <a class="code" href="structdiy_1_1stats_1_1_profiler.html">stats::Profiler</a>&amp; prof_):</div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;                            comm(comm_),</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;                            fine_(fine),</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;                            min_queue_size_(min_queue_size),</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;                            max_hold_time_(max_hold_time),</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;                            prof(prof_)                         { time_stamp_send(); }</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;      <span class="keyword">virtual</span>           ~<a class="code" href="structdiy_1_1_master_1_1_i_exchange_info.html">IExchangeInfo</a>()                        {}</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;      <span class="keywordtype">void</span>              not_done(<span class="keywordtype">int</span> <a class="code" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>)                       { update_done(gid, <span class="keyword">false</span>); }</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;      <span class="keyword">inline</span> <span class="keywordtype">void</span>       update_done(<span class="keywordtype">int</span> gid, <span class="keywordtype">bool</span> done_);</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;      <span class="keyword">virtual</span> <span class="keywordtype">bool</span>      all_done() =0;                             <span class="comment">// get global all done status</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;      <span class="keyword">virtual</span> <span class="keywordtype">void</span>      add_work(<span class="keywordtype">int</span> work) =0;                     <span class="comment">// add work to global work counter</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;      <span class="keyword">virtual</span> <span class="keywordtype">void</span>      control() =0;</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;      <span class="keywordtype">void</span>              inc_work()                              { add_work(1); }   <span class="comment">// increment work counter</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;      <span class="keywordtype">void</span>              dec_work()                              { add_work(-1); }  <span class="comment">// decremnent work counter</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;      <span class="comment">// shortcut</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;      <span class="keywordtype">void</span>              time_stamp_send()                       { time_last_send = Clock::now(); }</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;      <span class="keywordtype">bool</span>              hold(<span class="keywordtype">size_t</span> queue_size)                 { <span class="keywordflow">return</span> queue_size &lt; min_queue_size_ &amp;&amp; hold_time() &lt; max_hold_time_; }</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;      <span class="keywordtype">size_t</span>            hold_time()                             { <span class="keywordflow">return</span> std::chrono::duration_cast&lt;std::chrono::milliseconds&gt;(Clock::now() - time_last_send).count(); }</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;      <span class="keywordtype">bool</span>              fine()<span class="keyword"> const                            </span>{ <span class="keywordflow">return</span> fine_; }</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;      <a class="code" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a>                   comm;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;      std::unordered_map&lt;int, bool&gt;       done;                 <span class="comment">// gid -&gt; done</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;      <span class="keywordtype">bool</span>                                fine_ = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;      std::shared_ptr&lt;spd::logger&gt;        log = get_logger();</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      Time                                time_last_send;       <span class="comment">// time of last send from any queue in send_outgoing_queues()</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;      <span class="keywordtype">size_t</span>                              min_queue_size_;      <span class="comment">// minimum short message size (bytes)</span></div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;      <span class="keywordtype">size_t</span>                              max_hold_time_;       <span class="comment">// maximum short message hold time (milliseconds)</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      <span class="keywordtype">int</span>                                 from_gid = -1;        <span class="comment">// gid of current block, for shortcut sending of only this block&#39;s queues</span></div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      <a class="code" href="structdiy_1_1stats_1_1_profiler.html">stats::Profiler</a>&amp;                    prof;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    };</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;}</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keywordtype">void</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;diy::Master::IExchangeInfo::</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;update_done(<span class="keywordtype">int</span> gid, <span class="keywordtype">bool</span> done_)</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;{</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keywordflow">if</span> (done[gid] != done_)</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    {</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        done[<a class="code" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>] = done_;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        <span class="keywordflow">if</span> (done_)</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;            dec_work();</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;            inc_work();</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    }</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;}</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor">#include &quot;iexchange-dud.hpp&quot;</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">#include &quot;iexchange-collective.hpp&quot;</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;                            prof(prof_)                         {}</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;      <span class="keyword">virtual</span>           ~<a class="code" href="structdiy_1_1_master_1_1_i_exchange_info.html">IExchangeInfo</a>()                        {}</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;      <span class="keyword">virtual</span> <span class="keywordtype">bool</span>      all_done() =0;                             <span class="comment">// get global all done status</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;      <span class="keyword">virtual</span> <span class="keywordtype">void</span>      add_work(<span class="keywordtype">int</span> work) =0;                     <span class="comment">// add work to global work counter</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;      <span class="keyword">virtual</span> <span class="keywordtype">void</span>      control() =0;</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;      <span class="keywordtype">void</span>              inc_work()                              { add_work(1); }   <span class="comment">// increment work counter</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;      <span class="keywordtype">void</span>              dec_work()                              { add_work(-1); }  <span class="comment">// decremnent work counter</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;      <a class="code" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a>                   comm;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;      std::shared_ptr&lt;spd::logger&gt;        log = get_logger();</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;      <a class="code" href="structdiy_1_1stats_1_1_profiler.html">stats::Profiler</a>&amp;                    prof;</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    };</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;}</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#include &quot;iexchange-collective.hpp&quot;</span></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_i_exchange_info_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_i_exchange_info.html">diy::Master::IExchangeInfo</a></div><div class="ttdef"><b>Definition:</b> iexchange.hpp:3</div></div>
-<div class="ttc" id="classdiy_1_1_master_html_a20e686efa0c9389b4ed943277ccfffbc"><div class="ttname"><a href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">diy::Master::gid</a></div><div class="ttdeci">int gid(int i) const </div><div class="ttdoc">return gid of the i-th block </div><div class="ttdef"><b>Definition:</b> master.hpp:203</div></div>
 <div class="ttc" id="structdiy_1_1stats_1_1_profiler_html"><div class="ttname"><a href="structdiy_1_1stats_1_1_profiler.html">diy::stats::Profiler</a></div><div class="ttdef"><b>Definition:</b> stats.hpp:142</div></div>
 <div class="ttc" id="classdiy_1_1mpi_1_1communicator_html"><div class="ttname"><a href="classdiy_1_1mpi_1_1communicator.html">diy::mpi::communicator</a></div><div class="ttdoc">Simple wrapper around MPI_Comm. </div><div class="ttdef"><b>Definition:</b> communicator.hpp:8</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jan 29 2020 19:05:48 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 3 2020 23:45:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

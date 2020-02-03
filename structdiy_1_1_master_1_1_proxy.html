@@ -93,6 +93,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="structdiy_1_1_master_1_1_proxy-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -120,14 +121,38 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_master_1_1_proxy_1_1_enqueue_iterator.html">EnqueueIterator</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:adcf029a8640e8464e7d45cdb3cb1fc19"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adcf029a8640e8464e7d45cdb3cb1fc19"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>IncomingQueues</b> = std::map&lt; int, <a class="el" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a> &gt;</td></tr>
+<tr class="separator:adcf029a8640e8464e7d45cdb3cb1fc19"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c285472a8e30cb3bae1a8b56ced2f54"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8c285472a8e30cb3bae1a8b56ced2f54"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>OutgoingQueues</b> = std::map&lt; <a class="el" href="structdiy_1_1_block_i_d.html">BlockID</a>, <a class="el" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a> &gt;</td></tr>
+<tr class="separator:a8c285472a8e30cb3bae1a8b56ced2f54"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a877bc8f0e70b504840cad269682bb50f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a877bc8f0e70b504840cad269682bb50f"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>Proxy</b> (<a class="el" href="classdiy_1_1_master.html">Master</a> *master__, int gid__, <a class="el" href="structdiy_1_1_master_1_1_i_exchange_info.html">IExchangeInfo</a> *iexchange__=0)</td></tr>
 <tr class="separator:a877bc8f0e70b504840cad269682bb50f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebb70adf029ec12c107310f50b77cb38"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aebb70adf029ec12c107310f50b77cb38"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Proxy</b> (const <a class="el" href="structdiy_1_1_master_1_1_proxy.html">Proxy</a> &amp;)=delete</td></tr>
+<tr class="separator:aebb70adf029ec12c107310f50b77cb38"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8fb501d689a2378f32ac3f7c187c1905"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8fb501d689a2378f32ac3f7c187c1905"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Proxy</b> (<a class="el" href="structdiy_1_1_master_1_1_proxy.html">Proxy</a> &amp;&amp;)=default</td></tr>
+<tr class="separator:a8fb501d689a2378f32ac3f7c187c1905"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5cc1cf309dd486dda1f805ee07a26f95"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5cc1cf309dd486dda1f805ee07a26f95"></a>
+<a class="el" href="structdiy_1_1_master_1_1_proxy.html">Proxy</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="structdiy_1_1_master_1_1_proxy.html">Proxy</a> &amp;)=delete</td></tr>
+<tr class="separator:a5cc1cf309dd486dda1f805ee07a26f95"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab1dea34a3d739608bc5f4cc180098cf2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab1dea34a3d739608bc5f4cc180098cf2"></a>
+<a class="el" href="structdiy_1_1_master_1_1_proxy.html">Proxy</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="structdiy_1_1_master_1_1_proxy.html">Proxy</a> &amp;&amp;)=default</td></tr>
+<tr class="separator:ab1dea34a3d739608bc5f4cc180098cf2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acb2497c6809ef06beb00dc14109edc3d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acb2497c6809ef06beb00dc14109edc3d"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>gid</b> () const </td></tr>
 <tr class="separator:acb2497c6809ef06beb00dc14109edc3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad86b06f0aa031d19aafa3cd003492a43"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad86b06f0aa031d19aafa3cd003492a43"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>fill_incoming</b> () const </td></tr>
+<tr class="separator:ad86b06f0aa031d19aafa3cd003492a43"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1752f60f14167a972c7e0519baa02e90"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a1752f60f14167a972c7e0519baa02e90"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structdiy_1_1_master_1_1_proxy.html#a1752f60f14167a972c7e0519baa02e90">enqueue</a> (const <a class="el" href="structdiy_1_1_block_i_d.html">BlockID</a> &amp;to, const T &amp;x, void(*<a class="el" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>)(<a class="el" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a> &amp;, const T &amp;)=&amp;::<a class="el" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">diy::save</a>) const </td></tr>
 <tr class="memdesc:a1752f60f14167a972c7e0519baa02e90"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enqueue data whose size can be determined automatically, e.g., an STL vector.  <a href="#a1752f60f14167a972c7e0519baa02e90">More...</a><br/></td></tr>
@@ -538,7 +563,7 @@ template&lt;class T &gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jan 29 2020 19:05:50 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 3 2020 23:45:35 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

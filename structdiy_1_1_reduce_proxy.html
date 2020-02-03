@@ -119,13 +119,20 @@ Public Types</h2></td></tr>
 <tr class="memitem:aac1634b0f9900e535f16ecbe06357920"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aac1634b0f9900e535f16ecbe06357920"></a>
 typedef std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>GIDVector</b></td></tr>
 <tr class="separator:aac1634b0f9900e535f16ecbe06357920"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_types_structdiy_1_1_master_1_1_proxy"><td colspan="2" onclick="javascript:toggleInherit('pub_types_structdiy_1_1_master_1_1_proxy')"><img src="closed.png" alt="-"/>&#160;Public Types inherited from <a class="el" href="structdiy_1_1_master_1_1_proxy.html">diy::Master::Proxy</a></td></tr>
+<tr class="memitem:adcf029a8640e8464e7d45cdb3cb1fc19 inherit pub_types_structdiy_1_1_master_1_1_proxy"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adcf029a8640e8464e7d45cdb3cb1fc19"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>IncomingQueues</b> = std::map&lt; int, <a class="el" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a> &gt;</td></tr>
+<tr class="separator:adcf029a8640e8464e7d45cdb3cb1fc19 inherit pub_types_structdiy_1_1_master_1_1_proxy"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c285472a8e30cb3bae1a8b56ced2f54 inherit pub_types_structdiy_1_1_master_1_1_proxy"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8c285472a8e30cb3bae1a8b56ced2f54"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>OutgoingQueues</b> = std::map&lt; <a class="el" href="structdiy_1_1_block_i_d.html">BlockID</a>, <a class="el" href="structdiy_1_1_memory_buffer.html">MemoryBuffer</a> &gt;</td></tr>
+<tr class="separator:a8c285472a8e30cb3bae1a8b56ced2f54 inherit pub_types_structdiy_1_1_master_1_1_proxy"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a00fc565b7b88b6bdc3f3163a41e1e0a9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_reduce_proxy.html#a00fc565b7b88b6bdc3f3163a41e1e0a9">ReduceProxy</a> (const <a class="el" href="structdiy_1_1_master_1_1_proxy.html">Master::Proxy</a> &amp;proxy, void *<a class="el" href="structdiy_1_1_reduce_proxy.html#a6ae6c22da66bea79cbf2702a5d51fe2b">block</a>, unsigned <a class="el" href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">round</a>, const <a class="el" href="classdiy_1_1_assigner.html">Assigner</a> &amp;<a class="el" href="structdiy_1_1_reduce_proxy.html#ab3cba8511e114ecfd3e84a25f30f6bd9">assigner</a>, const GIDVector &amp;incoming_gids, const GIDVector &amp;outgoing_gids)</td></tr>
-<tr class="separator:a00fc565b7b88b6bdc3f3163a41e1e0a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5ed1995ee2e11b6704c733ed289f52d4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_reduce_proxy.html#a5ed1995ee2e11b6704c733ed289f52d4">ReduceProxy</a> (const <a class="el" href="structdiy_1_1_master_1_1_proxy.html">Master::Proxy</a> &amp;proxy, void *<a class="el" href="structdiy_1_1_reduce_proxy.html#a6ae6c22da66bea79cbf2702a5d51fe2b">block</a>, unsigned <a class="el" href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">round</a>, const <a class="el" href="classdiy_1_1_assigner.html">Assigner</a> &amp;<a class="el" href="structdiy_1_1_reduce_proxy.html#ab3cba8511e114ecfd3e84a25f30f6bd9">assigner</a>, const <a class="el" href="classdiy_1_1_link.html">Link</a> &amp;<a class="el" href="structdiy_1_1_reduce_proxy.html#a4468710ba18007a4be74aa46b9e98386">in_link</a>, const <a class="el" href="classdiy_1_1_link.html">Link</a> &amp;<a class="el" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>)</td></tr>
-<tr class="separator:a5ed1995ee2e11b6704c733ed289f52d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad35de6e5825475afb439a95aedcd3139"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_reduce_proxy.html#ad35de6e5825475afb439a95aedcd3139">ReduceProxy</a> (<a class="el" href="structdiy_1_1_master_1_1_proxy.html">Master::Proxy</a> &amp;&amp;proxy, void *<a class="el" href="structdiy_1_1_reduce_proxy.html#a6ae6c22da66bea79cbf2702a5d51fe2b">block</a>, unsigned <a class="el" href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">round</a>, const <a class="el" href="classdiy_1_1_assigner.html">Assigner</a> &amp;<a class="el" href="structdiy_1_1_reduce_proxy.html#ab3cba8511e114ecfd3e84a25f30f6bd9">assigner</a>, const GIDVector &amp;incoming_gids, const GIDVector &amp;outgoing_gids)</td></tr>
+<tr class="separator:ad35de6e5825475afb439a95aedcd3139"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd67c97a71a327950aeb799fb04600e3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_reduce_proxy.html#acd67c97a71a327950aeb799fb04600e3">ReduceProxy</a> (<a class="el" href="structdiy_1_1_master_1_1_proxy.html">Master::Proxy</a> &amp;&amp;proxy, void *<a class="el" href="structdiy_1_1_reduce_proxy.html#a6ae6c22da66bea79cbf2702a5d51fe2b">block</a>, unsigned <a class="el" href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">round</a>, const <a class="el" href="classdiy_1_1_assigner.html">Assigner</a> &amp;<a class="el" href="structdiy_1_1_reduce_proxy.html#ab3cba8511e114ecfd3e84a25f30f6bd9">assigner</a>, const <a class="el" href="classdiy_1_1_link.html">Link</a> &amp;<a class="el" href="structdiy_1_1_reduce_proxy.html#a4468710ba18007a4be74aa46b9e98386">in_link</a>, const <a class="el" href="classdiy_1_1_link.html">Link</a> &amp;<a class="el" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>)</td></tr>
+<tr class="separator:acd67c97a71a327950aeb799fb04600e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6ae6c22da66bea79cbf2702a5d51fe2b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6ae6c22da66bea79cbf2702a5d51fe2b"></a>
 void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1_reduce_proxy.html#a6ae6c22da66bea79cbf2702a5d51fe2b">block</a> () const </td></tr>
 <tr class="memdesc:a6ae6c22da66bea79cbf2702a5d51fe2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns pointer to block <br/></td></tr>
@@ -158,9 +165,24 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stru
 <tr class="memitem:a877bc8f0e70b504840cad269682bb50f inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a877bc8f0e70b504840cad269682bb50f"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>Proxy</b> (<a class="el" href="classdiy_1_1_master.html">Master</a> *master__, int gid__, <a class="el" href="structdiy_1_1_master_1_1_i_exchange_info.html">IExchangeInfo</a> *iexchange__=0)</td></tr>
 <tr class="separator:a877bc8f0e70b504840cad269682bb50f inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebb70adf029ec12c107310f50b77cb38 inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aebb70adf029ec12c107310f50b77cb38"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Proxy</b> (const <a class="el" href="structdiy_1_1_master_1_1_proxy.html">Proxy</a> &amp;)=delete</td></tr>
+<tr class="separator:aebb70adf029ec12c107310f50b77cb38 inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8fb501d689a2378f32ac3f7c187c1905 inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8fb501d689a2378f32ac3f7c187c1905"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Proxy</b> (<a class="el" href="structdiy_1_1_master_1_1_proxy.html">Proxy</a> &amp;&amp;)=default</td></tr>
+<tr class="separator:a8fb501d689a2378f32ac3f7c187c1905 inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5cc1cf309dd486dda1f805ee07a26f95 inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5cc1cf309dd486dda1f805ee07a26f95"></a>
+<a class="el" href="structdiy_1_1_master_1_1_proxy.html">Proxy</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="structdiy_1_1_master_1_1_proxy.html">Proxy</a> &amp;)=delete</td></tr>
+<tr class="separator:a5cc1cf309dd486dda1f805ee07a26f95 inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab1dea34a3d739608bc5f4cc180098cf2 inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab1dea34a3d739608bc5f4cc180098cf2"></a>
+<a class="el" href="structdiy_1_1_master_1_1_proxy.html">Proxy</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="structdiy_1_1_master_1_1_proxy.html">Proxy</a> &amp;&amp;)=default</td></tr>
+<tr class="separator:ab1dea34a3d739608bc5f4cc180098cf2 inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acb2497c6809ef06beb00dc14109edc3d inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acb2497c6809ef06beb00dc14109edc3d"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>gid</b> () const </td></tr>
 <tr class="separator:acb2497c6809ef06beb00dc14109edc3d inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad86b06f0aa031d19aafa3cd003492a43 inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad86b06f0aa031d19aafa3cd003492a43"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>fill_incoming</b> () const </td></tr>
+<tr class="separator:ad86b06f0aa031d19aafa3cd003492a43 inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1752f60f14167a972c7e0519baa02e90 inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a1752f60f14167a972c7e0519baa02e90 inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structdiy_1_1_master_1_1_proxy.html#a1752f60f14167a972c7e0519baa02e90">enqueue</a> (const <a class="el" href="structdiy_1_1_block_i_d.html">BlockID</a> &amp;to, const T &amp;x, void(*<a class="el" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">save</a>)(<a class="el" href="structdiy_1_1_binary_buffer.html">BinaryBuffer</a> &amp;, const T &amp;)=&amp;::<a class="el" href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">diy::save</a>) const </td></tr>
 <tr class="memdesc:a1752f60f14167a972c7e0519baa02e90 inherit pub_methods_structdiy_1_1_master_1_1_proxy"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enqueue data whose size can be determined automatically, e.g., an STL vector.  <a href="#a1752f60f14167a972c7e0519baa02e90">More...</a><br/></td></tr>
@@ -246,7 +268,7 @@ template&lt;class T &gt; </td></tr>
 <div class="textblock"><p>Enables communication within a group during a reduction. DIY creates the <a class="el" href="structdiy_1_1_reduce_proxy.html" title="Enables communication within a group during a reduction. DIY creates the ReduceProxy for you in diy::...">ReduceProxy</a> for you in <a class="el" href="group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f" title="Implementation of the reduce communication pattern (includes swap-reduce, merge-reduce, and any other global communication). ">diy::reduce()</a> and provides a reference to <a class="el" href="structdiy_1_1_reduce_proxy.html" title="Enables communication within a group during a reduction. DIY creates the ReduceProxy for you in diy::...">ReduceProxy</a> each time the user's reduction function is called. </p>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="reduce_2all-done_8cpp-example.html#_a5">reduce/all-done.cpp</a>, <a class="el" href="reduce_2all-to-all_8cpp-example.html#_a3">reduce/all-to-all.cpp</a>, <a class="el" href="reduce_2kd-tree_8cpp-example.html#_a10">reduce/kd-tree.cpp</a>, <a class="el" href="reduce_2merge-reduce_8cpp-example.html#_a7">reduce/merge-reduce.cpp</a>, <a class="el" href="reduce_2sort_8cpp-example.html#_a5">reduce/sort.cpp</a>, and <a class="el" href="reduce_2swap-reduce_8cpp-example.html#_a2">reduce/swap-reduce.cpp</a>.</dd>
 </dl></div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a00fc565b7b88b6bdc3f3163a41e1e0a9"></a>
+<a class="anchor" id="ad35de6e5825475afb439a95aedcd3139"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -256,7 +278,7 @@ template&lt;class T &gt; </td></tr>
         <tr>
           <td class="memname">diy::ReduceProxy::ReduceProxy </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structdiy_1_1_master_1_1_proxy.html">Master::Proxy</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="structdiy_1_1_master_1_1_proxy.html">Master::Proxy</a> &amp;&amp;&#160;</td>
           <td class="paramname"><em>proxy</em>, </td>
         </tr>
         <tr>
@@ -314,7 +336,7 @@ template&lt;class T &gt; </td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a5ed1995ee2e11b6704c733ed289f52d4"></a>
+<a class="anchor" id="acd67c97a71a327950aeb799fb04600e3"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -324,7 +346,7 @@ template&lt;class T &gt; </td></tr>
         <tr>
           <td class="memname">diy::ReduceProxy::ReduceProxy </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structdiy_1_1_master_1_1_proxy.html">Master::Proxy</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="structdiy_1_1_master_1_1_proxy.html">Master::Proxy</a> &amp;&amp;&#160;</td>
           <td class="paramname"><em>proxy</em>, </td>
         </tr>
         <tr>
@@ -386,7 +408,7 @@ template&lt;class T &gt; </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jan 29 2020 19:05:50 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 3 2020 23:45:35 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

@@ -7,6 +7,5 @@ var searchData=
   ['truncating_5fiterator_3c_20outputit_2c_20std_3a_3afalse_5ftype_20_3e',['truncating_iterator&lt; OutputIt, std::false_type &gt;',['../classinternal_1_1truncating__iterator_3_01_output_it_00_01std_1_1false__type_01_4.html',1,'internal']]],
   ['truncating_5fiterator_3c_20outputit_2c_20std_3a_3atrue_5ftype_20_3e',['truncating_iterator&lt; OutputIt, std::true_type &gt;',['../classinternal_1_1truncating__iterator_3_01_output_it_00_01std_1_1true__type_01_4.html',1,'internal']]],
   ['truncating_5fiterator_5fbase',['truncating_iterator_base',['../classinternal_1_1truncating__iterator__base.html',1,'internal']]],
-  ['type',['type',['../structdiy_1_1_master_1_1_i_exchange_info_d_u_d_1_1type.html',1,'diy::Master::IExchangeInfoDUD']]],
   ['type_5fconstant',['type_constant',['../structinternal_1_1type__constant.html',1,'internal']]]
 ];

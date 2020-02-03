@@ -107,7 +107,6 @@ Inheritance diagram for diy::Master::IExchangeInfo:</div>
   <img src="structdiy_1_1_master_1_1_i_exchange_info.png" usemap="#diy::Master::IExchangeInfo_map" alt=""/>
   <map id="diy::Master::IExchangeInfo_map" name="diy::Master::IExchangeInfo_map">
 <area href="structdiy_1_1_master_1_1_i_exchange_info_collective.html" alt="diy::Master::IExchangeInfoCollective" shape="rect" coords="0,56,216,80"/>
-<area href="structdiy_1_1_master_1_1_i_exchange_info_d_u_d.html" alt="diy::Master::IExchangeInfoDUD" shape="rect" coords="226,56,442,80"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -122,15 +121,9 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>Time</b> = Clock::ti
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:afd4bfb7ae202f36ec42571beb75a2a17"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afd4bfb7ae202f36ec42571beb75a2a17"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>IExchangeInfo</b> (<a class="el" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a> comm_, size_t min_queue_size, size_t max_hold_time, bool fine, <a class="el" href="structdiy_1_1stats_1_1_profiler.html">stats::Profiler</a> &amp;prof_)</td></tr>
-<tr class="separator:afd4bfb7ae202f36ec42571beb75a2a17"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4d8294d868f19285b0b486665c2fabd7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4d8294d868f19285b0b486665c2fabd7"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>not_done</b> (int <a class="el" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>)</td></tr>
-<tr class="separator:a4d8294d868f19285b0b486665c2fabd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a827de935a49031e8ffda04882cabe7ef"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a827de935a49031e8ffda04882cabe7ef"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>update_done</b> (int <a class="el" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>, bool done_)</td></tr>
-<tr class="separator:a827de935a49031e8ffda04882cabe7ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e054ff3fedece5175f3d1d48b740ab8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9e054ff3fedece5175f3d1d48b740ab8"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>IExchangeInfo</b> (<a class="el" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a> comm_, <a class="el" href="structdiy_1_1stats_1_1_profiler.html">stats::Profiler</a> &amp;prof_)</td></tr>
+<tr class="separator:a9e054ff3fedece5175f3d1d48b740ab8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8af5fa3078e77d04892dac0e3277c144"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8af5fa3078e77d04892dac0e3277c144"></a>
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>all_done</b> ()=0</td></tr>
 <tr class="separator:a8af5fa3078e77d04892dac0e3277c144"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -146,45 +139,15 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>inc_work</b> ()</td><
 <tr class="memitem:a467e006ef7b9c6165c041792af780074"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a467e006ef7b9c6165c041792af780074"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>dec_work</b> ()</td></tr>
 <tr class="separator:a467e006ef7b9c6165c041792af780074"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aef77129ab6682e7b9c2004f770abeb48"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aef77129ab6682e7b9c2004f770abeb48"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>time_stamp_send</b> ()</td></tr>
-<tr class="separator:aef77129ab6682e7b9c2004f770abeb48"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a935b6fd5c4ca534b2a4e42f743bb82eb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a935b6fd5c4ca534b2a4e42f743bb82eb"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>hold</b> (size_t queue_size)</td></tr>
-<tr class="separator:a935b6fd5c4ca534b2a4e42f743bb82eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2b6a966f57eec9ec159dcf1a76a920b1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2b6a966f57eec9ec159dcf1a76a920b1"></a>
-size_t&#160;</td><td class="memItemRight" valign="bottom"><b>hold_time</b> ()</td></tr>
-<tr class="separator:a2b6a966f57eec9ec159dcf1a76a920b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab793aed2d51a9caaf86a8da577a00151"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab793aed2d51a9caaf86a8da577a00151"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>fine</b> () const </td></tr>
-<tr class="separator:ab793aed2d51a9caaf86a8da577a00151"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a18356777e4e83f5b85afc58a8dfc39a0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a18356777e4e83f5b85afc58a8dfc39a0"></a>
 <a class="el" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>comm</b></td></tr>
 <tr class="separator:a18356777e4e83f5b85afc58a8dfc39a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8628b30c3796770eecd5327d8a08ba74"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8628b30c3796770eecd5327d8a08ba74"></a>
-std::unordered_map&lt; int, bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>done</b></td></tr>
-<tr class="separator:a8628b30c3796770eecd5327d8a08ba74"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6eba7b0fb0c9097b537e964cc31b95f5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6eba7b0fb0c9097b537e964cc31b95f5"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>fine_</b> = false</td></tr>
-<tr class="separator:a6eba7b0fb0c9097b537e964cc31b95f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ada70a7907e4c95977faa4eeac6ffbbe0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ada70a7907e4c95977faa4eeac6ffbbe0"></a>
 std::shared_ptr&lt; <a class="el" href="structdiy_1_1spd_1_1logger.html">spd::logger</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>log</b> = get_logger()</td></tr>
 <tr class="separator:ada70a7907e4c95977faa4eeac6ffbbe0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9b2b0c1b4c0eb9e6eb2e1e2841d4ae2b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9b2b0c1b4c0eb9e6eb2e1e2841d4ae2b"></a>
-Time&#160;</td><td class="memItemRight" valign="bottom"><b>time_last_send</b></td></tr>
-<tr class="separator:a9b2b0c1b4c0eb9e6eb2e1e2841d4ae2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a51c7c5d993af5429004b9a4029d099e2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a51c7c5d993af5429004b9a4029d099e2"></a>
-size_t&#160;</td><td class="memItemRight" valign="bottom"><b>min_queue_size_</b></td></tr>
-<tr class="separator:a51c7c5d993af5429004b9a4029d099e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a98b3ff7449aebc1eaba49b26614c89c3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a98b3ff7449aebc1eaba49b26614c89c3"></a>
-size_t&#160;</td><td class="memItemRight" valign="bottom"><b>max_hold_time_</b></td></tr>
-<tr class="separator:a98b3ff7449aebc1eaba49b26614c89c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9755902c9ccebb702e6c8038a6ae55cd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9755902c9ccebb702e6c8038a6ae55cd"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>from_gid</b> = -1</td></tr>
-<tr class="separator:a9755902c9ccebb702e6c8038a6ae55cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aab963851584e94d5a77375b6be6703e3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aab963851584e94d5a77375b6be6703e3"></a>
 <a class="el" href="structdiy_1_1stats_1_1_profiler.html">stats::Profiler</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>prof</b></td></tr>
 <tr class="separator:aab963851584e94d5a77375b6be6703e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -195,7 +158,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>from_gid</b> = -1</td>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jan 29 2020 19:05:49 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 3 2020 23:45:35 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

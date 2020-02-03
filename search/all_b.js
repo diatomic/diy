@@ -11,7 +11,6 @@ var searchData=
   ['maximum',['maximum',['../structdiy_1_1mpi_1_1maximum.html',1,'diy::mpi']]],
   ['mpi',['mpi',['../md_docs_detail_mpi.html',1,'']]],
   ['memorybuffer',['MemoryBuffer',['../structdiy_1_1_memory_buffer.html',1,'diy']]],
-  ['message',['Message',['../structdiy_1_1_master_1_1_i_exchange_info_d_u_d_1_1_message.html',1,'diy::Master::IExchangeInfoDUD']]],
   ['messageinfo',['MessageInfo',['../structdiy_1_1_master_1_1_message_info.html',1,'diy::Master']]],
   ['minimum',['minimum',['../structdiy_1_1mpi_1_1minimum.html',1,'diy::mpi']]],
   ['monostate',['monostate',['../structmonostate.html',1,'']]],

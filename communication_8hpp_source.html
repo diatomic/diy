@@ -234,40 +234,28 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    <span class="keywordtype">int</span> to          = info.to;</div>
 <div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    <span class="keywordtype">int</span> external    = -1;</div>
 <div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <span class="keywordflow">if</span> (unload)</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    {</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        get_logger()-&gt;debug(<span class="stringliteral">&quot;Directly unloading queue {} &lt;- {}&quot;</span>, to, from);</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;        external = storage-&gt;put(message);       <span class="comment">// unload directly</span></div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    }</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (!iexchange)</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    message.reset();</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <span class="keyword">auto</span> access = in-&gt;map[to][from].access();</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    access-&gt;emplace_back(std::move(message));</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    <span class="keywordflow">if</span> (unload)</div>
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    {</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        in-&gt;map[to].queues[from].swap(message);</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        in-&gt;map[to].queues[from].reset();       <span class="comment">// buffer position = 0</span></div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        get_logger()-&gt;debug(<span class="stringliteral">&quot;Directly unloading queue {} &lt;- {}&quot;</span>, to, from);</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        access-&gt;back().unload(storage);</div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    }</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    <span class="keywordflow">else</span>    <span class="comment">// iexchange</span></div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    {</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;        <span class="keyword">auto</span> log = get_logger();</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;        log-&gt;debug(<span class="stringliteral">&quot;[{}] Received queue {} &lt;- {}&quot;</span>, iexchange-&gt;comm.rank(), to, from);</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;        iexchange-&gt;not_done(to);</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;        in-&gt;map[to].queues[from].append_binary(&amp;message.buffer[0], message.size());        <span class="comment">// append instead of overwrite</span></div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;        iexchange-&gt;dec_work();</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;        log-&gt;debug(<span class="stringliteral">&quot;[{}] Decrementing work after receiving\n&quot;</span>, to);</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    }</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    in-&gt;map[to].records[from] = QueueRecord(size, external);</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    ++(in-&gt;received);</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;}</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    ++(in-&gt;received);</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;}</div>
 <div class="ttc" id="structdiy_1_1_master_1_1_gid_send_order_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_gid_send_order.html">diy::Master::GidSendOrder</a></div><div class="ttdef"><b>Definition:</b> communication.hpp:35</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_in_flight_send_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_in_flight_send.html">diy::Master::InFlightSend</a></div><div class="ttdef"><b>Definition:</b> communication.hpp:10</div></div>
-<div class="ttc" id="group___serialization_html_gae54f4c5c6740fcf7627009bdcfe02aa1"><div class="ttname"><a href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a></div><div class="ttdeci">void load(BinaryBuffer &amp;, T &amp;)</div><div class="ttdoc">Loads x from bb by calling diy::Serialization&lt;T&gt;::load(bb,x). </div><div class="ttdef"><b>Definition:</b> serialization.hpp:111</div></div>
-<div class="ttc" id="group___serialization_html_ga33accb25f133567d216ebd3bee44595b"><div class="ttname"><a href="group___serialization.html#ga33accb25f133567d216ebd3bee44595b">diy::load_back</a></div><div class="ttdeci">void load_back(BinaryBuffer &amp;bb, T &amp;x)</div><div class="ttdoc">Supports only binary data copying (meant for simple footers). </div><div class="ttdef"><b>Definition:</b> serialization.hpp:125</div></div>
+<div class="ttc" id="group___serialization_html_gae54f4c5c6740fcf7627009bdcfe02aa1"><div class="ttname"><a href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a></div><div class="ttdeci">void load(BinaryBuffer &amp;, T &amp;)</div><div class="ttdoc">Loads x from bb by calling diy::Serialization&lt;T&gt;::load(bb,x). </div><div class="ttdef"><b>Definition:</b> serialization.hpp:118</div></div>
+<div class="ttc" id="group___serialization_html_ga33accb25f133567d216ebd3bee44595b"><div class="ttname"><a href="group___serialization.html#ga33accb25f133567d216ebd3bee44595b">diy::load_back</a></div><div class="ttdeci">void load_back(BinaryBuffer &amp;bb, T &amp;x)</div><div class="ttdoc">Supports only binary data copying (meant for simple footers). </div><div class="ttdef"><b>Definition:</b> serialization.hpp:132</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_i_exchange_info_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_i_exchange_info.html">diy::Master::IExchangeInfo</a></div><div class="ttdef"><b>Definition:</b> iexchange.hpp:3</div></div>
-<div class="ttc" id="structdiy_1_1_master_1_1_incoming_round_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_incoming_round.html">diy::Master::IncomingRound</a></div><div class="ttdef"><b>Definition:</b> master.hpp:137</div></div>
+<div class="ttc" id="structdiy_1_1_master_1_1_incoming_round_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_incoming_round.html">diy::Master::IncomingRound</a></div><div class="ttdef"><b>Definition:</b> master.hpp:143</div></div>
 <div class="ttc" id="classdiy_1_1_external_storage_html"><div class="ttname"><a href="classdiy_1_1_external_storage.html">diy::ExternalStorage</a></div><div class="ttdef"><b>Definition:</b> storage.hpp:46</div></div>
 <div class="ttc" id="classdiy_1_1mpi_1_1communicator_html"><div class="ttname"><a href="classdiy_1_1mpi_1_1communicator.html">diy::mpi::communicator</a></div><div class="ttdoc">Simple wrapper around MPI_Comm. </div><div class="ttdef"><b>Definition:</b> communicator.hpp:8</div></div>
-<div class="ttc" id="structdiy_1_1_memory_buffer_html"><div class="ttname"><a href="structdiy_1_1_memory_buffer.html">diy::MemoryBuffer</a></div><div class="ttdef"><b>Definition:</b> serialization.hpp:28</div></div>
+<div class="ttc" id="structdiy_1_1_memory_buffer_html"><div class="ttname"><a href="structdiy_1_1_memory_buffer.html">diy::MemoryBuffer</a></div><div class="ttdef"><b>Definition:</b> serialization.hpp:30</div></div>
 <div class="ttc" id="structdiy_1_1mpi_1_1status_html"><div class="ttname"><a href="structdiy_1_1mpi_1_1status.html">diy::mpi::status</a></div><div class="ttdef"><b>Definition:</b> status.hpp:5</div></div>
 <div class="ttc" id="structdiy_1_1mpi_1_1request_html"><div class="ttname"><a href="structdiy_1_1mpi_1_1request.html">diy::mpi::request</a></div><div class="ttdef"><b>Definition:</b> request.hpp:5</div></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_in_flight_recvs_map_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_in_flight_recvs_map.html">diy::Master::InFlightRecvsMap</a></div><div class="ttdef"><b>Definition:</b> communication.hpp:29</div></div>
@@ -278,7 +266,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jan 29 2020 19:05:48 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 3 2020 23:45:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

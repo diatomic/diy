@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>DIY: diy::Master::OutgoingQueuesRecord Struct Reference</title>
+<title>DIY: diy::concurrent_map&lt; T, U &gt;::iterator_&lt; MapIterator &gt; Struct Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -87,44 +87,59 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="namespacediy.html">diy</a></li><li class="navelem"><a class="el" href="classdiy_1_1_master.html">Master</a></li><li class="navelem"><a class="el" href="structdiy_1_1_master_1_1_outgoing_queues_record.html">OutgoingQueuesRecord</a></li>  </ul>
+<li class="navelem"><a class="el" href="namespacediy.html">diy</a></li><li class="navelem"><a class="el" href="structdiy_1_1concurrent__map.html">concurrent_map</a></li><li class="navelem"><a class="el" href="structdiy_1_1concurrent__map_1_1iterator__.html">iterator_</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
-<a href="structdiy_1_1_master_1_1_outgoing_queues_record-members.html">List of all members</a>  </div>
+<a href="structdiy_1_1concurrent__map_1_1iterator__-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">diy::Master::OutgoingQueuesRecord Struct Reference</div>  </div>
+<div class="title">diy::concurrent_map&lt; T, U &gt;::iterator_&lt; MapIterator &gt; Struct Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aeef87161a4e870f8253c82c6f0451a33"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aeef87161a4e870f8253c82c6f0451a33"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>OutgoingQueuesRecord</b> (int e=-1)</td></tr>
-<tr class="separator:aeef87161a4e870f8253c82c6f0451a33"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a40b01ad9ceeb5fc24490a5a7b0da411c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a40b01ad9ceeb5fc24490a5a7b0da411c"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>iterator_</b> (const MapIterator &amp;it_, const SharedPtr &amp;lock_ptr_=SharedPtr())</td></tr>
+<tr class="separator:a40b01ad9ceeb5fc24490a5a7b0da411c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98ae6a211b6b37df01294cfe4c908597"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a98ae6a211b6b37df01294cfe4c908597"></a>
+<a class="el" href="structdiy_1_1concurrent__map_1_1iterator__.html">iterator_</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator++</b> ()</td></tr>
+<tr class="separator:a98ae6a211b6b37df01294cfe4c908597"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c63ec8252dcc947310728ee19909276"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2c63ec8252dcc947310728ee19909276"></a>
+<a class="el" href="structdiy_1_1concurrent__map_1_1iterator__.html">iterator_</a>&#160;</td><td class="memItemRight" valign="bottom"><b>operator++</b> (int)</td></tr>
+<tr class="separator:a2c63ec8252dcc947310728ee19909276"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:affcc93ae690ef0c662969ea2fc73ae43"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="affcc93ae690ef0c662969ea2fc73ae43"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (const <a class="el" href="structdiy_1_1concurrent__map_1_1iterator__.html">iterator_</a> &amp;other) const </td></tr>
+<tr class="separator:affcc93ae690ef0c662969ea2fc73ae43"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b082b75dc37a9ae110ffca8428f8031"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7b082b75dc37a9ae110ffca8428f8031"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator!=</b> (const <a class="el" href="structdiy_1_1concurrent__map_1_1iterator__.html">iterator_</a> &amp;other) const </td></tr>
+<tr class="separator:a7b082b75dc37a9ae110ffca8428f8031"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a693db29537d14dd8d03ffc23fe613d06"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a693db29537d14dd8d03ffc23fe613d06"></a>
+decltype(it.operator-&gt;())&#160;</td><td class="memItemRight" valign="bottom"><b>operator-&gt;</b> () const </td></tr>
+<tr class="separator:a693db29537d14dd8d03ffc23fe613d06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:afa84f2da09121a80bdba0d1496c07904"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afa84f2da09121a80bdba0d1496c07904"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>external</b></td></tr>
-<tr class="separator:afa84f2da09121a80bdba0d1496c07904"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af4157ffe460320ac6642de18b9bf0f75"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af4157ffe460320ac6642de18b9bf0f75"></a>
-OutQueueRecords&#160;</td><td class="memItemRight" valign="bottom"><b>external_local</b></td></tr>
-<tr class="separator:af4157ffe460320ac6642de18b9bf0f75"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad7ff2e33b22eb2e762f669b387c21d08"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad7ff2e33b22eb2e762f669b387c21d08"></a>
-OutgoingQueues&#160;</td><td class="memItemRight" valign="bottom"><b>queues</b></td></tr>
-<tr class="separator:ad7ff2e33b22eb2e762f669b387c21d08"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e3d925147d8768177c5a135c86db82d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6e3d925147d8768177c5a135c86db82d"></a>
+MapIterator&#160;</td><td class="memItemRight" valign="bottom"><b>it</b></td></tr>
+<tr class="separator:a6e3d925147d8768177c5a135c86db82d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70806fb9995bdcae2d5e253ebe446b0e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a70806fb9995bdcae2d5e253ebe446b0e"></a>
+SharedPtr&#160;</td><td class="memItemRight" valign="bottom"><b>lock_ptr</b></td></tr>
+<tr class="separator:a70806fb9995bdcae2d5e253ebe446b0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3c7168e7c0b9dce3a1a947dd30f036da"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3c7168e7c0b9dce3a1a947dd30f036da"></a>
+decltype(*it&#160;</td><td class="memItemRight" valign="bottom"><b>operator*</b> )() const </td></tr>
+<tr class="separator:a3c7168e7c0b9dce3a1a947dd30f036da"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li>include/diy/<a class="el" href="master_8hpp_source.html">master.hpp</a></li>
+<li>include/diy/<a class="el" href="thread_8hpp_source.html">thread.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jan 29 2020 19:05:50 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 3 2020 23:45:35 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
