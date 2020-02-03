@@ -142,28 +142,16 @@ place(IncomingRound* in, bool unload, ExternalStorage* storage, IExchangeInfo* i
     int to          = info.to;
     int external    = -1;
 
+    message.reset();
+
+    auto access = in->map[to][from].access();
+    access->emplace_back(std::move(message));
+
     if (unload)
     {
         get_logger()->debug("Directly unloading queue {} <- {}", to, from);
-        external = storage->put(message);       // unload directly
+        access->back().unload(storage);
     }
-    else if (!iexchange)
-    {
-        in->map[to].queues[from].swap(message);
-        in->map[to].queues[from].reset();       // buffer position = 0
-    }
-    else    // iexchange
-    {
-        auto log = get_logger();
-        log->debug("[{}] Received queue {} <- {}", iexchange->comm.rank(), to, from);
-
-        iexchange->not_done(to);
-        in->map[to].queues[from].append_binary(&message.buffer[0], message.size());        // append instead of overwrite
-
-        iexchange->dec_work();
-        log->debug("[{}] Decrementing work after receiving\n", to);
-    }
-    in->map[to].records[from] = QueueRecord(size, external);
 
     ++(in->received);
 }

@@ -32,6 +32,7 @@ compile_test                (iexchange-test         iexchange.cpp)
 compile_test                (grid-test              grid.cpp)
 compile_test                (serialization-test     serialization.cpp)
 compile_test                (two-masters            two-masters.cpp)
+compile_test                (double-foreach         double-foreach.cpp)
 compile_test                (shared-output          shared-output.cpp)
 compile_test                (custom-bounds-test     custom-bounds.cpp)
 compile_test                (custom-bounds-load-test    custom-bounds-load.cpp)
@@ -42,6 +43,7 @@ if                          (MSVC AND NOT(MSVC_VERSION LESS 1400))
     set_source_files_properties (merge-swap-reduce.cpp  PROPERTIES COMPILE_FLAGS "/bigobj")
     set_source_files_properties (swap-reduce.cpp        PROPERTIES COMPILE_FLAGS "/bigobj")
     set_source_files_properties (rexchange.cpp          PROPERTIES COMPILE_FLAGS "/bigobj")
+    set_source_files_properties (simple.cpp             PROPERTIES COMPILE_FLAGS "/bigobj")
 endif                       ()
 
 
@@ -178,6 +180,12 @@ if                          (mpi AND MPIEXEC)
   foreach                   (p RANGE 1 ${maxp})
           add_test          (NAME two-masters-p${p}
                              COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:two-masters>
+                            )
+  endforeach                (p)
+
+  foreach                   (p RANGE 1 ${maxp})
+          add_test          (NAME double-foreach-p${p}
+                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:double-foreach>
                             )
   endforeach                (p)
 

@@ -13,6 +13,8 @@
 #include <unordered_set>
 #include <type_traits>              // this is used for a safety check for default serialization
 
+#include <cassert>
+
 namespace diy
 {
   //! A serialization buffer. \ingroup Serialization
@@ -29,6 +31,11 @@ namespace diy
   {
                         MemoryBuffer(size_t position_ = 0):
                           position(position_)                       {}
+
+                        MemoryBuffer(MemoryBuffer&&)                =default;
+                        MemoryBuffer(const MemoryBuffer&)           =delete;
+    MemoryBuffer&       operator=(MemoryBuffer&&)                   =default;
+    MemoryBuffer&       operator=(const MemoryBuffer&)              =delete;
 
     virtual inline void save_binary(const char* x, size_t count) override;   //!< copy `count` bytes from `x` into the buffer
     virtual inline void append_binary(const char* x, size_t count) override; //!< append `count` bytes from `x` to end of buffer

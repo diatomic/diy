@@ -51,27 +51,30 @@ bool bounce(Block*                              b,
         b->count--;
     }
 
-    // then dequeue as long as something is incoming and enqueue as long as the hop count is not exceeded
-    // bounce will be called by master multiple times until no more messages are in flight anywhere
-    for (size_t i = 0; i < l->size(); ++i)
+    do
     {
-        int nbr_gid = l->target(i).gid;
-        while (cp.incoming(nbr_gid))
+        // then dequeue as long as something is incoming and enqueue as long as the hop count is not exceeded
+        // bounce will be called by master multiple times until no more messages are in flight anywhere
+        for (size_t i = 0; i < l->size(); ++i)
         {
-            Particle p;
-            cp.dequeue(nbr_gid, p);
-            fmt::print(stderr, "[{}] <- ({},{}) <- [{}]\n", my_gid, p.id, p.hops, nbr_gid);
-
-            p.hops--;
-            if (p.hops > 0)
+            int nbr_gid = l->target(i).gid;
+            while (cp.incoming(nbr_gid))
             {
-                int nbr = rand() % l->size();
-                fmt::print(stderr, "[{}] -> ({},{}) -> [{}]\n", my_gid, p.id, p.hops, l->target(nbr).gid);
-                cp.enqueue(l->target(nbr), p);
-            } else
-                fmt::print(stderr, "[{}] finish particle ({},{})\n", my_gid, p.id, p.hops);
+                Particle p;
+                cp.dequeue(nbr_gid, p);
+                fmt::print(stderr, "[{}] <- ({},{}) <- [{}]\n", my_gid, p.id, p.hops, nbr_gid);
+
+                p.hops--;
+                if (p.hops > 0)
+                {
+                    int nbr = rand() % l->size();
+                    fmt::print(stderr, "[{}] -> ({},{}) -> [{}]\n", my_gid, p.id, p.hops, l->target(nbr).gid);
+                    cp.enqueue(l->target(nbr), p);
+                } else
+                    fmt::print(stderr, "[{}] finish particle ({},{})\n", my_gid, p.id, p.hops);
+            }
         }
-    }
+    } while (cp.fill_incoming());   // this loop is an optimization
 
     return true;
 }

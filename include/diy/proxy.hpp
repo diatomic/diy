@@ -10,16 +10,82 @@ namespace diy
     template <class T>
     struct EnqueueIterator;
 
+    using IncomingQueues = std::map<int,     MemoryBuffer>;
+    using OutgoingQueues = std::map<BlockID, MemoryBuffer>;
+
                         Proxy(Master* master__, int gid__,
                               IExchangeInfo*  iexchange__ = 0):
                           gid_(gid__),
                           master_(master__),
                           iexchange_(iexchange__),
-                          incoming_(&master__->incoming(gid__)),
-                          outgoing_(&master__->outgoing(gid__)),
-                          collectives_(&master__->collectives(gid__))   {}
+                          collectives_(&master__->collectives(gid__))
+    {
+        fill_incoming();
+
+        // move outgoing_ back into proxy, in case it's a multi-foreach round
+        if (!iexchange_)
+            for (auto& x : master_->outgoing(gid_))
+            {
+                auto access = x.second.access();
+                if (!access->empty())
+                {
+                    outgoing_.emplace(x.first, access->back().move());
+                    access->pop_back();
+                }
+            }
+    }
+
+    // delete copy constructor to avoid coping incoming_ and outgoing_ (plus it
+    // won't work otherwise because MemoryBuffer has a deleted copy
+    // constructor)
+                        Proxy(const Proxy&)     =delete;
+                        Proxy(Proxy&&)          =default;
+    Proxy&              operator=(const Proxy&) =delete;
+    Proxy&              operator=(Proxy&&)      =default;
+
+                        ~Proxy()
+    {
+        auto& outgoing = master_->outgoing(gid_);
+        auto& incoming = master_->incoming(gid_);
+
+        // copy out outgoing_
+        for (auto& x : outgoing_)
+        {
+            outgoing[x.first].access()->emplace_back(std::move(x.second));
+            if (iexchange_)
+                iexchange_->inc_work();
+        }
+
+        // move incoming_ back into master, in case it's a multi-foreach round
+        if (!iexchange_)
+            for (auto& x : incoming_)
+                incoming[x.first].access()->emplace_front(std::move(x.second));
+    }
 
     int                 gid() const                                     { return gid_; }
+
+    bool                fill_incoming() const
+    {
+        bool exists = false;
+
+        incoming_.clear();
+
+        // fill incoming_
+        for (auto& x : master_->incoming(gid_))
+        {
+            auto access = x.second.access();
+            if (!access->empty())
+            {
+                exists = true;
+                incoming_.emplace(x.first, access->front().move());
+                access->pop_front();
+                if (iexchange_)
+                    iexchange_->dec_work();
+            }
+        }
+
+        return exists;
+    }
 
     //! Enqueue data whose size can be determined automatically, e.g., an STL vector.
     template<class T>
@@ -28,13 +94,7 @@ namespace diy
                                 void (*save)(BinaryBuffer&, const T&) = &::diy::save    //!< optional serialization function
                                ) const
     {
-        OutgoingQueues& out = *outgoing_; save(out[to], x);
-
-        if (iexchange_ && iexchange_->fine())
-        {
-            GidSendOrder gid_order;             // uninitialized, not needed
-            master()->comm_exchange(gid_order, iexchange_);
-        }
+        save(outgoing_[to], x);
     }
 
     //! Enqueue data whose size is given explicitly by the user, e.g., an array.
@@ -53,7 +113,7 @@ namespace diy
                                 T&              x,                                      //!< data (eg. STL vector)
                                 void (*load)(BinaryBuffer&, T&) = &::diy::load          //!< optional serialization function
                                ) const
-    { IncomingQueues& in  = *incoming_; load(in[from], x); }
+    { load(incoming_[from], x); }
 
     //! Dequeue an array of data whose size is given explicitly by the user.
     //! In this case, the user needs to allocate the receive buffer prior to calling dequeue.
@@ -87,12 +147,12 @@ namespace diy
                                  void (*save)(BinaryBuffer&, const T&) = &::diy::save   ) const
     { return EnqueueIterator<T>(this, x, save); }
 
-    IncomingQueues*     incoming() const                                { return incoming_; }
-    MemoryBuffer&       incoming(int from) const                        { return (*incoming_)[from]; }
+    IncomingQueues*     incoming() const                                { return &incoming_; }
+    MemoryBuffer&       incoming(int from) const                        { return incoming_[from]; }
     inline void         incoming(std::vector<int>& v) const;            // fill v with every gid from which we have a message
 
-    OutgoingQueues*     outgoing() const                                { return outgoing_; }
-    MemoryBuffer&       outgoing(const BlockID& to) const               { return (*outgoing_)[to]; }
+    OutgoingQueues*     outgoing() const                                { return &outgoing_; }
+    MemoryBuffer&       outgoing(const BlockID& to) const               { return outgoing_[to]; }
 
     inline bool         empty_incoming_queues() const;
     inline bool         empty_outgoing_queues() const;
@@ -139,8 +199,11 @@ namespace diy
       Master*           master_;
       IExchangeInfo*    iexchange_;
 
-      IncomingQueues*   incoming_;
-      OutgoingQueues*   outgoing_;
+      // TODO: these are marked mutable to not have to undo consts on enqueue/dequeue, in case it breaks things;
+      //       eventually, implement this change
+      mutable IncomingQueues    incoming_;
+      mutable OutgoingQueues    outgoing_;
+
       CollectivesList*  collectives_;
   };
 
@@ -168,10 +231,10 @@ namespace diy
 
   struct Master::ProxyWithLink: public Master::Proxy
   {
-            ProxyWithLink(const Proxy&    proxy,
+            ProxyWithLink(Proxy&&         proxy,
                           void*           block__,
                           Link*           link__):
-              Proxy(proxy),
+              Proxy(std::move(proxy)),
               block_(block__),
               link_(link__)                                         {}
 
@@ -188,8 +251,8 @@ void
 diy::Master::Proxy::
 incoming(std::vector<int>& v) const
 {
-  for (IncomingQueues::const_iterator it = incoming_->begin(); it != incoming_->end(); ++it)
-    v.push_back(it->first);
+  for (auto& x : incoming_)
+    v.push_back(x.first);
 }
 
 bool
@@ -262,19 +325,12 @@ diy::Master::Proxy::
 enqueue(const BlockID& to, const T* x, size_t n,
         void (*save)(BinaryBuffer&, const T&)) const
 {
-    OutgoingQueues& out = *outgoing_;
-    BinaryBuffer&   bb  = out[to];
+    BinaryBuffer&   bb  = outgoing_[to];
     if (save == (void (*)(BinaryBuffer&, const T&)) &::diy::save<T>)
         diy::save(bb, x, n);       // optimized for unspecialized types
     else
         for (size_t i = 0; i < n; ++i)
             save(bb, x[i]);
-
-    if (iexchange_ && iexchange_->fine())
-    {
-        GidSendOrder gid_order;             // uninitialized, not needed
-        master()->comm_exchange(gid_order, iexchange_);
-    }
 }
 
 template<class T>
@@ -283,8 +339,7 @@ diy::Master::Proxy::
 dequeue(int from, T* x, size_t n,
         void (*load)(BinaryBuffer&, T&)) const
 {
-    IncomingQueues& in = *incoming_;
-    BinaryBuffer&   bb = in[from];
+    BinaryBuffer&   bb = incoming_[from];
     if (load == (void (*)(BinaryBuffer&, T&)) &::diy::load<T>)
         diy::load(bb, x, n);       // optimized for unspecialized types
     else
