@@ -240,7 +240,13 @@ namespace diy
       int           threads() const                     { return threads_; }
       int           in_memory() const                   { return *blocks_.in_memory().const_access(); }
 
-      void          set_threads(int threads__)          { threads_ = threads__; }
+      void          set_threads(int threads__)
+      {
+          threads_ = threads__;
+#if defined(DIY_NO_THREADS)
+          threads_ = 1;
+#endif
+      }
 
       CreateBlock   creator() const                     { return blocks_.creator(); }
       DestroyBlock  destroyer() const                   { return blocks_.destroyer(); }
@@ -366,7 +372,11 @@ Master(mpi::communicator    comm,
   blocks_(create_, destroy_, storage, save, load_),
   queue_policy_(q_policy),
   limit_(limit__),
+#if !defined(DIY_NO_THREADS)
   threads_(threads__ == -1 ? static_cast<int>(thread::hardware_concurrency()) : threads__),
+#else
+  threads_(1),
+#endif
   storage_(storage),
   // Communicator functionality
   inflight_sends_(new InFlightSendsList),
