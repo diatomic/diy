@@ -33,7 +33,7 @@ macro (diy_dependent_option variable)
   endif ()
 endmacro ()
 
-diy_dependent_option        (threads             "Build DIY with threading"                                  ON "NOT WIN32" OFF)
+diy_option                  (threads             "Build DIY with threading"                                  ON)
 diy_option                  (log                 "Build DIY with logging"                                    OFF)
 diy_option                  (profile             "Build DIY with profiling"                                  OFF)
 diy_option                  (caliper             "Build DIY with caliper"                                    OFF)
@@ -52,6 +52,7 @@ endif                       (NOT CMAKE_BUILD_TYPE)
 
 set (diy_definitions "")
 set (diy_include_directories "")
+set (diy_include_thirdparty_directories "")
 set (diy_libraries "")
 
 # Debugging
@@ -64,7 +65,7 @@ endif                       ()
 if                          (log)
     list (APPEND diy_definitions "-DDIY_USE_SPDLOG")
     find_path               (SPDLOG_INCLUDE_DIR     spdlog/spdlog.h)
-    list (APPEND diy_include_directories ${SPDLOG_INCLUDE_DIR})
+    list (APPEND diy_include_thirdparty_directories ${SPDLOG_INCLUDE_DIR})
 endif()
 
 # Profiling
@@ -76,7 +77,7 @@ if                          (caliper)
     list (APPEND diy_definitions "-DDIY_USE_CALIPER")
 
     find_package            (caliper)
-    list (APPEND diy_include_directories ${caliper_INCLUDE_DIR})
+    list (APPEND diy_include_thirdparty_directories ${caliper_INCLUDE_DIR})
     list (APPEND diy_libraries caliper caliper-mpi)
 endif()
 
@@ -109,6 +110,9 @@ if (NOT DEFINED diy_export_name)
     set(diy_export_name "diy_targets")
 endif()
 
+# for diy_developer_flags
+include(DIYCompilerFlags)
+
 function(add_diy_mpi_library use_mpi)
     set (sources
         "include/${diy_prefix}/mpi/collectives.cpp"
@@ -135,7 +139,9 @@ function(add_diy_mpi_library use_mpi)
     target_compile_definitions(${lib_name}
         PRIVATE -DDIY_HAS_MPI=${has_mpi_val}
         PRIVATE ${diy_definitions})
-    target_include_directories(${lib_name} PRIVATE ${diy_include_directories})
+    target_include_directories(${lib_name} PRIVATE ${diy_include_directories}) # for mpitypes.hpp
+    target_include_directories(${lib_name} SYSTEM PRIVATE ${diy_include_thirdparty_directories})
+    target_link_libraries(${lib_name} PRIVATE diy_developer_flags)
     if (use_mpi AND TARGET MPI::MPI_CXX)
         target_link_libraries(${lib_name} PRIVATE MPI::MPI_CXX)
     endif()
@@ -175,6 +181,7 @@ target_compile_definitions(${diy_prefix} INTERFACE ${diy_definitions})
 target_include_directories(${diy_prefix} INTERFACE
     "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
     "$<INSTALL_INTERFACE:${diy_install_include_dir}>")
+target_include_directories(${diy_prefix} SYSTEM INTERFACE ${diy_include_thirdparty_directories})
 if (diy_include_directories)
     target_include_directories(${diy_prefix} INTERFACE ${diy_include_directories})
 endif()
@@ -196,7 +203,7 @@ elseif (NOT build_diy_nompi_lib)
     endif()
 endif()
 
-list(APPEND diy_targets ${diy_prefix})
+list(APPEND diy_targets ${diy_prefix} diy_developer_flags)
 
 # libraries used by examples and tests
 set(libraries ${diy_prefix})
@@ -205,7 +212,7 @@ if (${diy_prefix}mpi IN_LIST diy_targets)
 elseif (${diy_prefix}mpi_nompi IN_LIST diy_targets)
     list(APPEND libraries ${diy_prefix}mpi_nompi)
 endif()
-list(APPEND libraries)
+list(APPEND libraries diy_developer_flags)
 
 # enable testing and CDash dashboard submission
 enable_testing              ()

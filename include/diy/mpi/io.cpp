@@ -47,7 +47,7 @@ size() const
 #if DIY_HAS_MPI
   MPI_Offset sz;
   MPI_File_get_size(diy::mpi::mpi_cast(fh), &sz);
-  return sz;
+  return static_cast<offset>(sz);
 #else
   DIY_UNSUPPORTED_MPI_CALL(MPI_File_get_size);
 #endif
@@ -58,7 +58,7 @@ diy::mpi::io::file::
 resize(diy::mpi::io::offset size_)
 {
 #if DIY_HAS_MPI
-  MPI_File_set_size(diy::mpi::mpi_cast(fh), size_);
+  MPI_File_set_size(diy::mpi::mpi_cast(fh), static_cast<MPI_Offset>(size_));
 #else
   (void)size_;
   DIY_UNSUPPORTED_MPI_CALL(MPI_File_set_size);
@@ -71,7 +71,7 @@ read_at(offset o, char* buffer, size_t size_)
 {
 #if DIY_HAS_MPI
   status s;
-  MPI_File_read_at(diy::mpi::mpi_cast(fh), o, buffer, static_cast<int>(size_), MPI_BYTE, &diy::mpi::mpi_cast(s.handle));
+  MPI_File_read_at(diy::mpi::mpi_cast(fh), static_cast<MPI_Offset>(o), buffer, static_cast<int>(size_), MPI_BYTE, &diy::mpi::mpi_cast(s.handle));
 #else
   (void)o; (void)buffer; (void)size_;
   DIY_UNSUPPORTED_MPI_CALL(MPI_File_read_at);
@@ -84,7 +84,7 @@ read_at_all(offset o, char* buffer, size_t size_)
 {
 #if DIY_HAS_MPI
   status s;
-  MPI_File_read_at_all(diy::mpi::mpi_cast(fh), o, buffer, static_cast<int>(size_), MPI_BYTE, &diy::mpi::mpi_cast(s.handle));
+  MPI_File_read_at_all(diy::mpi::mpi_cast(fh), static_cast<MPI_Offset>(o), buffer, static_cast<int>(size_), MPI_BYTE, &diy::mpi::mpi_cast(s.handle));
 #else
   (void)o; (void)buffer; (void)size_;
   DIY_UNSUPPORTED_MPI_CALL(MPI_File_read_at_all);
@@ -97,7 +97,7 @@ write_at(offset o, const char* buffer, size_t size_)
 {
 #if DIY_HAS_MPI
   status s;
-  MPI_File_write_at(diy::mpi::mpi_cast(fh), o, (void *)buffer, static_cast<int>(size_), MPI_BYTE, &diy::mpi::mpi_cast(s.handle));
+  MPI_File_write_at(diy::mpi::mpi_cast(fh), static_cast<MPI_Offset>(o), (void *)buffer, static_cast<int>(size_), MPI_BYTE, &diy::mpi::mpi_cast(s.handle));
 #else
   (void)o; (void)buffer; (void)size_;
   DIY_UNSUPPORTED_MPI_CALL(MPI_File_write_at);
@@ -110,7 +110,7 @@ write_at_all(offset o, const char* buffer, size_t size_)
 {
 #if DIY_HAS_MPI
   status s;
-  MPI_File_write_at_all(diy::mpi::mpi_cast(fh), o, (void *)buffer, static_cast<int>(size_), MPI_BYTE, &diy::mpi::mpi_cast(s.handle));
+  MPI_File_write_at_all(diy::mpi::mpi_cast(fh), static_cast<MPI_Offset>(o), (void *)buffer, static_cast<int>(size_), MPI_BYTE, &diy::mpi::mpi_cast(s.handle));
 #else
   (void)o; (void)buffer; (void)size_;
   DIY_UNSUPPORTED_MPI_CALL(MPI_File_write_at_all);
@@ -124,7 +124,7 @@ read_bov(const DiscreteBounds& bounds, int ndims, const int dims[], char* buffer
 #if DIY_HAS_MPI
   int total = 1;
   std::vector<int> subsizes;
-  for (int i = 0; i < ndims; ++i)
+  for (unsigned i = 0; i < static_cast<unsigned>(ndims); ++i)
   {
     subsizes.push_back(bounds.max[i] - bounds.min[i] + 1);
     total *= subsizes.back();
@@ -151,7 +151,7 @@ read_bov(const DiscreteBounds& bounds, int ndims, const int dims[], char* buffer
   MPI_Type_create_subarray(ndims, dims, subsizes.data(), (int*) &bounds.min[0], MPI_ORDER_C, T_type, &fileblk);
   MPI_Type_commit(&fileblk);
 
-  MPI_File_set_view(diy::mpi::mpi_cast(fh), offset, T_type, fileblk, (char*)"native", MPI_INFO_NULL);
+  MPI_File_set_view(diy::mpi::mpi_cast(fh), static_cast<MPI_Offset>(offset), T_type, fileblk, (char*)"native", MPI_INFO_NULL);
 
   mpi::status s;
   if (!collective)
@@ -175,7 +175,7 @@ write_bov(const DiscreteBounds& bounds, const DiscreteBounds& core, int ndims, c
 #if DIY_HAS_MPI
   std::vector<int> subsizes;
   std::vector<int> buffer_shape, buffer_start;
-  for (int i = 0; i < ndims; ++i)
+  for (unsigned i = 0; i < static_cast<unsigned>(ndims); ++i)
   {
     buffer_shape.push_back(bounds.max[i] - bounds.min[i] + 1);
     buffer_start.push_back(core.min[i] - bounds.min[i]);
@@ -203,7 +203,7 @@ write_bov(const DiscreteBounds& bounds, const DiscreteBounds& core, int ndims, c
   MPI_Type_commit(&fileblk);
   MPI_Type_commit(&subbuffer);
 
-  MPI_File_set_view(diy::mpi::mpi_cast(fh), offset, T_type, fileblk, (char*)"native", MPI_INFO_NULL);
+  MPI_File_set_view(diy::mpi::mpi_cast(fh), static_cast<MPI_Offset>(offset), T_type, fileblk, (char*)"native", MPI_INFO_NULL);
 
   mpi::status s;
   if (!collective)

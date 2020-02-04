@@ -14,9 +14,9 @@ struct environment
   DIY_MPI_EXPORT_FUNCTION static bool initialized();
 
   DIY_MPI_EXPORT_FUNCTION environment();
-  DIY_MPI_EXPORT_FUNCTION environment(int threading);
+  DIY_MPI_EXPORT_FUNCTION environment(int requested_threading);
   DIY_MPI_EXPORT_FUNCTION environment(int argc, char* argv[]);
-  DIY_MPI_EXPORT_FUNCTION environment(int argc, char* argv[], int threading);
+  DIY_MPI_EXPORT_FUNCTION environment(int argc, char* argv[], int requested_threading);
 
   DIY_MPI_EXPORT_FUNCTION  ~environment();
 

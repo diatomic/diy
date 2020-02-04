@@ -26,8 +26,6 @@ class Factory
         template <class T>
         struct Registrar: Base
         {
-            friend T;
-
             static bool registerT()
             {
                 const auto name = typeid(T).name();
@@ -41,16 +39,25 @@ class Factory
 
             std::string id() const override     { return typeid(T).name(); }
 
+#if defined(__NVCC__)
+	    protected:
+#else
             private:
+              friend T;
+#endif
 #if defined(__INTEL_COMPILER)
                 __attribute__ ((used))
 #endif
                 Registrar(): Base(Key{}) { (void)registered; }
         };
 
-        friend Base;
 
+#if defined(__NVCC__)
+    protected:
+#else
     private:
+      friend Base;
+#endif
         class Key
         {
             Key(){};

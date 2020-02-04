@@ -30,7 +30,7 @@ void broadcast(const communicator& comm, void* data, int count, const datatype& 
 
 request ibroadcast(const communicator& comm, void* data, int count, const datatype& type, int root)
 {
-  request r{};
+  request r;
 #if DIY_HAS_MPI
   MPI_Ibcast(data, count, mpi_cast(type.handle), root, mpi_cast(comm.handle()), &mpi_cast(r.handle));
 #else
@@ -123,7 +123,7 @@ request iall_reduce(const communicator& comm,
                     const void* dataIn, void* dataOut, int count, const datatype& type,
                     const operation& op)
 {
-  request r{};
+  request r;
 #if DIY_HAS_MPI
   MPI_Iallreduce(dataIn, dataOut, count, mpi_cast(type.handle), mpi_cast(op.handle), mpi_cast(comm.handle()), &mpi_cast(r.handle));
 #else

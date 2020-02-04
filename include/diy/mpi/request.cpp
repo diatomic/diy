@@ -2,6 +2,18 @@
 #include "request.hpp"
 #endif
 
+#include <algorithm>
+#include <iterator>
+
+#if defined(VTKMDIY_MPI_AS_LIB) && !VTKMDIY_HAS_MPI
+diy::mpi::request::request()
+{
+  std::fill(std::begin(this->handle.data), std::end(this->handle.data), nullptr);
+}
+#else
+diy::mpi::request::request() = default;
+#endif
+
 diy::mpi::status diy::mpi::request::wait()
 {
 #if DIY_HAS_MPI

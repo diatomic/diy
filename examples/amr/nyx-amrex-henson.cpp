@@ -12,8 +12,9 @@
 #include <diy/assigner.hpp>
 #include <diy/link.hpp>
 #include <diy/resolve.hpp>
-#include <diy/fmt/format.h>
 #include <diy/io/block.hpp>         // for saving blocks in DIY format
+
+#include <diy/thirdparty/fmt/format.h>
 
 #include "fab-block.h"
 using Block = FabBlock<amrex::Real>;

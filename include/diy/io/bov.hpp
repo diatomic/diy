@@ -69,7 +69,7 @@ void
 diy::io::BOV::
 read(const DiscreteBounds& bounds, T* buffer, bool collective, int chunk) const
 {
-  f_.read_bov(bounds, shape_.size(), shape_.data(), reinterpret_cast<char*>(buffer), offset_, mpi::detail::get_mpi_datatype<T>(), collective, chunk);
+  f_.read_bov(bounds, static_cast<int>(shape_.size()), shape_.data(), reinterpret_cast<char*>(buffer), offset_, mpi::detail::get_mpi_datatype<T>(), collective, chunk);
 }
 
 template<class T>
@@ -85,7 +85,7 @@ void
 diy::io::BOV::
 write(const DiscreteBounds& bounds, const T* buffer, const DiscreteBounds& core, bool collective, int chunk)
 {
-  f_.write_bov(bounds, core, shape_.size(), shape_.data(), reinterpret_cast<const char*>(buffer), offset_, mpi::detail::get_mpi_datatype<T>(), collective, chunk);
+  f_.write_bov(bounds, core, static_cast<int>(shape_.size()), shape_.data(), reinterpret_cast<const char*>(buffer), offset_, mpi::detail::get_mpi_datatype<T>(), collective, chunk);
 }
 
 #endif

@@ -142,7 +142,7 @@ diy::mpi::window<T>::
 window(const diy::mpi::communicator& comm, unsigned size):
   buffer_(size), rank_(comm.rank())
 {
-  window_ = detail::win_create(comm, buffer_.data(), buffer_.size()*sizeof(T), sizeof(T));
+  window_ = detail::win_create(comm, buffer_.data(), static_cast<unsigned>(buffer_.size()*sizeof(T)), static_cast<int>(sizeof(T)));
 }
 
 template<class T>

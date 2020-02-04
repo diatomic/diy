@@ -48,7 +48,7 @@ namespace detail
   status recv(DIY_MPI_Comm comm, int source, int tag, std::vector<T>& x)
   {
     auto s = probe(comm, source, tag);
-    x.resize(s.count<T>());
+    x.resize(static_cast<size_t>(s.count<T>()));
     return recv(comm, source, tag, address(x), count(x), datatype_of(x));
   }
 

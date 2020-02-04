@@ -135,12 +135,10 @@ recv(mpi::communicator& comm, const mpi::status& status)
 // once the InFlightRecv is done, place it either out of core or in the appropriate incoming queue
 void
 diy::Master::InFlightRecv::
-place(IncomingRound* in, bool unload, ExternalStorage* storage, IExchangeInfo* iexchange)
+place(IncomingRound* in, bool unload, ExternalStorage* storage, IExchangeInfo*)
 {
-    size_t size     = message.size();
     int from        = info.from;
     int to          = info.to;
-    int external    = -1;
 
     message.reset();
 

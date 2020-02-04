@@ -113,7 +113,7 @@ void all_to_all(const communicator& comm,
       std::vector<int> counts;
       if (comm.rank() == root)
       {
-        counts.resize(comm.size());
+        counts.resize(static_cast<size_t>(comm.size()));
       }
 
       Collectives<int,void*>::gather(comm, count(in), counts, root);
@@ -121,7 +121,7 @@ void all_to_all(const communicator& comm,
       std::vector<int> offsets;
       if (comm.rank() == root)
       {
-        offsets.resize(comm.size());
+        offsets.resize(counts.size());
         offsets[0] = 0;
         std::partial_sum(counts.begin(), counts.end() - 1, offsets.begin() + 1);
       }
@@ -139,11 +139,11 @@ void all_to_all(const communicator& comm,
 
       if (comm.rank() == root)
       {
-          out.resize(comm.size());
+          out.resize(static_cast<size_t>(comm.size()));
           size_t offset = 0;
-          for (size_t i = 0; i < static_cast<size_t>(comm.size()); ++i)
+          for (size_t i = 0; i < out.size(); ++i)
           {
-            size_t count = counts[i] / elem_size;
+            auto count = static_cast<size_t>(counts[i] / elem_size);
             out[i].insert(out[i].end(), buffer.data() + offset, buffer.data() + offset + count);
             offset += count;
           }
@@ -169,10 +169,10 @@ void all_to_all(const communicator& comm,
 
     static void all_gather(const communicator& comm, const std::vector<T>& in, std::vector< std::vector<T> >& out)
     {
-      std::vector<int>  counts(comm.size());
+      std::vector<int>  counts(static_cast<size_t>(comm.size()));
       Collectives<int,void*>::all_gather(comm, count(in), counts);
 
-      std::vector<int>  offsets(comm.size());
+      std::vector<int>  offsets(counts.size());
       offsets[0] = 0;
       std::partial_sum(counts.begin(), counts.end() - 1, offsets.begin() + 1);
 
@@ -184,11 +184,11 @@ void all_to_all(const communicator& comm,
                            &counts[0],
                            &offsets[0]);
 
-      out.resize(comm.size());
+      out.resize(static_cast<size_t>(comm.size()));
       size_t offset = 0;
-      for (size_t i = 0; i < static_cast<size_t>(comm.size()); ++i)
+      for (size_t i = 0; i < out.size(); ++i)
       {
-          size_t count = counts[i] / elem_size;
+          auto count = static_cast<size_t>(counts[i] / elem_size);
           out[i].insert(out[i].end(), buffer.data() + offset, buffer.data() + offset + count);
           offset += count;
       }
