@@ -4,6 +4,7 @@ var searchData=
   ['parent_5fround',['parent_round',['../structdiy_1_1_regular_all_reduce_partners.html#a5549f231ac8e62d5611e398c243c1319',1,'diy::RegularAllReducePartners::parent_round()'],['../structdiy_1_1_regular_broadcast_partners.html#a2f8a25e60936d4a101d38064c1bf4958',1,'diy::RegularBroadcastPartners::parent_round()']]],
   ['part_5fcounter',['part_counter',['../structinternal_1_1part__counter.html',1,'internal']]],
   ['point',['Point',['../classdiy_1_1_point.html',1,'diy']]],
+  ['point_3c_20index_2c_20d_20_3e',['Point&lt; Index, D &gt;',['../classdiy_1_1_point.html',1,'diy']]],
   ['point_3c_20int_2c_20d_20_3e',['Point&lt; int, D &gt;',['../classdiy_1_1_point.html',1,'diy']]],
   ['point_5fto_5fgid',['point_to_gid',['../structdiy_1_1_regular_decomposer.html#aa80f92b502081b4e130725c80d3f497a',1,'diy::RegularDecomposer']]],
   ['precision_5fadapter',['precision_adapter',['../structinternal_1_1precision__adapter.html',1,'internal']]],

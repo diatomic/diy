@@ -147,8 +147,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">    <span class="comment">// sort points into vectors corresponding to neighbor blocks</span></div>
 <div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; b-&gt;points.size(); ++i) <span class="comment">// for all points</span></div>
 <div class="line">    {</div>
-<div class="line">        <span class="keywordtype">int</span> loc = floor((b-&gt;points[i][cur_dim] - b-&gt;box.min[cur_dim]) /</div>
-<div class="line">                        (b-&gt;box.max[cur_dim] - b-&gt;box.min[cur_dim]) * group_size);</div>
+<div class="line">        <span class="keyword">auto</span> loc = <span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(floor((b-&gt;points[i][cur_dim] - b-&gt;box.min[cur_dim]) /</div>
+<div class="line">                                             (b-&gt;box.max[cur_dim] - b-&gt;box.min[cur_dim]) * group_size));</div>
 <div class="line">        out_points[loc].push_back(b-&gt;points[i]);</div>
 <div class="line">    }</div>
 <div class="line">    <span class="keywordtype">int</span> pos = -1;</div>
@@ -273,7 +273,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Feb 3 2020 23:45:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 4 2020 18:35:39 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

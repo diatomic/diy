@@ -2,6 +2,7 @@ var searchData=
 [
   ['part_5fcounter',['part_counter',['../structinternal_1_1part__counter.html',1,'internal']]],
   ['point',['Point',['../classdiy_1_1_point.html',1,'diy']]],
+  ['point_3c_20index_2c_20d_20_3e',['Point&lt; Index, D &gt;',['../classdiy_1_1_point.html',1,'diy']]],
   ['point_3c_20int_2c_20d_20_3e',['Point&lt; int, D &gt;',['../classdiy_1_1_point.html',1,'diy']]],
   ['precision_5fadapter',['precision_adapter',['../structinternal_1_1precision__adapter.html',1,'internal']]],
   ['precision_5fchecker',['precision_checker',['../classinternal_1_1precision__checker.html',1,'internal']]],

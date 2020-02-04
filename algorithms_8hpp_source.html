@@ -166,7 +166,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        <span class="keyword">typedef</span>     <a class="code" href="classdiy_1_1_regular_link.html">diy::RegularContinuousLink</a>      RCLink;</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; master.<a class="code" href="classdiy_1_1_master.html#acf5ddc5dbd765ce578571aa90c238b45">size</a>(); ++i)</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; static_cast&lt;int&gt;(master.<a class="code" href="classdiy_1_1_master.html#acf5ddc5dbd765ce578571aa90c238b45">size</a>()); ++i)</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        {</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;            RCLink* link   = <span class="keyword">static_cast&lt;</span>RCLink*<span class="keyword">&gt;</span>(master.link(i));</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;            *link = RCLink(dim, domain, domain);</div>
@@ -202,7 +202,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;        <span class="comment">// update master.expected to match the links</span></div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        <span class="keywordtype">int</span> expected = 0;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; master.<a class="code" href="classdiy_1_1_master.html#acf5ddc5dbd765ce578571aa90c238b45">size</a>(); ++i)</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; static_cast&lt;int&gt;(master.<a class="code" href="classdiy_1_1_master.html#acf5ddc5dbd765ce578571aa90c238b45">size</a>()); ++i)</div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;            expected += master.link(i)-&gt;size_unique();</div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;        master.set_expected(expected);</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    }</div>
@@ -222,7 +222,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;</div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        <span class="keyword">typedef</span>     <a class="code" href="classdiy_1_1_regular_link.html">diy::RegularContinuousLink</a>      RCLink;</div>
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; master.<a class="code" href="classdiy_1_1_master.html#acf5ddc5dbd765ce578571aa90c238b45">size</a>(); ++i)</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; static_cast&lt;int&gt;(master.<a class="code" href="classdiy_1_1_master.html#acf5ddc5dbd765ce578571aa90c238b45">size</a>()); ++i)</div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        {</div>
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;            RCLink* link   = <span class="keyword">static_cast&lt;</span>RCLink*<span class="keyword">&gt;</span>(master.link(i));</div>
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;            *link = RCLink(dim, domain, domain);</div>
@@ -258,7 +258,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;</div>
 <div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;        <span class="comment">// update master.expected to match the links</span></div>
 <div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        <span class="keywordtype">int</span> expected = 0;</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; master.<a class="code" href="classdiy_1_1_master.html#acf5ddc5dbd765ce578571aa90c238b45">size</a>(); ++i)</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; static_cast&lt;int&gt;(master.<a class="code" href="classdiy_1_1_master.html#acf5ddc5dbd765ce578571aa90c238b45">size</a>()); ++i)</div>
 <div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;            expected += master.link(i)-&gt;size_unique();</div>
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;        master.set_expected(expected);</div>
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    }</div>
@@ -286,7 +286,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Feb 3 2020 23:45:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 4 2020 18:35:39 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

@@ -114,7 +114,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;{</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <span class="comment">// figure out local ranks</span></div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    std::vector&lt;std::tuple&lt;int,int&gt;&gt; local_gids;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; master.<a class="code" href="classdiy_1_1_master.html#acf5ddc5dbd765ce578571aa90c238b45">size</a>(); ++i)</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; static_cast&lt;int&gt;(master.<a class="code" href="classdiy_1_1_master.html#acf5ddc5dbd765ce578571aa90c238b45">size</a>()); ++i)</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;        local_gids.emplace_back(std::make_tuple(master.<a class="code" href="classdiy_1_1_master.html#a78c622d124589e8e8be7fa7041a5f21c">communicator</a>().rank(), master.<a class="code" href="classdiy_1_1_master.html#a20e686efa0c9389b4ed943277ccfffbc">gid</a>(i)));</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    assigner.set_ranks(local_gids);</div>
@@ -126,7 +126,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;{</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="comment">// figure out all the gids we need</span></div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    std::vector&lt;int&gt; nbr_gids;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; master.<a class="code" href="classdiy_1_1_master.html#acf5ddc5dbd765ce578571aa90c238b45">size</a>(); ++i)</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; static_cast&lt;int&gt;(master.<a class="code" href="classdiy_1_1_master.html#acf5ddc5dbd765ce578571aa90c238b45">size</a>()); ++i)</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    {</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        <span class="keyword">auto</span>* link = master.link(i);</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        <span class="keywordflow">for</span> (<span class="keyword">auto</span> blockid : link-&gt;neighbors())</div>
@@ -146,7 +146,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        gid_to_proc[nbr_gids[i]] = nbr_procs[i];</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="comment">// fix the procs in links</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; master.<a class="code" href="classdiy_1_1_master.html#acf5ddc5dbd765ce578571aa90c238b45">size</a>(); ++i)</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; static_cast&lt;int&gt;(master.<a class="code" href="classdiy_1_1_master.html#acf5ddc5dbd765ce578571aa90c238b45">size</a>()); ++i)</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    {</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        <span class="keyword">auto</span>* link = master.link(i);</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; blockid : link-&gt;neighbors())</div>
@@ -175,7 +175,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Feb 3 2020 23:45:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 4 2020 18:35:40 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

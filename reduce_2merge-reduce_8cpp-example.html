@@ -139,7 +139,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">    {</div>
 <div class="line">        data.resize(n);</div>
 <div class="line">        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; n; ++i)</div>
-<div class="line">            data[i] = i;</div>
+<div class="line">            data[i] = static_cast&lt;int&gt;(i);</div>
 <div class="line">    }</div>
 <div class="line">    <span class="comment">// block data</span></div>
 <div class="line">    Bounds          bounds { 0 };</div>
@@ -161,8 +161,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">    <span class="comment">// this is the function that is needed for diy::decompose</span></div>
 <div class="line">    <span class="keywordtype">void</span>  operator()(<span class="keywordtype">int</span> gid,                <span class="comment">// block global id</span></div>
 <div class="line">                     <span class="keyword">const</span> Bounds&amp; core,     <span class="comment">// block bounds without any ghost added</span></div>
-<div class="line">                     <span class="keyword">const</span> Bounds&amp; bounds,   <span class="comment">// block bounds including any ghost region added</span></div>
-<div class="line">                     <span class="keyword">const</span> Bounds&amp; domain,   <span class="comment">// global data bounds</span></div>
+<div class="line">                     <span class="keyword">const</span> Bounds&amp;,          <span class="comment">// block bounds including any ghost region added</span></div>
+<div class="line">                     <span class="keyword">const</span> Bounds&amp;,          <span class="comment">// global data bounds</span></div>
 <div class="line">                     <span class="keyword">const</span> RCLink&amp; link)     <span class="comment">// neighborhood</span><span class="keyword"></span></div>
 <div class="line"><span class="keyword">        const</span></div>
 <div class="line"><span class="keyword">        </span>{</div>
@@ -190,7 +190,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><span class="comment">//</span></div>
 <div class="line"><span class="keywordtype">void</span> sum(Block* b,                                  <span class="comment">// local block</span></div>
 <div class="line">         <span class="keyword">const</span> <a name="_a7"></a><a class="code" href="structdiy_1_1_reduce_proxy.html">diy::ReduceProxy</a>&amp; rp,                <span class="comment">// communication proxy</span></div>
-<div class="line">         <span class="keyword">const</span> <a name="_a8"></a><a class="code" href="structdiy_1_1_regular_merge_partners.html">diy::RegularMergePartners</a>&amp; partners) <span class="comment">// partners of the current block</span></div>
+<div class="line">         <span class="keyword">const</span> <a name="_a8"></a><a class="code" href="structdiy_1_1_regular_merge_partners.html">diy::RegularMergePartners</a>&amp;)          <span class="comment">// partners of the current block</span></div>
 <div class="line">{</div>
 <div class="line">    <span class="keywordtype">unsigned</span>   round    = rp.<a name="a9"></a><a class="code" href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">round</a>();               <span class="comment">// current round number</span></div>
 <div class="line"></div>
@@ -337,7 +337,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Feb 3 2020 23:45:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 4 2020 18:35:39 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

@@ -168,7 +168,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        dim = partners.dim(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">round</a>() - 1);</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keywordflow">if</span> (srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">round</a>() == partners.rounds())</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        update_links(b, srp, dim, partners.sub_round(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">round</a>() - 2), partners.swap_rounds(), partners.wrap, partners.domain); <span class="comment">// -1 would be the &quot;uninformative&quot; link round</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        update_links(b, srp, dim, partners.sub_round((<span class="keywordtype">int</span>)srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">round</a>() - 2), (<span class="keywordtype">int</span>)partners.swap_rounds(), partners.wrap, partners.domain); <span class="comment">// -1 would be the &quot;uninformative&quot; link round</span></div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (partners.swap_round(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">round</a>()) &amp;&amp; partners.sub_round(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">round</a>()) &lt; 0)       <span class="comment">// link round</span></div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    {</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        dequeue_exchange(b, srp, dim);         <span class="comment">// from the swap round</span></div>
@@ -186,7 +186,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;            <span class="keywordtype">int</span> prev_dim = dim - 1;</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;            <span class="keywordflow">if</span> (prev_dim &lt; 0)</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;                prev_dim += dim_;</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;            update_links(b, srp, prev_dim, partners.sub_round(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">round</a>() - 2), partners.swap_rounds(), partners.wrap, partners.domain);    <span class="comment">// -1 would be the &quot;uninformative&quot; link round</span></div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;            update_links(b, srp, prev_dim, partners.sub_round((<span class="keywordtype">int</span>)srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#aa38bbd6145d035a99562a1a5a3d92375">round</a>() - 2), (<span class="keywordtype">int</span>)partners.swap_rounds(), partners.wrap, partners.domain);    <span class="comment">// -1 would be the &quot;uninformative&quot; link round</span></div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        }</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        compute_local_samples(b, srp, dim);</div>
@@ -228,7 +228,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> Block, <span class="keyword">class</span> Po<span class="keywordtype">int</span>&gt;</div>
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;<span class="keywordtype">void</span></div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;diy::detail::KDTreeSamplingPartition&lt;Block,Point&gt;::</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;update_links(Block* b, <span class="keyword">const</span> <a class="code" href="structdiy_1_1_reduce_proxy.html">diy::ReduceProxy</a>&amp; srp, <span class="keywordtype">int</span> dim, <span class="keywordtype">int</span> round, <span class="keywordtype">int</span> rounds, <span class="keywordtype">bool</span> wrap, <span class="keyword">const</span> Bounds&amp; domain)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;update_links(Block*, <span class="keyword">const</span> <a class="code" href="structdiy_1_1_reduce_proxy.html">diy::ReduceProxy</a>&amp; srp, <span class="keywordtype">int</span> dim, <span class="keywordtype">int</span> round, <span class="keywordtype">int</span> rounds, <span class="keywordtype">bool</span> wrap, <span class="keyword">const</span> Bounds&amp; domain)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;<span class="keyword"></span>{</div>
 <div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    <span class="keyword">auto</span>        log  = get_logger();</div>
 <div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    <span class="keywordtype">int</span>         gid  = srp.gid();</div>
@@ -347,7 +347,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> Block, <span class="keyword">class</span> Po<span class="keywordtype">int</span>&gt;</div>
 <div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;<span class="keywordtype">void</span></div>
 <div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;diy::detail::KDTreeSamplingPartition&lt;Block,Point&gt;::</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;split_to_neighbors(Block* b, <span class="keyword">const</span> <a class="code" href="structdiy_1_1_reduce_proxy.html">diy::ReduceProxy</a>&amp; srp, <span class="keywordtype">int</span> dim)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;split_to_neighbors(Block*, <span class="keyword">const</span> <a class="code" href="structdiy_1_1_reduce_proxy.html">diy::ReduceProxy</a>&amp; srp, <span class="keywordtype">int</span>)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;<span class="keyword"></span>{</div>
 <div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    <span class="keywordtype">int</span>         lid  = srp.master()-&gt;<a class="code" href="classdiy_1_1_master.html#a87bc338b26092730c23983ee40104230">lid</a>(srp.gid());</div>
 <div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    RCLink*     link = <span class="keyword">static_cast&lt;</span>RCLink*<span class="keyword">&gt;</span>(srp.master()-&gt;link(lid));</div>
@@ -384,7 +384,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> Block, <span class="keyword">class</span> Po<span class="keywordtype">int</span>&gt;</div>
 <div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;<span class="keywordtype">void</span></div>
 <div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;diy::detail::KDTreeSamplingPartition&lt;Block,Point&gt;::</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;add_samples(Block* b, <span class="keyword">const</span> <a class="code" href="structdiy_1_1_reduce_proxy.html">diy::ReduceProxy</a>&amp; srp, Samples&amp; samples)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;add_samples(Block*, <span class="keyword">const</span> <a class="code" href="structdiy_1_1_reduce_proxy.html">diy::ReduceProxy</a>&amp; srp, Samples&amp; samples)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;<span class="keyword"></span>{</div>
 <div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    <span class="comment">// dequeue and combine the samples</span></div>
 <div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a4468710ba18007a4be74aa46b9e98386">in_link</a>().size(); ++i)</div>
@@ -401,7 +401,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> Block, <span class="keyword">class</span> Po<span class="keywordtype">int</span>&gt;</div>
 <div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;<span class="keywordtype">void</span></div>
 <div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;diy::detail::KDTreeSamplingPartition&lt;Block,Point&gt;::</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;receive_samples(Block* b, <span class="keyword">const</span> <a class="code" href="structdiy_1_1_reduce_proxy.html">diy::ReduceProxy</a>&amp; srp, Samples&amp; samples)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;receive_samples(Block*, <span class="keyword">const</span> <a class="code" href="structdiy_1_1_reduce_proxy.html">diy::ReduceProxy</a>&amp; srp, Samples&amp; samples)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;<span class="keyword"></span>{</div>
 <div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a1c2d7f947714e9641175b7da68d8d19b">dequeue</a>(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a4468710ba18007a4be74aa46b9e98386">in_link</a>().target(0).gid, samples);</div>
 <div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;}</div>
@@ -409,7 +409,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> Block, <span class="keyword">class</span> Po<span class="keywordtype">int</span>&gt;</div>
 <div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;<span class="keywordtype">void</span></div>
 <div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;diy::detail::KDTreeSamplingPartition&lt;Block,Point&gt;::</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;forward_samples(Block* b, <span class="keyword">const</span> <a class="code" href="structdiy_1_1_reduce_proxy.html">diy::ReduceProxy</a>&amp; srp, <span class="keyword">const</span> Samples&amp; samples)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;forward_samples(Block*, <span class="keyword">const</span> <a class="code" href="structdiy_1_1_reduce_proxy.html">diy::ReduceProxy</a>&amp; srp, <span class="keyword">const</span> Samples&amp; samples)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;<span class="keyword"></span>{</div>
 <div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().size(); ++i)</div>
 <div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;        srp.<a class="code" href="structdiy_1_1_master_1_1_proxy.html#a1752f60f14167a972c7e0519baa02e90">enqueue</a>(srp.<a class="code" href="structdiy_1_1_reduce_proxy.html#a930bd9ac87512bc08e20501d406946c9">out_link</a>().target(i), samples);</div>
@@ -558,7 +558,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Feb 3 2020 23:45:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 4 2020 18:35:39 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

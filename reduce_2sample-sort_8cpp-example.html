@@ -191,7 +191,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"></div>
 <div class="line">  <span class="keywordflow">if</span> (infile.empty())</div>
 <div class="line">  {</div>
-<div class="line">    srand(time(0));</div>
+<div class="line">    srand(static_cast&lt;unsigned int&gt;(time(0)));</div>
 <div class="line"></div>
 <div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; gids.size(); ++i)</div>
 <div class="line">    {</div>
@@ -230,10 +230,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">    }</div>
 <div class="line"></div>
 <div class="line">    std::vector&lt;int&gt; shape;</div>
-<div class="line">    shape.push_back(sz / chunk_size);</div>
+<div class="line">    shape.push_back(static_cast&lt;int&gt;(sz / chunk_size));</div>
 <div class="line">    <a name="_a14"></a><a class="code" href="classdiy_1_1io_1_1_b_o_v.html">diy::io::BOV</a> reader(in, shape);</div>
 <div class="line"></div>
-<div class="line">    <span class="keywordtype">size_t</span> block_size = sz / nblocks;</div>
+<div class="line">    <span class="keywordtype">int</span> block_size = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(sz) / nblocks;</div>
 <div class="line"></div>
 <div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; gids.size(); ++i)</div>
 <div class="line">    {</div>
@@ -242,7 +242,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">      Link*           l   = <span class="keyword">new</span> Link;</div>
 <div class="line"></div>
 <div class="line">      <span class="comment">// read values from a file</span></div>
-<div class="line">      b-&gt;values.resize(block_size);</div>
+<div class="line">      b-&gt;values.resize(static_cast&lt;size_t&gt;(block_size));</div>
 <div class="line">      <a name="_a15"></a><a class="code" href="structdiy_1_1_bounds.html">diy::DiscreteBounds</a> block_bounds(1);</div>
 <div class="line">      block_bounds.min[0] =  gid      * (block_size / chunk_size);</div>
 <div class="line">      block_bounds.max[0] = (gid + 1) * (block_size / chunk_size) - 1;</div>
@@ -292,7 +292,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Feb 3 2020 23:45:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 4 2020 18:35:39 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

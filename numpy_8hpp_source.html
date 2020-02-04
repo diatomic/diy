@@ -173,21 +173,21 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    header = header.substr(11, nl - 11 + 1);</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keywordtype">size_t</span> header_size = nl + 1;</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="keywordtype">int</span> loc1, loc2;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="keywordtype">size_t</span> loc1, loc2;</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="comment">//fortran order</span></div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    loc1 = header.find(<span class="stringliteral">&quot;fortran_order&quot;</span>)+16;</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    fortran_order = (header.substr(loc1,4) == <span class="stringliteral">&quot;True&quot;</span> ? <span class="keyword">true</span> : <span class="keyword">false</span>);</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="comment">//shape</span></div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keywordtype">unsigned</span> ndims;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keywordtype">size_t</span> ndims;</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    loc1 = header.find(<span class="stringliteral">&quot;(&quot;</span>);</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    loc2 = header.find(<span class="stringliteral">&quot;)&quot;</span>);</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    std::string str_shape = header.substr(loc1+1,loc2-loc1-1);</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="keywordflow">if</span>(str_shape[str_shape.size()-1] == <span class="charliteral">&#39;,&#39;</span>) ndims = 1;</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="keywordflow">else</span> ndims = std::count(str_shape.begin(),str_shape.end(),<span class="charliteral">&#39;,&#39;</span>)+1;</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    shape.resize(ndims);</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0;i &lt; ndims;i++) {</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> i = 0;i &lt; ndims;i++) {</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        loc1 = str_shape.find(<span class="stringliteral">&quot;,&quot;</span>);</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        shape[i] = atoi(str_shape.substr(0,loc1).c_str());</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        str_shape = str_shape.substr(loc1+1);</div>
@@ -308,17 +308,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="classfile_html"><div class="ttname"><a href="classfile.html">file</a></div><div class="ttdef"><b>Definition:</b> posix.h:186</div></div>
 <div class="ttc" id="structdiy_1_1_binary_buffer_html_a9d0ab30fe4978c730176a52ccd142cc3"><div class="ttname"><a href="structdiy_1_1_binary_buffer.html#a9d0ab30fe4978c730176a52ccd142cc3">diy::BinaryBuffer::save_binary</a></div><div class="ttdeci">virtual void save_binary(const char *x, size_t count)=0</div><div class="ttdoc">copy count bytes from x into the buffer </div></div>
 <div class="ttc" id="classdiy_1_1io_1_1_num_py_html"><div class="ttname"><a href="classdiy_1_1io_1_1_num_py.html">diy::io::NumPy</a></div><div class="ttdef"><b>Definition:</b> numpy.hpp:15</div></div>
-<div class="ttc" id="group___serialization_html_gafaac9aa4ccdc04930f612ca20341fc9b"><div class="ttname"><a href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">diy::save</a></div><div class="ttdeci">void save(BinaryBuffer &amp;, const T &amp;)</div><div class="ttdoc">Saves x to bb by calling diy::Serialization&lt;T&gt;::save(bb,x). </div><div class="ttdef"><b>Definition:</b> serialization.hpp:114</div></div>
+<div class="ttc" id="group___serialization_html_gafaac9aa4ccdc04930f612ca20341fc9b"><div class="ttname"><a href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">diy::save</a></div><div class="ttdeci">void save(BinaryBuffer &amp;, const T &amp;)</div><div class="ttdoc">Saves x to bb by calling diy::Serialization&lt;T&gt;::save(bb,x). </div><div class="ttdef"><b>Definition:</b> serialization.hpp:123</div></div>
 <div class="ttc" id="classdiy_1_1io_1_1_b_o_v_html"><div class="ttname"><a href="classdiy_1_1io_1_1_b_o_v.html">diy::io::BOV</a></div><div class="ttdef"><b>Definition:</b> bov.hpp:16</div></div>
 <div class="ttc" id="classdiy_1_1mpi_1_1io_1_1file_html"><div class="ttname"><a href="classdiy_1_1mpi_1_1io_1_1file.html">diy::mpi::io::file</a></div><div class="ttdoc">Wraps MPI file IO. </div><div class="ttdef"><b>Definition:</b> io.hpp:18</div></div>
 <div class="ttc" id="structdiy_1_1_memory_buffer_html"><div class="ttname"><a href="structdiy_1_1_memory_buffer.html">diy::MemoryBuffer</a></div><div class="ttdef"><b>Definition:</b> serialization.hpp:30</div></div>
 <div class="ttc" id="structdiy_1_1_bounds_html"><div class="ttname"><a href="structdiy_1_1_bounds.html">diy::Bounds</a></div><div class="ttdef"><b>Definition:</b> types.hpp:19</div></div>
-<div class="ttc" id="structdiy_1_1_memory_buffer_html_af84521a942f8316143db729254874025"><div class="ttname"><a href="structdiy_1_1_memory_buffer.html#af84521a942f8316143db729254874025">diy::MemoryBuffer::save_binary</a></div><div class="ttdeci">virtual void save_binary(const char *x, size_t count) override</div><div class="ttdoc">copy count bytes from x into the buffer </div><div class="ttdef"><b>Definition:</b> serialization.hpp:436</div></div>
+<div class="ttc" id="structdiy_1_1_memory_buffer_html_af84521a942f8316143db729254874025"><div class="ttname"><a href="structdiy_1_1_memory_buffer.html#af84521a942f8316143db729254874025">diy::MemoryBuffer::save_binary</a></div><div class="ttdeci">virtual void save_binary(const char *x, size_t count) override</div><div class="ttdoc">copy count bytes from x into the buffer </div><div class="ttdef"><b>Definition:</b> serialization.hpp:445</div></div>
 <div class="ttc" id="structdiy_1_1_binary_buffer_html"><div class="ttname"><a href="structdiy_1_1_binary_buffer.html">diy::BinaryBuffer</a></div><div class="ttdoc">A serialization buffer. </div><div class="ttdef"><b>Definition:</b> serialization.hpp:21</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Feb 3 2020 23:45:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 4 2020 18:35:40 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

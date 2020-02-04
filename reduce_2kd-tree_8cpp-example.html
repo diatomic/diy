@@ -156,7 +156,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">        <span class="keywordtype">float</span> min = domain.min[j];</div>
 <div class="line">        <span class="keywordtype">float</span> max = domain.max[j];</div>
 <div class="line">        <span class="keywordtype">float</span> u = float(rand() % 1024) / 1024;</div>
-<div class="line">        <span class="keywordtype">float</span> x = min - log(u) * 10 * log(2) / (max - min);     <span class="comment">// median at min + (max - min) / 10</span></div>
+<div class="line">        <span class="keywordtype">float</span> x = min - std::log(u) * 10.0f * std::log(2.0f) / (max - min);     <span class="comment">// median at min + (max - min) / 10</span></div>
 <div class="line">        <span class="keywordflow">if</span> (x &lt; min)</div>
 <div class="line">          points[i][j] = min;</div>
 <div class="line">        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (x &gt; max)</div>
@@ -444,7 +444,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Feb 3 2020 23:45:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 4 2020 18:35:39 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

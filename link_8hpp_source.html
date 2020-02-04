@@ -178,7 +178,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;      <span class="comment">// direction</span></div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;      <span class="keywordtype">int</span>       direction(Direction dir) <span class="keyword">const</span>;         <span class="comment">// convert direction to a neighbor (-1 if no neighbor)</span></div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;      Direction direction(<span class="keywordtype">int</span> i)<span class="keyword"> const                  </span>{ <span class="keywordflow">return</span> dir_vec_[i]; }</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;      <span class="keywordtype">void</span>      add_direction(Direction dir)            { <span class="keywordtype">int</span> c = dir_map_.size(); dir_map_[dir] = c; dir_vec_.push_back(dir); }</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;      <span class="keywordtype">void</span>      add_direction(Direction dir)            { <span class="keyword">auto</span> c = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(dir_map_.size()); dir_map_[dir] = c; dir_vec_.push_back(dir); }</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;      <span class="comment">// wrap</span></div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;      <span class="keywordtype">void</span>       add_wrap(Direction dir)                { wrap_.push_back(dir); }</div>
@@ -421,9 +421,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;}</div>
 <div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;</div>
 <div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;<span class="preprocessor">#endif      // DIY_LINK_HPP</span></div>
-<div class="ttc" id="group___serialization_html_gae54f4c5c6740fcf7627009bdcfe02aa1"><div class="ttname"><a href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a></div><div class="ttdeci">void load(BinaryBuffer &amp;, T &amp;)</div><div class="ttdoc">Loads x from bb by calling diy::Serialization&lt;T&gt;::load(bb,x). </div><div class="ttdef"><b>Definition:</b> serialization.hpp:118</div></div>
+<div class="ttc" id="group___serialization_html_gae54f4c5c6740fcf7627009bdcfe02aa1"><div class="ttname"><a href="group___serialization.html#gae54f4c5c6740fcf7627009bdcfe02aa1">diy::load</a></div><div class="ttdeci">void load(BinaryBuffer &amp;, T &amp;)</div><div class="ttdoc">Loads x from bb by calling diy::Serialization&lt;T&gt;::load(bb,x). </div><div class="ttdef"><b>Definition:</b> serialization.hpp:127</div></div>
 <div class="ttc" id="structdiy_1_1_block_i_d_html"><div class="ttname"><a href="structdiy_1_1_block_i_d.html">diy::BlockID</a></div><div class="ttdef"><b>Definition:</b> types.hpp:10</div></div>
-<div class="ttc" id="group___serialization_html_gafaac9aa4ccdc04930f612ca20341fc9b"><div class="ttname"><a href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">diy::save</a></div><div class="ttdeci">void save(BinaryBuffer &amp;, const T &amp;)</div><div class="ttdoc">Saves x to bb by calling diy::Serialization&lt;T&gt;::save(bb,x). </div><div class="ttdef"><b>Definition:</b> serialization.hpp:114</div></div>
+<div class="ttc" id="group___serialization_html_gafaac9aa4ccdc04930f612ca20341fc9b"><div class="ttname"><a href="group___serialization.html#gafaac9aa4ccdc04930f612ca20341fc9b">diy::save</a></div><div class="ttdeci">void save(BinaryBuffer &amp;, const T &amp;)</div><div class="ttdoc">Saves x to bb by calling diy::Serialization&lt;T&gt;::save(bb,x). </div><div class="ttdef"><b>Definition:</b> serialization.hpp:123</div></div>
 <div class="ttc" id="classdiy_1_1_assigner_html_a272d33bcc94394f39880603084b55f38"><div class="ttname"><a href="classdiy_1_1_assigner.html#a272d33bcc94394f39880603084b55f38">diy::Assigner::rank</a></div><div class="ttdeci">virtual int rank(int gid) const =0</div><div class="ttdoc">returns the process rank of the block with global id gid (need not be local) </div></div>
 <div class="ttc" id="structdiy_1_1_a_m_r_link_1_1_description_html"><div class="ttname"><a href="structdiy_1_1_a_m_r_link_1_1_description.html">diy::AMRLink::Description</a></div><div class="ttdef"><b>Definition:</b> link.hpp:154</div></div>
 <div class="ttc" id="classdiy_1_1_assigner_html"><div class="ttname"><a href="classdiy_1_1_assigner.html">diy::Assigner</a></div><div class="ttdef"><b>Definition:</b> assigner.hpp:14</div></div>
@@ -440,7 +440,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Feb 3 2020 23:45:34 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 4 2020 18:35:40 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
