@@ -17,12 +17,12 @@ void test(int n, int k)
     diy::RegularPartners partners(decomposer, k, false);
 
     int kvs_product = 1;
-    for (size_t i = 0; i < partners.rounds(); ++i)
+    for (int i = 0; i < static_cast<int>(partners.rounds()); ++i)
         kvs_product *= partners.size(i);
     REQUIRE(kvs_product == n);
 
     for (int gid = 0; gid < n; ++gid)
-        for (size_t i = 0; i < partners.rounds(); ++i)
+        for (int i = 0; i < static_cast<int>(partners.rounds()); ++i)
         {
             std::vector<int> nbr_gids;
             partners.fill(i, gid, nbr_gids);

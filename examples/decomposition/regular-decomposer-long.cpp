@@ -90,8 +90,8 @@ int main(int argc, char* argv[])
                                               ghosts);
     decomposer.decompose(rank, assigner,
                          [&](int gid,                          // block global id
-                             const Bounds& core,               // block bounds without any ghost added
-                             const Bounds& bounds,             // block bounds including ghost region
+                             const Bounds&,                    // block bounds without any ghost added
+                             const Bounds&,                    // block bounds including ghost region
                              const Bounds&,                    // global data bounds
                              const RGLink& link)               // neighborhood
                          {

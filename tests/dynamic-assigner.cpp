@@ -24,9 +24,8 @@ TEST_CASE_METHOD(SimpleFixture, "Dynamic Assigner Test", "[dynamic-assigner]")
 
     // select gids for which we will choose the random ranks
     diy::ContiguousAssigner contiguous(world.size(), nblocks);
-    int rank = world.rank();
     std::vector<int> gids;
-    contiguous.local_gids(rank, gids);
+    contiguous.local_gids(world.rank(), gids);
 
     diy::DynamicAssigner dynamic(world, world.size(), nblocks);
 

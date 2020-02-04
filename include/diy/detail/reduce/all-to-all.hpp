@@ -23,7 +23,7 @@ namespace detail
       }
     }
 
-    void operator()(Block* b, const ReduceProxy& srp, const RegularSwapPartners& partners) const
+    void operator()(Block* b, const ReduceProxy& srp, const RegularSwapPartners&) const
     {
       int k_in  = srp.in_link().size();
       int k_out = srp.out_link().size();

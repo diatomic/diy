@@ -36,7 +36,7 @@ class DynamicPoint: public chobo::small_vector<Coordinate_, static_size>
                             DynamicPoint(const DynamicPoint&)       =default;
         DynamicPoint&       operator=(const DynamicPoint&)          =default;
 
-        unsigned            dimension() const                       { return Parent::size(); }
+        unsigned            dimension() const                       { return static_cast<unsigned>(Parent::size()); }
 
         static DynamicPoint zero(int dim)                           { return DynamicPoint(dim, 0); }
         static DynamicPoint one(int dim)                            { return DynamicPoint(dim, 1); }

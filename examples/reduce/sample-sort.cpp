@@ -106,7 +106,7 @@ int main(int argc, char* argv[])
 
   if (infile.empty())
   {
-    srand(time(0));
+    srand(static_cast<unsigned int>(time(0)));
 
     for (unsigned i = 0; i < gids.size(); ++i)
     {
@@ -145,10 +145,10 @@ int main(int argc, char* argv[])
     }
 
     std::vector<int> shape;
-    shape.push_back(sz / chunk_size);
+    shape.push_back(static_cast<int>(sz / chunk_size));
     diy::io::BOV reader(in, shape);
 
-    size_t block_size = sz / nblocks;
+    int block_size = static_cast<int>(sz) / nblocks;
 
     for (unsigned i = 0; i < gids.size(); ++i)
     {
@@ -157,7 +157,7 @@ int main(int argc, char* argv[])
       Link*           l   = new Link;
 
       // read values from a file
-      b->values.resize(block_size);
+      b->values.resize(static_cast<size_t>(block_size));
       diy::DiscreteBounds block_bounds(1);
       block_bounds.min[0] =  gid      * (block_size / chunk_size);
       block_bounds.max[0] = (gid + 1) * (block_size / chunk_size) - 1;

@@ -64,7 +64,7 @@ bool bounce(Block*                              b,
 
     // then dequeue as long as something is incoming and enqueue as long as the hop count is not exceeded
     // bounce will be called by master multiple times until no more messages are in flight anywhere
-    for (size_t i = 0; i < l->size(); ++i)
+    for (int i = 0; i < l->size(); ++i)
     {
         int nbr_gid = l->target(i).gid;
         while (cp.incoming(nbr_gid))
@@ -128,7 +128,7 @@ int main(int argc, char* argv[])
                                      &save_block,
                                      &load_block);
 
-    srand(time(NULL) + world.rank());
+    srand(static_cast<unsigned int>(time(NULL) + world.rank()));
 
     diy::ContiguousAssigner   assigner(world.size(), nblocks);
 
@@ -172,7 +172,7 @@ int main(int argc, char* argv[])
     diy::reduce(master, assigner, merge_partners,
                 [](Block*                           b,
                    const diy::ReduceProxy&          rp,
-                   const diy::RegularMergePartners& partners)
+                   const diy::RegularMergePartners&)
                 {
                     fmt::print("[{}]: round = {}, entered\n", rp.gid(), rp.round());
 

@@ -86,7 +86,7 @@ namespace diy
 
         typedef     diy::RegularContinuousLink      RCLink;
 
-        for (size_t i = 0; i < master.size(); ++i)
+        for (int i = 0; i < static_cast<int>(master.size()); ++i)
         {
             RCLink* link   = static_cast<RCLink*>(master.link(i));
             *link = RCLink(dim, domain, domain);
@@ -122,7 +122,7 @@ namespace diy
 
         // update master.expected to match the links
         int expected = 0;
-        for (size_t i = 0; i < master.size(); ++i)
+        for (int i = 0; i < static_cast<int>(master.size()); ++i)
             expected += master.link(i)->size_unique();
         master.set_expected(expected);
     }
@@ -146,7 +146,7 @@ namespace diy
 
         typedef     diy::RegularContinuousLink      RCLink;
 
-        for (size_t i = 0; i < master.size(); ++i)
+        for (int i = 0; i < static_cast<int>(master.size()); ++i)
         {
             RCLink* link   = static_cast<RCLink*>(master.link(i));
             *link = RCLink(dim, domain, domain);
@@ -182,7 +182,7 @@ namespace diy
 
         // update master.expected to match the links
         int expected = 0;
-        for (size_t i = 0; i < master.size(); ++i)
+        for (int i = 0; i < static_cast<int>(master.size()); ++i)
             expected += master.link(i)->size_unique();
         master.set_expected(expected);
     }

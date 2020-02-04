@@ -8,7 +8,7 @@
 typedef     diy::DiscreteBounds         Bounds;
 //typedef     diy::ContinuousBounds       Bounds;
 
-void create(int gid, const Bounds& core, const Bounds& bounds, const Bounds& domain,
+void create(int gid, const Bounds& core, const Bounds& bounds, const Bounds&,
             const diy::Link& link)
 {
   const diy::RegularLink<Bounds>& l = static_cast<const diy::RegularLink<Bounds>&>(link);
@@ -32,7 +32,7 @@ void create(int gid, const Bounds& core, const Bounds& bounds, const Bounds& dom
   }
 }
 
-int main(int argc, char* argv[])
+int main(int, char* [])
 {
   int                       size    = 8;
   int                       nblocks = 32;

@@ -16,7 +16,7 @@ struct Elem
     size_t d;
 };
 
-const int vec_size = 6;
+const size_t vec_size = 6;
 
 namespace diy
 {
@@ -71,17 +71,17 @@ TEST_CASE_METHOD(SimpleFixture, "MPI Collectives Test", "[mpi-collectives]")
         complex_sca.d = 4;
 
         // init simple vector
-        for (unsigned i = 0; i < vec_size; ++i)
-            simple_vec[i] = i;
+        for (size_t i = 0; i < vec_size; ++i)
+            simple_vec[i] = static_cast<int>(i);
 
         // init complex vector
-        for (unsigned i = 0; i < vec_size; i++)
+        for (size_t i = 0; i < vec_size; i++)
         {
             Elem elem;
-            elem.a = i + 1;
-            elem.b = 2 * (i + 1);
-            elem.c = 3 * (i + 1);
-            elem.d = 4 * (i + 1);
+            elem.a = static_cast<char>(i + 1);
+            elem.b = static_cast<short>(2 * (i + 1));
+            elem.c = static_cast<int>(3 * (i + 1));
+            elem.d = static_cast<size_t>(4 * (i + 1));
             complex_vec[i] = elem;
         }
     }
@@ -95,7 +95,7 @@ TEST_CASE_METHOD(SimpleFixture, "MPI Collectives Test", "[mpi-collectives]")
     // broadcast complex scalar
     mpi::broadcast(world, complex_sca, 0);
     fmt::print(stderr, "Complex scalar broadcast:\n");
-    sum = complex_sca.a + complex_sca.b + complex_sca.c + complex_sca.d;
+    sum = static_cast<int>(complex_sca.a + complex_sca.b + complex_sca.c + complex_sca.d);
     fmt::print(stderr, "[rank {}] received sum {}\n", world.rank(), sum);
     CHECK(sum == 10);
 
@@ -103,7 +103,7 @@ TEST_CASE_METHOD(SimpleFixture, "MPI Collectives Test", "[mpi-collectives]")
     mpi::broadcast(world, simple_vec, 0);
     fmt::print(stderr, "Simple vector broadcast:\n");
     sum = 0;
-    for (unsigned i = 0; i < vec_size; i++)
+    for (size_t i = 0; i < vec_size; i++)
         sum += simple_vec[i];
     fmt::print(stderr, "[rank {}] received sum {}\n", world.rank(), sum);
     CHECK(sum == 15);
@@ -112,8 +112,8 @@ TEST_CASE_METHOD(SimpleFixture, "MPI Collectives Test", "[mpi-collectives]")
     mpi::broadcast(world, complex_vec, 0);
     fmt::print(stderr, "Complex vector broadcast:\n");
     sum = 0;
-    for (unsigned i = 0; i < vec_size; i++)
-        sum += (complex_vec[i].a + complex_vec[i].b + complex_vec[i].c + complex_vec[i].d);
+    for (size_t i = 0; i < vec_size; i++)
+        sum += static_cast<int>(complex_vec[i].a + complex_vec[i].b + complex_vec[i].c + complex_vec[i].d);
     fmt::print(stderr, "[rank {}] received sum {}\n", world.rank(), sum);
     CHECK(sum == 210);
 
@@ -124,13 +124,15 @@ TEST_CASE_METHOD(SimpleFixture, "MPI Collectives Test", "[mpi-collectives]")
     vector< vector<int> >   gathered_simple_vec;
     vector< vector<Elem> >  gathered_complex_vec;
 
+    auto world_size = static_cast<size_t>(world.size());
+
     // gather simple scalar
     mpi::gather(world, simple_sca, gathered_simple_sca, 0);
     if (world.rank() == 0)
     {
         sum = 0;
         fmt::print(stderr, "Simple scalar gather:\n");
-        for (unsigned j = 0; j < world.size(); j++)
+        for (size_t j = 0; j < world_size; j++)
             sum += gathered_simple_sca[j];
         fmt::print(stderr, "[rank {}] received sum {}\n", world.rank(), sum);
         CHECK(sum == 42 * world.size());
@@ -142,8 +144,8 @@ TEST_CASE_METHOD(SimpleFixture, "MPI Collectives Test", "[mpi-collectives]")
     {
         sum = 0;
         fmt::print(stderr, "Complex scalar gather:\n");
-        for (unsigned j = 0; j < world.size(); j++)
-            sum += (gathered_complex_sca[j].a + gathered_complex_sca[j].b + gathered_complex_sca[j].c + gathered_complex_sca[j].d);
+        for (size_t j = 0; j < world_size; j++)
+            sum += static_cast<int>(gathered_complex_sca[j].a + gathered_complex_sca[j].b + gathered_complex_sca[j].c + gathered_complex_sca[j].d);
         fmt::print(stderr, "[rank {}] received sum {}\n", world.rank(), sum);
         CHECK(sum == 10 * world.size());
     }
@@ -154,8 +156,8 @@ TEST_CASE_METHOD(SimpleFixture, "MPI Collectives Test", "[mpi-collectives]")
     {
         sum = 0;
         fmt::print(stderr, "Simple vector gather:\n");
-        for (unsigned j = 0; j < world.size(); j++)
-            for (unsigned i = 0; i < vec_size; i++)
+        for (size_t j = 0; j < world_size; j++)
+            for (size_t i = 0; i < vec_size; i++)
                 sum += (gathered_simple_vec[j][i]);
         fmt::print(stderr, "[rank {}] received sum {}\n", world.rank(), sum);
         CHECK(sum == 15 * world.size());
@@ -167,9 +169,9 @@ TEST_CASE_METHOD(SimpleFixture, "MPI Collectives Test", "[mpi-collectives]")
     {
         sum = 0;
         fmt::print(stderr, "Complex vector gather:\n");
-        for (unsigned j = 0; j < world.size(); j++)
-            for (unsigned i = 0; i < vec_size; i++)
-                sum += (gathered_complex_vec[j][i].a + gathered_complex_vec[j][i].b + gathered_complex_vec[j][i].c + gathered_complex_vec[j][i].d);
+        for (size_t j = 0; j < world_size; j++)
+            for (size_t i = 0; i < vec_size; i++)
+                sum += static_cast<int>(gathered_complex_vec[j][i].a + gathered_complex_vec[j][i].b + gathered_complex_vec[j][i].c + gathered_complex_vec[j][i].d);
         fmt::print(stderr, "[rank {}] received sum {}\n", world.rank(), sum);
         CHECK(sum == 210 * world.size());
     }

@@ -148,8 +148,8 @@ struct Profiler
     void    operator<<(std::string name)        { enter(name); }
     void    operator>>(std::string name)        { exit(name); }
 
-    void    enter(std::string name)             {}
-    void    exit(std::string name)              {}
+    void    enter(std::string)                  {}
+    void    exit(std::string)                   {}
 
     void    output(std::ostream& out, std::string = "") const
     {
@@ -173,7 +173,7 @@ struct Annotation
 {
     struct Guard
     {
-                    Guard(Annotation& a)            {}
+                    Guard(Annotation&)              {}
     };
 
                     Annotation(const char*)         {}

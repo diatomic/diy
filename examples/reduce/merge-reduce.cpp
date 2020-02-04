@@ -54,7 +54,7 @@ struct Block
     {
         data.resize(n);
         for (size_t i = 0; i < n; ++i)
-            data[i] = i;
+            data[i] = static_cast<int>(i);
     }
     // block data
     Bounds          bounds { 0 };
@@ -76,8 +76,8 @@ struct AddBlock
     // this is the function that is needed for diy::decompose
     void  operator()(int gid,                // block global id
                      const Bounds& core,     // block bounds without any ghost added
-                     const Bounds& bounds,   // block bounds including any ghost region added
-                     const Bounds& domain,   // global data bounds
+                     const Bounds&,          // block bounds including any ghost region added
+                     const Bounds&,          // global data bounds
                      const RCLink& link)     // neighborhood
         const
         {
@@ -105,7 +105,7 @@ struct AddBlock
 //
 void sum(Block* b,                                  // local block
          const diy::ReduceProxy& rp,                // communication proxy
-         const diy::RegularMergePartners& partners) // partners of the current block
+         const diy::RegularMergePartners&)          // partners of the current block
 {
     unsigned   round    = rp.round();               // current round number
 

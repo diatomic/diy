@@ -62,8 +62,8 @@ void redistribute(Block* b,                                 // local block
     // sort points into vectors corresponding to neighbor blocks
     for (size_t i = 0; i < b->points.size(); ++i) // for all points
     {
-        int loc = floor((b->points[i][cur_dim] - b->box.min[cur_dim]) /
-                        (b->box.max[cur_dim] - b->box.min[cur_dim]) * group_size);
+        auto loc = static_cast<size_t>(floor((b->points[i][cur_dim] - b->box.min[cur_dim]) /
+                                             (b->box.max[cur_dim] - b->box.min[cur_dim]) * group_size));
         out_points[loc].push_back(b->points[i]);
     }
     int pos = -1;

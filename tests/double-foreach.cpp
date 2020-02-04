@@ -11,12 +11,12 @@ struct Block
 struct DoubleForeachFixture
 {
   static int nblocks;
-  static int iter;
+  static unsigned int iter;
   diy::mpi::communicator world;
 };
 
 int DoubleForeachFixture::nblocks = 0;
-int DoubleForeachFixture::iter    = 2;
+unsigned int DoubleForeachFixture::iter    = 2;
 
 TEST_CASE_METHOD(DoubleForeachFixture, "Send/Receive", "[double-foreach]")
 {
