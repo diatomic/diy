@@ -23,13 +23,13 @@ diy::mpi::environment::environment()
 #endif
 }
 
-diy::mpi::environment::environment(int threading)
+diy::mpi::environment::environment(int requested_threading)
 {
 #if DIY_HAS_MPI
   int argc = 0; char** argv = nullptr;
-  MPI_Init_thread(&argc, &argv, threading, &provided_threading);
+  MPI_Init_thread(&argc, &argv, requested_threading, &provided_threading);
 #else
-  provided_threading = threading;
+  provided_threading = requested_threading;
 #endif
 }
 
@@ -43,13 +43,13 @@ diy::mpi::environment::environment(int argc, char* argv[])
 #endif
 }
 
-diy::mpi::environment::environment(int argc, char* argv[], int threading)
+diy::mpi::environment::environment(int argc, char* argv[], int requested_threading)
 {
-#if DIY_HAS_MPI
-  MPI_Init_thread(&argc, &argv, threading, &provided_threading);
+#if VTKMDIY_HAS_MPI
+  MPI_Init_thread(&argc, &argv, requested_threading, &provided_threading);
 #else
   (void) argc; (void) argv;
-  provided_threading = threading;
+  provided_threading = requested_threading;
 #endif
 }
 

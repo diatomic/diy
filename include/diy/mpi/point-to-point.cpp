@@ -8,8 +8,14 @@ namespace mpi
 {
 
 #ifdef DIY_MPI_AS_LIB
-DIY_MPI_EXPORT const int any_source  = MPI_ANY_SOURCE;
-DIY_MPI_EXPORT const int any_tag     = MPI_ANY_TAG;
+#  ifdef _MSC_VER
+#    define EXPORT_MACRO DIY_MPI_EXPORT
+#  else
+#    define EXPORT_MACRO
+#  endif
+EXPORT_MACRO const int any_source  = MPI_ANY_SOURCE;
+EXPORT_MACRO const int any_tag     = MPI_ANY_TAG;
+#  undef EXPORT_MACRO
 #endif
 
 namespace detail

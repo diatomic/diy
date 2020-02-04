@@ -11,6 +11,7 @@ namespace mpi
 {
   struct request
   {
+    DIY_MPI_EXPORT_FUNCTION                  request();
     DIY_MPI_EXPORT_FUNCTION status           wait();
     DIY_MPI_EXPORT_FUNCTION optional<status> test();
     DIY_MPI_EXPORT_FUNCTION void             cancel();

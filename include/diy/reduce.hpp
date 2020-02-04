@@ -170,7 +170,7 @@ namespace detail
   {
     using Callback = std::function<void(Block*, const ReduceProxy&, const Partners&)>;
 
-                ReductionFunctor(unsigned round_, const Callback& reduce_, const Partners& partners_, const Assigner& assigner_):
+                ReductionFunctor(int round_, const Callback& reduce_, const Partners& partners_, const Assigner& assigner_):
                     round(round_), reduce(reduce_), partners(partners_), assigner(assigner_)        {}
 
     void        operator()(Block* b, const Master::ProxyWithLink& cp) const
@@ -180,7 +180,7 @@ namespace detail
       std::vector<int> incoming_gids, outgoing_gids;
       if (round > 0)
           partners.incoming(round, cp.gid(), incoming_gids, *cp.master());        // receive from the previous round
-      if (round < partners.rounds())
+      if (round < static_cast<int>(partners.rounds()))
           partners.outgoing(round, cp.gid(), outgoing_gids, *cp.master());        // send to the next round
 
       ReduceProxy   rp(std::move(const_cast<Master::ProxyWithLink&>(cp)), b, round, assigner, incoming_gids, outgoing_gids);
@@ -188,12 +188,12 @@ namespace detail
 
       // touch the outgoing queues to make sure they exist
       Master::Proxy::OutgoingQueues& outgoing = *rp.outgoing();
-      if (outgoing.size() < (size_t) rp.out_link().size())
+      if (outgoing.size() < static_cast<size_t>(rp.out_link().size()))
         for (BlockID target : rp.out_link().neighbors())
           outgoing[target];       // touch the outgoing queue, creating it if necessary
     }
 
-    unsigned        round;
+    int             round;
     Callback        reduce;
     Partners        partners;
     const Assigner& assigner;

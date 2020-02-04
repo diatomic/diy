@@ -42,7 +42,7 @@ namespace io
 
     public:
       DIY_MPI_EXPORT_FUNCTION        file(const communicator& comm, const std::string& filename, int mode);
-                            ~file()                            { close(); }
+                                     ~file()                            { close(); }
       DIY_MPI_EXPORT_FUNCTION void   close();
 
       DIY_MPI_EXPORT_FUNCTION offset size() const;
@@ -72,6 +72,7 @@ namespace io
 
     private:
       communicator   comm_;
+    protected: // mark protected to avoid the "unused private field" warning
       DIY_MPI_File   fh;
   };
 }

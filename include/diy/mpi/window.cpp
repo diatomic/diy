@@ -10,7 +10,13 @@ namespace mpi
 {
 
 #ifdef DIY_MPI_AS_LIB
-DIY_MPI_EXPORT const int nocheck  = MPI_MODE_NOCHECK;
+#  ifdef _MSC_VER
+#    define EXPORT_MACRO DIY_MPI_EXPORT
+#  else
+#    define EXPORT_MACRO
+#  endif
+EXPORT_MACRO const int nocheck  = MPI_MODE_NOCHECK;
+#  undef EXPORT_MACRO
 #endif
 
 namespace detail

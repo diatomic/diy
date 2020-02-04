@@ -12,9 +12,9 @@ struct Point
 struct PointVec
 {
         PointVec()              {}          // need this for de-serialization
-        PointVec(int dim):
+        PointVec(size_t dim) :
           coords(dim)           {}
-  int&  operator[](int i)       { return coords[i]; }
+  int&  operator[](size_t i)       { return coords[i]; }
   std::vector<int>  coords;
 };
 

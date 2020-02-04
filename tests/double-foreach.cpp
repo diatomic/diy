@@ -49,14 +49,14 @@ TEST_CASE_METHOD(DoubleForeachFixture, "Send/Receive", "[double-foreach]")
   }
 
   for (unsigned i = 0; i < iter; ++i)
-      master.foreach([i](Block* b, const diy::Master::ProxyWithLink& cp)
+      master.foreach([i](Block*, const diy::Master::ProxyWithLink& cp)
       {
         for (auto target : cp.link()->neighbors())
             cp.enqueue(target, i);
       });
   master.exchange();
 
-  master.foreach([](Block* b, const diy::Master::ProxyWithLink& cp)
+  master.foreach([](Block*, const diy::Master::ProxyWithLink& cp)
   {
     for (auto target : cp.link()->neighbors())
     {
