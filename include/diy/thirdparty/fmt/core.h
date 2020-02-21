@@ -133,7 +133,7 @@
 #  endif
 #endif
 // Workaround broken [[deprecated]] in the Intel compiler.
-#ifdef __INTEL_COMPILER
+#if defined(__INTEL_COMPILER) || defined(__NVCC__)
 #  define FMT_DEPRECATED_ALIAS
 #else
 #  define FMT_DEPRECATED_ALIAS FMT_DEPRECATED
