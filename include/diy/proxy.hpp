@@ -65,8 +65,6 @@ namespace diy
 
     void                init()
     {
-        incoming_    = &master()->incoming(gid());
-        outgoing_    = &master()->outgoing(gid());
         collectives_ = &master()->collectives(gid());
     }
 
