@@ -142,6 +142,7 @@ function(add_diy_mpi_library use_mpi)
     target_compile_features(${lib_name} PRIVATE cxx_std_11)
     target_compile_definitions(${lib_name}
         PRIVATE -DDIY_HAS_MPI=${has_mpi_val}
+        PRIVATE -Ddiy=${diy_prefix}         # mangle diy namespace
         PRIVATE ${diy_definitions})
     target_include_directories(${lib_name} SYSTEM PRIVATE ${PROJECT_SOURCE_DIR}/include) # for types.hpp
     target_include_directories(${lib_name} SYSTEM PRIVATE ${diy_include_directories}) # for mpitypes.hpp
