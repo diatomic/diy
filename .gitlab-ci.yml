@@ -1,0 +1,91 @@
+include:
+    # Metadata shared my many jobs
+    - local: .gitlab/rules.yml
+    - local: .gitlab/artifacts.yml
+
+    # OS builds.
+    - local: .gitlab/os-linux.yml
+
+stages:
+    - build
+    - test
+
+################################################################################
+# Job declarations
+#
+# Each job must pull in each of the following keys:
+#
+#   - a "base image"
+#   - a build script
+#   - tags for the jobs
+#     - already provided for upload and CI update jobs
+#   - rules for when to run the job
+#
+# Additionally, jobs may also contain:
+#
+#   - artifacts
+#   - dependency/needs jobs for required jobs
+################################################################################
+
+# CI strategy for DIY.
+#
+# Builders:
+#
+# - Fedora 34
+#   * ci/docker/fedora34
+#     - includes mpich and openmpi
+#
+# Wanted test sets:
+#
+# - OS
+#   - Windows
+#   - macOS
+# - Features
+#   - nothreads
+# - Checkers
+#   - asan
+#   - ubsan
+#   - clang-tidy?
+
+stages:
+    - build
+    - test
+
+build:fedora34-mpich:
+    extends:
+        - .fedora34_mpich
+        - .cmake_build_linux
+        - .linux_builder_tags
+        - .cmake_build_artifacts
+        - .run_automatically
+
+test:fedora34-mpich:
+    extends:
+        - .fedora34_mpich
+        - .cmake_test_linux
+        - .linux_builder_tags
+        - .run_automatically
+    dependencies:
+        - build:fedora34-mpich
+    needs:
+        - build:fedora34-mpich
+
+build:fedora34-openmpi:
+    extends:
+        - .fedora34_openmpi
+        - .cmake_build_linux
+        - .linux_builder_tags
+        - .cmake_build_artifacts
+        - .run_automatically
+
+test:fedora34-openmpi:
+    extends:
+        - .fedora34_openmpi
+        - .cmake_test_linux
+        - .linux_builder_tags
+        - .cmake_build_artifacts
+        - .run_automatically
+    dependencies:
+        - build:fedora34-openmpi
+    needs:
+        - build:fedora34-openmpi
