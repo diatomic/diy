@@ -43,7 +43,6 @@ stages:
 # - Features
 #   - nothreads
 # - Checkers
-#   - asan
 #   - ubsan
 #   - clang-tidy?
 
@@ -89,3 +88,23 @@ test:fedora34-openmpi:
         - build:fedora34-openmpi
     needs:
         - build:fedora34-openmpi
+
+build:fedora34-asan:
+    extends:
+        - .fedora34_asan
+        - .cmake_build_linux
+        - .linux_builder_tags
+        - .cmake_build_artifacts
+        - .run_automatically
+
+test:fedora34-asan:
+    extends:
+        - .fedora34_asan
+        - .cmake_memcheck_linux
+        - .linux_tester_priv_tags
+        - .cmake_build_artifacts
+        - .run_automatically
+    dependencies:
+        - build:fedora34-asan
+    needs:
+        - build:fedora34-asan

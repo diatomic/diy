@@ -45,6 +45,16 @@
     variables:
         CMAKE_BUILD_TYPE: RelWithDebInfo
 
+.fedora34_asan: &fedora34_asan
+    extends: .fedora34_memcheck
+
+    variables:
+        CMAKE_CONFIGURATION: fedora34_asan
+        CTEST_MEMORYCHECK_TYPE: AddressSanitizer
+        # Disable LeakSanitizer for now. It's catching all kinds of errors that
+        # need investigated or suppressed.
+        CTEST_MEMORYCHECK_SANITIZER_OPTIONS: detect_leaks=0
+
 .linux_builder_tags:
     tags:
         - diy
