@@ -40,8 +40,6 @@ stages:
 # - OS
 #   - Windows
 #   - macOS
-# - Features
-#   - nothreads
 # - Checkers
 #   - clang-tidy?
 
@@ -67,6 +65,25 @@ test:fedora34-mpich:
         - build:fedora34-mpich
     needs:
         - build:fedora34-mpich
+
+build:fedora34-mpich-nothreads:
+    extends:
+        - .fedora34_mpich_nothreads
+        - .cmake_build_linux
+        - .linux_builder_tags
+        - .cmake_build_artifacts
+        - .run_automatically
+
+test:fedora34-mpich-nothreads:
+    extends:
+        - .fedora34_mpich_nothreads
+        - .cmake_test_linux
+        - .linux_builder_tags
+        - .run_automatically
+    dependencies:
+        - build:fedora34-mpich-nothreads
+    needs:
+        - build:fedora34-mpich-nothreads
 
 build:fedora34-openmpi:
     extends:

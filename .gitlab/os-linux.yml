@@ -31,6 +31,12 @@
     variables:
         CMAKE_CONFIGURATION: fedora34_mpich
 
+.fedora34_mpich_nothreads: &fedora34_mpich_nothreads
+    extends: .fedora34_mpich
+
+    variables:
+        CMAKE_CONFIGURATION: fedora34_mpich_nothreads
+
 .fedora34_openmpi: &fedora34_openmpi
     extends: .fedora34
 
