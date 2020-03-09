@@ -43,7 +43,6 @@ stages:
 # - Features
 #   - nothreads
 # - Checkers
-#   - ubsan
 #   - clang-tidy?
 
 stages:
@@ -108,3 +107,23 @@ test:fedora34-asan:
         - build:fedora34-asan
     needs:
         - build:fedora34-asan
+
+build:fedora34-ubsan:
+    extends:
+        - .fedora34_ubsan
+        - .cmake_build_linux
+        - .linux_builder_tags
+        - .cmake_build_artifacts
+        - .run_automatically
+
+test:fedora34-ubsan:
+    extends:
+        - .fedora34_ubsan
+        - .cmake_memcheck_linux
+        - .linux_tester_priv_tags
+        - .cmake_build_artifacts
+        - .run_automatically
+    dependencies:
+        - build:fedora34-ubsan
+    needs:
+        - build:fedora34-ubsan

@@ -55,6 +55,13 @@
         # need investigated or suppressed.
         CTEST_MEMORYCHECK_SANITIZER_OPTIONS: detect_leaks=0
 
+.fedora34_ubsan: &fedora34_ubsan
+    extends: .fedora34_memcheck
+
+    variables:
+        CMAKE_CONFIGURATION: fedora34_ubsan
+        CTEST_MEMORYCHECK_TYPE: UndefinedBehaviorSanitizer
+
 .linux_builder_tags:
     tags:
         - diy
