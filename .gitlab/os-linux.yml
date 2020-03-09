@@ -39,12 +39,25 @@
         OMPI_ALLOW_RUN_AS_ROOT: 1
         OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: 1
 
+.fedora34_memcheck: &fedora34_memcheck
+    extends: .fedora34_mpich
+
+    variables:
+        CMAKE_BUILD_TYPE: RelWithDebInfo
+
 .linux_builder_tags:
     tags:
         - diy
         - build
         - docker
         - linux
+
+.linux_tester_priv_tags:
+    tags:
+        - diy
+        - docker
+        - linux
+        - privileged
 
 ## Linux-specific scripts
 
@@ -78,4 +91,12 @@
         - *before_script_linux
         - ctest -V --output-on-failure -S .gitlab/ci/ctest_test.cmake
 
+    interruptible: true
+
+.cmake_memcheck_linux:
+    stage: test
+
+    script:
+        - *before_script_linux
+        - "$LAUNCHER ctest --output-on-failure -V -S .gitlab/ci/ctest_memcheck.cmake"
     interruptible: true
