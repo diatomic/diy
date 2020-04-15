@@ -1,5 +1,5 @@
-#ifndef DIY_MPI_COLLECTIVES_HPP
-#define DIY_MPI_COLLECTIVES_HPP
+#ifndef VTKMDIY_MPI_COLLECTIVES_HPP
+#define VTKMDIY_MPI_COLLECTIVES_HPP
 
 #include "config.hpp"
 #include "communicator.hpp"
@@ -19,57 +19,57 @@ namespace mpi
 namespace detail
 {
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 void broadcast(const communicator& comm,
                void* data, int count, const datatype& type,
                int root);
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 request ibroadcast(const communicator& comm,
                    void* data, int count, const datatype& type,
                    int root);
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 void gather(const communicator& comm,
             const void* dataIn, int count, const datatype& type, void* dataOut,
             int root);
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 void gather_v(const communicator& comm,
               const void* dataIn, int countIn, const datatype& type,
               void* dataOut, const int counts[], const int offsets[],
               int root);
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 void all_gather(const communicator& comm,
                 const void* dataIn, int count, const datatype& type, void* dataOut);
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 void all_gather_v(const communicator& comm,
                   const void* dataIn, int countIn, const datatype& type,
                   void* dataOut, const int counts[], const int offsets[]);
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 void reduce(const communicator& comm,
             const void* dataIn, int count, const datatype& type, void* dataOut,
             const operation& op, int root);
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 void all_reduce(const communicator& comm,
                 const void* dataIn, void* dataOut, int count, const datatype& type,
                 const operation& op);
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 request iall_reduce(const communicator& comm,
                     const void* dataIn, void* dataOut, int count, const datatype& type,
                     const operation& op);
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 void scan(const communicator& comm,
           const void* dataIn, void* dataOut, int count, const datatype& type,
           const operation& op);
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 void all_to_all(const communicator& comm,
                 const void* dataIn, int count, const datatype& type, void* dataOut);
 
@@ -399,8 +399,8 @@ void all_to_all(const communicator& comm,
 }
 }
 
-#ifndef DIY_MPI_AS_LIB
+#ifndef VTKMDIY_MPI_AS_LIB
 #include "collectives.cpp"
 #endif
 
-#endif // DIY_MPI_COLLECTIVES_HPP
+#endif // VTKMDIY_MPI_COLLECTIVES_HPP

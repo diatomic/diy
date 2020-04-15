@@ -95,7 +95,7 @@ execute()
 {
   log->debug("Entered execute()");
   auto scoped = prof.scoped("execute");
-  DIY_UNUSED(scoped);
+  VTKMDIY_UNUSED(scoped);
   //show_incoming_records();
 
   // touch the outgoing and incoming queues as well as collectives to make sure they exist

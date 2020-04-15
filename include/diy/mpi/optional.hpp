@@ -1,5 +1,5 @@
-#ifndef DIY_MPI_OPTIONAL_HPP
-#define DIY_MPI_OPTIONAL_HPP
+#ifndef VTKMDIY_MPI_OPTIONAL_HPP
+#define VTKMDIY_MPI_OPTIONAL_HPP
 
 namespace diy
 {
@@ -57,4 +57,4 @@ operator=(const optional& o)
   return *this;
 }
 
-#endif // DIY_MPI_OPTIONAL_HPP
+#endif // VTKMDIY_MPI_OPTIONAL_HPP

@@ -1,5 +1,5 @@
-#ifndef DIY_MPI_STATUS_HPP
-#define DIY_MPI_STATUS_HPP
+#ifndef VTKMDIY_MPI_STATUS_HPP
+#define VTKMDIY_MPI_STATUS_HPP
 
 #include "config.hpp"
 #include "datatypes.hpp"
@@ -10,11 +10,11 @@ namespace mpi
 {
   struct status
   {
-    DIY_MPI_EXPORT_FUNCTION int  source() const;
-    DIY_MPI_EXPORT_FUNCTION int  tag() const;
-    DIY_MPI_EXPORT_FUNCTION int  error() const;
-    DIY_MPI_EXPORT_FUNCTION bool cancelled() const;
-    DIY_MPI_EXPORT_FUNCTION int  count(const datatype& type) const;
+    VTKMDIY_MPI_EXPORT_FUNCTION int  source() const;
+    VTKMDIY_MPI_EXPORT_FUNCTION int  tag() const;
+    VTKMDIY_MPI_EXPORT_FUNCTION int  error() const;
+    VTKMDIY_MPI_EXPORT_FUNCTION bool cancelled() const;
+    VTKMDIY_MPI_EXPORT_FUNCTION int  count(const datatype& type) const;
 
     template<class T>
                    int count() const
@@ -28,8 +28,8 @@ namespace mpi
 }
 } // diy::mpi
 
-#ifndef DIY_MPI_AS_LIB
+#ifndef VTKMDIY_MPI_AS_LIB
 #include "status.cpp"
 #endif
 
-#endif // DIY_MPI_STATUS_HPP
+#endif // VTKMDIY_MPI_STATUS_HPP

@@ -1,5 +1,5 @@
-#ifndef DIY_POINT_HPP
-#define DIY_POINT_HPP
+#ifndef VTKMDIY_POINT_HPP
+#define VTKMDIY_POINT_HPP
 
 #include <iostream>
 #include <vector>
@@ -121,4 +121,4 @@ operator>>(std::istream& in, Point<C,D>& p)
 
 }
 
-#endif // DIY_POINT_HPP
+#endif // VTKMDIY_POINT_HPP

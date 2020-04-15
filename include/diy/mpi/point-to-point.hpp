@@ -1,5 +1,5 @@
-#ifndef DIY_MPI_POINT_TO_POINT_HPP
-#define DIY_MPI_POINT_TO_POINT_HPP
+#ifndef VTKMDIY_MPI_POINT_TO_POINT_HPP
+#define VTKMDIY_MPI_POINT_TO_POINT_HPP
 
 #include "config.hpp"
 #include "datatypes.hpp"
@@ -13,22 +13,22 @@ namespace diy
 namespace mpi
 {
 
-#ifndef DIY_MPI_AS_LIB
+#ifndef VTKMDIY_MPI_AS_LIB
 constexpr int any_source  = MPI_ANY_SOURCE;
 constexpr int any_tag     = MPI_ANY_TAG;
 #else
-DIY_MPI_EXPORT extern const int any_source;
-DIY_MPI_EXPORT extern const int any_tag;
+VTKMDIY_MPI_EXPORT extern const int any_source;
+VTKMDIY_MPI_EXPORT extern const int any_tag;
 #endif
 
 namespace detail
 {
-  DIY_MPI_EXPORT_FUNCTION void send(DIY_MPI_Comm comm, int dest, int tag, const void* data, int count, const datatype& type);
-  DIY_MPI_EXPORT_FUNCTION request isend(DIY_MPI_Comm comm, int dest, int tag, const void* data, int count, const datatype& type);
-  DIY_MPI_EXPORT_FUNCTION request issend(DIY_MPI_Comm comm, int dest, int tag, const void* data, int count, const datatype& type);
-  DIY_MPI_EXPORT_FUNCTION status probe(DIY_MPI_Comm comm, int source, int tag);
-  DIY_MPI_EXPORT_FUNCTION status recv(DIY_MPI_Comm comm, int source, int tag, void* data, int count, const datatype& type);
-  DIY_MPI_EXPORT_FUNCTION request irecv(DIY_MPI_Comm comm, int source, int tag, void* data, int count, const datatype& type);
+  VTKMDIY_MPI_EXPORT_FUNCTION void send(DIY_MPI_Comm comm, int dest, int tag, const void* data, int count, const datatype& type);
+  VTKMDIY_MPI_EXPORT_FUNCTION request isend(DIY_MPI_Comm comm, int dest, int tag, const void* data, int count, const datatype& type);
+  VTKMDIY_MPI_EXPORT_FUNCTION request issend(DIY_MPI_Comm comm, int dest, int tag, const void* data, int count, const datatype& type);
+  VTKMDIY_MPI_EXPORT_FUNCTION status probe(DIY_MPI_Comm comm, int source, int tag);
+  VTKMDIY_MPI_EXPORT_FUNCTION status recv(DIY_MPI_Comm comm, int source, int tag, void* data, int count, const datatype& type);
+  VTKMDIY_MPI_EXPORT_FUNCTION request irecv(DIY_MPI_Comm comm, int source, int tag, void* data, int count, const datatype& type);
 
   template <class T>
   inline void send(DIY_MPI_Comm comm, int dest, int tag, const T& x)
@@ -77,8 +77,8 @@ namespace detail
 }
 } // diy::mpi::detail
 
-#ifndef DIY_MPI_AS_LIB
+#ifndef VTKMDIY_MPI_AS_LIB
 #include "point-to-point.cpp"
 #endif
 
-#endif // DIY_MPI_POINT_TO_POINT_HPP
+#endif // VTKMDIY_MPI_POINT_TO_POINT_HPP

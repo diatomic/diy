@@ -1,5 +1,5 @@
-#ifndef DIY_TYPES_HPP
-#define DIY_TYPES_HPP
+#ifndef VTKMDIY_TYPES_HPP
+#define VTKMDIY_TYPES_HPP
 
 #include <iostream>
 #include "constants.h"
@@ -62,17 +62,17 @@ namespace diy
               Direction(int dim, int dir):
                   Parent(dim)
       {
-          if (dim > 0 && dir & DIY_X0) (*this)[0] -= 1;
-          if (dim > 0 && dir & DIY_X1) (*this)[0] += 1;
-          if (dim > 1 && dir & DIY_Y0) (*this)[1] -= 1;
-          if (dim > 1 && dir & DIY_Y1) (*this)[1] += 1;
-          if (dim > 2 && dir & DIY_Z0) (*this)[2] -= 1;
-          if (dim > 2 && dir & DIY_Z1) (*this)[2] += 1;
-          if (dim > 3 && dir & DIY_T0) (*this)[3] -= 1;
-          if (dim > 3 && dir & DIY_T1) (*this)[3] += 1;
+          if (dim > 0 && dir & VTKMDIY_X0) (*this)[0] -= 1;
+          if (dim > 0 && dir & VTKMDIY_X1) (*this)[0] += 1;
+          if (dim > 1 && dir & VTKMDIY_Y0) (*this)[1] -= 1;
+          if (dim > 1 && dir & VTKMDIY_Y1) (*this)[1] += 1;
+          if (dim > 2 && dir & VTKMDIY_Z0) (*this)[2] -= 1;
+          if (dim > 2 && dir & VTKMDIY_Z1) (*this)[2] += 1;
+          if (dim > 3 && dir & VTKMDIY_T0) (*this)[3] -= 1;
+          if (dim > 3 && dir & VTKMDIY_T1) (*this)[3] += 1;
       }
 
-      static Direction from_bits(int dir, int dim = DIY_MAX_DIM)    { return Direction(dim, dir); }
+      static Direction from_bits(int dir, int dim = VTKMDIY_MAX_DIM)    { return Direction(dim, dir); }
 
       bool
       operator==(const diy::Direction& y) const

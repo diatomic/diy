@@ -1,7 +1,7 @@
-#ifndef DIY_THREAD_H
-#define DIY_THREAD_H
+#ifndef VTKMDIY_THREAD_H
+#define VTKMDIY_THREAD_H
 
-#ifdef DIY_NO_THREADS
+#ifdef VTKMDIY_NO_THREADS
 #include "no-thread.hpp"
 #else
 
@@ -34,11 +34,11 @@ namespace diy
     struct concurrent_map;
 }
 
-#endif // DIY_NO_THREADS
+#endif // VTKMDIY_NO_THREADS
 
 #include "critical-resource.hpp"
 
-#if !defined(DIY_NO_THREADS)
+#if !defined(VTKMDIY_NO_THREADS)
 template<class T, class U>
 struct diy::concurrent_map
 {
@@ -84,6 +84,6 @@ struct diy::concurrent_map
     Map                 map_;
     mutable fast_mutex  mutex_;
 };
-#endif // !defined(DIY_NO_THREADS)
+#endif // !defined(VTKMDIY_NO_THREADS)
 
 #endif

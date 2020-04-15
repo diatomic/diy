@@ -1,5 +1,5 @@
-#ifndef DIY_IO_UTILS_HPP
-#define DIY_IO_UTILS_HPP
+#ifndef VTKMDIY_IO_UTILS_HPP
+#define VTKMDIY_IO_UTILS_HPP
 
 #if defined(_WIN32)
 #include <direct.h>
@@ -14,7 +14,7 @@
 #include <cstdlib>      // mkstemp() on Linux
 #include <sys/stat.h>
 
-#include "../constants.h" // for DIY_UNUSED
+#include "../constants.h" // for VTKMDIY_UNUSED
 
 namespace diy
 {
@@ -83,7 +83,7 @@ namespace utils
     }
 #else
     int error = ::truncate(filename.c_str(), static_cast<off_t>(length));
-    DIY_UNUSED(error);
+    VTKMDIY_UNUSED(error);
 #endif
   }
 
@@ -141,7 +141,7 @@ namespace utils
   inline void sync(int fd)
   {
 #if defined(_WIN32)
-    DIY_UNUSED(fd);
+    VTKMDIY_UNUSED(fd);
 #else
     fsync(fd);
 #endif

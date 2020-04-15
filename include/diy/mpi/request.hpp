@@ -1,5 +1,5 @@
-#ifndef DIY_MPI_REQUEST_HPP
-#define DIY_MPI_REQUEST_HPP
+#ifndef VTKMDIY_MPI_REQUEST_HPP
+#define VTKMDIY_MPI_REQUEST_HPP
 
 #include "config.hpp"
 #include "status.hpp"
@@ -11,10 +11,10 @@ namespace mpi
 {
   struct request
   {
-    DIY_MPI_EXPORT_FUNCTION                  request();
-    DIY_MPI_EXPORT_FUNCTION status           wait();
-    DIY_MPI_EXPORT_FUNCTION optional<status> test();
-    DIY_MPI_EXPORT_FUNCTION void             cancel();
+    VTKMDIY_MPI_EXPORT_FUNCTION                  request();
+    VTKMDIY_MPI_EXPORT_FUNCTION status           wait();
+    VTKMDIY_MPI_EXPORT_FUNCTION optional<status> test();
+    VTKMDIY_MPI_EXPORT_FUNCTION void             cancel();
 
     DIY_MPI_Request handle;
   };
@@ -22,8 +22,8 @@ namespace mpi
 }
 } // diy::mpi
 
-#ifndef DIY_MPI_AS_LIB
+#ifndef VTKMDIY_MPI_AS_LIB
 #include "request.cpp"
 #endif
 
-#endif // DIY_MPI_REQUEST_HPP
+#endif // VTKMDIY_MPI_REQUEST_HPP
