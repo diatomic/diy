@@ -5,6 +5,7 @@ var searchData=
   ['fallback_5fformatter',['fallback_formatter',['../structinternal_1_1fallback__formatter.html',1,'internal']]],
   ['fallback_5fformatter_3c_20t_2c_20char_2c_20enable_5fif_5ft_3c_20is_5fstreamable_3c_20t_2c_20char_20_3e_3a_3avalue_20_3e_20_3e',['fallback_formatter&lt; T, Char, enable_if_t&lt; is_streamable&lt; T, Char &gt;::value &gt; &gt;',['../structinternal_1_1fallback__formatter_3_01_t_00_01_char_00_01enable__if__t_3_01is__streamable_3_5182f96b213c85479e4fbfa710b29535.html',1,'internal']]],
   ['fallback_5fuintptr',['fallback_uintptr',['../structinternal_1_1fallback__uintptr.html',1,'internal']]],
+  ['fast_5fmutex',['fast_mutex',['../classtthread_1_1fast__mutex.html',1,'tthread']]],
   ['fast_5fmutex',['fast_mutex',['../structdiy_1_1fast__mutex.html',1,'diy']]],
   ['file',['file',['../classfile.html',1,'']]],
   ['file',['file',['../classdiy_1_1mpi_1_1io_1_1file.html',1,'diy::mpi::io']]],

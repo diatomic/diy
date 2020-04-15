@@ -1,6 +1,7 @@
 var searchData=
 [
   ['data',['data',['../structinternal_1_1data.html',1,'internal']]],
+  ['datatype',['datatype',['../structdiy_1_1mpi_1_1datatype.html',1,'diy::mpi']]],
   ['dec_5fwriter',['dec_writer',['../structinternal_1_1basic__writer_1_1int__writer_1_1dec__writer.html',1,'internal::basic_writer::int_writer']]],
   ['decimal_5fformatter',['decimal_formatter',['../classinternal_1_1decimal__formatter.html',1,'internal']]],
   ['description',['Description',['../structdiy_1_1_a_m_r_link_1_1_description.html',1,'diy::AMRLink']]],

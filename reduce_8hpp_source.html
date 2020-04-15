@@ -73,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -242,7 +242,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;  {</div>
 <div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <span class="keyword">using</span> Callback = std::function&lt;void(Block*, const ReduceProxy&amp;, const Partners&amp;)&gt;;</div>
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;                ReductionFunctor(<span class="keywordtype">unsigned</span> round_, <span class="keyword">const</span> Callback&amp; reduce_, <span class="keyword">const</span> Partners&amp; partners_, <span class="keyword">const</span> Assigner&amp; assigner_):</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;                ReductionFunctor(<span class="keywordtype">int</span> round_, <span class="keyword">const</span> Callback&amp; reduce_, <span class="keyword">const</span> Partners&amp; partners_, <span class="keyword">const</span> Assigner&amp; assigner_):</div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;                    round(round_), <a class="code" href="group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f">reduce</a>(reduce_), partners(partners_), assigner(assigner_)        {}</div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;</div>
 <div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    <span class="keywordtype">void</span>        operator()(Block* b, <span class="keyword">const</span> Master::ProxyWithLink&amp; cp)<span class="keyword"> const</span></div>
@@ -252,7 +252,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;      std::vector&lt;int&gt; incoming_gids, outgoing_gids;</div>
 <div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;      <span class="keywordflow">if</span> (round &gt; 0)</div>
 <div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;          partners.incoming(round, cp.gid(), incoming_gids, *cp.master());        <span class="comment">// receive from the previous round</span></div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;      <span class="keywordflow">if</span> (round &lt; partners.rounds())</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;      <span class="keywordflow">if</span> (round &lt; static_cast&lt;int&gt;(partners.rounds()))</div>
 <div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;          partners.outgoing(round, cp.gid(), outgoing_gids, *cp.master());        <span class="comment">// send to the next round</span></div>
 <div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;</div>
 <div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;      ReduceProxy   rp(std::move(const_cast&lt;Master::ProxyWithLink&amp;&gt;(cp)), b, round, assigner, incoming_gids, outgoing_gids);</div>
@@ -260,12 +260,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;</div>
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;      <span class="comment">// touch the outgoing queues to make sure they exist</span></div>
 <div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;      Master::Proxy::OutgoingQueues&amp; outgoing = *rp.outgoing();</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;      <span class="keywordflow">if</span> (outgoing.size() &lt; (size_t) rp.out_link().size())</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;      <span class="keywordflow">if</span> (outgoing.size() &lt; <span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(rp.out_link().size()))</div>
 <div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;        <span class="keywordflow">for</span> (BlockID target : rp.out_link().neighbors())</div>
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;          outgoing[target];       <span class="comment">// touch the outgoing queue, creating it if necessary</span></div>
 <div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    }</div>
 <div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="keywordtype">unsigned</span>        round;</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="keywordtype">int</span>             round;</div>
 <div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    Callback        <a class="code" href="group___communication.html#ga4254d5b9c3e97e5d5d73dd019023257f">reduce</a>;</div>
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    Partners        partners;</div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    <span class="keyword">const</span> Assigner&amp; assigner;</div>
@@ -309,7 +309,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Feb 4 2020 18:35:40 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Apr 15 2020 18:55:36 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

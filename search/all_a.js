@@ -10,6 +10,7 @@ var searchData=
   ['local',['local',['../classdiy_1_1_master.html#a076f054751e66766169feadf1e592489',1,'diy::Master']]],
   ['local_5fgids',['local_gids',['../classdiy_1_1_static_assigner.html#a8c48278c29fc47df4a5d359f04cae229',1,'diy::StaticAssigner::local_gids()'],['../classdiy_1_1_contiguous_assigner.html#a052b4216dd42fb573a4daabb86e6a0e9',1,'diy::ContiguousAssigner::local_gids()'],['../classdiy_1_1_round_robin_assigner.html#a2544e41d6f469b3a0e9cf9b817615e8f',1,'diy::RoundRobinAssigner::local_gids()']]],
   ['locale_5fref',['locale_ref',['../classinternal_1_1locale__ref.html',1,'internal']]],
+  ['lock',['lock',['../classtthread_1_1fast__mutex.html#a4fa61071e9e59b0ecab8137eadfc4558',1,'tthread::fast_mutex']]],
   ['lock_5fguard',['lock_guard',['../structdiy_1_1lock__guard.html',1,'diy']]],
   ['lock_5fguard_3c_20mutex_20_3e',['lock_guard&lt; Mutex &gt;',['../structdiy_1_1lock__guard.html',1,'diy']]],
   ['logger',['logger',['../structdiy_1_1spd_1_1logger.html',1,'diy::spd']]]

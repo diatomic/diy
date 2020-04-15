@@ -74,7 +74,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -105,6 +105,12 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1mpi_1_1communicator.html">communicator</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Simple wrapper around <code>MPI_Comm</code>.  <a href="classdiy_1_1mpi_1_1communicator.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1mpi_1_1datatype.html">datatype</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1mpi_1_1environment.html">environment</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1mpi_1_1operation.html">operation</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1mpi_1_1maximum.html">maximum</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1mpi_1_1minimum.html">minimum</a></td></tr>
@@ -117,8 +123,6 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1mpi_1_1window.html">window</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Simple wrapper around MPI window functions.  <a href="classdiy_1_1mpi_1_1window.html#details">More...</a><br/></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdiy_1_1mpi_1_1environment.html">environment</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -215,19 +219,22 @@ template&lt;class T &gt; </td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a5df909434340b8f128b5f646ad954fcb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5df909434340b8f128b5f646ad954fcb"></a>
-const int&#160;</td><td class="memItemRight" valign="bottom"><b>any_source</b> = MPI_ANY_SOURCE</td></tr>
-<tr class="separator:a5df909434340b8f128b5f646ad954fcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a670bfa93ed8813ac664d3d6644143ce1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a670bfa93ed8813ac664d3d6644143ce1"></a>
-const int&#160;</td><td class="memItemRight" valign="bottom"><b>any_tag</b> = MPI_ANY_TAG</td></tr>
-<tr class="separator:a670bfa93ed8813ac664d3d6644143ce1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a849ab9852833bbc2810ae92d996f121d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a849ab9852833bbc2810ae92d996f121d"></a>
+constexpr int&#160;</td><td class="memItemRight" valign="bottom"><b>any_source</b> = MPI_ANY_SOURCE</td></tr>
+<tr class="separator:a849ab9852833bbc2810ae92d996f121d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4fc79704c4f322384dd94bd38030f5c9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4fc79704c4f322384dd94bd38030f5c9"></a>
+constexpr int&#160;</td><td class="memItemRight" valign="bottom"><b>any_tag</b> = MPI_ANY_TAG</td></tr>
+<tr class="separator:a4fc79704c4f322384dd94bd38030f5c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a432e52d19e911ac62451ac63d491ce9f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a432e52d19e911ac62451ac63d491ce9f"></a>
+constexpr int&#160;</td><td class="memItemRight" valign="bottom"><b>nocheck</b> = MPI_MODE_NOCHECK</td></tr>
+<tr class="separator:a432e52d19e911ac62451ac63d491ce9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>C++ MPI wrapper </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Feb 4 2020 18:35:41 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Apr 15 2020 18:55:38 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

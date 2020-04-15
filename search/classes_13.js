@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['value',['value',['../unioninternal_1_1arg__ref_1_1value.html',1,'internal::arg_ref']]],
-  ['value',['value',['../unioninternal_1_1format__part_1_1argument__id_1_1value.html',1,'internal::format_part::argument_id']]],
-  ['value',['value',['../classinternal_1_1value.html',1,'internal']]],
   ['value',['value',['../unioninternal_1_1format__part_1_1value.html',1,'internal::format_part']]],
+  ['value',['value',['../unioninternal_1_1format__part_1_1argument__id_1_1value.html',1,'internal::format_part::argument_id']]],
+  ['value',['value',['../unioninternal_1_1arg__ref_1_1value.html',1,'internal::arg_ref']]],
+  ['value',['value',['../classinternal_1_1value.html',1,'internal']]],
   ['value_3c_20basic_5fformat_5fcontext_20_3e',['value&lt; basic_format_context &gt;',['../classinternal_1_1value.html',1,'internal']]],
   ['value_3c_20basic_5fprintf_5fcontext_20_3e',['value&lt; basic_printf_context &gt;',['../classinternal_1_1value.html',1,'internal']]],
   ['value_3c_20format_5fcontext_20_3e',['value&lt; format_context &gt;',['../classinternal_1_1value.html',1,'internal']]],

@@ -73,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -181,7 +181,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;                      <a class="code" href="classdiy_1_1_assigner.html#afbce9fc4ffb176dbf7575058779511a2">Assigner</a>(size__, nblocks__),</div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;                      comm_(comm),</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;                      div_(nblocks__ / size__ + ((nblocks__ % size__) == 0 ? 0 : 1)),   <span class="comment">// NB: same size window everywhere means the last rank may allocate extra space</span></div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;                      rank_map_(comm_, div_)                                            { rank_map_.lock_all(MPI_MODE_NOCHECK); }</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;                      rank_map_(comm_, div_)                                            { rank_map_.lock_all(mpi::nocheck); }</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;                    ~<a class="code" href="classdiy_1_1_dynamic_assigner.html">DynamicAssigner</a>()                                                  { rank_map_.unlock_all(); }</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;      <span class="keyword">inline</span></div>
@@ -261,7 +261,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;</div>
 <div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    rank_map_.unlock_all();</div>
 <div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    rank_map_ = <a class="code" href="classdiy_1_1mpi_1_1window.html">mpi::window&lt;int&gt;</a>(comm_, div_);</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    rank_map_.lock_all(MPI_MODE_NOCHECK);</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    rank_map_.lock_all(mpi::nocheck);</div>
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;}</div>
 <div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;</div>
 <div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;std::tuple&lt;bool,int&gt;</div>
@@ -352,7 +352,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="classdiy_1_1_assigner_html"><div class="ttname"><a href="classdiy_1_1_assigner.html">diy::Assigner</a></div><div class="ttdef"><b>Definition:</b> assigner.hpp:14</div></div>
 <div class="ttc" id="classdiy_1_1_contiguous_assigner_html_a5c879abab3d9f8dc0f3161c340033346"><div class="ttname"><a href="classdiy_1_1_contiguous_assigner.html#a5c879abab3d9f8dc0f3161c340033346">diy::ContiguousAssigner::rank</a></div><div class="ttdeci">int rank(int gid) const override</div><div class="ttdoc">returns the process rank of the block with global id gid (need not be local) </div><div class="ttdef"><b>Definition:</b> assigner.hpp:71</div></div>
 <div class="ttc" id="classdiy_1_1_round_robin_assigner_html_a5ed6d8557499540c6390c3b513cb2eec"><div class="ttname"><a href="classdiy_1_1_round_robin_assigner.html#a5ed6d8557499540c6390c3b513cb2eec">diy::RoundRobinAssigner::rank</a></div><div class="ttdeci">int rank(int gid) const override</div><div class="ttdoc">returns the process rank of the block with global id gid (need not be local) </div><div class="ttdef"><b>Definition:</b> assigner.hpp:100</div></div>
-<div class="ttc" id="classdiy_1_1mpi_1_1communicator_html"><div class="ttname"><a href="classdiy_1_1mpi_1_1communicator.html">diy::mpi::communicator</a></div><div class="ttdoc">Simple wrapper around MPI_Comm. </div><div class="ttdef"><b>Definition:</b> communicator.hpp:8</div></div>
+<div class="ttc" id="classdiy_1_1mpi_1_1communicator_html"><div class="ttname"><a href="classdiy_1_1mpi_1_1communicator.html">diy::mpi::communicator</a></div><div class="ttdoc">Simple wrapper around MPI_Comm. </div><div class="ttdef"><b>Definition:</b> communicator.hpp:17</div></div>
 <div class="ttc" id="classdiy_1_1_contiguous_assigner_html_a052b4216dd42fb573a4daabb86e6a0e9"><div class="ttname"><a href="classdiy_1_1_contiguous_assigner.html#a052b4216dd42fb573a4daabb86e6a0e9">diy::ContiguousAssigner::local_gids</a></div><div class="ttdeci">void local_gids(int rank, std::vector&lt; int &gt; &amp;gids) const override</div><div class="ttdoc">gets the local gids for a given process rank </div><div class="ttdef"><b>Definition:</b> assigner.hpp:151</div></div>
 <div class="ttc" id="classdiy_1_1_static_assigner_html"><div class="ttname"><a href="classdiy_1_1_static_assigner.html">diy::StaticAssigner</a></div><div class="ttdef"><b>Definition:</b> assigner.hpp:46</div></div>
 <div class="ttc" id="classdiy_1_1_static_assigner_html_a8c48278c29fc47df4a5d359f04cae229"><div class="ttname"><a href="classdiy_1_1_static_assigner.html#a8c48278c29fc47df4a5d359f04cae229">diy::StaticAssigner::local_gids</a></div><div class="ttdeci">virtual void local_gids(int rank, std::vector&lt; int &gt; &amp;gids) const =0</div><div class="ttdoc">gets the local gids for a given process rank </div></div>
@@ -360,7 +360,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Feb 4 2020 18:35:39 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Apr 15 2020 18:55:36 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

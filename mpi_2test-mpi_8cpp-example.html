@@ -69,7 +69,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -103,7 +103,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">  std::vector&lt;int&gt;  vec;</div>
 <div class="line">  <span class="keywordflow">if</span> (world.rank() == 0)</div>
 <div class="line">  {</div>
-<div class="line">    <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> i = 0; i &lt; 6; ++i)</div>
+<div class="line">    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; 6; ++i)</div>
 <div class="line">      vec.push_back(i*i);</div>
 <div class="line">    world.send(1,0,vec);</div>
 <div class="line">    <span class="keywordtype">int</span> val = 42;</div>
@@ -113,14 +113,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">    std::vector&lt;int&gt; total(in.size());</div>
 <div class="line">    <a name="a1"></a><a class="code" href="group___m_p_i.html#ga13ff29a892870f09695ff7fd3832e764">mpi::reduce</a>(world, in, total, 0, std::plus&lt;int&gt;());</div>
 <div class="line">    std::cout &lt;&lt; <span class="stringliteral">&quot;Sum:&quot;</span> &lt;&lt; std::endl;</div>
-<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; total.size(); ++i)</div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; total.size(); ++i)</div>
 <div class="line">      std::cout &lt;&lt; <span class="stringliteral">&quot;  &quot;</span> &lt;&lt; total[i] &lt;&lt; std::endl;</div>
 <div class="line">  }</div>
 <div class="line">  <span class="keywordflow">else</span> <span class="keywordflow">if</span> (world.rank() == 1)</div>
 <div class="line">  {</div>
 <div class="line">    world.recv(0,0,vec);</div>
 <div class="line">    std::cout &lt;&lt; <span class="stringliteral">&quot;Received: &quot;</span> &lt;&lt; std::endl;</div>
-<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; vec.size(); ++i)</div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; vec.size(); ++i)</div>
 <div class="line">      std::cout &lt;&lt; vec[i] &lt;&lt; std::endl;</div>
 <div class="line">    <span class="keywordtype">int</span> val;</div>
 <div class="line">    <a class="code" href="group___m_p_i.html#ga306425d8ccbecd1b6fd77ec0950c86a6">mpi::broadcast</a>(world, val, 0);</div>
@@ -130,8 +130,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">    <a class="code" href="group___m_p_i.html#ga13ff29a892870f09695ff7fd3832e764">mpi::reduce</a>(world, in, 0, std::plus&lt;int&gt;());</div>
 <div class="line">  }</div>
 <div class="line"></div>
-<div class="line">  <span class="keywordtype">int</span> <a class="code" href="namespacediy.html#a80c48a0054904994a271642ebec51608">in</a>   = 3 + world.rank()*2,</div>
-<div class="line">      out;</div>
+<div class="line">  <span class="keywordtype">int</span> <a class="code" href="namespacediy.html#a80c48a0054904994a271642ebec51608">in</a> = 3 + world.rank()*2;</div>
+<div class="line">  <span class="keywordtype">int</span> out;</div>
 <div class="line">  <a name="a2"></a><a class="code" href="group___m_p_i.html#ga76daf228be0f1f03f4bab95e9bd34f45">mpi::scan</a>(world, in, out, std::plus&lt;int&gt;());</div>
 <div class="line">  std::cout &lt;&lt; <span class="stringliteral">&quot;Scan (&quot;</span> &lt;&lt; world.rank() &lt;&lt; <span class="stringliteral">&quot;): &quot;</span> &lt;&lt; in &lt;&lt; <span class="stringliteral">&quot; -&gt; &quot;</span> &lt;&lt; out &lt;&lt; std::endl;</div>
 <div class="line"></div>
@@ -146,14 +146,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"></div>
 <div class="line">  std::vector&lt; std::vector&lt;int&gt; &gt; all_vec;</div>
 <div class="line">  <a name="a3"></a><a class="code" href="group___m_p_i.html#ga9346ef64e83013dc4a92b7b91e5ba79f">mpi::all_gather</a>(world, in_vec, all_vec);</div>
-<div class="line">  <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; all_vec.size(); ++i)</div>
-<div class="line">      <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> j = 0; j &lt; all_vec[i].size(); ++j)</div>
+<div class="line">  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; all_vec.size(); ++i)</div>
+<div class="line">      <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 0; j &lt; all_vec[i].size(); ++j)</div>
 <div class="line">          std::cout &lt;&lt; world.rank() &lt;&lt; <span class="stringliteral">&quot;: &quot;</span> &lt;&lt; all_vec[i][j] &lt;&lt; std::endl;</div>
 <div class="line">}</div>
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Feb 4 2020 18:35:39 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Apr 15 2020 18:55:36 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
