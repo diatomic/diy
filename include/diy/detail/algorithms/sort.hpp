@@ -90,24 +90,24 @@ struct SampleSort<Block,T,Cmp>::Sampler
         int k_in  = srp.in_link().size();
         int k_out = srp.out_link().size();
 
-        std::vector<T> samples;
+        std::vector<T> samps;
 
         if (k_in == 0)
         {
             // draw random samples
             for (size_t i = 0; i < num_samples; ++i)
-                samples.push_back((b->*values)[std::rand() % (b->*values).size()]);
+                samps.push_back((b->*values)[std::rand() % (b->*values).size()]);
         } else
-            dequeue_values(samples, srp, false);
+            dequeue_values(samps, srp, false);
 
         if (k_out == 0)
         {
             // pick subsamples that separate quantiles
-            std::sort(samples.begin(), samples.end(), cmp);
+            std::sort(samps.begin(), samps.end(), cmp);
             std::vector<T>  subsamples(srp.nblocks() - 1);
-            size_t step = samples.size() / srp.nblocks();       // NB: subsamples.size() + 1
+            size_t step = samps.size() / srp.nblocks();       // NB: subsamples.size() + 1
             for (size_t i = 0; i < subsamples.size(); ++i)
-                subsamples[i] = samples[(i+1)*step];
+                subsamples[i] = samps[(i+1)*step];
             (b->*dividers).swap(subsamples);
         }
         else
@@ -115,7 +115,7 @@ struct SampleSort<Block,T,Cmp>::Sampler
             for (int i = 0; i < k_out; ++i)
             {
                 MemoryBuffer& out = srp.outgoing(srp.out_link().target(i));
-                save(out, &samples[0], samples.size());
+                save(out, &samps[0], samps.size());
             }
         }
     }

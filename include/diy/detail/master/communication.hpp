@@ -63,7 +63,7 @@ namespace diy
         struct mpi_datatype< diy::detail::VectorWindow<T> >
         {
             using VecWin = diy::detail::VectorWindow<T>;
-            static MPI_Datatype         datatype()                { return get_mpi_datatype<T>(); }
+            static diy::mpi::datatype   datatype()                { return get_mpi_datatype<T>(); }
             static const void*          address(const VecWin& x)  { return x.begin; }
             static void*                address(VecWin& x)        { return x.begin; }
             static int                  count(const VecWin& x)    { return static_cast<int>(x.count); }
@@ -135,12 +135,10 @@ recv(mpi::communicator& comm, const mpi::status& status)
 // once the InFlightRecv is done, place it either out of core or in the appropriate incoming queue
 void
 diy::Master::InFlightRecv::
-place(IncomingRound* in, bool unload, ExternalStorage* storage, IExchangeInfo* iexchange)
+place(IncomingRound* in, bool unload, ExternalStorage* storage, IExchangeInfo*)
 {
-    size_t size     = message.size();
     int from        = info.from;
     int to          = info.to;
-    int external    = -1;
 
     message.reset();
 

@@ -84,7 +84,7 @@ namespace diy
       {
                 QueueSizePolicy(size_t sz): size(sz)          {}
         bool    unload_incoming(const Master&, int, int, size_t sz) const         { return sz > size; }
-        bool    unload_outgoing(const Master& master, int from, size_t sz) const  { return sz > size; }
+        bool    unload_outgoing(const Master&, int, size_t sz) const              { return sz > size; }
 
         size_t  size;
       };
@@ -383,6 +383,9 @@ Master(mpi::communicator    comm,
   inflight_recvs_(new InFlightRecvsMap),
   collectives_(new CollectivesMap)
 {
+#ifdef DIY_NO_THREADS
+  (void) threads__;
+#endif
     comm_.duplicate(comm);
 }
 
@@ -613,11 +616,10 @@ exchange(bool remote)
 
   log->debug("Starting exchange");
 
-#ifdef DIY_NO_MPI
-  // remote doesn't need to do anything special if there is no mpi, but we also
-  // can't just use it because of the ibarrier
-  remote = false;
-#endif
+  if (comm_.size() == 1)
+  {
+    remote = false;
+  }
 
   // make sure there is a queue for each neighbor
   if (!remote)
@@ -985,7 +987,7 @@ send_outgoing_queues(GidSendOrder&   gid_order,
 
 void
 diy::Master::
-send_same_rank(int from, int to, QueueRecord& qr, IExchangeInfo* iex)
+send_same_rank(int from, int to, QueueRecord& qr, IExchangeInfo*)
 {
     auto scoped = prof.scoped("send-same-rank");
 

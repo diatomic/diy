@@ -68,10 +68,10 @@ struct diy::detail::KDTreePartners
                         wrap(wrap_),
                         domain(domain_)
   {
-    for (unsigned i = 0; i < swap.rounds(); ++i)
+    for (int i = 0; i < swap.rounds(); ++i)
     {
       // fill histogram rounds
-      for (unsigned j = 0; j < histogram.rounds(); ++j)
+      for (int j = 0; j < histogram.rounds(); ++j)
       {
         rounds_.push_back(std::make_pair(false, j));
         dim_.push_back(i % dim);

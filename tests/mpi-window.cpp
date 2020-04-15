@@ -22,7 +22,7 @@ TEST_CASE_METHOD(SimpleFixture, "MPI Window Test", "[mpi-window]")
 
     int rank = world.rank();
 
-    window.lock_all(MPI_MODE_NOCHECK);
+    window.lock_all(diy::mpi::nocheck);
 
     // put the values
     int target_rank = (rank + 2) % world.size();

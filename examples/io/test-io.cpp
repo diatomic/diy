@@ -5,6 +5,8 @@
 #include <diy/io/bov.hpp>
 #include <diy/io/numpy.hpp>
 
+#include <diy/mpi.hpp>
+
 int main(int argc, char* argv[])
 {
   diy::mpi::environment     env(argc, argv);

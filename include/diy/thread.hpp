@@ -5,7 +5,9 @@
 #include "no-thread.hpp"
 #else
 
+#if !defined(_MSC_VER)
 #include "thread/fast_mutex.h"
+#endif
 
 #include <thread>
 #include <mutex>
@@ -17,8 +19,13 @@ namespace diy
     using std::recursive_mutex;
     namespace this_thread = std::this_thread;
 
+#if defined(_MSC_VER)
+    // fast_mutex implementation has issues on MSVC. Just use std::mutex
+    using fast_mutex = std::mutex;
+#else
     // TODO: replace with our own implementation using std::atomic_flag
     using fast_mutex = tthread::fast_mutex;
+#endif
 
     template<class Mutex>
     using lock_guard = std::unique_lock<Mutex>;
@@ -27,7 +34,7 @@ namespace diy
     struct concurrent_map;
 }
 
-#endif
+#endif // DIY_NO_THREADS
 
 #include "critical-resource.hpp"
 
@@ -77,6 +84,6 @@ struct diy::concurrent_map
     Map                 map_;
     mutable fast_mutex  mutex_;
 };
-#endif
+#endif // !defined(DIY_NO_THREADS)
 
 #endif
