@@ -76,7 +76,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -92,9 +92,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-static-attribs">Static Public Attributes</a> &#124;
-<a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classdiy_1_1mpi_1_1io_1_1file-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">diy::mpi::io::file Class Reference<div class="ingroups"><a class="el" href="group___m_p_i.html">MPI</a></div></div>  </div>
@@ -106,31 +105,49 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p><code>#include &lt;<a class="el" href="io_8hpp_source.html">diy/mpi/io.hpp</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:aaa3865c1465eaeb816e8c3112f0039fd"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom">{ <br/>
+&#160;&#160;<b>rdonly</b> = MPI_MODE_RDONLY, 
+<b>rdwr</b> = MPI_MODE_RDWR, 
+<b>wronly</b> = MPI_MODE_WRONLY, 
+<b>create</b> = MPI_MODE_CREATE, 
+<br/>
+&#160;&#160;<b>exclusive</b> = MPI_MODE_EXCL, 
+<b>delete_on_close</b> = MPI_MODE_DELETE_ON_CLOSE, 
+<b>unique_open</b> = MPI_MODE_UNIQUE_OPEN, 
+<b>sequential</b> = MPI_MODE_SEQUENTIAL, 
+<br/>
+&#160;&#160;<b>append</b> = MPI_MODE_APPEND
+<br/>
+ }</td></tr>
+<tr class="separator:aaa3865c1465eaeb816e8c3112f0039fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ae2ea6b7f78bea32b482c24ea4376f8f0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae2ea6b7f78bea32b482c24ea4376f8f0"></a>
-DIY_MPI_EXPORT_FUNCTION&#160;</td><td class="memItemRight" valign="bottom"><b>file</b> (const <a class="el" href="classdiy_1_1mpi_1_1communicator.html">communicator</a> &amp;comm, const std::string &amp;filename, int mode)</td></tr>
+&#160;</td><td class="memItemRight" valign="bottom"><b>file</b> (const <a class="el" href="classdiy_1_1mpi_1_1communicator.html">communicator</a> &amp;comm, const std::string &amp;filename, int mode)</td></tr>
 <tr class="separator:ae2ea6b7f78bea32b482c24ea4376f8f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4aac06488c6787e0aae48041596398f5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4aac06488c6787e0aae48041596398f5"></a>
-DIY_MPI_EXPORT_FUNCTION void&#160;</td><td class="memItemRight" valign="bottom"><b>close</b> ()</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>close</b> ()</td></tr>
 <tr class="separator:a4aac06488c6787e0aae48041596398f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a064b9fba9c5cba38c50f8cc7df1b6a8f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a064b9fba9c5cba38c50f8cc7df1b6a8f"></a>
-DIY_MPI_EXPORT_FUNCTION offset&#160;</td><td class="memItemRight" valign="bottom"><b>size</b> () const </td></tr>
+offset&#160;</td><td class="memItemRight" valign="bottom"><b>size</b> () const </td></tr>
 <tr class="separator:a064b9fba9c5cba38c50f8cc7df1b6a8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8e8a66b9aeffe8b4aa17c3fab0a4c266"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8e8a66b9aeffe8b4aa17c3fab0a4c266"></a>
-DIY_MPI_EXPORT_FUNCTION void&#160;</td><td class="memItemRight" valign="bottom"><b>resize</b> (offset size)</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>resize</b> (offset size)</td></tr>
 <tr class="separator:a8e8a66b9aeffe8b4aa17c3fab0a4c266"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab4d710dba208c9d2895440e17cb72e22"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab4d710dba208c9d2895440e17cb72e22"></a>
-DIY_MPI_EXPORT_FUNCTION void&#160;</td><td class="memItemRight" valign="bottom"><b>read_at</b> (offset o, char *buffer, size_t size)</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>read_at</b> (offset o, char *buffer, size_t size)</td></tr>
 <tr class="separator:ab4d710dba208c9d2895440e17cb72e22"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5e5ca76d0d43e2c9cc1cb483c8dbed69"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5e5ca76d0d43e2c9cc1cb483c8dbed69"></a>
-DIY_MPI_EXPORT_FUNCTION void&#160;</td><td class="memItemRight" valign="bottom"><b>read_at_all</b> (offset o, char *buffer, size_t size)</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>read_at_all</b> (offset o, char *buffer, size_t size)</td></tr>
 <tr class="separator:a5e5ca76d0d43e2c9cc1cb483c8dbed69"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a34af5078d458ab4a9ef0b86e485b8af3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a34af5078d458ab4a9ef0b86e485b8af3"></a>
-DIY_MPI_EXPORT_FUNCTION void&#160;</td><td class="memItemRight" valign="bottom"><b>write_at</b> (offset o, const char *buffer, size_t size)</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>write_at</b> (offset o, const char *buffer, size_t size)</td></tr>
 <tr class="separator:a34af5078d458ab4a9ef0b86e485b8af3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:accb8279ae352e23cdcb85e5125e0f63b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="accb8279ae352e23cdcb85e5125e0f63b"></a>
-DIY_MPI_EXPORT_FUNCTION void&#160;</td><td class="memItemRight" valign="bottom"><b>write_at_all</b> (offset o, const char *buffer, size_t size)</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>write_at_all</b> (offset o, const char *buffer, size_t size)</td></tr>
 <tr class="separator:accb8279ae352e23cdcb85e5125e0f63b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9809a93d9e85830875aa685e2a74f55c"><td class="memTemplParams" colspan="2"><a class="anchor" id="a9809a93d9e85830875aa685e2a74f55c"></a>
 template&lt;class T &gt; </td></tr>
@@ -148,63 +165,23 @@ template&lt;class T &gt; </td></tr>
 template&lt;class T &gt; </td></tr>
 <tr class="memitem:a74eafaa4792f69fb3a63f8c9e024ec5b"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>write_at_all</b> (offset o, const std::vector&lt; T &gt; &amp;data)</td></tr>
 <tr class="separator:a74eafaa4792f69fb3a63f8c9e024ec5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a92bc6a5ba4e0db5402398a3743414e9a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a92bc6a5ba4e0db5402398a3743414e9a"></a>
-DIY_MPI_EXPORT_FUNCTION void&#160;</td><td class="memItemRight" valign="bottom"><b>read_bov</b> (const <a class="el" href="structdiy_1_1_bounds.html">DiscreteBounds</a> &amp;bounds, int ndims, const int dims[], char *buffer, size_t offset, const <a class="el" href="structdiy_1_1mpi_1_1datatype.html">datatype</a> &amp;dt, bool collective, int chunk)</td></tr>
-<tr class="separator:a92bc6a5ba4e0db5402398a3743414e9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4104e3dff35014cd68025f65716ff8e1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4104e3dff35014cd68025f65716ff8e1"></a>
-DIY_MPI_EXPORT_FUNCTION void&#160;</td><td class="memItemRight" valign="bottom"><b>write_bov</b> (const <a class="el" href="structdiy_1_1_bounds.html">DiscreteBounds</a> &amp;bounds, const <a class="el" href="structdiy_1_1_bounds.html">DiscreteBounds</a> &amp;core, int ndims, const int dims[], const char *buffer, size_t offset, const <a class="el" href="structdiy_1_1mpi_1_1datatype.html">datatype</a> &amp;dt, bool collective, int chunk)</td></tr>
-<tr class="separator:a4104e3dff35014cd68025f65716ff8e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae7191acdaf2e50cf372208870c5479af"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae7191acdaf2e50cf372208870c5479af"></a>
 const <a class="el" href="classdiy_1_1mpi_1_1communicator.html">communicator</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>comm</b> () const </td></tr>
 <tr class="separator:ae7191acdaf2e50cf372208870c5479af"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
-Static Public Attributes</h2></td></tr>
-<tr class="memitem:ae6a2d36c441fe325cbdbaac750b107eb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae6a2d36c441fe325cbdbaac750b107eb"></a>
-static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><b>rdonly</b> = MPI_MODE_RDONLY</td></tr>
-<tr class="separator:ae6a2d36c441fe325cbdbaac750b107eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a268071256a082fd7463960275a360cad"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a268071256a082fd7463960275a360cad"></a>
-static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><b>rdwr</b> = MPI_MODE_RDWR</td></tr>
-<tr class="separator:a268071256a082fd7463960275a360cad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adbdb07e1dd2be65476c4e52ac2b03e19"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adbdb07e1dd2be65476c4e52ac2b03e19"></a>
-static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><b>wronly</b> = MPI_MODE_WRONLY</td></tr>
-<tr class="separator:adbdb07e1dd2be65476c4e52ac2b03e19"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3d4bb2db5b04f4c0a1704c83eab94969"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3d4bb2db5b04f4c0a1704c83eab94969"></a>
-static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><b>create</b> = MPI_MODE_CREATE</td></tr>
-<tr class="separator:a3d4bb2db5b04f4c0a1704c83eab94969"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afd13606996ed1af698c42bd77abbdb10"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afd13606996ed1af698c42bd77abbdb10"></a>
-static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><b>exclusive</b> = MPI_MODE_EXCL</td></tr>
-<tr class="separator:afd13606996ed1af698c42bd77abbdb10"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa0423dfaf09091f763ad5691adca5d95"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa0423dfaf09091f763ad5691adca5d95"></a>
-static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><b>delete_on_close</b> = MPI_MODE_DELETE_ON_CLOSE</td></tr>
-<tr class="separator:aa0423dfaf09091f763ad5691adca5d95"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7cd822081dd67e946839f2966f5657b4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7cd822081dd67e946839f2966f5657b4"></a>
-static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><b>unique_open</b> = MPI_MODE_UNIQUE_OPEN</td></tr>
-<tr class="separator:a7cd822081dd67e946839f2966f5657b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a955ea2adb3a6916b63ede45ac39a0780"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a955ea2adb3a6916b63ede45ac39a0780"></a>
-static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><b>sequential</b> = MPI_MODE_SEQUENTIAL</td></tr>
-<tr class="separator:a955ea2adb3a6916b63ede45ac39a0780"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aca0b2d6c44d5c61ee59d876bdde2e7a4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aca0b2d6c44d5c61ee59d876bdde2e7a4"></a>
-static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><b>append</b> = MPI_MODE_APPEND</td></tr>
-<tr class="separator:aca0b2d6c44d5c61ee59d876bdde2e7a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
-Protected Attributes</h2></td></tr>
-<tr class="memitem:ad65b6289a8c70b6c3dbf69812789b763"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad65b6289a8c70b6c3dbf69812789b763"></a>
-DIY_MPI_File&#160;</td><td class="memItemRight" valign="bottom"><b>fh</b></td></tr>
-<tr class="separator:ad65b6289a8c70b6c3dbf69812789b763"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08558c956b03cbd6b8e89ab1679c4166"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a08558c956b03cbd6b8e89ab1679c4166"></a>
+MPI_File &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>handle</b> ()</td></tr>
+<tr class="separator:a08558c956b03cbd6b8e89ab1679c4166"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Wraps MPI file IO. </p>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="io_2test-io_8cpp-example.html#_a5">io/test-io.cpp</a>, <a class="el" href="reduce_2sample-sort_8cpp-example.html#_a13">reduce/sample-sort.cpp</a>, and <a class="el" href="reduce_2sort_8cpp-example.html#_a28">reduce/sort.cpp</a>.</dd>
-</dl></div><hr/>The documentation for this class was generated from the following files:<ul>
+</dl></div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>include/diy/mpi/<a class="el" href="io_8hpp_source.html">io.hpp</a></li>
-<li>include/diy/mpi/io.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 15 2020 18:55:38 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Apr 16 2020 18:05:50 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

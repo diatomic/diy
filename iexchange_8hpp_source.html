@@ -73,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -99,9 +99,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;      <span class="keyword">using</span>   Clock   = std::chrono::high_resolution_clock;</div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;      <span class="keyword">using</span>   Time    = Clock::time_point;</div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;                        <a class="code" href="structdiy_1_1_master_1_1_i_exchange_info.html">IExchangeInfo</a>(<a class="code" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a> c, <a class="code" href="structdiy_1_1stats_1_1_profiler.html">stats::Profiler</a>&amp; p):</div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;                            comm(c),</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;                            prof(p)                             {}</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;                        <a class="code" href="structdiy_1_1_master_1_1_i_exchange_info.html">IExchangeInfo</a>(<a class="code" href="classdiy_1_1mpi_1_1communicator.html">mpi::communicator</a> comm_, <a class="code" href="structdiy_1_1stats_1_1_profiler.html">stats::Profiler</a>&amp; prof_):</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;                            comm(comm_),</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;                            prof(prof_)                         {}</div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;      <span class="keyword">virtual</span>           ~<a class="code" href="structdiy_1_1_master_1_1_i_exchange_info.html">IExchangeInfo</a>()                        {}</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;</div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;      <span class="keyword">virtual</span> <span class="keywordtype">bool</span>      all_done() =0;                             <span class="comment">// get global all done status</span></div>
@@ -122,11 +122,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#include &quot;iexchange-collective.hpp&quot;</span></div>
 <div class="ttc" id="structdiy_1_1_master_1_1_i_exchange_info_html"><div class="ttname"><a href="structdiy_1_1_master_1_1_i_exchange_info.html">diy::Master::IExchangeInfo</a></div><div class="ttdef"><b>Definition:</b> iexchange.hpp:3</div></div>
 <div class="ttc" id="structdiy_1_1stats_1_1_profiler_html"><div class="ttname"><a href="structdiy_1_1stats_1_1_profiler.html">diy::stats::Profiler</a></div><div class="ttdef"><b>Definition:</b> stats.hpp:142</div></div>
-<div class="ttc" id="classdiy_1_1mpi_1_1communicator_html"><div class="ttname"><a href="classdiy_1_1mpi_1_1communicator.html">diy::mpi::communicator</a></div><div class="ttdoc">Simple wrapper around MPI_Comm. </div><div class="ttdef"><b>Definition:</b> communicator.hpp:17</div></div>
+<div class="ttc" id="classdiy_1_1mpi_1_1communicator_html"><div class="ttname"><a href="classdiy_1_1mpi_1_1communicator.html">diy::mpi::communicator</a></div><div class="ttdoc">Simple wrapper around MPI_Comm. </div><div class="ttdef"><b>Definition:</b> communicator.hpp:8</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 15 2020 18:55:36 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Apr 16 2020 18:05:48 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

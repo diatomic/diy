@@ -76,7 +76,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -106,9 +106,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:adfe4134385e77ba2f538b2da9e2167e5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adfe4134385e77ba2f538b2da9e2167e5"></a>
-DIY_MPI_EXPORT_FUNCTION&#160;</td><td class="memItemRight" valign="bottom"><b>communicator</b> (DIY_MPI_Comm comm, bool owner=false)</td></tr>
-<tr class="separator:adfe4134385e77ba2f538b2da9e2167e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a83dfb0e328b7eee36ce2411c74d9f2d1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a83dfb0e328b7eee36ce2411c74d9f2d1"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>communicator</b> (MPI_Comm comm=MPI_COMM_WORLD, bool owner=false)</td></tr>
+<tr class="separator:a83dfb0e328b7eee36ce2411c74d9f2d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afb83f3344ce61a1a1de2b1bf74f50ae4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afb83f3344ce61a1a1de2b1bf74f50ae4"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>communicator</b> (const <a class="el" href="classdiy_1_1mpi_1_1communicator.html">communicator</a> &amp;other)</td></tr>
 <tr class="separator:afb83f3344ce61a1a1de2b1bf74f50ae4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -153,46 +153,43 @@ template&lt;class T &gt; </td></tr>
 <tr class="memdesc:ac8953e70e3bb38f820279f2e3c57e9ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Non-blocking version of <code><a class="el" href="classdiy_1_1mpi_1_1communicator.html#a49d6b9d40158decf77b6b2f9b866779d" title="Receive x from dest using tag (blocking). If T is an std::vector&lt;...&gt;, recv will resize it to fit exa...">recv()</a></code>. If <code>T</code> is an <code>std::vector&lt;...&gt;</code>, its size must be big enough to accommodate the sent values. <br/></td></tr>
 <tr class="separator:ac8953e70e3bb38f820279f2e3c57e9ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aedd24dd693fc544b3742ff613f4621ec"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aedd24dd693fc544b3742ff613f4621ec"></a>
-DIY_MPI_EXPORT_FUNCTION <a class="el" href="structdiy_1_1mpi_1_1status.html">status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1mpi_1_1communicator.html#aedd24dd693fc544b3742ff613f4621ec">probe</a> (int source, int tag) const </td></tr>
+<a class="el" href="structdiy_1_1mpi_1_1status.html">status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1mpi_1_1communicator.html#aedd24dd693fc544b3742ff613f4621ec">probe</a> (int source, int tag) const </td></tr>
 <tr class="memdesc:aedd24dd693fc544b3742ff613f4621ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">probe <br/></td></tr>
 <tr class="separator:aedd24dd693fc544b3742ff613f4621ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a985ffab378f21b2b5f70a4cc1ddb3dc9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a985ffab378f21b2b5f70a4cc1ddb3dc9"></a>
-DIY_MPI_EXPORT_FUNCTION <br class="typebreak"/>
 <a class="el" href="structdiy_1_1mpi_1_1optional.html">optional</a>&lt; <a class="el" href="structdiy_1_1mpi_1_1status.html">status</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1mpi_1_1communicator.html#a985ffab378f21b2b5f70a4cc1ddb3dc9">iprobe</a> (int source, int tag) const </td></tr>
 <tr class="memdesc:a985ffab378f21b2b5f70a4cc1ddb3dc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">iprobe <br/></td></tr>
 <tr class="separator:a985ffab378f21b2b5f70a4cc1ddb3dc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adbc7ea9a65ef0e8e52875511e72aa643"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adbc7ea9a65ef0e8e52875511e72aa643"></a>
-DIY_MPI_EXPORT_FUNCTION void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1mpi_1_1communicator.html#adbc7ea9a65ef0e8e52875511e72aa643">barrier</a> () const </td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1mpi_1_1communicator.html#adbc7ea9a65ef0e8e52875511e72aa643">barrier</a> () const </td></tr>
 <tr class="memdesc:adbc7ea9a65ef0e8e52875511e72aa643"><td class="mdescLeft">&#160;</td><td class="mdescRight">barrier <br/></td></tr>
 <tr class="separator:adbc7ea9a65ef0e8e52875511e72aa643"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a86e998024eba15ce54bd2a3b0d2fa0a1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a86e998024eba15ce54bd2a3b0d2fa0a1"></a>
-DIY_MPI_EXPORT_FUNCTION <a class="el" href="structdiy_1_1mpi_1_1request.html">request</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1mpi_1_1communicator.html#a86e998024eba15ce54bd2a3b0d2fa0a1">ibarrier</a> () const </td></tr>
+<a class="el" href="structdiy_1_1mpi_1_1request.html">request</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1mpi_1_1communicator.html#a86e998024eba15ce54bd2a3b0d2fa0a1">ibarrier</a> () const </td></tr>
 <tr class="memdesc:a86e998024eba15ce54bd2a3b0d2fa0a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Nonblocking version of barrier. <br/></td></tr>
 <tr class="separator:a86e998024eba15ce54bd2a3b0d2fa0a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a33dc34d6d78e84d009b96dcace12de46"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a33dc34d6d78e84d009b96dcace12de46"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>operator MPI_Comm</b> () const </td></tr>
+<tr class="separator:a33dc34d6d78e84d009b96dcace12de46"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae70d3de7299c172254852f1b0b133eed"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae70d3de7299c172254852f1b0b133eed"></a>
-DIY_MPI_EXPORT_FUNCTION <br class="typebreak"/>
 <a class="el" href="classdiy_1_1mpi_1_1communicator.html">communicator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1mpi_1_1communicator.html#ae70d3de7299c172254852f1b0b133eed">split</a> (int color, int key=0) const </td></tr>
 <tr class="memdesc:ae70d3de7299c172254852f1b0b133eed"><td class="mdescLeft">&#160;</td><td class="mdescRight">split When keys are the same, the ties are broken by the rank in the original comm. <br/></td></tr>
 <tr class="separator:ae70d3de7299c172254852f1b0b133eed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5be9b0dcfecee6e8ee54cb934f35af13"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5be9b0dcfecee6e8ee54cb934f35af13"></a>
-DIY_MPI_EXPORT_FUNCTION void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1mpi_1_1communicator.html#a5be9b0dcfecee6e8ee54cb934f35af13">duplicate</a> (const <a class="el" href="classdiy_1_1mpi_1_1communicator.html">communicator</a> &amp;other)</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdiy_1_1mpi_1_1communicator.html#a5be9b0dcfecee6e8ee54cb934f35af13">duplicate</a> (const <a class="el" href="classdiy_1_1mpi_1_1communicator.html">communicator</a> &amp;other)</td></tr>
 <tr class="memdesc:a5be9b0dcfecee6e8ee54cb934f35af13"><td class="mdescLeft">&#160;</td><td class="mdescRight">duplicate <br/></td></tr>
 <tr class="separator:a5be9b0dcfecee6e8ee54cb934f35af13"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab682ff9a9ffa1c7ddcf12c54095c51b6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab682ff9a9ffa1c7ddcf12c54095c51b6"></a>
-DIY_MPI_Comm&#160;</td><td class="memItemRight" valign="bottom"><b>handle</b> () const </td></tr>
-<tr class="separator:ab682ff9a9ffa1c7ddcf12c54095c51b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Simple wrapper around <code>MPI_Comm</code>. </p>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="decomposition_2regular-decomposer-long_8cpp-example.html#_a8">decomposition/regular-decomposer-long.cpp</a>, <a class="el" href="decomposition_2regular-decomposer-short_8cpp-example.html#_a8">decomposition/regular-decomposer-short.cpp</a>, <a class="el" href="decomposition_2test-direct-master_8cpp-example.html#_a8">decomposition/test-direct-master.cpp</a>, <a class="el" href="io_2test-io_8cpp-example.html#_a1">io/test-io.cpp</a>, <a class="el" href="reduce_2all-done_8cpp-example.html#_a16">reduce/all-done.cpp</a>, <a class="el" href="reduce_2all-to-all_8cpp-example.html#_a16">reduce/all-to-all.cpp</a>, <a class="el" href="reduce_2kd-tree_8cpp-example.html#_a26">reduce/kd-tree.cpp</a>, <a class="el" href="reduce_2merge-reduce_8cpp-example.html#_a20">reduce/merge-reduce.cpp</a>, <a class="el" href="reduce_2sample-sort_8cpp-example.html#_a4">reduce/sample-sort.cpp</a>, <a class="el" href="reduce_2sort_8cpp-example.html#_a18">reduce/sort.cpp</a>, <a class="el" href="reduce_2swap-reduce_8cpp-example.html#_a15">reduce/swap-reduce.cpp</a>, <a class="el" href="simple_2read-blocks_8cpp-example.html#_a8">simple/read-blocks.cpp</a>, <a class="el" href="simple_2simple_8cpp-example.html#_a12">simple/simple.cpp</a>, and <a class="el" href="simple_2until-done_8cpp-example.html#_a7">simple/until-done.cpp</a>.</dd>
-</dl></div><hr/>The documentation for this class was generated from the following files:<ul>
+</dl></div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>include/diy/mpi/<a class="el" href="mpi_2communicator_8hpp_source.html">communicator.hpp</a></li>
-<li>include/diy/mpi/communicator.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 15 2020 18:55:38 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Apr 16 2020 18:05:50 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
