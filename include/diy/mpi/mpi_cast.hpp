@@ -13,9 +13,10 @@ namespace diy
 namespace mpi
 {
 
-#define DEFINE_MPI_CAST(mpitype)                                                                 \
-inline mpitype& mpi_cast(DIY_##mpitype& obj) { return *reinterpret_cast<mpitype*>(&obj); }       \
-inline const mpitype& mpi_cast(const DIY_##mpitype& obj) { return *reinterpret_cast<const mpitype*>(&obj); }
+#define DEFINE_MPI_CAST(mpitype)                                                                              \
+inline mpitype& mpi_cast(DIY_##mpitype& obj) { return *reinterpret_cast<mpitype*>(&obj); }                    \
+inline const mpitype& mpi_cast(const DIY_##mpitype& obj) { return *reinterpret_cast<const mpitype*>(&obj); }  \
+inline DIY_##mpitype make_DIY_##mpitype(const mpitype& obj) { DIY_##mpitype ret; mpi_cast(ret) = obj; return ret; }
 
 DEFINE_MPI_CAST(MPI_Comm)
 DEFINE_MPI_CAST(MPI_Datatype)

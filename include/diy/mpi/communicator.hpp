@@ -20,8 +20,11 @@ namespace mpi
                 DIY_MPI_EXPORT_FUNCTION
                 communicator();
 
+                communicator(DIY_MPI_Comm comm):
+                  communicator(comm, false) {}
+
                 DIY_MPI_EXPORT_FUNCTION
-                communicator(DIY_MPI_Comm comm, bool owner = false);
+                communicator(DIY_MPI_Comm comm, bool owner);
 
                 ~communicator()                     { destroy(); }
 
@@ -36,6 +39,16 @@ namespace mpi
                     rank_(other.rank_),
                     size_(other.size_),
                     owner_(other.owner_)                    { other.owner_ = false; }
+
+#ifndef DIY_MPI_AS_LIB // only available in header-only mode
+                communicator(MPI_Comm comm):
+                  communicator(comm, false) {}
+
+                DIY_MPI_EXPORT_FUNCTION
+                communicator(MPI_Comm comm, bool owner);
+
+                operator MPI_Comm() { return comm_; }
+#endif
 
       communicator&
                 operator=(const communicator& other)        { destroy(); comm_ = other.comm_; rank_ = other.rank_; size_ = other.size_; owner_ = false; return *this; }

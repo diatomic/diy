@@ -40,7 +40,14 @@ namespace diy
 namespace mpi
 {
 
-#define DEFINE_DIY_MPI_TYPE(mpitype) struct DIY_##mpitype { mpitype data; };
+#define DEFINE_DIY_MPI_TYPE(mpitype)                                          \
+struct DIY_##mpitype {                                                        \
+  DIY_##mpitype() = default;                                                  \
+  DIY_##mpitype(const mpitype& obj) : data(obj) {}                            \
+  DIY_##mpitype& operator=(const mpitype& obj) { data = obj; return *this; }  \
+  operator mpitype() { return data; }                                         \
+  mpitype data;                                                               \
+};
 
 DEFINE_DIY_MPI_TYPE(MPI_Comm)
 DEFINE_DIY_MPI_TYPE(MPI_Datatype)

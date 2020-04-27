@@ -13,6 +13,14 @@ namespace mpi
 
 struct datatype
 {
+  datatype() = default;
+  datatype(const DIY_MPI_Datatype& dt) : handle(dt) {}
+
+#ifndef DIY_MPI_AS_LIB // only available in header-only mode
+  datatype(const MPI_Datatype& dt) : handle(dt) {}
+  operator MPI_Datatype() { return handle; }
+#endif
+
   DIY_MPI_Datatype handle;
 };
 
@@ -28,7 +36,7 @@ namespace detail
   template<class T> datatype  get_mpi_datatype();
 
   #define DIY_MPI_DATATYPE_DEFAULT(cpp_type)                                                      \
-  template<> DIY_MPI_EXPORT_FUNCTION datatype get_mpi_datatype<cpp_type>();                                \
+  template<> DIY_MPI_EXPORT_FUNCTION datatype get_mpi_datatype<cpp_type>();                       \
   template<>  struct is_mpi_datatype< cpp_type >                { typedef true_type type; };      \
   template<>  struct is_mpi_datatype< std::vector<cpp_type> >   { typedef true_type type; };      \
   template<size_t N>                                                                              \

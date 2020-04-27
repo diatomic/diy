@@ -14,15 +14,15 @@ namespace detail
 
 operation get_builtin_operation(BuiltinOperation id)
 {
-  operation op;
+  operation op{};
   switch(id)
   {
-    case OP_MAXIMUM:     mpi_cast(op.handle) = MPI_MAX;  break;
-    case OP_MINIMUM:     mpi_cast(op.handle) = MPI_MIN;  break;
-    case OP_PLUS:        mpi_cast(op.handle) = MPI_SUM;  break;
-    case OP_MULTIPLIES:  mpi_cast(op.handle) = MPI_PROD; break;
-    case OP_LOGICAL_AND: mpi_cast(op.handle) = MPI_LAND; break;
-    case OP_LOGICAL_OR:  mpi_cast(op.handle) = MPI_LOR;  break;
+    case OP_MAXIMUM:     op.handle = make_DIY_MPI_Op(MPI_MAX);  break;
+    case OP_MINIMUM:     op.handle = make_DIY_MPI_Op(MPI_MIN);  break;
+    case OP_PLUS:        op.handle = make_DIY_MPI_Op(MPI_SUM);  break;
+    case OP_MULTIPLIES:  op.handle = make_DIY_MPI_Op(MPI_PROD); break;
+    case OP_LOGICAL_AND: op.handle = make_DIY_MPI_Op(MPI_LAND); break;
+    case OP_LOGICAL_OR:  op.handle = make_DIY_MPI_Op(MPI_LOR);  break;
     default: break;
   }
   return op;

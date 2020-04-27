@@ -14,6 +14,14 @@ namespace mpi
   //!@{
   struct operation
   {
+    operation() = default;
+    operation(const DIY_MPI_Op& op) : handle(op) {}
+
+#ifndef DIY_MPI_AS_LIB // only available in header-only mode
+    operation(const MPI_Op& op) : handle(op) {}
+    operator MPI_Op() { return handle; }
+#endif
+
     DIY_MPI_Op handle;
   };
 

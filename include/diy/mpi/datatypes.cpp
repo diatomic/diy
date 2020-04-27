@@ -12,9 +12,7 @@ namespace detail
 
 #define DIY_MPI_DATATYPE_MAP(cpp_type, mpi_type)                                                  \
   template<>  datatype get_mpi_datatype<cpp_type>() {                                             \
-    datatype dt;                                                                                  \
-    mpi_cast(dt.handle) = mpi_type;                                                               \
-    return dt;                                                                                    \
+    return datatype(make_DIY_MPI_Datatype(mpi_type));                                             \
   }
 
   DIY_MPI_DATATYPE_MAP(char,                MPI_BYTE)

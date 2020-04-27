@@ -30,8 +30,7 @@ DIY_MPI_Win win_create(const communicator& comm, void* base, unsigned size, int 
   return win;
 #else
   (void)comm; (void)size; (void)disp;
-  DIY_MPI_Win win;
-  mpi_cast(win) = base;
+  auto win = make_DIY_MPI_Win(base);
   return win;
 #endif
 }

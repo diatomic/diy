@@ -3,9 +3,8 @@
 #endif
 
 diy::mpi::communicator::communicator()
-  : rank_(0), size_(1), owner_(false)
+  : comm_(make_DIY_MPI_Comm(MPI_COMM_WORLD)), rank_(0), size_(1), owner_(false)
 {
-  mpi_cast(comm_) = MPI_COMM_WORLD;
 #if DIY_HAS_MPI
   MPI_Comm_rank(mpi_cast(comm_), &rank_);
   MPI_Comm_size(mpi_cast(comm_), &size_);
@@ -24,6 +23,21 @@ communicator(DIY_MPI_Comm comm, bool owner):
   }
 #endif
 }
+
+#ifndef DIY_MPI_AS_LIB // only available in header-only mode
+diy::mpi::communicator::
+communicator(MPI_Comm comm, bool owner):
+    comm_(comm), rank_(0), size_(1), owner_(owner)
+{
+#if DIY_HAS_MPI
+  if (comm_ != MPI_COMM_NULL)
+  {
+    MPI_Comm_rank(comm_, &rank_);
+    MPI_Comm_size(comm_, &size_);
+  }
+#endif
+}
+#endif
 
 void
 diy::mpi::communicator::
