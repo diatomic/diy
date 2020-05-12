@@ -1,6 +1,8 @@
 #ifndef DIY_THREAD_H
 #define DIY_THREAD_H
 
+#include <map>
+
 #ifdef DIY_NO_THREADS
 #include "no-thread.hpp"
 #else
