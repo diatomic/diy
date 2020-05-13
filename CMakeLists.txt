@@ -65,7 +65,7 @@ endif                       ()
 if                          (log)
     list (APPEND diy_definitions "-DDIY_USE_SPDLOG")
     find_path               (SPDLOG_INCLUDE_DIR     spdlog/spdlog.h)
-    list (APPEND diy_include_thirdparty_directories ${SPDLOG_INCLUDE_DIR})
+    list (APPEND diy_include_thirdparty_directories $<BUILD_INTERFACE:${SPDLOG_INCLUDE_DIR}>)
 endif()
 
 # Profiling
@@ -77,7 +77,7 @@ if                          (caliper)
     list (APPEND diy_definitions "-DDIY_USE_CALIPER")
 
     find_package            (caliper)
-    list (APPEND diy_include_thirdparty_directories ${caliper_INCLUDE_DIR})
+    list (APPEND diy_include_thirdparty_directories $<BUILD_INTERFACE:${caliper_INCLUDE_DIR}>)
     list (APPEND diy_libraries caliper caliper-mpi)
 endif()
 
@@ -109,6 +109,8 @@ endif()
 if (NOT DEFINED diy_export_name)
     set(diy_export_name "diy_targets")
 endif()
+
+set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 
 # for diy_developer_flags
 include(DIYCompilerFlags)
@@ -226,9 +228,17 @@ if                          (build_tests)
     add_subdirectory        (tests)
 endif                       (build_tests)
 
+# configure find_package script
+include(CMakePackageConfigHelpers)
+configure_package_config_file(
+    "${PROJECT_SOURCE_DIR}/cmake/diy-config.cmake.in"
+    "${PROJECT_BINARY_DIR}/lib/${diy_prefix}/diy-config.cmake"
+    INSTALL_DESTINATION "${diy_install_lib_dir}/${diy_prefix}")
+
 # install targets
 if (NOT DEFINED diy_install_only_libraries) # defined by parent project if building for binary distribution
     install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/${diy_prefix} DESTINATION ${diy_install_include_dir})
+    install(FILES "${PROJECT_BINARY_DIR}/lib/${diy_prefix}/diy-config.cmake" DESTINATION "${diy_install_lib_dir}/${diy_prefix}")
 
     if (build_diy_mpi_lib)
         install(FILES ${PROJECT_BINARY_DIR}/include/${diy_prefix}/mpi/mpitypes.hpp DESTINATION ${diy_install_include_dir}/${diy_prefix}/mpi)
@@ -237,6 +247,7 @@ endif()
 
 install(TARGETS ${diy_targets} EXPORT ${diy_export_name} DESTINATION ${diy_install_lib_dir})
 
+export(EXPORT ${diy_export_name} NAMESPACE DIY:: FILE "${PROJECT_BINARY_DIR}/lib/${diy_prefix}/diy-targets.cmake")
 if (NOT DEFINED diy_dont_install_export) # defined by parent project if it is handling the exports
-    install(EXPORT ${diy_export_name} NAMESPACE DIY:: DESTINATION ${diy_install_lib_dir}/${diy_prefix})
+    install(EXPORT ${diy_export_name} NAMESPACE DIY:: DESTINATION "${diy_install_lib_dir}/${diy_prefix}" FILE diy-targets.cmake)
 endif()
