@@ -74,7 +74,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -94,6 +94,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">diy Namespace Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Include appropriate mpi header. Since DIY_HAS_MPI is only defined for the compilation units of the library, when in library mode, the header is only included for the library's compilation units.  
+<a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 Namespaces</h2></td></tr>
@@ -423,9 +426,12 @@ template&lt;class Vertex , class Callback &gt; </td></tr>
 <tr class="separator:a8cdb779f51ecb98f16277fa0bdc7b7eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>All classes and functions are declared inside this namespace.</p>
+<div class="textblock"><p>Include appropriate mpi header. Since DIY_HAS_MPI is only defined for the compilation units of the library, when in library mode, the header is only included for the library's compilation units. </p>
+<p>This header provides convinience functions to cast from diy's type erased MPI objects to thier correct types.</p>
+<p>All classes and functions are declared inside this namespace.</p>
 <h1><code>&lt;utils/traits.hpp&gt;</code> &mdash; Additional type traits </h1>
-<p>This module provides additional type traits and related functions, missing from the standard library. </p>
+<p>This module provides additional type traits and related functions, missing from the standard library.</p>
+<p>Classes and objects that need to be visible to clients of the library should be marked as DIY_MPI_EXPORT. Similarly API functions should be marked as DIY_MPI_EXPORT_FUNCTION. Define alisases for MPI types </p>
 </div><h2 class="groupheader">Function Documentation</h2>
 <a class="anchor" id="a80c48a0054904994a271642ebec51608"></a>
 <div class="memitem">
@@ -546,7 +552,7 @@ template&lt;class Bounds , class Point , class OutIter , class Coordinate &gt; <
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 12 2020 21:07:37 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 26 2020 16:15:19 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

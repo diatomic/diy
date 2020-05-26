@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['char_5ftype',['char_type',['../classbasic__format__context.html#a71fea7d34edb618df612644dfd02a896',1,'basic_format_context::char_type()'],['../classbasic__printf__context.html#a5ceea5767a393451e5a82b2b75a6f63e',1,'basic_printf_context::char_type()']]]
+  ['parent',['Parent',['../structdiy_1_1_regular_all_reduce_partners.html#a296e604a311947574b84a05369f5ae5d',1,'diy::RegularAllReducePartners::Parent()'],['../structdiy_1_1_regular_broadcast_partners.html#ad4c035cc5144eeab1861bc481c6480db',1,'diy::RegularBroadcastPartners::Parent()']]]
 ];

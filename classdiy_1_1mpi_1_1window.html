@@ -76,7 +76,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -148,9 +148,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>lock_all</b> (int ass
 <tr class="memitem:a9277b9cfacfef55063f728680029a8c5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9277b9cfacfef55063f728680029a8c5"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>unlock_all</b> ()</td></tr>
 <tr class="separator:a9277b9cfacfef55063f728680029a8c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab9c254538f3747b2173cabcc22906c01"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab9c254538f3747b2173cabcc22906c01"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>fetch_and_op</b> (const T *origin, T *result, int rank, unsigned offset, MPI_Op op)</td></tr>
-<tr class="separator:ab9c254538f3747b2173cabcc22906c01"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3a45db71d264b4ae33bde5ff8e21720"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac3a45db71d264b4ae33bde5ff8e21720"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fetch_and_op</b> (const T *origin, T *result, int rank, unsigned offset, const <a class="el" href="structdiy_1_1mpi_1_1operation.html">operation</a> &amp;op)</td></tr>
+<tr class="separator:ac3a45db71d264b4ae33bde5ff8e21720"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2a1c9dfa874efaa19ce5d6989d181257"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2a1c9dfa874efaa19ce5d6989d181257"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>fetch</b> (T &amp;result, int rank, unsigned offset)</td></tr>
 <tr class="separator:a2a1c9dfa874efaa19ce5d6989d181257"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -184,7 +184,7 @@ class diy::mpi::window&lt; T &gt;</h3>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 12 2020 21:07:38 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 26 2020 16:15:20 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
