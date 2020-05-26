@@ -37,6 +37,10 @@ compile_test                (shared-output          shared-output.cpp)
 compile_test                (custom-bounds-test     custom-bounds.cpp)
 compile_test                (custom-bounds-load-test    custom-bounds-load.cpp)
 
+if (NOT build_diy_mpi_lib)
+    compile_test            (mpi-type-conversions mpi-type-conversions.cpp)
+    add_test                (NAME mpi-type-conversions COMMAND mpi-type-conversions)
+endif()
 
 if                          (MSVC AND NOT(MSVC_VERSION LESS 1400))
     set_source_files_properties (kd-tree.cpp            PROPERTIES COMPILE_FLAGS "/bigobj")

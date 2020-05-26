@@ -59,7 +59,7 @@ namespace diy
     static float        growth_multiplier()                         { return 1.5; }
 
     // simple file IO
-    void                write(const std::string& fn) const          { std::ofstream out(fn.c_str()); out.write(&buffer[0], size()); }
+    void                write(const std::string& fn) const          { std::ofstream out(fn.c_str()); out.write(&buffer[0], static_cast<std::streamsize>(size())); }
     void                read(const std::string& fn)
     {
         std::ifstream in(fn.c_str(), std::ios::binary | std::ios::ate);

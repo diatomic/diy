@@ -5,9 +5,9 @@ namespace diy
       using   Clock   = std::chrono::high_resolution_clock;
       using   Time    = Clock::time_point;
 
-                        IExchangeInfo(mpi::communicator comm_, stats::Profiler& prof_):
-                            comm(comm_),
-                            prof(prof_)                         {}
+                        IExchangeInfo(mpi::communicator c, stats::Profiler& p):
+                            comm(c),
+                            prof(p)                             {}
       virtual           ~IExchangeInfo()                        {}
 
       virtual bool      all_done() =0;                             // get global all done status
