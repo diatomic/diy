@@ -4,7 +4,7 @@
 #include "config.hpp"
 #include "communicator.hpp"
 
-#include "../types.hpp"
+#include <vtkmdiy/types.hpp>
 
 #include <vector>
 #include <string>

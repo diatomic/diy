@@ -143,7 +143,8 @@ function(add_diy_mpi_library use_mpi)
     target_compile_definitions(${lib_name}
         PRIVATE -DDIY_HAS_MPI=${has_mpi_val}
         PRIVATE ${diy_definitions})
-    target_include_directories(${lib_name} PRIVATE ${diy_include_directories}) # for mpitypes.hpp
+    target_include_directories(${lib_name} SYSTEM PRIVATE ${PROJECT_SOURCE_DIR}/include) # for types.hpp
+    target_include_directories(${lib_name} SYSTEM PRIVATE ${diy_include_directories}) # for mpitypes.hpp
     target_include_directories(${lib_name} SYSTEM PRIVATE ${diy_include_thirdparty_directories})
     target_link_libraries(${lib_name} PRIVATE diy_developer_flags)
     if (use_mpi AND TARGET MPI::MPI_CXX)
@@ -182,12 +183,12 @@ endif() # build_diy_mpi_lib
 add_library(${diy_prefix} INTERFACE)
 target_compile_features(${diy_prefix} INTERFACE cxx_std_11)
 target_compile_definitions(${diy_prefix} INTERFACE ${diy_definitions})
-target_include_directories(${diy_prefix} INTERFACE
+target_include_directories(${diy_prefix} SYSTEM INTERFACE
     "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
     "$<INSTALL_INTERFACE:${diy_install_include_dir}>")
 target_include_directories(${diy_prefix} SYSTEM INTERFACE ${diy_include_thirdparty_directories})
 if (diy_include_directories)
-    target_include_directories(${diy_prefix} INTERFACE ${diy_include_directories})
+    target_include_directories(${diy_prefix} SYSTEM INTERFACE ${diy_include_directories})
 endif()
 target_link_libraries(${diy_prefix} INTERFACE ${diy_libraries})
 if (NOT build_diy_mpi_lib)
