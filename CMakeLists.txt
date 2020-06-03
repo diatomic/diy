@@ -40,6 +40,7 @@ diy_option                  (caliper             "Build DIY with caliper"       
 diy_option                  (mpi                 "Build DIY with mpi"                                        ON)
 diy_option                  (wrapped_mpi         "MPI compiler wrapper requires no further MPI libraries"    OFF)
 diy_option                  (build_diy_mpi_lib   "Build diy::mpi as a library"                               OFF)
+diy_dependent_option        (BUILD_SHARED_LIBS   "Create shared libraries if on"                             ON  "build_diy_mpi_lib" OFF)
 diy_dependent_option        (build_diy_nompi_lib "Also build the nompi version of diy::mpi"                  OFF "mpi;build_diy_mpi_lib" OFF)
 diy_option                  (build_examples      "Build DIY examples"                                        ON)
 diy_option                  (build_tests         "Build DIY tests"                                           ON)
@@ -110,6 +111,7 @@ if (NOT DEFINED diy_export_name)
     set(diy_export_name "diy_targets")
 endif()
 
+set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 
 # for diy_developer_flags
@@ -232,13 +234,12 @@ endif                       (build_tests)
 include(CMakePackageConfigHelpers)
 configure_package_config_file(
     "${PROJECT_SOURCE_DIR}/cmake/diy-config.cmake.in"
-    "${PROJECT_BINARY_DIR}/lib/${diy_prefix}/diy-config.cmake"
-    INSTALL_DESTINATION "${diy_install_lib_dir}/${diy_prefix}")
+    "${PROJECT_BINARY_DIR}/diy-config.cmake"
+    INSTALL_DESTINATION ".")
 
 # install targets
 if (NOT DEFINED diy_install_only_libraries) # defined by parent project if building for binary distribution
     install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/${diy_prefix} DESTINATION ${diy_install_include_dir})
-    install(FILES "${PROJECT_BINARY_DIR}/lib/${diy_prefix}/diy-config.cmake" DESTINATION "${diy_install_lib_dir}/${diy_prefix}")
 
     if (build_diy_mpi_lib)
         install(FILES ${PROJECT_BINARY_DIR}/include/${diy_prefix}/mpi/mpitypes.hpp DESTINATION ${diy_install_include_dir}/${diy_prefix}/mpi)
@@ -247,7 +248,8 @@ endif()
 
 install(TARGETS ${diy_targets} EXPORT ${diy_export_name} DESTINATION ${diy_install_lib_dir})
 
-export(EXPORT ${diy_export_name} NAMESPACE DIY:: FILE "${PROJECT_BINARY_DIR}/lib/${diy_prefix}/diy-targets.cmake")
-if (NOT DEFINED diy_dont_install_export) # defined by parent project if it is handling the exports
-    install(EXPORT ${diy_export_name} NAMESPACE DIY:: DESTINATION "${diy_install_lib_dir}/${diy_prefix}" FILE diy-targets.cmake)
+export(EXPORT ${diy_export_name} NAMESPACE DIY:: FILE "${PROJECT_BINARY_DIR}/diy-targets.cmake")
+if (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR) # Only generate these files when diy is the main project
+    install(EXPORT ${diy_export_name} NAMESPACE DIY:: DESTINATION "." FILE diy-targets.cmake)
+    install(FILES "${PROJECT_BINARY_DIR}/diy-config.cmake" DESTINATION ".")
 endif()
