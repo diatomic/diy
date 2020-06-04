@@ -1,10 +1,10 @@
-#ifdef DIY_MPI_AS_LIB
+#ifdef VTKMDIY_MPI_AS_LIB
 #include "io.hpp"
 #endif
 
 #include "status.hpp"
 
-#ifdef DIY_MPI_AS_LIB
+#ifdef VTKMDIY_MPI_AS_LIB
 const int diy::mpi::io::file::rdonly          = MPI_MODE_RDONLY;
 const int diy::mpi::io::file::rdwr            = MPI_MODE_RDWR;
 const int diy::mpi::io::file::wronly          = MPI_MODE_WRONLY;
@@ -20,13 +20,13 @@ diy::mpi::io::file::
 file(const communicator& comm__, const std::string& filename, int mode)
 : comm_(comm__)
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   int ret = MPI_File_open(diy::mpi::mpi_cast(comm__.handle()), const_cast<char*>(filename.c_str()), mode, MPI_INFO_NULL, &diy::mpi::mpi_cast(fh));
   if (ret)
       throw std::runtime_error("DIY cannot open file: " + filename);
 #else
   (void)comm__; (void)filename; (void)mode;
-  DIY_UNSUPPORTED_MPI_CALL(MPI_File_open);
+  VTKMDIY_UNSUPPORTED_MPI_CALL(MPI_File_open);
 #endif
 }
 
@@ -34,7 +34,7 @@ void
 diy::mpi::io::file::
 close()
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   if (diy::mpi::mpi_cast(fh) != MPI_FILE_NULL)
     MPI_File_close(&diy::mpi::mpi_cast(fh));
 #endif
@@ -44,12 +44,12 @@ diy::mpi::io::offset
 diy::mpi::io::file::
 size() const
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   MPI_Offset sz;
   MPI_File_get_size(diy::mpi::mpi_cast(fh), &sz);
   return static_cast<offset>(sz);
 #else
-  DIY_UNSUPPORTED_MPI_CALL(MPI_File_get_size);
+  VTKMDIY_UNSUPPORTED_MPI_CALL(MPI_File_get_size);
 #endif
 }
 
@@ -57,11 +57,11 @@ void
 diy::mpi::io::file::
 resize(diy::mpi::io::offset size_)
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   MPI_File_set_size(diy::mpi::mpi_cast(fh), static_cast<MPI_Offset>(size_));
 #else
   (void)size_;
-  DIY_UNSUPPORTED_MPI_CALL(MPI_File_set_size);
+  VTKMDIY_UNSUPPORTED_MPI_CALL(MPI_File_set_size);
 #endif
 }
 
@@ -69,12 +69,12 @@ void
 diy::mpi::io::file::
 read_at(offset o, char* buffer, size_t size_)
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   status s;
   MPI_File_read_at(diy::mpi::mpi_cast(fh), static_cast<MPI_Offset>(o), buffer, static_cast<int>(size_), MPI_BYTE, &diy::mpi::mpi_cast(s.handle));
 #else
   (void)o; (void)buffer; (void)size_;
-  DIY_UNSUPPORTED_MPI_CALL(MPI_File_read_at);
+  VTKMDIY_UNSUPPORTED_MPI_CALL(MPI_File_read_at);
 #endif
 }
 
@@ -82,12 +82,12 @@ void
 diy::mpi::io::file::
 read_at_all(offset o, char* buffer, size_t size_)
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   status s;
   MPI_File_read_at_all(diy::mpi::mpi_cast(fh), static_cast<MPI_Offset>(o), buffer, static_cast<int>(size_), MPI_BYTE, &diy::mpi::mpi_cast(s.handle));
 #else
   (void)o; (void)buffer; (void)size_;
-  DIY_UNSUPPORTED_MPI_CALL(MPI_File_read_at_all);
+  VTKMDIY_UNSUPPORTED_MPI_CALL(MPI_File_read_at_all);
 #endif
 }
 
@@ -95,12 +95,12 @@ void
 diy::mpi::io::file::
 write_at(offset o, const char* buffer, size_t size_)
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   status s;
   MPI_File_write_at(diy::mpi::mpi_cast(fh), static_cast<MPI_Offset>(o), (void *)buffer, static_cast<int>(size_), MPI_BYTE, &diy::mpi::mpi_cast(s.handle));
 #else
   (void)o; (void)buffer; (void)size_;
-  DIY_UNSUPPORTED_MPI_CALL(MPI_File_write_at);
+  VTKMDIY_UNSUPPORTED_MPI_CALL(MPI_File_write_at);
 #endif
 }
 
@@ -108,12 +108,12 @@ void
 diy::mpi::io::file::
 write_at_all(offset o, const char* buffer, size_t size_)
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   status s;
   MPI_File_write_at_all(diy::mpi::mpi_cast(fh), static_cast<MPI_Offset>(o), (void *)buffer, static_cast<int>(size_), MPI_BYTE, &diy::mpi::mpi_cast(s.handle));
 #else
   (void)o; (void)buffer; (void)size_;
-  DIY_UNSUPPORTED_MPI_CALL(MPI_File_write_at_all);
+  VTKMDIY_UNSUPPORTED_MPI_CALL(MPI_File_write_at_all);
 #endif
 }
 
@@ -121,7 +121,7 @@ void
 diy::mpi::io::file::
 read_bov(const DiscreteBounds& bounds, int ndims, const int dims[], char* buffer, size_t offset, const datatype& dt, bool collective, int chunk)
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   int total = 1;
   std::vector<int> subsizes;
   for (unsigned i = 0; i < static_cast<unsigned>(ndims); ++i)
@@ -164,7 +164,7 @@ read_bov(const DiscreteBounds& bounds, int ndims, const int dims[], char* buffer
   MPI_Type_free(&fileblk);
 #else
   (void) bounds; (void) ndims; (void) dims, (void) buffer; (void) offset, (void) dt, (void) collective; (void) chunk;
-  DIY_UNSUPPORTED_MPI_CALL(diy::mpi::io::file::read_bov);
+  VTKMDIY_UNSUPPORTED_MPI_CALL(diy::mpi::io::file::read_bov);
 #endif
 }
 
@@ -172,7 +172,7 @@ void
 diy::mpi::io::file::
 write_bov(const DiscreteBounds& bounds, const DiscreteBounds& core, int ndims, const int dims[], const char* buffer, size_t offset, const datatype& dt, bool collective, int chunk)
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   std::vector<int> subsizes;
   std::vector<int> buffer_shape, buffer_start;
   for (unsigned i = 0; i < static_cast<unsigned>(ndims); ++i)
@@ -217,6 +217,6 @@ write_bov(const DiscreteBounds& bounds, const DiscreteBounds& core, int ndims, c
   MPI_Type_free(&subbuffer);
 #else
   (void) bounds; (void) core, (void) ndims; (void) dims, (void) buffer; (void) offset, (void) dt, (void) collective; (void) chunk;
-  DIY_UNSUPPORTED_MPI_CALL(diy::mpi::io::file::write_bov);
+  VTKMDIY_UNSUPPORTED_MPI_CALL(diy::mpi::io::file::write_bov);
 #endif
 }

@@ -1,5 +1,5 @@
-#ifndef DIY_MPI_OPERATIONS_HPP
-#define DIY_MPI_OPERATIONS_HPP
+#ifndef VTKMDIY_MPI_OPERATIONS_HPP
+#define VTKMDIY_MPI_OPERATIONS_HPP
 
 #include "config.hpp"
 
@@ -17,7 +17,7 @@ namespace mpi
     operation() = default;
     operation(const DIY_MPI_Op& op) : handle(op) {}
 
-#ifndef DIY_MPI_AS_LIB // only available in header-only mode
+#ifndef VTKMDIY_MPI_AS_LIB // only available in header-only mode
     operation(const MPI_Op& op) : handle(op) {}
     operator MPI_Op() { return handle; }
 #endif
@@ -42,7 +42,7 @@ namespace detail
     OP_LOGICAL_OR
   };
 
-  DIY_MPI_EXPORT_FUNCTION operation get_builtin_operation(BuiltinOperation id);
+  VTKMDIY_MPI_EXPORT_FUNCTION operation get_builtin_operation(BuiltinOperation id);
 
   template<class T> struct mpi_op;
 
@@ -57,8 +57,8 @@ namespace detail
 }
 } // diy::mpi
 
-#ifndef DIY_MPI_AS_LIB
+#ifndef VTKMDIY_MPI_AS_LIB
 #include "operations.cpp"
 #endif
 
-#endif // DIY_MPI_OPERATIONS_HPP
+#endif // VTKMDIY_MPI_OPERATIONS_HPP

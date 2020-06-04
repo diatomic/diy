@@ -1,24 +1,24 @@
-#ifndef DIY_MPI_CONFIG_HPP
-#define DIY_MPI_CONFIG_HPP
+#ifndef VTKMDIY_MPI_CONFIG_HPP
+#define VTKMDIY_MPI_CONFIG_HPP
 
 /// We want to allow the use of `diy::mpi` in either header-only or library mode.
-/// DIY_MPI_AS_LIB is defined when using library mode.
+/// VTKMDIY_MPI_AS_LIB is defined when using library mode.
 /// This file contains some configuration macros. To maintain backwards compatibility
 /// suitable default values should be defined when using header-only mode.
 
-/// DIY_HAS_MPI should always be defined when DIY_MPI_AS_LIB is defined, but only for
+/// VTKMDIY_HAS_MPI should always be defined when VTKMDIY_MPI_AS_LIB is defined, but only for
 /// the compilation units that are part of the library.
-/// DIY_HAS_MPI=1 means MPI library is availalbe.
+/// VTKMDIY_HAS_MPI=1 means MPI library is availalbe.
 /// For header-only, the default is to assume MPI is available
-#if !defined(DIY_MPI_AS_LIB) && !defined(DIY_HAS_MPI)
-#  define DIY_HAS_MPI 1
+#if !defined(VTKMDIY_MPI_AS_LIB) && !defined(VTKMDIY_HAS_MPI)
+#  define VTKMDIY_HAS_MPI 1
 #endif
 
-/// Include appropriate mpi header. Since DIY_HAS_MPI is only defined for
+/// Include appropriate mpi header. Since VTKMDIY_HAS_MPI is only defined for
 /// the compilation units of the library, when in library mode, the header is
 /// only included for the library's compilation units.
-#ifdef DIY_HAS_MPI
-#  if DIY_HAS_MPI
+#ifdef VTKMDIY_HAS_MPI
+#  if VTKMDIY_HAS_MPI
 #    include <mpi.h>
 #  else
 #    include "no-mpi.hpp"
@@ -26,14 +26,14 @@
 #endif
 
 /// Classes and objects that need to be visible to clients of the library should be
-/// marked as DIY_MPI_EXPORT. Similarly API functions should be marked as
-/// DIY_MPI_EXPORT_FUNCTION.
-#include "diy-mpi-export.h" // defines DIY_MPI_EXPORT and DIY_MPI_EXPORT_FUNCTION
+/// marked as VTKMDIY_MPI_EXPORT. Similarly API functions should be marked as
+/// VTKMDIY_MPI_EXPORT_FUNCTION.
+#include "diy-mpi-export.h" // defines VTKMDIY_MPI_EXPORT and VTKMDIY_MPI_EXPORT_FUNCTION
 
 /// Define alisases for MPI types
-#ifdef DIY_MPI_AS_LIB
+#ifdef VTKMDIY_MPI_AS_LIB
 #  include "mpitypes.hpp" // only configured in library mode
-#else // ifdef DIY_MPI_AS_LIB
+#else // ifdef VTKMDIY_MPI_AS_LIB
 
 namespace diy
 {
@@ -61,10 +61,10 @@ DEFINE_DIY_MPI_TYPE(MPI_Win)
 
 }
 } // diy::mpi
-#endif // ifdef DIY_MPI_AS_LIB
+#endif // ifdef VTKMDIY_MPI_AS_LIB
 
-#ifdef DIY_HAS_MPI
+#ifdef VTKMDIY_HAS_MPI
 #  include "mpi_cast.hpp"
 #endif
 
-#endif // DIY_MPI_CONFIG_HPP
+#endif // VTKMDIY_MPI_CONFIG_HPP

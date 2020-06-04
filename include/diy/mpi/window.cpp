@@ -1,4 +1,4 @@
-#ifdef DIY_MPI_AS_LIB
+#ifdef VTKMDIY_MPI_AS_LIB
 #include "window.hpp"
 #endif
 
@@ -9,9 +9,9 @@ namespace diy
 namespace mpi
 {
 
-#ifdef DIY_MPI_AS_LIB
+#ifdef VTKMDIY_MPI_AS_LIB
 #  ifdef _MSC_VER
-#    define EXPORT_MACRO DIY_MPI_EXPORT
+#    define EXPORT_MACRO VTKMDIY_MPI_EXPORT
 #  else
 #    define EXPORT_MACRO
 #  endif
@@ -24,7 +24,7 @@ namespace detail
 
 DIY_MPI_Win win_create(const communicator& comm, void* base, unsigned size, int disp)
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   DIY_MPI_Win win;
   MPI_Win_create(base, size, disp, MPI_INFO_NULL, mpi_cast(comm.handle()), &mpi_cast(win));
   return win;
@@ -37,7 +37,7 @@ DIY_MPI_Win win_create(const communicator& comm, void* base, unsigned size, int 
 
 void win_free(DIY_MPI_Win& win)
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   MPI_Win_free(&mpi_cast(win));
 #else
   (void)win;
@@ -46,7 +46,7 @@ void win_free(DIY_MPI_Win& win)
 
 void put(const DIY_MPI_Win& win, const void* data, int count, const datatype& type, int rank, unsigned offset)
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   MPI_Put(data, count, mpi_cast(type.handle), rank, offset, count, mpi_cast(type.handle), mpi_cast(win));
 #else
   void* buffer = mpi_cast(win);
@@ -60,7 +60,7 @@ void put(const DIY_MPI_Win& win, const void* data, int count, const datatype& ty
 
 void get(const DIY_MPI_Win& win, void* data, int count, const datatype& type, int rank, unsigned offset)
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   MPI_Get(data, count, mpi_cast(type.handle), rank, offset, count, mpi_cast(type.handle), mpi_cast(win));
 #else
   const void* buffer = mpi_cast(win);
@@ -74,7 +74,7 @@ void get(const DIY_MPI_Win& win, void* data, int count, const datatype& type, in
 
 void fence(const DIY_MPI_Win& win, int assert)
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   MPI_Win_fence(assert, mpi_cast(win));
 #else
   (void) win; (void) assert;
@@ -83,7 +83,7 @@ void fence(const DIY_MPI_Win& win, int assert)
 
 void lock(const DIY_MPI_Win& win, int lock_type, int rank, int assert)
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   MPI_Win_lock(lock_type, rank, assert, mpi_cast(win));
 #else
   (void) win; (void) lock_type; (void) rank; (void) assert;
@@ -92,7 +92,7 @@ void lock(const DIY_MPI_Win& win, int lock_type, int rank, int assert)
 
 void unlock(const DIY_MPI_Win& win, int rank)
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   MPI_Win_unlock(rank, mpi_cast(win));
 #else
   (void) win; (void) rank;
@@ -101,7 +101,7 @@ void unlock(const DIY_MPI_Win& win, int rank)
 
 void lock_all(const DIY_MPI_Win& win, int assert)
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   MPI_Win_lock_all(assert, mpi_cast(win));
 #else
   (void) win; (void) assert;
@@ -110,7 +110,7 @@ void lock_all(const DIY_MPI_Win& win, int assert)
 
 void unlock_all(const DIY_MPI_Win& win)
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   MPI_Win_unlock_all(mpi_cast(win));
 #else
   (void) win;
@@ -122,17 +122,17 @@ void fetch_and_op(const DIY_MPI_Win& win,
                   int rank, unsigned offset,
                   const operation& op)
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   MPI_Fetch_and_op(origin, result, mpi_cast(type.handle), rank, offset, mpi_cast(op.handle), mpi_cast(win));
 #else
   (void) win; (void) origin; (void) result; (void) type; (void) rank; (void) offset; (void) op;
-  DIY_UNSUPPORTED_MPI_CALL(MPI_Fetch_and_op);
+  VTKMDIY_UNSUPPORTED_MPI_CALL(MPI_Fetch_and_op);
 #endif
 }
 
 void fetch(const DIY_MPI_Win& win, void* result, const datatype& type, int rank, unsigned offset)
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   MPI_Fetch_and_op(nullptr, result, mpi_cast(type.handle), rank, offset, MPI_NO_OP, mpi_cast(win));
 #else
   (void) rank;
@@ -146,7 +146,7 @@ void fetch(const DIY_MPI_Win& win, void* result, const datatype& type, int rank,
 
 void replace(const DIY_MPI_Win& win, const void* value, const datatype& type, int rank, unsigned offset)
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   MPI_Fetch_and_op(value, nullptr, mpi_cast(type.handle), rank, offset, MPI_REPLACE, mpi_cast(win));
 #else
   (void) rank;
@@ -160,7 +160,7 @@ void replace(const DIY_MPI_Win& win, const void* value, const datatype& type, in
 
 void sync(const DIY_MPI_Win& win)
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   MPI_Win_sync(mpi_cast(win));
 #else
   (void) win;
@@ -169,7 +169,7 @@ void sync(const DIY_MPI_Win& win)
 
 void flush(const DIY_MPI_Win& win, int rank)
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   MPI_Win_flush(rank, mpi_cast(win));
 #else
   (void) win; (void) rank;
@@ -178,7 +178,7 @@ void flush(const DIY_MPI_Win& win, int rank)
 
 void flush_all(const DIY_MPI_Win& win)
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   MPI_Win_flush_all(mpi_cast(win));
 #else
   (void) win;
@@ -187,7 +187,7 @@ void flush_all(const DIY_MPI_Win& win)
 
 void flush_local(const DIY_MPI_Win& win, int rank)
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   MPI_Win_flush_local(rank, mpi_cast(win));
 #else
   (void) win; (void) rank;
@@ -196,7 +196,7 @@ void flush_local(const DIY_MPI_Win& win, int rank)
 
 void flush_local_all(const DIY_MPI_Win& win)
 {
-#if DIY_HAS_MPI
+#if VTKMDIY_HAS_MPI
   MPI_Win_flush_local_all(mpi_cast(win));
 #else
   (void) win;

@@ -1,5 +1,5 @@
-#ifndef DIY_IO_BOV_HPP
-#define DIY_IO_BOV_HPP
+#ifndef VTKMDIY_IO_BOV_HPP
+#define VTKMDIY_IO_BOV_HPP
 
 #include <vector>
 

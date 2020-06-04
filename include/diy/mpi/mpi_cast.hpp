@@ -1,10 +1,10 @@
-#ifndef DIY_MPI_MPICAST_HPP
-#define DIY_MPI_MPICAST_HPP
+#ifndef VTKMDIY_MPI_MPICAST_HPP
+#define VTKMDIY_MPI_MPICAST_HPP
 
 /// This header provides convinience functions to cast from diy's type erased MPI objects
 /// to thier correct types.
 
-#ifndef DIY_HAS_MPI
+#ifndef VTKMDIY_HAS_MPI
 #  include <mpi.h>
 #endif
 
@@ -31,4 +31,4 @@ DEFINE_MPI_CAST(MPI_Win)
 }
 } // diy::mpi
 
-#endif // DIY_MPI_MPICAST_HPP
+#endif // VTKMDIY_MPI_MPICAST_HPP

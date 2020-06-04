@@ -1,5 +1,5 @@
-#ifndef DIY_MPI_WINODW_HPP
-#define DIY_MPI_WINODW_HPP
+#ifndef VTKMDIY_MPI_WINODW_HPP
+#define VTKMDIY_MPI_WINODW_HPP
 
 #include "config.hpp"
 #include "communicator.hpp"
@@ -13,73 +13,73 @@ namespace diy
 namespace mpi
 {
 
-#ifndef DIY_MPI_AS_LIB
+#ifndef VTKMDIY_MPI_AS_LIB
 constexpr int nocheck  = MPI_MODE_NOCHECK;
 #else
-DIY_MPI_EXPORT extern const int nocheck;
+VTKMDIY_MPI_EXPORT extern const int nocheck;
 #endif
 
 namespace detail
 {
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 DIY_MPI_Win win_create(const communicator& comm, void* base, unsigned size, int disp);
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 void win_free(DIY_MPI_Win& win);
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 void put(const DIY_MPI_Win& win,
          const void* data, int count, const datatype& type,
          int rank, unsigned offset);
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 void get(const DIY_MPI_Win& win,
          void* data, int count, const datatype& type,
          int rank, unsigned offset);
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 void fence(const DIY_MPI_Win& win, int assert);
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 void lock(const DIY_MPI_Win& win, int lock_type, int rank, int assert);
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 void unlock(const DIY_MPI_Win& win, int rank);
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 void lock_all(const DIY_MPI_Win& win, int assert);
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 void unlock_all(const DIY_MPI_Win& win);
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 void fetch_and_op(const DIY_MPI_Win& win,
                   const void* origin, void* result, const datatype& type,
                   int rank, unsigned offset,
                   const operation& op);
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 void fetch(const DIY_MPI_Win& win, void* result, const datatype& type, int rank, unsigned offset);
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 void replace(const DIY_MPI_Win& win,
              const void* value, const datatype& type,
              int rank, unsigned offset);
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 void sync(const DIY_MPI_Win& win);
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 void flush(const DIY_MPI_Win& win, int rank);
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 void flush_all(const DIY_MPI_Win& win);
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 void flush_local(const DIY_MPI_Win& win, int rank);
 
-DIY_MPI_EXPORT_FUNCTION
+VTKMDIY_MPI_EXPORT_FUNCTION
 void flush_local_all(const DIY_MPI_Win& win);
 
 } // detail
@@ -288,8 +288,8 @@ flush_local_all()
   detail::flush_local_all(window_);
 }
 
-#ifndef DIY_MPI_AS_LIB
+#ifndef VTKMDIY_MPI_AS_LIB
 #include "window.cpp"
 #endif
 
-#endif // DIY_MPI_WINODW_HPP
+#endif // VTKMDIY_MPI_WINODW_HPP

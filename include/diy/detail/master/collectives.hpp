@@ -95,7 +95,7 @@ diy::Master::
 process_collectives()
 {
   auto scoped = prof.scoped("collectives");
-  DIY_UNUSED(scoped);
+  VTKMDIY_UNUSED(scoped);
 
   if (collectives().empty())
       return;

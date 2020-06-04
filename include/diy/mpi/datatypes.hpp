@@ -1,5 +1,5 @@
-#ifndef DIY_MPI_DATATYPES_HPP
-#define DIY_MPI_DATATYPES_HPP
+#ifndef VTKMDIY_MPI_DATATYPES_HPP
+#define VTKMDIY_MPI_DATATYPES_HPP
 
 #include "config.hpp"
 
@@ -16,7 +16,7 @@ struct datatype
   datatype() = default;
   datatype(const DIY_MPI_Datatype& dt) : handle(dt) {}
 
-#ifndef DIY_MPI_AS_LIB // only available in header-only mode
+#ifndef VTKMDIY_MPI_AS_LIB // only available in header-only mode
   datatype(const MPI_Datatype& dt) : handle(dt) {}
   operator MPI_Datatype() { return handle; }
 #endif
@@ -35,26 +35,26 @@ namespace detail
 
   template<class T> datatype  get_mpi_datatype();
 
-  #define DIY_MPI_DATATYPE_DEFAULT(cpp_type)                                                      \
-  template<> DIY_MPI_EXPORT_FUNCTION datatype get_mpi_datatype<cpp_type>();                       \
+  #define VTKMDIY_MPI_DATATYPE_DEFAULT(cpp_type)                                                      \
+  template<> VTKMDIY_MPI_EXPORT_FUNCTION datatype get_mpi_datatype<cpp_type>();                       \
   template<>  struct is_mpi_datatype< cpp_type >                { typedef true_type type; };      \
   template<>  struct is_mpi_datatype< std::vector<cpp_type> >   { typedef true_type type; };      \
   template<size_t N>                                                                              \
               struct is_mpi_datatype< std::array<cpp_type, N> > { typedef true_type type; };
 
-  DIY_MPI_DATATYPE_DEFAULT(char)
-  DIY_MPI_DATATYPE_DEFAULT(unsigned char)
-  DIY_MPI_DATATYPE_DEFAULT(bool)
-  DIY_MPI_DATATYPE_DEFAULT(int)
-  DIY_MPI_DATATYPE_DEFAULT(unsigned)
-  DIY_MPI_DATATYPE_DEFAULT(long)
-  DIY_MPI_DATATYPE_DEFAULT(unsigned long)
-  DIY_MPI_DATATYPE_DEFAULT(long long)
-  DIY_MPI_DATATYPE_DEFAULT(unsigned long long)
-  DIY_MPI_DATATYPE_DEFAULT(float)
-  DIY_MPI_DATATYPE_DEFAULT(double)
+  VTKMDIY_MPI_DATATYPE_DEFAULT(char)
+  VTKMDIY_MPI_DATATYPE_DEFAULT(unsigned char)
+  VTKMDIY_MPI_DATATYPE_DEFAULT(bool)
+  VTKMDIY_MPI_DATATYPE_DEFAULT(int)
+  VTKMDIY_MPI_DATATYPE_DEFAULT(unsigned)
+  VTKMDIY_MPI_DATATYPE_DEFAULT(long)
+  VTKMDIY_MPI_DATATYPE_DEFAULT(unsigned long)
+  VTKMDIY_MPI_DATATYPE_DEFAULT(long long)
+  VTKMDIY_MPI_DATATYPE_DEFAULT(unsigned long long)
+  VTKMDIY_MPI_DATATYPE_DEFAULT(float)
+  VTKMDIY_MPI_DATATYPE_DEFAULT(double)
 
-  #undef DIY_MPI_DATATYPE_DEFAULT
+  #undef VTKMDIY_MPI_DATATYPE_DEFAULT
 
   /* mpi_datatype: helper routines, specialized for std::vector<...>, std::array<...> */
   template<class T>
@@ -116,8 +116,8 @@ static int count(const U& x)
 } // mpi
 } // diy
 
-#ifndef DIY_MPI_AS_LIB
+#ifndef VTKMDIY_MPI_AS_LIB
 #include "datatypes.cpp"
 #endif
 
-#endif // DIY_MPI_DATATYPES_HPP
+#endif // VTKMDIY_MPI_DATATYPES_HPP

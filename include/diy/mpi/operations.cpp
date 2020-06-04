@@ -1,4 +1,4 @@
-#ifdef DIY_MPI_AS_LIB
+#ifdef VTKMDIY_MPI_AS_LIB
 #include "operations.hpp"
 #endif
 

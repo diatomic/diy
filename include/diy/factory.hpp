@@ -1,5 +1,5 @@
-#ifndef DIY_FACTORY_HPP
-#define DIY_FACTORY_HPP
+#ifndef VTKMDIY_FACTORY_HPP
+#define VTKMDIY_FACTORY_HPP
 
 // From http://www.nirfriedman.com/2018/04/29/unforgettable-factory/
 // with minor changes.

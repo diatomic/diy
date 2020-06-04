@@ -1,5 +1,5 @@
-#ifndef DIY_LINK_HPP
-#define DIY_LINK_HPP
+#ifndef VTKMDIY_LINK_HPP
+#define VTKMDIY_LINK_HPP
 
 #include <vector>
 #include <map>
@@ -326,4 +326,4 @@ direction(Direction dir) const
     return it->second;
 }
 
-#endif      // DIY_LINK_HPP
+#endif      // VTKMDIY_LINK_HPP

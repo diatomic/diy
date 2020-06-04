@@ -1,5 +1,5 @@
-#ifndef DIY_MPI_HPP
-#define DIY_MPI_HPP
+#ifndef VTKMDIY_MPI_HPP
+#define VTKMDIY_MPI_HPP
 
 #include "mpi/config.hpp"
 #include "mpi/datatypes.hpp"
@@ -13,4 +13,4 @@
 #include "mpi/io.hpp"
 #include "mpi/window.hpp"
 
-#endif // DIY_MPI_HPP
+#endif // VTKMDIY_MPI_HPP

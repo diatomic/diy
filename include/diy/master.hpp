@@ -1,5 +1,5 @@
-#ifndef DIY_MASTER_HPP
-#define DIY_MASTER_HPP
+#ifndef VTKMDIY_MASTER_HPP
+#define VTKMDIY_MASTER_HPP
 
 #include <vector>
 #include <map>
@@ -243,7 +243,7 @@ namespace diy
       void          set_threads(int threads__)
       {
           threads_ = threads__;
-#if defined(DIY_NO_THREADS)
+#if defined(VTKMDIY_NO_THREADS)
           threads_ = 1;
 #endif
       }
@@ -372,7 +372,7 @@ Master(mpi::communicator    comm,
   blocks_(create_, destroy_, storage, save, load_),
   queue_policy_(q_policy),
   limit_(limit__),
-#if !defined(DIY_NO_THREADS)
+#if !defined(VTKMDIY_NO_THREADS)
   threads_(threads__ == -1 ? static_cast<int>(thread::hardware_concurrency()) : threads__),
 #else
   threads_(1),
@@ -383,7 +383,7 @@ Master(mpi::communicator    comm,
   inflight_recvs_(new InFlightRecvsMap),
   collectives_(new CollectivesMap)
 {
-#ifdef DIY_NO_THREADS
+#ifdef VTKMDIY_NO_THREADS
   (void) threads__;
 #endif
     comm_.duplicate(comm);
@@ -597,7 +597,7 @@ foreach_(const Callback<Block>& f, const Skip& skip)
     exchange_round_annotation.set(exchange_round_);
 
     auto scoped = prof.scoped("foreach");
-    DIY_UNUSED(scoped);
+    VTKMDIY_UNUSED(scoped);
 
     commands_.emplace_back(new Command<Block>(f, skip));
 
@@ -610,7 +610,7 @@ diy::Master::
 exchange(bool remote)
 {
   auto scoped = prof.scoped("exchange");
-  DIY_UNUSED(scoped);
+  VTKMDIY_UNUSED(scoped);
 
   execute();
 
@@ -661,9 +661,9 @@ diy::Master::
 iexchange_(const ICallback<Block>& f)
 {
     auto scoped = prof.scoped("iexchange");
-    DIY_UNUSED(scoped);
+    VTKMDIY_UNUSED(scoped);
 
-#if !defined(DIY_NO_THREADS) && (!defined(DIY_USE_CALIPER) && defined(DIY_PROFILE))
+#if !defined(VTKMDIY_NO_THREADS) && (!defined(VTKMDIY_USE_CALIPER) && defined(VTKMDIY_PROFILE))
     static_assert(false, "Cannot use DIY's internal profiler; it's not thread safe. Use caliper.");
 #endif
 
@@ -765,7 +765,7 @@ diy::Master::
 comm_exchange(GidSendOrder& gid_order, IExchangeInfo* iex)
 {
     auto scoped = prof.scoped("comm-exchange");
-    DIY_UNUSED(scoped);
+    VTKMDIY_UNUSED(scoped);
 
     send_outgoing_queues(gid_order, false, iex);
 
@@ -880,7 +880,7 @@ diy::Master::
 icommunicate(IExchangeInfo* iex)
 {
     auto scoped = prof.scoped("icommunicate");
-    DIY_UNUSED(scoped);
+    VTKMDIY_UNUSED(scoped);
 
     log->debug("Entering icommunicate()");
 
@@ -929,7 +929,7 @@ send_outgoing_queues(GidSendOrder&   gid_order,
                      IExchangeInfo*  iex)
 {
     auto scoped = prof.scoped("send-outgoing-queues");
-    DIY_UNUSED(scoped);
+    VTKMDIY_UNUSED(scoped);
 
     if (iex)                                      // for iex, send queues from a single block
     {
@@ -1110,7 +1110,7 @@ diy::Master::
 check_incoming_queues(IExchangeInfo* iex)
 {
     auto scoped = prof.scoped("check-incoming-queues");
-    DIY_UNUSED(scoped);
+    VTKMDIY_UNUSED(scoped);
 
     mpi::optional<mpi::status> ostatus = comm_.iprobe(mpi::any_source, tags::queue);
     while (ostatus)

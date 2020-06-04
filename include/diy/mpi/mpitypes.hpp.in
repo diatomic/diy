@@ -1,5 +1,5 @@
-#ifndef DIY_MPI_MPITYPES_H
-#define DIY_MPI_MPITYPES_H
+#ifndef VTKMDIY_MPI_MPITYPES_H
+#define VTKMDIY_MPI_MPITYPES_H
 
 #cmakedefine TYPESIZE_MPI_Comm     @TYPESIZE_MPI_Comm@
 #cmakedefine TYPESIZE_MPI_Datatype @TYPESIZE_MPI_Datatype@
@@ -14,7 +14,7 @@ namespace diy
 namespace mpi
 {
 
-#if defined(DIY_HAS_MPI)
+#if defined(VTKMDIY_HAS_MPI)
 #  define ASSERT_MPI_TYPE_SIZE(mpitype) static_assert(sizeof(mpitype) <= sizeof(DIY_##mpitype), "");
 #else
 # define ASSERT_MPI_TYPE_SIZE(mpitype)
@@ -48,4 +48,4 @@ DEFINE_DIY_MPI_TYPE(MPI_Win)
 #undef TYPESIZE_MPI_File
 #undef TYPESIZE_MPI_Win
 
-#endif // DIY_MPI_MPITYPES_H
+#endif // VTKMDIY_MPI_MPITYPES_H

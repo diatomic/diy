@@ -1,5 +1,5 @@
-#ifndef DIY_DYNAMIC_POINT_HPP
-#define DIY_DYNAMIC_POINT_HPP
+#ifndef VTKMDIY_DYNAMIC_POINT_HPP
+#define VTKMDIY_DYNAMIC_POINT_HPP
 
 #include <string>
 #include <sstream>
@@ -12,7 +12,7 @@
 namespace diy
 {
 
-template<class Coordinate_, size_t static_size = DIY_MAX_DIM>
+template<class Coordinate_, size_t static_size = VTKMDIY_MAX_DIM>
 class DynamicPoint: public chobo::small_vector<Coordinate_, static_size>
 {
     public:
@@ -155,4 +155,4 @@ struct Serialization<DynamicPoint<C, s_>>
 
 }
 
-#endif // DIY_POINT_HPP
+#endif // VTKMDIY_POINT_HPP

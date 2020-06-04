@@ -1,5 +1,5 @@
-#ifndef DIY_MPI_ENVIRONMENT_HPP
-#define DIY_MPI_ENVIRONMENT_HPP
+#ifndef VTKMDIY_MPI_ENVIRONMENT_HPP
+#define VTKMDIY_MPI_ENVIRONMENT_HPP
 
 #include "config.hpp"
 
@@ -11,14 +11,14 @@ namespace mpi
 //! \ingroup MPI
 struct environment
 {
-  DIY_MPI_EXPORT_FUNCTION static bool initialized();
+  VTKMDIY_MPI_EXPORT_FUNCTION static bool initialized();
 
-  DIY_MPI_EXPORT_FUNCTION environment();
-  DIY_MPI_EXPORT_FUNCTION environment(int requested_threading);
-  DIY_MPI_EXPORT_FUNCTION environment(int argc, char* argv[]);
-  DIY_MPI_EXPORT_FUNCTION environment(int argc, char* argv[], int requested_threading);
+  VTKMDIY_MPI_EXPORT_FUNCTION environment();
+  VTKMDIY_MPI_EXPORT_FUNCTION environment(int requested_threading);
+  VTKMDIY_MPI_EXPORT_FUNCTION environment(int argc, char* argv[]);
+  VTKMDIY_MPI_EXPORT_FUNCTION environment(int argc, char* argv[], int requested_threading);
 
-  DIY_MPI_EXPORT_FUNCTION  ~environment();
+  VTKMDIY_MPI_EXPORT_FUNCTION  ~environment();
 
   int   threading() const           { return provided_threading; }
 
@@ -28,8 +28,8 @@ struct environment
 }
 } // diy::mpi
 
-#ifndef DIY_MPI_AS_LIB
+#ifndef VTKMDIY_MPI_AS_LIB
 #include "environment.cpp"
 #endif
 
-#endif // DIY_MPI_ENVIRONMENT_HPP
+#endif // VTKMDIY_MPI_ENVIRONMENT_HPP

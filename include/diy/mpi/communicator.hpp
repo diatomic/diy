@@ -1,5 +1,5 @@
-#ifndef DIY_MPI_COMMUNICATOR_HPP
-#define DIY_MPI_COMMUNICATOR_HPP
+#ifndef VTKMDIY_MPI_COMMUNICATOR_HPP
+#define VTKMDIY_MPI_COMMUNICATOR_HPP
 
 #include "config.hpp"
 #include "optional.hpp"
@@ -17,13 +17,13 @@ namespace mpi
   class communicator
   {
     public:
-                DIY_MPI_EXPORT_FUNCTION
+                VTKMDIY_MPI_EXPORT_FUNCTION
                 communicator();
 
                 communicator(DIY_MPI_Comm comm):
                   communicator(comm, false) {}
 
-                DIY_MPI_EXPORT_FUNCTION
+                VTKMDIY_MPI_EXPORT_FUNCTION
                 communicator(DIY_MPI_Comm comm, bool owner);
 
                 ~communicator()                     { destroy(); }
@@ -40,11 +40,11 @@ namespace mpi
                     size_(other.size_),
                     owner_(other.owner_)                    { other.owner_ = false; }
 
-#ifndef DIY_MPI_AS_LIB // only available in header-only mode
+#ifndef VTKMDIY_MPI_AS_LIB // only available in header-only mode
                 communicator(MPI_Comm comm):
                   communicator(comm, false) {}
 
-                DIY_MPI_EXPORT_FUNCTION
+                VTKMDIY_MPI_EXPORT_FUNCTION
                 communicator(MPI_Comm comm, bool owner);
 
                 operator MPI_Comm() { return comm_; }
@@ -81,36 +81,36 @@ namespace mpi
       request   irecv(int source, int tag, T& x) const      { return detail::irecv(comm_, source, tag, x); }
 
       //! probe
-      DIY_MPI_EXPORT_FUNCTION
+      VTKMDIY_MPI_EXPORT_FUNCTION
       status    probe(int source, int tag) const;
 
       //! iprobe
-      DIY_MPI_EXPORT_FUNCTION
+      VTKMDIY_MPI_EXPORT_FUNCTION
       optional<status>
                 iprobe(int source, int tag) const;
 
       //! barrier
-      DIY_MPI_EXPORT_FUNCTION
+      VTKMDIY_MPI_EXPORT_FUNCTION
       void      barrier() const;
 
       //! Nonblocking version of barrier
-      DIY_MPI_EXPORT_FUNCTION
+      VTKMDIY_MPI_EXPORT_FUNCTION
       request   ibarrier() const;
 
       //! split
       //! When keys are the same, the ties are broken by the rank in the original comm.
-      DIY_MPI_EXPORT_FUNCTION
+      VTKMDIY_MPI_EXPORT_FUNCTION
       communicator
                 split(int color, int key = 0) const;
 
       //! duplicate
-      DIY_MPI_EXPORT_FUNCTION
+      VTKMDIY_MPI_EXPORT_FUNCTION
       void      duplicate(const communicator& other);
 
       DIY_MPI_Comm handle() const { return comm_; }
 
     private:
-      DIY_MPI_EXPORT_FUNCTION
+      VTKMDIY_MPI_EXPORT_FUNCTION
       void      destroy();
 
     private:
@@ -123,8 +123,8 @@ namespace mpi
 }
 } // diy::mpi
 
-#ifndef DIY_MPI_AS_LIB
+#ifndef VTKMDIY_MPI_AS_LIB
 #include "communicator.cpp"
 #endif
 
-#endif // DIY_MPI_COMMUNICATOR_HPP
+#endif // VTKMDIY_MPI_COMMUNICATOR_HPP

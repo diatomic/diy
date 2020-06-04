@@ -1,7 +1,7 @@
-#ifndef DIY_LOG_HPP
-#define DIY_LOG_HPP
+#ifndef VTKMDIY_LOG_HPP
+#define VTKMDIY_LOG_HPP
 
-#ifndef DIY_USE_SPDLOG
+#ifndef VTKMDIY_USE_SPDLOG
 
 #include <memory>
 #include "thirdparty/fmt/format.h"
@@ -47,7 +47,7 @@ set_logger(Args...)
 
 }   // diy
 
-#else // DIY_USE_SPDLOG
+#else // VTKMDIY_USE_SPDLOG
 
 #include <string>
 
@@ -98,4 +98,4 @@ set_logger(Args... args)
 #endif
 
 
-#endif // DIY_LOG_HPP
+#endif // VTKMDIY_LOG_HPP

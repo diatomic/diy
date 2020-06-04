@@ -1,5 +1,5 @@
-#ifndef DIY_STATS_HPP
-#define DIY_STATS_HPP
+#ifndef VTKMDIY_STATS_HPP
+#define VTKMDIY_STATS_HPP
 
 #include <chrono>
 #include <string>
@@ -8,7 +8,7 @@
 
 #include "log.hpp"
 
-#if defined(DIY_USE_CALIPER)
+#if defined(VTKMDIY_USE_CALIPER)
 #include <caliper/cali.h>
 #include <caliper/common/Variant.h>
 #endif
@@ -79,8 +79,8 @@ struct  ScopedProfile
 };
 
 
-#if !defined(DIY_USE_CALIPER)
-#if defined(DIY_PROFILE)
+#if !defined(VTKMDIY_USE_CALIPER)
+#if defined(VTKMDIY_PROFILE)
 struct Profiler
 {
     using   Clock = std::chrono::high_resolution_clock;
@@ -138,7 +138,7 @@ struct Profiler
         EventsVector            events;
         DurationAccumulator     total;
 };
-#else   // DIY_PROFILE
+#else   // VTKMDIY_PROFILE
 struct Profiler
 {
     using   Scoped = ScopedProfile<Profiler>;
@@ -166,7 +166,7 @@ struct Profiler
     private:
         DurationAccumulator total;
 };
-#endif  // DIY_PROFILE
+#endif  // VTKMDIY_PROFILE
 
 // Annotations don't do anything without Caliper
 struct Annotation
@@ -189,7 +189,7 @@ struct Variant
 
 };
 
-#else   // DIY_USE_CALIPER
+#else   // VTKMDIY_USE_CALIPER
 
 using Annotation = cali::Annotation;
 using Variant    = cali::Variant;
