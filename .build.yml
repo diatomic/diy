@@ -10,7 +10,7 @@ packages:
 sources:
   - https://github.com/diatomic/diy
 secrets:
-  - 7fa6e87d-7821-4d20-9f0c-b6272e8feb96
+  - d5741a21-e00a-4cf7-9a75-262c33d3ecd0
 environment:
   OMPI_MCA_rmaps_base_oversubscribe: 1
 tasks:
