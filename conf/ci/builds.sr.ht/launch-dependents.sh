@@ -9,7 +9,7 @@ REV_SHORT=`git rev-parse --short HEAD`
 curl https://raw.githubusercontent.com/diatomic/tess2/master/.build.yml |
 (cat && echo "environment: { DIY_REV: $REV }") |
 jq -sR '{"manifest": .,"note":"Test tess2 with DIY rev ['$REV_SHORT'](https://github.com/diatomic/diy/commit/'$REV')"}' |
-curl --verbose \
+curl --silent \
     -H "$AUTH" \
     -H "Content-Type: application/json" \
     -X POST \
