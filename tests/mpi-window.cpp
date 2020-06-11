@@ -53,6 +53,23 @@ TEST_CASE_METHOD(SimpleFixture, "MPI Window Test", "[mpi-window]")
     window.unlock_all();
 }
 
+TEST_CASE_METHOD(SimpleFixture, "MPI Window Move", "[mpi-window-move]")
+{
+    SECTION("move constructor")
+    {
+        diy::mpi::window<int> moved_window(world, width);
+        diy::mpi::window<int> window(std::move(moved_window));
+    }
+
+    SECTION("move assignment")
+    {
+        diy::mpi::window<int> moved_window(world, width);
+        diy::mpi::window<int> window(world, width);
+
+        window = std::move(moved_window);
+    }
+}
+
 int main(int argc, char* argv[])
 {
   diy::mpi::environment env(argc, argv);
