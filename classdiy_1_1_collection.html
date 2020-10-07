@@ -112,18 +112,18 @@ typedef std::vector&lt; Element &gt;&#160;</td><td class="memItemRight" valign="
 typedef <a class="el" href="classdiy_1_1critical__resource.html">critical_resource</a>&lt; int, <br class="typebreak"/>
 <a class="el" href="structdiy_1_1recursive__mutex.html">recursive_mutex</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>CInt</b></td></tr>
 <tr class="separator:a396a898d2157e60bb9e704dae8c5a823"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a99986993dfb6b285b1abf8cd02abb5b8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a99986993dfb6b285b1abf8cd02abb5b8"></a>
-typedef void *(*&#160;</td><td class="memItemRight" valign="bottom"><b>Create</b> )()</td></tr>
-<tr class="separator:a99986993dfb6b285b1abf8cd02abb5b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6c4711efe2596ed1bdee394f5a0a70bb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6c4711efe2596ed1bdee394f5a0a70bb"></a>
-typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><b>Destroy</b> )(void *)</td></tr>
-<tr class="separator:a6c4711efe2596ed1bdee394f5a0a70bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3cf5862609d38b389df8f458124d1122"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3cf5862609d38b389df8f458124d1122"></a>
-typedef detail::Save&#160;</td><td class="memItemRight" valign="bottom"><b>Save</b></td></tr>
-<tr class="separator:a3cf5862609d38b389df8f458124d1122"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a33f6cf1bb456ded2c49632929f31093e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a33f6cf1bb456ded2c49632929f31093e"></a>
-typedef detail::Load&#160;</td><td class="memItemRight" valign="bottom"><b>Load</b></td></tr>
-<tr class="separator:a33f6cf1bb456ded2c49632929f31093e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1a42143c3913b38ad074e0f91780a449"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1a42143c3913b38ad074e0f91780a449"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>Create</b> = std::function&lt; void *()&gt;</td></tr>
+<tr class="separator:a1a42143c3913b38ad074e0f91780a449"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae05328158eeb8c942a7dcf9f91464d2f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae05328158eeb8c942a7dcf9f91464d2f"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>Destroy</b> = std::function&lt; void(void *)&gt;</td></tr>
+<tr class="separator:ae05328158eeb8c942a7dcf9f91464d2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28c0e4cbec6fb388154d909a0b4ea3a7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a28c0e4cbec6fb388154d909a0b4ea3a7"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>Save</b> = detail::Save</td></tr>
+<tr class="separator:a28c0e4cbec6fb388154d909a0b4ea3a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29ee4c7edbe6a7e77b055eb5487b611f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a29ee4c7edbe6a7e77b055eb5487b611f"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>Load</b> = detail::Load</td></tr>
+<tr class="separator:a29ee4c7edbe6a7e77b055eb5487b611f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -191,7 +191,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>own</b> () const </td
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Aug 26 2020 17:45:39 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Oct 7 2020 22:25:31 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

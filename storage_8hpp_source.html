@@ -109,8 +109,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;{</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;  <span class="keyword">namespace </span>detail</div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  {</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <span class="keyword">typedef</span>       void  (*Save)(<span class="keyword">const</span> <span class="keywordtype">void</span>*, BinaryBuffer&amp; buf);</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    <span class="keyword">typedef</span>       void  (*Load)(<span class="keywordtype">void</span>*,       BinaryBuffer&amp; buf);</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <span class="keyword">using</span> Save = std::function&lt;void(const void*, BinaryBuffer&amp;)&gt;;</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    <span class="keyword">using</span> Load = std::function&lt;void(void*, BinaryBuffer&amp;)&gt;;</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <span class="keyword">struct </span>FileBuffer: <span class="keyword">public</span> BinaryBuffer</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    {</div>
@@ -353,7 +353,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Aug 26 2020 17:45:39 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Oct 7 2020 22:25:31 for DIY by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
