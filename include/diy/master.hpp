@@ -173,6 +173,7 @@ namespace diy
       inline void   destroy(int i)                      { if (blocks_.own()) blocks_.destroy(i); }
 
       inline int    add(int gid, void* b, Link* l);     //!< add a block
+      inline int    add(int gid, void* b, const Link& l){ return add(gid, b, l.clone()); }
       inline void*  release(int i);                     //!< release ownership of the block
 
       //!< return the `i`-th block
