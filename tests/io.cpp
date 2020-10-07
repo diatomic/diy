@@ -2,6 +2,7 @@
 #include "catch.hpp"
 
 #include <diy/io/bov.hpp>
+#include <diy/io/numpy.hpp>
 #include <diy/mpi.hpp>
 
 int full_data[4][3] = { { 1, 2, 3 },
@@ -37,6 +38,45 @@ TEST_CASE("Test BOV", "[io]")
 
         std::ifstream in("test.bin", std::ios::binary);
         in.read((char*) (void*) restored_data, 4*3*sizeof(int));
+
+        for (int x = 0; x < 4; ++x)
+            for (int y = 0; y < 3; ++y)
+            {
+                INFO("Coordinates " << x << " " << y);
+                CHECK(restored_data[x][y] == full_data[x][y]);
+            }
+    }
+}
+
+TEST_CASE("Test NumPy", "[io]")
+{
+    diy::mpi::communicator world;
+
+    SECTION("test NumPy io")
+    {
+        {
+            std::vector<int> shape(2); shape[0] = 4; shape[1] = 3;
+            diy::mpi::io::file out(world, "test.npy", diy::mpi::io::file::wronly | diy::mpi::io::file::create);
+            diy::io::NumPy writer(out);
+            writer.write_header<int>(shape);
+
+            diy::DiscreteBounds sub_box { 2 };
+            sub_box.min[0] = 0; sub_box.min[1] = 0;
+            sub_box.max[0] = 1; sub_box.max[1] = 2;
+            writer.write(sub_box, &block1[0][0], sub_box);
+
+            sub_box.min[0] = 2; sub_box.min[1] = 0;
+            sub_box.max[0] = 3; sub_box.max[1] = 2;
+            writer.write(sub_box, &block2[0][0], sub_box);
+        }
+
+        diy::mpi::io::file in(world, "test.npy", diy::mpi::io::file::rdonly);
+        diy::io::NumPy reader(in);
+        reader.read_header();
+        diy::DiscreteBounds full_box {2};
+        full_box.min[0] = 0; full_box.min[1] = 0;
+        full_box.max[0] = 3; full_box.max[1] = 2;
+        reader.read(full_box, (int*) restored_data);
 
         for (int x = 0; x < 4; ++x)
             for (int y = 0; y < 3; ++y)

@@ -15,8 +15,8 @@ namespace diy
 {
   namespace detail
   {
-    typedef       void  (*Save)(const void*, BinaryBuffer& buf);
-    typedef       void  (*Load)(void*,       BinaryBuffer& buf);
+    using Save = std::function<void(const void*, BinaryBuffer&)>;
+    using Load = std::function<void(void*, BinaryBuffer&)>;
 
     struct FileBuffer: public BinaryBuffer
     {
