@@ -1,7 +1,10 @@
-project                     (pyDIY)
-cmake_minimum_required      (VERSION 3.0)
-
 add_subdirectory            (ext/pybind11)
+
+if                          (CMAKE_LIBRARY_OUTPUT_DIRECTORY)        # to work with pip
+    set                     (MODULE_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+else                        ()
+    set                     (MODULE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+endif                       ()
 
 # Copy diy/*.py
 file                        (MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/diy")
@@ -29,7 +32,6 @@ set                         (DIY_SOURCES
 pybind11_add_module         (_diy ${DIY_SOURCES})
 set_target_properties       (_diy PROPERTIES OUTPUT_NAME diy/_diy)
 
-## MPI
 target_link_libraries       (_diy PRIVATE ${libraries})
 
 add_subdirectory            (examples)
