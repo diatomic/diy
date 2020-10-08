@@ -115,8 +115,12 @@ if (NOT DEFINED diy_export_name)
     set(diy_export_name "diy_targets")
 endif()
 
-set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
-set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
+if  (NOT DEFINED CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+    set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
+endif()
+if  (NOT DEFINED CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+    set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
+endif()
 
 # for diy_developer_flags
 include(DIYCompilerFlags)
