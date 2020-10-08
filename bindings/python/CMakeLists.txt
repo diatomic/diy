@@ -7,11 +7,11 @@ else                        ()
 endif                       ()
 
 # Copy diy/*.py
-file                        (MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/diy")
+file                        (MAKE_DIRECTORY "${MODULE_OUTPUT_DIRECTORY}/diy")
 file                        (GLOB PYDIY_PYTHON "${CMAKE_CURRENT_SOURCE_DIR}/diy/*.py")
 add_custom_target           (pydiy ALL ${CMAKE_COMMAND} -E copy_directory
-                                   ${CMAKE_CURRENT_SOURCE_DIR}/diy ${CMAKE_CURRENT_BINARY_DIR}/diy
-                                   DEPENDS ${PYDIY_PYTHON})
+                                    ${CMAKE_CURRENT_SOURCE_DIR}/diy ${MODULE_OUTPUT_DIRECTORY}/diy
+                                    DEPENDS ${PYDIY_PYTHON})
 
 # Build diy/_diy.so
 set                         (DIY_SOURCES
