@@ -44,6 +44,7 @@ diy_dependent_option        (BUILD_SHARED_LIBS   "Create shared libraries if on"
 diy_dependent_option        (build_diy_nompi_lib "Also build the nompi version of diy::mpi"                  OFF "mpi;build_diy_mpi_lib" OFF)
 diy_option                  (build_examples      "Build DIY examples"                                        ON)
 diy_option                  (build_tests         "Build DIY tests"                                           ON)
+diy_option                  (python              "Build Python bindings"                                     OFF)
 
 # Default to Release
 if                          (NOT CMAKE_BUILD_TYPE)
@@ -114,8 +115,12 @@ if (NOT DEFINED diy_export_name)
     set(diy_export_name "diy_targets")
 endif()
 
-set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
-set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
+if  (NOT DEFINED CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+    set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
+endif()
+if  (NOT DEFINED CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+    set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
+endif()
 
 # for diy_developer_flags
 include(DIYCompilerFlags)
@@ -259,3 +264,7 @@ if (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR) # Only generate these files wh
   install(EXPORT ${diy_export_name} NAMESPACE DIY:: DESTINATION "." FILE diy-targets.cmake)
   install(FILES "${PROJECT_BINARY_DIR}/diy-config.cmake" DESTINATION ".")
 endif()
+
+if      (python)
+    add_subdirectory(bindings/python)
+endif   (python)
