@@ -5,6 +5,7 @@
 namespace py = pybind11;
 
 #include <diy/assigner.hpp>
+#include <diy/resolve.hpp>
 using namespace diy;
 
 void init_assigner(py::module& m)
@@ -50,4 +51,8 @@ void init_assigner(py::module& m)
         .def("set_ranks",   &DynamicAssigner::set_ranks)
         .def("rank_offset", &DynamicAssigner::rank_offset)
     ;
+
+    m.def("fix_links", &fix_links);
+    m.def("record_local_gids", &record_local_gids);
+    m.def("update_links", &update_links);
 }

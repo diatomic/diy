@@ -6,6 +6,7 @@ namespace py = pybind11;
 using namespace diy;
 
 #include "serialization.h"
+#include "mpi.hpp"
 
 void init_master(py::module& m)
 {
@@ -23,7 +24,7 @@ void init_master(py::module& m)
     //py::class_<FileStorage>(m, "FileStorage");
 
     py::class_<Master>(m, "Master")
-      .def(py::init([](long                 comm_,
+      .def(py::init([](mpi::communicator    comm,
                        int                  threads,
                        int                  limit,
                        Create               create,
@@ -32,7 +33,6 @@ void init_master(py::module& m)
                        Load                 load)
                        //FileStorage*         storage)
                        {
-                           MPI_Comm comm = *static_cast<MPI_Comm*>(reinterpret_cast<void*>(comm_));
                            return new Master(comm,
                                              threads,
                                              limit,
@@ -48,7 +48,7 @@ void init_master(py::module& m)
                        }),
                        "comm"_a, "threads"_a = 1, "limit"_a = -1,
                        "create"_a = Create([]() -> py::object { return py::none(); }),
-                       "destroy"_a = Destroy([](py::object* b) { }),
+                       "destroy"_a = Destroy([](py::object*) { }),
                        "save"_a = Save([](const py::object* b, diy::BinaryBuffer* bb) { diy::save(*bb, *b); }),
                        "load"_a = Load([](diy::BinaryBuffer* bb) -> py::object
                                        {

@@ -4,27 +4,21 @@ namespace py = pybind11;
 
 #include <mpi.h>
 
-struct PyMPIComm
-{
-                PyMPIComm(MPI_Comm comm_ = MPI_COMM_WORLD):
-                    comm(comm_)
-    {
-        MPI_Comm_size(comm, &size);
-        MPI_Comm_rank(comm, &rank);
-    }
-
-    MPI_Comm    comm;
-    int         size;
-    int         rank;
-};
+#include <diy/mpi/communicator.hpp>
 
 void init_mpi(py::module& m)
 {
+    using PyMPIComm = diy::mpi::communicator;
+
     py::class_<PyMPIComm>(m, "MPIComm")
         .def(py::init<>())
-        .def_readonly("size", &PyMPIComm::size)
-        .def_readonly("rank", &PyMPIComm::rank)
-        .def("comm",          [](const PyMPIComm& comm) { return (long) &comm.comm; })
+        .def(py::init([](long comm_)
+             {
+                return new diy::mpi::communicator(*static_cast<MPI_Comm*>(reinterpret_cast<void*>(comm_)));
+             }))
+        .def_property_readonly("size", &PyMPIComm::size)
+        .def_property_readonly("rank", &PyMPIComm::rank)
+        .def_property_readonly("comm", &PyMPIComm::handle)
     ;
 
     m.def("init",       []() { int argc = 0; char** argv = 0; MPI_Init(&argc, &argv); });
