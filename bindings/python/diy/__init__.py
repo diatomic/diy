@@ -2,15 +2,19 @@ from ._diy import *
 
 # Monkey-patch the constructor to accept a normal mpi4py communicator
 
-init = Master.__init__
-def convert_mpi_comm(self, comm, *args, **kwargs):
-    if not isinstance(comm, mpi.MPIComm):
-        from mpi4py import MPI
-        a = MPI._addressof(comm)
+init = mpi.MPIComm.__init__
+def convert_mpi_comm(self, *args, **kwargs):
+    if len(args) == 0:
+        init(self, *args, **kwargs)
     else:
-        a = comm.comm()
-    init(self, a, *args, **kwargs)
-Master.__init__ = convert_mpi_comm
+        comm = args[0]
+
+        if not isinstance(comm, mpi.MPIComm):
+            from mpi4py import MPI
+            comm = MPI._addressof(comm)
+
+        init(self, comm, *args[1:], **kwargs)
+mpi.MPIComm.__init__ = convert_mpi_comm
 
 class InitFinalize:
     def __init__(self):

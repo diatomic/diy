@@ -12,6 +12,10 @@ void init_mpi(py::module& m)
 
     py::class_<PyMPIComm>(m, "MPIComm")
         .def(py::init<>())
+        .def(py::init([](long comm_)
+             {
+                return new diy::mpi::communicator(*static_cast<MPI_Comm*>(reinterpret_cast<void*>(comm_)));
+             }))
         .def_property_readonly("size", &PyMPIComm::size)
         .def_property_readonly("rank", &PyMPIComm::rank)
         .def_property_readonly("comm", &PyMPIComm::handle)

@@ -10,7 +10,8 @@ import diy
 # can get comm either from diy or mpi4py, in this case exercising mpi4py
 comm = MPI.COMM_WORLD
 
-m = diy.Master(comm)               # master
+c = diy.mpi.MPIComm(comm)
+m = diy.Master(c)               # master
 
 # try some more mpi4py to get my rank and size of comm
 rank = comm.Get_rank()
