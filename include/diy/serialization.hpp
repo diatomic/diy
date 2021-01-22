@@ -26,6 +26,7 @@ namespace diy
     virtual void        load_binary(char* x, size_t count)          =0;   //!< copy `count` bytes into `x` from the buffer
     virtual void        load_binary_back(char* x, size_t count)     =0;   //!< copy `count` bytes into `x` from the back of the buffer
     virtual char*       grow(size_t count)                          =0;   //!< allocate enough space for `count` bytes and return the pointer to the beginning
+    virtual char*       advance(size_t count)                       =0;   //!< advance buffer position by `count` bytes and return the pointer to the beginning
   };
 
   struct MemoryBuffer: public BinaryBuffer
@@ -43,6 +44,7 @@ namespace diy
     virtual inline void load_binary(char* x, size_t count) override;         //!< copy `count` bytes into `x` from the buffer
     virtual inline void load_binary_back(char* x, size_t count) override;    //!< copy `count` bytes into `x` from the back of the buffer
     virtual char*       grow(size_t count) override;                         //!< allocate enough space for `count` bytes and return the pointer to the beginning
+    virtual char*       advance(size_t count) override;                      //!< advance buffer position by `count` bytes and return the pointer to the beginning
 
     void                clear()                                     { buffer.clear(); reset(); }
     void                wipe()                                      { std::vector<char>().swap(buffer); reset(); }
@@ -519,6 +521,15 @@ grow(size_t count)
   position += count;
 
   return destination;
+}
+
+char*
+diy::MemoryBuffer::
+advance(size_t count)
+{
+    char* origin = &buffer[position];
+    position += count;
+    return origin;
 }
 
 void
