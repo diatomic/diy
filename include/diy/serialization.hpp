@@ -43,8 +43,8 @@ namespace diy
     virtual inline void append_binary(const char* x, size_t count) override; //!< append `count` bytes from `x` to end of buffer
     virtual inline void load_binary(char* x, size_t count) override;         //!< copy `count` bytes into `x` from the buffer
     virtual inline void load_binary_back(char* x, size_t count) override;    //!< copy `count` bytes into `x` from the back of the buffer
-    virtual char*       grow(size_t count) override;                         //!< allocate enough space for `count` bytes and return the pointer to the beginning
-    virtual char*       advance(size_t count) override;                      //!< advance buffer position by `count` bytes and return the pointer to the beginning
+    virtual inline char* grow(size_t count) override;                        //!< allocate enough space for `count` bytes and return the pointer to the beginning
+    virtual inline char* advance(size_t count) override;                     //!< advance buffer position by `count` bytes and return the pointer to the beginning
 
     void                clear()                                     { buffer.clear(); reset(); }
     void                wipe()                                      { std::vector<char>().swap(buffer); reset(); }
