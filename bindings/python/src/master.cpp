@@ -6,7 +6,6 @@ namespace py = pybind11;
 using namespace diy;
 
 #include "serialization.h"
-#include "mpi.hpp"
 
 void init_master(py::module& m)
 {

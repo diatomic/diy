@@ -19,6 +19,7 @@ void init_mpi(py::module& m)
         .def_property_readonly("size", &PyMPIComm::size)
         .def_property_readonly("rank", &PyMPIComm::rank)
         .def_property_readonly("comm", &PyMPIComm::handle)
+        .def("barrier",                &PyMPIComm::barrier)
     ;
 
     m.def("init",       []() { int argc = 0; char** argv = 0; MPI_Init(&argc, &argv); });

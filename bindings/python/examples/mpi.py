@@ -60,7 +60,12 @@ m.foreach(Block.send)
 m.exchange()
 
 # a little more mpi4py: pretend we want a barrier here
+print("Calling mpi4py barrier")
 comm.Barrier()
+
+# barrier is so common that it's also available directly in pyDIY
+print("Calling pyDIY barrier")
+c.barrier()
 
 m.foreach(Block.recv)
 
