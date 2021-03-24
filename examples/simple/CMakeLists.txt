@@ -12,3 +12,8 @@ target_link_libraries       (rexchange      ${libraries})
 
 add_executable              (iexchange-particles      iexchange-particles.cpp)
 target_link_libraries       (iexchange-particles      ${libraries})
+
+if                          (mpi)
+    add_executable          (intercomm      intercomm.cpp)
+    target_link_libraries   (intercomm      ${libraries})
+endif                       (mpi)
