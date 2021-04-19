@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <iterator>
 
-#if defined(VTKMDIY_MPI_AS_LIB) && !VTKMDIY_HAS_MPI
+#if defined(DIY_MPI_AS_LIB) && !DIY_HAS_MPI
 diy::mpi::request::request()
 {
   std::fill(std::begin(this->handle.data), std::end(this->handle.data), nullptr);

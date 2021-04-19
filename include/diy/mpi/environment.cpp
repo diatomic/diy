@@ -45,7 +45,7 @@ diy::mpi::environment::environment(int argc, char* argv[])
 
 diy::mpi::environment::environment(int argc, char* argv[], int requested_threading)
 {
-#if VTKMDIY_HAS_MPI
+#if DIY_HAS_MPI
   MPI_Init_thread(&argc, &argv, requested_threading, &provided_threading);
 #else
   (void) argc; (void) argv;
