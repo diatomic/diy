@@ -10,6 +10,7 @@
 #include <numeric>
 #include <memory>
 #include <chrono>
+#include <climits>
 
 #include "link.hpp"
 #include "collection.hpp"
