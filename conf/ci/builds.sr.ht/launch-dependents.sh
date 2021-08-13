@@ -16,9 +16,7 @@ curl --silent \
     -d @- \
     https://builds.sr.ht/api/jobs
 
-GH_TOKEN=`cat ~/.github.token`
-GH_AUTH=Authorization:"token ${GH_TOKEN}"
-curl -H "$GH_AUTH" https://raw.githubusercontent.com/mrzv/reeber/master/.build.yml |
+curl https://raw.githubusercontent.com/mrzv/reeber/master/.build.yml |
 (cat && echo "environment: { DIY_REV: $REV }") |
 jq -sR '{"manifest": .,"note":"Test Reeber with DIY rev ['$REV_SHORT'](https://github.com/diatomic/diy/commit/'$REV')"}' |
 curl --silent \

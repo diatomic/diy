@@ -34,6 +34,8 @@ namespace diy
       }
       virtual inline void load_binary(char* x, size_t count) override         { auto n = fread(x, 1, count, file); DIY_UNUSED(n);}
       virtual inline void load_binary_back(char* x, size_t count) override    { fseek(file, static_cast<long>(tail), SEEK_END); auto n = fread(x, 1, count, file); tail += count; fseek(file, static_cast<long>(head), SEEK_SET); DIY_UNUSED(n);}
+      virtual inline char* grow(size_t) override                              { throw std::runtime_error("Cannot grow a FileBuffer"); }
+      virtual inline char* advance(size_t) override                           { throw std::runtime_error("Cannot advance a FileBuffer"); }
 
       size_t              size() const                                { return head; }
 

@@ -25,6 +25,8 @@ namespace diy
     virtual inline void append_binary(const char* x, size_t count)  =0;   //!< append `count` bytes from `x` to end of buffer
     virtual void        load_binary(char* x, size_t count)          =0;   //!< copy `count` bytes into `x` from the buffer
     virtual void        load_binary_back(char* x, size_t count)     =0;   //!< copy `count` bytes into `x` from the back of the buffer
+    virtual char*       grow(size_t count)                          =0;   //!< allocate enough space for `count` bytes and return the pointer to the beginning
+    virtual char*       advance(size_t count)                       =0;   //!< advance buffer position by `count` bytes and return the pointer to the beginning
   };
 
   struct MemoryBuffer: public BinaryBuffer
@@ -41,6 +43,8 @@ namespace diy
     virtual inline void append_binary(const char* x, size_t count) override; //!< append `count` bytes from `x` to end of buffer
     virtual inline void load_binary(char* x, size_t count) override;         //!< copy `count` bytes into `x` from the buffer
     virtual inline void load_binary_back(char* x, size_t count) override;    //!< copy `count` bytes into `x` from the back of the buffer
+    virtual inline char* grow(size_t count) override;                        //!< allocate enough space for `count` bytes and return the pointer to the beginning
+    virtual inline char* advance(size_t count) override;                     //!< advance buffer position by `count` bytes and return the pointer to the beginning
 
     void                clear()                                     { buffer.clear(); reset(); }
     void                wipe()                                      { std::vector<char>().swap(buffer); reset(); }
@@ -444,17 +448,7 @@ void
 diy::MemoryBuffer::
 save_binary(const char* x, size_t count)
 {
-  if (position + count > buffer.capacity())
-  {
-    double newsize = static_cast<double>(position + count) * growth_multiplier();  // if we have to grow, grow geometrically
-    buffer.reserve(static_cast<size_t>(newsize));
-  }
-
-  if (position + count > buffer.size())
-    buffer.resize(position + count);
-
-  std::copy_n(x, count, &buffer[position]);
-  position += count;
+  std::copy_n(x, count, grow(count));
 }
 
 void
@@ -507,6 +501,35 @@ load_binary_back(char* x, size_t count)
 {
   std::copy_n(&buffer[buffer.size() - count], count, x);
   buffer.resize(buffer.size() - count);
+}
+
+char*
+diy::MemoryBuffer::
+grow(size_t count)
+{
+  if (position + count > buffer.capacity())
+  {
+    double newsize = static_cast<double>(position + count) * growth_multiplier();  // if we have to grow, grow geometrically
+    buffer.reserve(static_cast<size_t>(newsize));
+  }
+
+  if (position + count > buffer.size())
+    buffer.resize(position + count);
+
+  char* destination = &buffer[position];
+
+  position += count;
+
+  return destination;
+}
+
+char*
+diy::MemoryBuffer::
+advance(size_t count)
+{
+    char* origin = &buffer[position];
+    position += count;
+    return origin;
 }
 
 void
