@@ -13,9 +13,9 @@
 
 #include "opts.h"
 
-static const int x = 0;
-static const int y = 1;
-static const int z = 2;
+static const int kd_x = 0;
+static const int kd_y = 1;
+static const int kd_z = 2;
 
 struct PointT
 {
@@ -38,28 +38,28 @@ struct BlockT
 diy::ContinuousBounds compute_bounds(std::vector<PointT> points)
 {
   diy::ContinuousBounds bds(3);
-  bds.min[x] = points[0][x];
-  bds.min[y] = points[0][y];
-  bds.min[z] = points[0][z];
-  bds.max[x] = points[0][x];
-  bds.max[y] = points[0][y];
-  bds.max[z] = points[0][z];
+  bds.min[kd_x] = points[0][kd_x];
+  bds.min[kd_y] = points[0][kd_y];
+  bds.min[kd_z] = points[0][kd_z];
+  bds.max[kd_x] = points[0][kd_x];
+  bds.max[kd_y] = points[0][kd_y];
+  bds.max[kd_z] = points[0][kd_z];
   // just need to find min and max of each coordinate axis
   for (const auto pt : points)
   {
-    if (pt[x] < bds.min[x])
-      bds.min[x] = pt[x];
-    if (pt[y] < bds.min[y])
-      bds.min[y] = pt[y];
-    if (pt[z] < bds.min[z])
-      bds.min[z] = pt[z];
+    if (pt[kd_x] < bds.min[kd_x])
+      bds.min[kd_x] = pt[kd_x];
+    if (pt[kd_y] < bds.min[kd_y])
+      bds.min[kd_y] = pt[kd_y];
+    if (pt[kd_z] < bds.min[kd_z])
+      bds.min[kd_z] = pt[kd_z];
 
-    if (pt[x] > bds.max[x])
-      bds.max[x] = pt[x];
-    if (pt[y] > bds.max[y])
-      bds.max[y] = pt[y];
-    if (pt[z] > bds.max[z])
-      bds.max[z] = pt[z];
+    if (pt[kd_x] > bds.max[kd_x])
+      bds.max[kd_x] = pt[kd_x];
+    if (pt[kd_y] > bds.max[kd_y])
+      bds.max[kd_y] = pt[kd_y];
+    if (pt[kd_z] > bds.max[kd_z])
+      bds.max[kd_z] = pt[kd_z];
   }
 
   return bds;

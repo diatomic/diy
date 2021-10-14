@@ -43,6 +43,7 @@ if (NOT build_diy_mpi_lib)
 endif()
 
 if                          (MSVC AND NOT(MSVC_VERSION LESS 1400))
+    set_source_files_properties (double-foreach.cpp     PROPERTIES COMPILE_FLAGS "/bigobj")
     set_source_files_properties (kd-tree.cpp            PROPERTIES COMPILE_FLAGS "/bigobj")
     set_source_files_properties (merge-swap-reduce.cpp  PROPERTIES COMPILE_FLAGS "/bigobj")
     set_source_files_properties (swap-reduce.cpp        PROPERTIES COMPILE_FLAGS "/bigobj")
