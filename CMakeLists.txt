@@ -288,10 +288,9 @@ if (NOT DEFINED diy_install_only_libraries) # defined by parent project if build
 endif()
 
 install(TARGETS ${diy_targets} EXPORT ${diy_export_name}
-    ARCHIVE DESTINATION ${diy_install_lib_dir}
-    LIBRARY DESTINATION ${diy_install_lib_dir}
-    RUNTIME DESTINATION ${diy_install_bin_dir}
-    COMPONENT ${diy_targets_component})
+    ARCHIVE DESTINATION ${diy_install_lib_dir} COMPONENT ${diy_headers_component}
+    LIBRARY DESTINATION ${diy_install_lib_dir} COMPONENT ${diy_targets_component}
+    RUNTIME DESTINATION ${diy_install_bin_dir} COMPONENT ${diy_targets_component})
 
 if (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR) # Only generate these files when diy is the main project
   export(EXPORT ${diy_export_name} NAMESPACE DIY:: FILE "${PROJECT_BINARY_DIR}/diy-targets.cmake")
