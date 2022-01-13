@@ -31,10 +31,13 @@
 #if defined(BACKWARD_CXX11)
 #elif defined(BACKWARD_CXX98)
 #else
-#if __cplusplus >= 201103L
+#if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1800)
 #define BACKWARD_CXX11
 #define BACKWARD_ATLEAST_CXX11
 #define BACKWARD_ATLEAST_CXX98
+#if __cplusplus >= 201703L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
+#define BACKWARD_ATLEAST_CXX17
+#endif
 #else
 #define BACKWARD_CXX98
 #define BACKWARD_ATLEAST_CXX98
@@ -49,21 +52,29 @@
 // #define BACKWARD_SYSTEM_DARWIN
 //	- specialization for Mac OS X 10.5 and later.
 //
+// #define BACKWARD_SYSTEM_WINDOWS
+//  - specialization for Windows (Clang 9 and MSVC2017)
+//
 // #define BACKWARD_SYSTEM_UNKNOWN
 //	- placebo implementation, does nothing.
 //
 #if defined(BACKWARD_SYSTEM_LINUX)
 #elif defined(BACKWARD_SYSTEM_DARWIN)
 #elif defined(BACKWARD_SYSTEM_UNKNOWN)
+#elif defined(BACKWARD_SYSTEM_WINDOWS)
 #else
 #if defined(__linux) || defined(__linux__)
 #define BACKWARD_SYSTEM_LINUX
 #elif defined(__APPLE__)
 #define BACKWARD_SYSTEM_DARWIN
+#elif defined(_WIN32)
+#define BACKWARD_SYSTEM_WINDOWS
 #else
 #define BACKWARD_SYSTEM_UNKNOWN
 #endif
 #endif
+
+#define NOINLINE __attribute__((noinline))
 
 #include <algorithm>
 #include <cctype>
@@ -79,6 +90,8 @@
 #include <streambuf>
 #include <string>
 #include <vector>
+#include <exception>
+#include <iterator>
 
 #if defined(BACKWARD_SYSTEM_LINUX)
 
@@ -92,6 +105,11 @@
 //  exception.
 //  - normally libgcc is already linked to your program by default.
 //
+// #define BACKWARD_HAS_LIBUNWIND 1
+//  - libunwind provides, in some cases, a more accurate stacktrace as it knows
+//  to decode signal handler frames and lets us edit the context registers when
+//  unwinding, allowing stack traces over bad function references.
+//
 // #define BACKWARD_HAS_BACKTRACE == 1
 //  - backtrace seems to be a little bit more portable than libunwind, but on
 //  linux, it uses unwind anyway, but abstract away a tiny information that is
@@ -104,10 +122,13 @@
 // Note that only one of the define should be set to 1 at a time.
 //
 #if BACKWARD_HAS_UNWIND == 1
+#elif BACKWARD_HAS_LIBUNWIND == 1
 #elif BACKWARD_HAS_BACKTRACE == 1
 #else
 #undef BACKWARD_HAS_UNWIND
 #define BACKWARD_HAS_UNWIND 1
+#undef BACKWARD_HAS_LIBUNWIND
+#define BACKWARD_HAS_LIBUNWIND 0
 #undef BACKWARD_HAS_BACKTRACE
 #define BACKWARD_HAS_BACKTRACE 0
 #endif
@@ -120,9 +141,10 @@
 //    - object filename
 //    - function name
 //    - source filename
-//	  - line and column numbers
-//	  - source code snippet (assuming the file is accessible)
-//	  - variables name and values (if not optimized out)
+//    - line and column numbers
+//    - source code snippet (assuming the file is accessible)
+//    - variable names (if not optimized out)
+//    - variable values (not supported by backward-cpp)
 //  - You need to link with the lib "dw":
 //    - apt-get install libdw-dev
 //    - g++/clang++ -ldw ...
@@ -132,8 +154,8 @@
 //    - object filename
 //    - function name
 //    - source filename
-//	  - line numbers
-//	  - source code snippet (assuming the file is accessible)
+//    - line numbers
+//    - source code snippet (assuming the file is accessible)
 //  - You need to link with the lib "bfd":
 //    - apt-get install binutils-dev
 //    - g++/clang++ -lbfd ...
@@ -145,7 +167,8 @@
 //    - source filename
 //    - line and column numbers
 //    - source code snippet (assuming the file is accessible)
-//    - variables name and values (if not optimized out)
+//    - variable names (if not optimized out)
+//    - variable values (not supported by backward-cpp)
 //  - You need to link with the lib "dwarf":
 //    - apt-get install libdwarf-dev
 //    - g++/clang++ -ldwarf ...
@@ -187,6 +210,12 @@
 #undef _Unwind_Ptr
 #else
 #include <link.h>
+#endif
+#if defined(__ppc__) || defined(__powerpc) || defined(__powerpc__) ||        \
+    defined(__POWERPC__)
+// Linux kernel header required for the struct pt_regs definition
+// to access the NIP (Next Instruction Pointer) register value
+#include <asm/ptrace.h>
 #endif
 #include <signal.h>
 #include <sys/stat.h>
@@ -252,6 +281,12 @@
 //  exception.
 //  - normally libgcc is already linked to your program by default.
 //
+// #define BACKWARD_HAS_LIBUNWIND 1
+//  - libunwind comes from clang, which implements an API compatible version.
+//  - libunwind provides, in some cases, a more accurate stacktrace as it knows
+//  to decode signal handler frames and lets us edit the context registers when
+//  unwinding, allowing stack traces over bad function references.
+//
 // #define BACKWARD_HAS_BACKTRACE == 1
 //  - backtrace is available by default, though it does not produce as much
 //  information as another library might.
@@ -263,11 +298,14 @@
 //
 #if BACKWARD_HAS_UNWIND == 1
 #elif BACKWARD_HAS_BACKTRACE == 1
+#elif BACKWARD_HAS_LIBUNWIND == 1
 #else
 #undef BACKWARD_HAS_UNWIND
 #define BACKWARD_HAS_UNWIND 1
 #undef BACKWARD_HAS_BACKTRACE
 #define BACKWARD_HAS_BACKTRACE 0
+#undef BACKWARD_HAS_LIBUNWIND
+#define BACKWARD_HAS_LIBUNWIND 0
 #endif
 
 // On Darwin, backward can extract detailed information about a stack trace
@@ -299,6 +337,53 @@
 #endif
 #endif // defined(BACKWARD_SYSTEM_DARWIN)
 
+#if defined(BACKWARD_SYSTEM_WINDOWS)
+
+#include <condition_variable>
+#include <mutex>
+#include <thread>
+
+#include <basetsd.h>
+typedef SSIZE_T ssize_t;
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#include <winnt.h>
+
+#include <psapi.h>
+#include <signal.h>
+
+#ifndef __clang__
+#undef NOINLINE
+#define NOINLINE __declspec(noinline)
+#endif
+
+#ifdef _MSC_VER
+#pragma comment(lib, "psapi.lib")
+#pragma comment(lib, "dbghelp.lib")
+#endif
+
+// Comment / packing is from stackoverflow:
+// https://stackoverflow.com/questions/6205981/windows-c-stack-trace-from-a-running-app/28276227#28276227
+// Some versions of imagehlp.dll lack the proper packing directives themselves
+// so we need to do it.
+#pragma pack(push, before_imagehlp, 8)
+#include <imagehlp.h>
+#pragma pack(pop, before_imagehlp)
+
+// TODO maybe these should be undefined somewhere else?
+#undef BACKWARD_HAS_UNWIND
+#undef BACKWARD_HAS_BACKTRACE
+#if BACKWARD_HAS_PDB_SYMBOL == 1
+#else
+#undef BACKWARD_HAS_PDB_SYMBOL
+#define BACKWARD_HAS_PDB_SYMBOL 1
+#endif
+
+#endif
+
 #if BACKWARD_HAS_UNWIND == 1
 
 #include <unwind.h>
@@ -322,6 +407,11 @@ extern "C" uintptr_t _Unwind_GetIPInfo(_Unwind_Context *, int *);
 #endif
 
 #endif // BACKWARD_HAS_UNWIND == 1
+
+#if BACKWARD_HAS_LIBUNWIND == 1
+#define UNW_LOCAL_ONLY
+#include <libunwind.h>
+#endif // BACKWARD_HAS_LIBUNWIND == 1
 
 #ifdef BACKWARD_ATLEAST_CXX11
 #include <unordered_map>
@@ -350,17 +440,30 @@ template <typename T> T &move(T &v) { return v; }
 #endif // BACKWARD_ATLEAST_CXX11
 
 namespace backward {
+namespace details {
+#if defined(BACKWARD_SYSTEM_WINDOWS)
+const char kBackwardPathDelimiter[] = ";";
+#else
+const char kBackwardPathDelimiter[] = ":";
+#endif
+} // namespace details
+} // namespace backward
+
+namespace backward {
 
 namespace system_tag {
 struct linux_tag; // seems that I cannot call that "linux" because the name
 // is already defined... so I am adding _tag everywhere.
 struct darwin_tag;
+struct windows_tag;
 struct unknown_tag;
 
 #if defined(BACKWARD_SYSTEM_LINUX)
 typedef linux_tag current_tag;
 #elif defined(BACKWARD_SYSTEM_DARWIN)
 typedef darwin_tag current_tag;
+#elif defined(BACKWARD_SYSTEM_WINDOWS)
+typedef windows_tag current_tag;
 #elif defined(BACKWARD_SYSTEM_UNKNOWN)
 typedef unknown_tag current_tag;
 #else
@@ -394,6 +497,13 @@ typedef backtrace_symbol current;
 #else
 #error "You shall not pass, until you know what you want."
 #endif
+#elif defined(BACKWARD_SYSTEM_WINDOWS)
+struct pdb_symbol;
+#if BACKWARD_HAS_PDB_SYMBOL == 1
+typedef pdb_symbol current;
+#else
+#error "You shall not pass, until you know what you want."
+#endif
 #endif
 } // namespace trace_resolver_tag
 
@@ -413,7 +523,7 @@ template <typename T> struct default_delete {
   void operator()(T &ptr) const { delete ptr; }
 };
 
-template <typename T, typename Deleter = deleter<void, void *, &::free>>
+template <typename T, typename Deleter = deleter<void, void *, &::free> >
 class handle {
   struct dummy;
   T _val;
@@ -459,6 +569,12 @@ public:
     handle tmp(new_val);
     swap(tmp);
   }
+
+  void update(T new_val) {
+    _val = new_val;
+    _empty = !static_cast<bool>(new_val);
+  }
+
   operator const dummy *() const {
     if (_empty) {
       return nullptr;
@@ -505,10 +621,10 @@ template <> struct demangler_impl<system_tag::current_tag> {
 
   std::string demangle(const char *funcname) {
     using namespace details;
-    char *result = abi::__cxa_demangle(funcname, _demangle_buffer.release(),
+    char *result = abi::__cxa_demangle(funcname, _demangle_buffer.get(),
                                        &_demangle_buffer_length, nullptr);
     if (result) {
-      _demangle_buffer.reset(result);
+      _demangle_buffer.update(result);
       return result;
     }
     return funcname;
@@ -522,6 +638,29 @@ private:
 #endif // BACKWARD_SYSTEM_LINUX || BACKWARD_SYSTEM_DARWIN
 
 struct demangler : public demangler_impl<system_tag::current_tag> {};
+
+// Split a string on the platform's PATH delimiter.  Example: if delimiter
+// is ":" then:
+//   ""              --> []
+//   ":"             --> ["",""]
+//   "::"            --> ["","",""]
+//   "/a/b/c"        --> ["/a/b/c"]
+//   "/a/b/c:/d/e/f" --> ["/a/b/c","/d/e/f"]
+//   etc.
+inline std::vector<std::string> split_source_prefixes(const std::string &s) {
+  std::vector<std::string> out;
+  size_t last = 0;
+  size_t next = 0;
+  size_t delimiter_size = sizeof(kBackwardPathDelimiter) - 1;
+  while ((next = s.find(kBackwardPathDelimiter, last)) != std::string::npos) {
+    out.push_back(s.substr(last, next - last));
+    last = next + delimiter_size;
+  }
+  if (last <= s.length()) {
+    out.push_back(s.substr(last));
+  }
+  return out;
+}
 
 } // namespace details
 
@@ -585,14 +724,17 @@ public:
   size_t size() const { return 0; }
   Trace operator[](size_t) const { return Trace(); }
   size_t load_here(size_t = 0) { return 0; }
-  size_t load_from(void *, size_t = 0) { return 0; }
+  size_t load_from(void *, size_t = 0, void * = nullptr, void * = nullptr) {
+    return 0;
+  }
   size_t thread_id() const { return 0; }
   void skip_n_firsts(size_t) {}
 };
 
 class StackTraceImplBase {
 public:
-  StackTraceImplBase() : _thread_id(0), _skip(0) {}
+  StackTraceImplBase()
+      : _thread_id(0), _skip(0), _context(nullptr), _error_addr(nullptr) {}
 
   size_t thread_id() const { return _thread_id; }
 
@@ -620,17 +762,27 @@ protected:
 #endif
   }
 
+  void set_context(void *context) { _context = context; }
+  void *context() const { return _context; }
+
+  void set_error_addr(void *error_addr) { _error_addr = error_addr; }
+  void *error_addr() const { return _error_addr; }
+
   size_t skip_n_firsts() const { return _skip; }
 
 private:
   size_t _thread_id;
   size_t _skip;
+  void *_context;
+  void *_error_addr;
 };
 
 class StackTraceImplHolder : public StackTraceImplBase {
 public:
   size_t size() const {
-    return _stacktrace.size() ? _stacktrace.size() - skip_n_firsts() : 0;
+    return (_stacktrace.size() >= skip_n_firsts())
+               ? _stacktrace.size() - skip_n_firsts()
+               : 0;
   }
   Trace operator[](size_t idx) const {
     if (idx >= size()) {
@@ -710,10 +862,12 @@ template <typename F> size_t unwind(F f, size_t depth) {
 template <>
 class StackTraceImpl<system_tag::current_tag> : public StackTraceImplHolder {
 public:
-  __attribute__((noinline)) // TODO use some macro
-  size_t
-  load_here(size_t depth = 32) {
+  NOINLINE
+  size_t load_here(size_t depth = 32, void *context = nullptr,
+                   void *error_addr = nullptr) {
     load_thread_info();
+    set_context(context);
+    set_error_addr(error_addr);
     if (depth == 0) {
       return 0;
     }
@@ -723,8 +877,9 @@ public:
     skip_n_firsts(0);
     return size();
   }
-  size_t load_from(void *addr, size_t depth = 32) {
-    load_here(depth + 8);
+  size_t load_from(void *addr, size_t depth = 32, void *context = nullptr,
+                   void *error_addr = nullptr) {
+    load_here(depth + 8, context, error_addr);
 
     for (size_t i = 0; i < _stacktrace.size(); ++i) {
       if (_stacktrace[i] == addr) {
@@ -746,14 +901,193 @@ private:
   };
 };
 
-#else // BACKWARD_HAS_UNWIND == 0
+#elif BACKWARD_HAS_LIBUNWIND == 1
 
 template <>
 class StackTraceImpl<system_tag::current_tag> : public StackTraceImplHolder {
 public:
-  __attribute__((noinline)) // TODO use some macro
-  size_t
-  load_here(size_t depth = 32) {
+  __attribute__((noinline)) size_t load_here(size_t depth = 32,
+                                             void *_context = nullptr,
+                                             void *_error_addr = nullptr) {
+    set_context(_context);
+    set_error_addr(_error_addr);
+    load_thread_info();
+    if (depth == 0) {
+      return 0;
+    }
+    _stacktrace.resize(depth + 1);
+
+    int result = 0;
+
+    unw_context_t ctx;
+    size_t index = 0;
+
+    // Add the tail call. If the Instruction Pointer is the crash address it
+    // means we got a bad function pointer dereference, so we "unwind" the
+    // bad pointer manually by using the return address pointed to by the
+    // Stack Pointer as the Instruction Pointer and letting libunwind do
+    // the rest
+
+    if (context()) {
+      ucontext_t *uctx = reinterpret_cast<ucontext_t *>(context());
+#ifdef REG_RIP         // x86_64
+      if (uctx->uc_mcontext.gregs[REG_RIP] ==
+          reinterpret_cast<greg_t>(error_addr())) {
+        uctx->uc_mcontext.gregs[REG_RIP] =
+            *reinterpret_cast<size_t *>(uctx->uc_mcontext.gregs[REG_RSP]);
+      }
+      _stacktrace[index] =
+          reinterpret_cast<void *>(uctx->uc_mcontext.gregs[REG_RIP]);
+      ++index;
+      ctx = *reinterpret_cast<unw_context_t *>(uctx);
+#elif defined(REG_EIP) // x86_32
+      if (uctx->uc_mcontext.gregs[REG_EIP] ==
+          reinterpret_cast<greg_t>(error_addr())) {
+        uctx->uc_mcontext.gregs[REG_EIP] =
+            *reinterpret_cast<size_t *>(uctx->uc_mcontext.gregs[REG_ESP]);
+      }
+      _stacktrace[index] =
+          reinterpret_cast<void *>(uctx->uc_mcontext.gregs[REG_EIP]);
+      ++index;
+      ctx = *reinterpret_cast<unw_context_t *>(uctx);
+#elif defined(__arm__)
+      // libunwind uses its own context type for ARM unwinding.
+      // Copy the registers from the signal handler's context so we can
+      // unwind
+      unw_getcontext(&ctx);
+      ctx.regs[UNW_ARM_R0] = uctx->uc_mcontext.arm_r0;
+      ctx.regs[UNW_ARM_R1] = uctx->uc_mcontext.arm_r1;
+      ctx.regs[UNW_ARM_R2] = uctx->uc_mcontext.arm_r2;
+      ctx.regs[UNW_ARM_R3] = uctx->uc_mcontext.arm_r3;
+      ctx.regs[UNW_ARM_R4] = uctx->uc_mcontext.arm_r4;
+      ctx.regs[UNW_ARM_R5] = uctx->uc_mcontext.arm_r5;
+      ctx.regs[UNW_ARM_R6] = uctx->uc_mcontext.arm_r6;
+      ctx.regs[UNW_ARM_R7] = uctx->uc_mcontext.arm_r7;
+      ctx.regs[UNW_ARM_R8] = uctx->uc_mcontext.arm_r8;
+      ctx.regs[UNW_ARM_R9] = uctx->uc_mcontext.arm_r9;
+      ctx.regs[UNW_ARM_R10] = uctx->uc_mcontext.arm_r10;
+      ctx.regs[UNW_ARM_R11] = uctx->uc_mcontext.arm_fp;
+      ctx.regs[UNW_ARM_R12] = uctx->uc_mcontext.arm_ip;
+      ctx.regs[UNW_ARM_R13] = uctx->uc_mcontext.arm_sp;
+      ctx.regs[UNW_ARM_R14] = uctx->uc_mcontext.arm_lr;
+      ctx.regs[UNW_ARM_R15] = uctx->uc_mcontext.arm_pc;
+
+      // If we have crashed in the PC use the LR instead, as this was
+      // a bad function dereference
+      if (reinterpret_cast<unsigned long>(error_addr()) ==
+          uctx->uc_mcontext.arm_pc) {
+        ctx.regs[UNW_ARM_R15] =
+            uctx->uc_mcontext.arm_lr - sizeof(unsigned long);
+      }
+      _stacktrace[index] = reinterpret_cast<void *>(ctx.regs[UNW_ARM_R15]);
+      ++index;
+#elif defined(__APPLE__) && defined(__x86_64__)
+      unw_getcontext(&ctx);
+      // OS X's implementation of libunwind uses its own context object
+      // so we need to convert the passed context to libunwind's format
+      // (information about the data layout taken from unw_getcontext.s
+      // in Apple's libunwind source
+      ctx.data[0] = uctx->uc_mcontext->__ss.__rax;
+      ctx.data[1] = uctx->uc_mcontext->__ss.__rbx;
+      ctx.data[2] = uctx->uc_mcontext->__ss.__rcx;
+      ctx.data[3] = uctx->uc_mcontext->__ss.__rdx;
+      ctx.data[4] = uctx->uc_mcontext->__ss.__rdi;
+      ctx.data[5] = uctx->uc_mcontext->__ss.__rsi;
+      ctx.data[6] = uctx->uc_mcontext->__ss.__rbp;
+      ctx.data[7] = uctx->uc_mcontext->__ss.__rsp;
+      ctx.data[8] = uctx->uc_mcontext->__ss.__r8;
+      ctx.data[9] = uctx->uc_mcontext->__ss.__r9;
+      ctx.data[10] = uctx->uc_mcontext->__ss.__r10;
+      ctx.data[11] = uctx->uc_mcontext->__ss.__r11;
+      ctx.data[12] = uctx->uc_mcontext->__ss.__r12;
+      ctx.data[13] = uctx->uc_mcontext->__ss.__r13;
+      ctx.data[14] = uctx->uc_mcontext->__ss.__r14;
+      ctx.data[15] = uctx->uc_mcontext->__ss.__r15;
+      ctx.data[16] = uctx->uc_mcontext->__ss.__rip;
+
+      // If the IP is the same as the crash address we have a bad function
+      // dereference The caller's address is pointed to by %rsp, so we
+      // dereference that value and set it to be the next frame's IP.
+      if (uctx->uc_mcontext->__ss.__rip ==
+          reinterpret_cast<__uint64_t>(error_addr())) {
+        ctx.data[16] =
+            *reinterpret_cast<__uint64_t *>(uctx->uc_mcontext->__ss.__rsp);
+      }
+      _stacktrace[index] = reinterpret_cast<void *>(ctx.data[16]);
+      ++index;
+#elif defined(__APPLE__)
+      unw_getcontext(&ctx)
+          // TODO: Convert the ucontext_t to libunwind's unw_context_t like
+          // we do in 64 bits
+          if (ctx.uc_mcontext->__ss.__eip ==
+              reinterpret_cast<greg_t>(error_addr())) {
+        ctx.uc_mcontext->__ss.__eip = ctx.uc_mcontext->__ss.__esp;
+      }
+      _stacktrace[index] =
+          reinterpret_cast<void *>(ctx.uc_mcontext->__ss.__eip);
+      ++index;
+#endif
+    }
+
+    unw_cursor_t cursor;
+    if (context()) {
+#if defined(UNW_INIT_SIGNAL_FRAME)
+      result = unw_init_local2(&cursor, &ctx, UNW_INIT_SIGNAL_FRAME);
+#else
+      result = unw_init_local(&cursor, &ctx);
+#endif
+    } else {
+      unw_getcontext(&ctx);
+      ;
+      result = unw_init_local(&cursor, &ctx);
+    }
+
+    if (result != 0)
+      return 1;
+
+    unw_word_t ip = 0;
+
+    while (index <= depth && unw_step(&cursor) > 0) {
+      result = unw_get_reg(&cursor, UNW_REG_IP, &ip);
+      if (result == 0) {
+        _stacktrace[index] = reinterpret_cast<void *>(--ip);
+        ++index;
+      }
+    }
+    --index;
+
+    _stacktrace.resize(index + 1);
+    skip_n_firsts(0);
+    return size();
+  }
+
+  size_t load_from(void *addr, size_t depth = 32, void *context = nullptr,
+                   void *error_addr = nullptr) {
+    load_here(depth + 8, context, error_addr);
+
+    for (size_t i = 0; i < _stacktrace.size(); ++i) {
+      if (_stacktrace[i] == addr) {
+        skip_n_firsts(i);
+        _stacktrace[i] = (void *)((uintptr_t)_stacktrace[i]);
+        break;
+      }
+    }
+
+    _stacktrace.resize(std::min(_stacktrace.size(), skip_n_firsts() + depth));
+    return size();
+  }
+};
+
+#elif defined(BACKWARD_HAS_BACKTRACE)
+
+template <>
+class StackTraceImpl<system_tag::current_tag> : public StackTraceImplHolder {
+public:
+  NOINLINE
+  size_t load_here(size_t depth = 32, void *context = nullptr,
+                   void *error_addr = nullptr) {
+    set_context(context);
+    set_error_addr(error_addr);
     load_thread_info();
     if (depth == 0) {
       return 0;
@@ -765,8 +1099,9 @@ public:
     return size();
   }
 
-  size_t load_from(void *addr, size_t depth = 32) {
-    load_here(depth + 8);
+  size_t load_from(void *addr, size_t depth = 32, void *context = nullptr,
+                   void *error_addr = nullptr) {
+    load_here(depth + 8, context, error_addr);
 
     for (size_t i = 0; i < _stacktrace.size(); ++i) {
       if (_stacktrace[i] == addr) {
@@ -781,25 +1116,125 @@ public:
   }
 };
 
-#endif // BACKWARD_HAS_UNWIND
+#elif defined(BACKWARD_SYSTEM_WINDOWS)
+
+template <>
+class StackTraceImpl<system_tag::current_tag> : public StackTraceImplHolder {
+public:
+  // We have to load the machine type from the image info
+  // So we first initialize the resolver, and it tells us this info
+  void set_machine_type(DWORD machine_type) { machine_type_ = machine_type; }
+  void set_context(CONTEXT *ctx) { ctx_ = ctx; }
+  void set_thread_handle(HANDLE handle) { thd_ = handle; }
+
+  NOINLINE
+  size_t load_here(size_t depth = 32, void *context = nullptr,
+                   void *error_addr = nullptr) {
+    set_context(static_cast<CONTEXT*>(context));
+    set_error_addr(error_addr);
+    CONTEXT localCtx; // used when no context is provided
+
+    if (depth == 0) {
+      return 0;
+    }
+
+    if (!ctx_) {
+      ctx_ = &localCtx;
+      RtlCaptureContext(ctx_);
+    }
+
+    if (!thd_) {
+      thd_ = GetCurrentThread();
+    }
+
+    HANDLE process = GetCurrentProcess();
+
+    STACKFRAME64 s;
+    memset(&s, 0, sizeof(STACKFRAME64));
+
+    // TODO: 32 bit context capture
+    s.AddrStack.Mode = AddrModeFlat;
+    s.AddrFrame.Mode = AddrModeFlat;
+    s.AddrPC.Mode = AddrModeFlat;
+#ifdef _M_X64
+    s.AddrPC.Offset = ctx_->Rip;
+    s.AddrStack.Offset = ctx_->Rsp;
+    s.AddrFrame.Offset = ctx_->Rbp;
+#else
+    s.AddrPC.Offset = ctx_->Eip;
+    s.AddrStack.Offset = ctx_->Esp;
+    s.AddrFrame.Offset = ctx_->Ebp;
+#endif
+
+    if (!machine_type_) {
+#ifdef _M_X64
+      machine_type_ = IMAGE_FILE_MACHINE_AMD64;
+#else
+      machine_type_ = IMAGE_FILE_MACHINE_I386;
+#endif
+    }
+
+    for (;;) {
+      // NOTE: this only works if PDBs are already loaded!
+      SetLastError(0);
+      if (!StackWalk64(machine_type_, process, thd_, &s, ctx_, NULL,
+                       SymFunctionTableAccess64, SymGetModuleBase64, NULL))
+        break;
+
+      if (s.AddrReturn.Offset == 0)
+        break;
+
+      _stacktrace.push_back(reinterpret_cast<void *>(s.AddrPC.Offset));
+
+      if (size() >= depth)
+        break;
+    }
+
+    return size();
+  }
+
+  size_t load_from(void *addr, size_t depth = 32, void *context = nullptr,
+                   void *error_addr = nullptr) {
+    load_here(depth + 8, context, error_addr);
+
+    for (size_t i = 0; i < _stacktrace.size(); ++i) {
+      if (_stacktrace[i] == addr) {
+        skip_n_firsts(i);
+        break;
+      }
+    }
+
+    _stacktrace.resize(std::min(_stacktrace.size(), skip_n_firsts() + depth));
+    return size();
+  }
+
+private:
+  DWORD machine_type_ = 0;
+  HANDLE thd_ = 0;
+  CONTEXT *ctx_ = nullptr;
+};
+
+#endif
 
 class StackTrace : public StackTraceImpl<system_tag::current_tag> {};
 
 /*************** TRACE RESOLVER ***************/
 
-template <typename TAG> class TraceResolverImpl;
-
-#ifdef BACKWARD_SYSTEM_UNKNOWN
-
-template <> class TraceResolverImpl<system_tag::unknown_tag> {
-public:
-  template <class ST> void load_stacktrace(ST &) {}
-  ResolvedTrace resolve(ResolvedTrace t) { return t; }
-};
-
-#endif
-
 class TraceResolverImplBase {
+public:
+  virtual ~TraceResolverImplBase() {}
+
+  virtual void load_addresses(void *const*addresses, int address_count) {
+    (void)addresses;
+    (void)address_count;
+  }
+
+  template <class ST> void load_stacktrace(ST &st) {
+    load_addresses(st.begin(), static_cast<int>(st.size()));
+  }
+
+  virtual ResolvedTrace resolve(ResolvedTrace t) { return t; }
+
 protected:
   std::string demangle(const char *funcname) {
     return _demangler.demangle(funcname);
@@ -809,36 +1244,52 @@ private:
   details::demangler _demangler;
 };
 
+template <typename TAG> class TraceResolverImpl;
+
+#ifdef BACKWARD_SYSTEM_UNKNOWN
+
+template <> class TraceResolverImpl<system_tag::unknown_tag>
+    : public TraceResolverImplBase {};
+
+#endif
+
 #ifdef BACKWARD_SYSTEM_LINUX
 
-class TraceResolverLinuxBase
-    : public TraceResolverImplBase {
+class TraceResolverLinuxBase : public TraceResolverImplBase {
 public:
   TraceResolverLinuxBase()
-    : argv0_(get_argv0()), exec_path_(read_symlink("/proc/self/exe")) {
-  }
+      : argv0_(get_argv0()), exec_path_(read_symlink("/proc/self/exe")) {}
   std::string resolve_exec_path(Dl_info &symbol_info) const {
-    // mutates symbol_info.dli_fname to be filename to open and returns filename to display
-    if(symbol_info.dli_fname == argv0_) {
+    // mutates symbol_info.dli_fname to be filename to open and returns filename
+    // to display
+    if (symbol_info.dli_fname == argv0_) {
       // dladdr returns argv[0] in dli_fname for symbols contained in
       // the main executable, which is not a valid path if the
       // executable was found by a search of the PATH environment
       // variable; In that case, we actually open /proc/self/exe, which
       // is always the actual executable (even if it was deleted/replaced!)
       // but display the path that /proc/self/exe links to.
+      // However, this right away reduces probability of successful symbol
+      // resolution, because libbfd may try to find *.debug files in the
+      // same dir, in case symbols are stripped. As a result, it may try
+      // to find a file /proc/self/<exe_name>.debug, which obviously does
+      // not exist. /proc/self/exe is a last resort. First load attempt
+      // should go for the original executable file path.
       symbol_info.dli_fname = "/proc/self/exe";
       return exec_path_;
     } else {
       return symbol_info.dli_fname;
     }
   }
+
 private:
   std::string argv0_;
   std::string exec_path_;
 
   static std::string get_argv0() {
     std::string argv0;
-    std::getline(std::ifstream("/proc/self/cmdline"), argv0, '\0');
+    std::ifstream ifs("/proc/self/cmdline");
+    std::getline(ifs, argv0, '\0');
     return argv0;
   }
 
@@ -872,15 +1323,14 @@ template <>
 class TraceResolverLinuxImpl<trace_resolver_tag::backtrace_symbol>
     : public TraceResolverLinuxBase {
 public:
-  template <class ST> void load_stacktrace(ST &st) {
-    using namespace details;
-    if (st.size() == 0) {
+  void load_addresses(void *const*addresses, int address_count) override {
+    if (address_count == 0) {
       return;
     }
-    _symbols.reset(backtrace_symbols(st.begin(), (int)st.size()));
+    _symbols.reset(backtrace_symbols(addresses, address_count));
   }
 
-  ResolvedTrace resolve(ResolvedTrace trace) {
+  ResolvedTrace resolve(ResolvedTrace trace) override {
     char *filename = _symbols[trace.idx];
     char *funcname = filename;
     while (*funcname && *funcname != '(') {
@@ -917,9 +1367,7 @@ class TraceResolverLinuxImpl<trace_resolver_tag::libbfd>
 public:
   TraceResolverLinuxImpl() : _bfd_loaded(false) {}
 
-  template <class ST> void load_stacktrace(ST &) {}
-
-  ResolvedTrace resolve(ResolvedTrace trace) {
+  ResolvedTrace resolve(ResolvedTrace trace) override {
     Dl_info symbol_info;
 
     // trace.addr is a virtual address in memory pointing to some code.
@@ -949,9 +1397,45 @@ public:
     }
 
     trace.object_filename = resolve_exec_path(symbol_info);
-    bfd_fileobject &fobj = load_object_with_bfd(symbol_info.dli_fname);
-    if (!fobj.handle) {
-      return trace; // sad, we couldn't load the object :(
+    bfd_fileobject *fobj;
+    // Before rushing to resolution need to ensure the executable
+    // file still can be used. For that compare inode numbers of
+    // what is stored by the executable's file path, and in the
+    // dli_fname, which not necessarily equals to the executable.
+    // It can be a shared library, or /proc/self/exe, and in the
+    // latter case has drawbacks. See the exec path resolution for
+    // details. In short - the dli object should be used only as
+    // the last resort.
+    // If inode numbers are equal, it is known dli_fname and the
+    // executable file are the same. This is guaranteed by Linux,
+    // because if the executable file is changed/deleted, it will
+    // be done in a new inode. The old file will be preserved in
+    // /proc/self/exe, and may even have inode 0. The latter can
+    // happen if the inode was actually reused, and the file was
+    // kept only in the main memory.
+    //
+    struct stat obj_stat;
+    struct stat dli_stat;
+    if (stat(trace.object_filename.c_str(), &obj_stat) == 0 &&
+        stat(symbol_info.dli_fname, &dli_stat) == 0 &&
+        obj_stat.st_ino == dli_stat.st_ino) {
+      // The executable file, and the shared object containing the
+      // address are the same file. Safe to use the original path.
+      // this is preferable. Libbfd will search for stripped debug
+      // symbols in the same directory.
+      fobj = load_object_with_bfd(trace.object_filename);
+    } else{
+      // The original object file was *deleted*! The only hope is
+      // that the debug symbols are either inside the shared
+      // object file, or are in the same directory, and this is
+      // not /proc/self/exe.
+      fobj = nullptr;
+    }
+    if (fobj == nullptr || !fobj->handle) {
+      fobj = load_object_with_bfd(symbol_info.dli_fname);
+      if (!fobj->handle) {
+        return trace;
+      }
     }
 
     find_sym_result *details_selected; // to be filled.
@@ -1071,7 +1555,7 @@ private:
   bool _bfd_loaded;
 
   typedef details::handle<bfd *,
-                          details::deleter<bfd_boolean, bfd *, &bfd_close>>
+                          details::deleter<bfd_boolean, bfd *, &bfd_close> >
       bfd_handle_t;
 
   typedef details::handle<asymbol **> bfd_symtab_t;
@@ -1086,7 +1570,7 @@ private:
   typedef details::hashtable<std::string, bfd_fileobject>::type fobj_bfd_map_t;
   fobj_bfd_map_t _fobj_bfd_map;
 
-  bfd_fileobject &load_object_with_bfd(const std::string &filename_object) {
+  bfd_fileobject *load_object_with_bfd(const std::string &filename_object) {
     using namespace details;
 
     if (!_bfd_loaded) {
@@ -1097,11 +1581,11 @@ private:
 
     fobj_bfd_map_t::iterator it = _fobj_bfd_map.find(filename_object);
     if (it != _fobj_bfd_map.end()) {
-      return it->second;
+      return &it->second;
     }
 
     // this new object is empty for now.
-    bfd_fileobject &r = _fobj_bfd_map[filename_object];
+    bfd_fileobject *r = &_fobj_bfd_map[filename_object];
 
     // we do the work temporary in this one;
     bfd_handle_t bfd_handle;
@@ -1150,9 +1634,9 @@ private:
       return r; // damned, that's a stripped file that you got there!
     }
 
-    r.handle = move(bfd_handle);
-    r.symtab = move(symtab);
-    r.dynamic_symtab = move(dynamic_symtab);
+    r->handle = move(bfd_handle);
+    r->symtab = move(symtab);
+    r->dynamic_symtab = move(dynamic_symtab);
     return r;
   }
 
@@ -1171,15 +1655,15 @@ private:
     find_sym_result result;
   };
 
-  find_sym_result find_symbol_details(bfd_fileobject &fobj, void *addr,
+  find_sym_result find_symbol_details(bfd_fileobject *fobj, void *addr,
                                       void *base_addr) {
     find_sym_context context;
     context.self = this;
-    context.fobj = &fobj;
+    context.fobj = fobj;
     context.addr = addr;
     context.base_addr = base_addr;
     context.result.found = false;
-    bfd_map_over_sections(fobj.handle.get(), &find_in_section_trampoline,
+    bfd_map_over_sections(fobj->handle.get(), &find_in_section_trampoline,
                           static_cast<void *>(&context));
     return context.result;
   }
@@ -1188,20 +1672,32 @@ private:
     find_sym_context *context = static_cast<find_sym_context *>(data);
     context->self->find_in_section(
         reinterpret_cast<bfd_vma>(context->addr),
-        reinterpret_cast<bfd_vma>(context->base_addr), *context->fobj, section,
+        reinterpret_cast<bfd_vma>(context->base_addr), context->fobj, section,
         context->result);
   }
 
-  void find_in_section(bfd_vma addr, bfd_vma base_addr, bfd_fileobject &fobj,
+  void find_in_section(bfd_vma addr, bfd_vma base_addr, bfd_fileobject *fobj,
                        asection *section, find_sym_result &result) {
     if (result.found)
       return;
 
-    if ((bfd_get_section_flags(fobj.handle.get(), section) & SEC_ALLOC) == 0)
+#ifdef bfd_get_section_flags
+    if ((bfd_get_section_flags(fobj->handle.get(), section) & SEC_ALLOC) == 0)
+#else
+    if ((bfd_section_flags(section) & SEC_ALLOC) == 0)
+#endif
       return; // a debug section is never loaded automatically.
 
-    bfd_vma sec_addr = bfd_get_section_vma(fobj.handle.get(), section);
+#ifdef bfd_get_section_vma
+    bfd_vma sec_addr = bfd_get_section_vma(fobj->handle.get(), section);
+#else
+    bfd_vma sec_addr = bfd_section_vma(section);
+#endif
+#ifdef bfd_get_section_size
     bfd_size_type size = bfd_get_section_size(section);
+#else
+    bfd_size_type size = bfd_section_size(section);
+#endif
 
     // are we in the boundaries of the section?
     if (addr < sec_addr || addr >= sec_addr + size) {
@@ -1215,15 +1711,15 @@ private:
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
 #endif
-    if (!result.found && fobj.symtab) {
+    if (!result.found && fobj->symtab) {
       result.found = bfd_find_nearest_line(
-          fobj.handle.get(), section, fobj.symtab.get(), addr - sec_addr,
+          fobj->handle.get(), section, fobj->symtab.get(), addr - sec_addr,
           &result.filename, &result.funcname, &result.line);
     }
 
-    if (!result.found && fobj.dynamic_symtab) {
+    if (!result.found && fobj->dynamic_symtab) {
       result.found = bfd_find_nearest_line(
-          fobj.handle.get(), section, fobj.dynamic_symtab.get(),
+          fobj->handle.get(), section, fobj->dynamic_symtab.get(),
           addr - sec_addr, &result.filename, &result.funcname, &result.line);
     }
 #if defined(__clang__)
@@ -1232,13 +1728,13 @@ private:
   }
 
   ResolvedTrace::source_locs_t
-  backtrace_inliners(bfd_fileobject &fobj, find_sym_result previous_result) {
+  backtrace_inliners(bfd_fileobject *fobj, find_sym_result previous_result) {
     // This function can be called ONLY after a SUCCESSFUL call to
     // find_symbol_details. The state is global to the bfd_handle.
     ResolvedTrace::source_locs_t results;
     while (previous_result.found) {
       find_sym_result result;
-      result.found = bfd_find_inliner_info(fobj.handle.get(), &result.filename,
+      result.found = bfd_find_inliner_info(fobj->handle.get(), &result.filename,
                                            &result.funcname, &result.line);
 
       if (result
@@ -1281,9 +1777,7 @@ class TraceResolverLinuxImpl<trace_resolver_tag::libdw>
 public:
   TraceResolverLinuxImpl() : _dwfl_handle_initialized(false) {}
 
-  template <class ST> void load_stacktrace(ST &) {}
-
-  ResolvedTrace resolve(ResolvedTrace trace) {
+  ResolvedTrace resolve(ResolvedTrace trace) override {
     using namespace details;
 
     Dwarf_Addr trace_addr = (Dwarf_Addr)trace.addr;
@@ -1433,9 +1927,9 @@ public:
   }
 
 private:
-  typedef details::handle<Dwfl *, details::deleter<void, Dwfl *, &dwfl_end>>
+  typedef details::handle<Dwfl *, details::deleter<void, Dwfl *, &dwfl_end> >
       dwfl_handle_t;
-  details::handle<Dwfl_Callbacks *, details::default_delete<Dwfl_Callbacks *>>
+  details::handle<Dwfl_Callbacks *, details::default_delete<Dwfl_Callbacks *> >
       _dwfl_cb;
   dwfl_handle_t _dwfl_handle;
   bool _dwfl_handle_initialized;
@@ -1576,9 +2070,9 @@ private:
 
   static const char *die_call_file(Dwarf_Die *die) {
     Dwarf_Attribute attr_mem;
-    Dwarf_Sword file_idx = 0;
+    Dwarf_Word file_idx = 0;
 
-    dwarf_formsdata(dwarf_attr(die, DW_AT_call_file, &attr_mem), &file_idx);
+    dwarf_formudata(dwarf_attr(die, DW_AT_call_file, &attr_mem), &file_idx);
 
     if (file_idx == 0) {
       return 0;
@@ -1610,9 +2104,7 @@ class TraceResolverLinuxImpl<trace_resolver_tag::libdwarf>
 public:
   TraceResolverLinuxImpl() : _dwarf_loaded(false) {}
 
-  template <class ST> void load_stacktrace(ST &) {}
-
-  ResolvedTrace resolve(ResolvedTrace trace) {
+  ResolvedTrace resolve(ResolvedTrace trace) override {
     // trace.addr is a virtual address in memory pointing to some code.
     // Let's try to find from which loaded object it comes from.
     // The loaded object can be yourself btw.
@@ -1759,14 +2251,14 @@ public:
 private:
   bool _dwarf_loaded;
 
-  typedef details::handle<int, details::deleter<int, int, &::close>>
+  typedef details::handle<int, details::deleter<int, int, &::close> >
       dwarf_file_t;
 
-  typedef details::handle<Elf *, details::deleter<int, Elf *, &elf_end>>
+  typedef details::handle<Elf *, details::deleter<int, Elf *, &elf_end> >
       dwarf_elf_t;
 
   typedef details::handle<Dwarf_Debug,
-                          details::deleter<int, Dwarf_Debug, &close_dwarf>>
+                          details::deleter<int, Dwarf_Debug, &close_dwarf> >
       dwarf_handle_t;
 
   typedef std::map<Dwarf_Addr, int> die_linemap_t;
@@ -1838,7 +2330,7 @@ private:
 
     dwarf_file_t file_handle;
     file_handle.reset(open(filename_object.c_str(), O_RDONLY));
-    if (file_handle < 0) {
+    if (file_handle.get() < 0) {
       return r;
     }
 
@@ -2628,7 +3120,7 @@ private:
             trace.object_function = demangler.demangle(linkage);
             dwarf_dealloc(dwarf, linkage, DW_DLA_STRING);
           }
-          dwarf_dealloc(dwarf, name, DW_DLA_ATTR);
+          dwarf_dealloc(dwarf, attr_mem, DW_DLA_ATTR);
         }
         break;
 
@@ -2836,12 +3328,12 @@ private:
                                    Dwarf_Die cu_die) {
     Dwarf_Attribute attr_mem;
     Dwarf_Error error = DW_DLE_NE;
-    Dwarf_Signed file_index;
+    Dwarf_Unsigned file_index;
 
     std::string file;
 
     if (dwarf_attr(die, DW_AT_call_file, &attr_mem, &error) == DW_DLV_OK) {
-      if (dwarf_formsdata(attr_mem, &file_index, &error) != DW_DLV_OK) {
+      if (dwarf_formudata(attr_mem, &file_index, &error) != DW_DLV_OK) {
         file_index = 0;
       }
       dwarf_dealloc(dwarf, attr_mem, DW_DLA_ATTR);
@@ -2853,8 +3345,9 @@ private:
       char **srcfiles = 0;
       Dwarf_Signed file_count = 0;
       if (dwarf_srcfiles(cu_die, &srcfiles, &file_count, &error) == DW_DLV_OK) {
-        if (file_index <= file_count)
+        if (file_count > 0 && file_index <= static_cast<Dwarf_Unsigned>(file_count)) {
           file = std::string(srcfiles[file_index - 1]);
+	}
 
         // Deallocate all strings!
         for (int i = 0; i < file_count; ++i) {
@@ -2991,15 +3484,14 @@ template <>
 class TraceResolverDarwinImpl<trace_resolver_tag::backtrace_symbol>
     : public TraceResolverImplBase {
 public:
-  template <class ST> void load_stacktrace(ST &st) {
-    using namespace details;
-    if (st.size() == 0) {
+  void load_addresses(void *const*addresses, int address_count) override {
+    if (address_count == 0) {
       return;
     }
-    _symbols.reset(backtrace_symbols(st.begin(), st.size()));
+    _symbols.reset(backtrace_symbols(addresses, address_count));
   }
 
-  ResolvedTrace resolve(ResolvedTrace trace) {
+  ResolvedTrace resolve(ResolvedTrace trace) override {
     // parse:
     // <n>  <file>  <addr>  <mangled-name> + <offset>
     char *filename = _symbols[trace.idx];
@@ -3068,17 +3560,158 @@ class TraceResolverImpl<system_tag::darwin_tag>
 
 #endif // BACKWARD_SYSTEM_DARWIN
 
+#ifdef BACKWARD_SYSTEM_WINDOWS
+
+// Load all symbol info
+// Based on:
+// https://stackoverflow.com/questions/6205981/windows-c-stack-trace-from-a-running-app/28276227#28276227
+
+struct module_data {
+  std::string image_name;
+  std::string module_name;
+  void *base_address;
+  DWORD load_size;
+};
+
+class get_mod_info {
+  HANDLE process;
+  static const int buffer_length = 4096;
+
+public:
+  get_mod_info(HANDLE h) : process(h) {}
+
+  module_data operator()(HMODULE module) {
+    module_data ret;
+    char temp[buffer_length];
+    MODULEINFO mi;
+
+    GetModuleInformation(process, module, &mi, sizeof(mi));
+    ret.base_address = mi.lpBaseOfDll;
+    ret.load_size = mi.SizeOfImage;
+
+    GetModuleFileNameExA(process, module, temp, sizeof(temp));
+    ret.image_name = temp;
+    GetModuleBaseNameA(process, module, temp, sizeof(temp));
+    ret.module_name = temp;
+    std::vector<char> img(ret.image_name.begin(), ret.image_name.end());
+    std::vector<char> mod(ret.module_name.begin(), ret.module_name.end());
+    SymLoadModule64(process, 0, &img[0], &mod[0], (DWORD64)ret.base_address,
+                    ret.load_size);
+    return ret;
+  }
+};
+
+template <> class TraceResolverImpl<system_tag::windows_tag>
+    : public TraceResolverImplBase {
+public:
+  TraceResolverImpl() {
+
+    HANDLE process = GetCurrentProcess();
+
+    std::vector<module_data> modules;
+    DWORD cbNeeded;
+    std::vector<HMODULE> module_handles(1);
+    SymInitialize(process, NULL, false);
+    DWORD symOptions = SymGetOptions();
+    symOptions |= SYMOPT_LOAD_LINES | SYMOPT_UNDNAME;
+    SymSetOptions(symOptions);
+    EnumProcessModules(process, &module_handles[0],
+                       module_handles.size() * sizeof(HMODULE), &cbNeeded);
+    module_handles.resize(cbNeeded / sizeof(HMODULE));
+    EnumProcessModules(process, &module_handles[0],
+                       module_handles.size() * sizeof(HMODULE), &cbNeeded);
+    std::transform(module_handles.begin(), module_handles.end(),
+                   std::back_inserter(modules), get_mod_info(process));
+    void *base = modules[0].base_address;
+    IMAGE_NT_HEADERS *h = ImageNtHeader(base);
+    image_type = h->FileHeader.Machine;
+  }
+
+  static const int max_sym_len = 255;
+  struct symbol_t {
+    SYMBOL_INFO sym;
+    char buffer[max_sym_len];
+  } sym;
+
+  DWORD64 displacement;
+
+  ResolvedTrace resolve(ResolvedTrace t) override {
+    HANDLE process = GetCurrentProcess();
+
+    char name[256];
+
+    memset(&sym, 0, sizeof(sym));
+    sym.sym.SizeOfStruct = sizeof(SYMBOL_INFO);
+    sym.sym.MaxNameLen = max_sym_len;
+
+    if (!SymFromAddr(process, (ULONG64)t.addr, &displacement, &sym.sym)) {
+      // TODO:  error handling everywhere
+      char* lpMsgBuf;
+      DWORD dw = GetLastError();
+
+      if (FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                             FORMAT_MESSAGE_FROM_SYSTEM |
+                             FORMAT_MESSAGE_IGNORE_INSERTS,
+                         NULL, dw, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                         (char*)&lpMsgBuf, 0, NULL)) {
+        std::fprintf(stderr, "%s\n", lpMsgBuf);
+        LocalFree(lpMsgBuf);
+      }
+
+      // abort();
+    }
+    UnDecorateSymbolName(sym.sym.Name, (PSTR)name, 256, UNDNAME_COMPLETE);
+
+    DWORD offset = 0;
+    IMAGEHLP_LINE line;
+    if (SymGetLineFromAddr(process, (ULONG64)t.addr, &offset, &line)) {
+      t.object_filename = line.FileName;
+      t.source.filename = line.FileName;
+      t.source.line = line.LineNumber;
+      t.source.col = offset;
+    }
+
+    t.source.function = name;
+    t.object_filename = "";
+    t.object_function = name;
+
+    return t;
+  }
+
+  DWORD machine_type() const { return image_type; }
+
+private:
+  DWORD image_type;
+};
+
+#endif
+
 class TraceResolver : public TraceResolverImpl<system_tag::current_tag> {};
 
 /*************** CODE SNIPPET ***************/
 
 class SourceFile {
 public:
-  typedef std::vector<std::pair<unsigned, std::string>> lines_t;
+  typedef std::vector<std::pair<unsigned, std::string> > lines_t;
 
   SourceFile() {}
-  SourceFile(const std::string &path)
-      : _file(new std::ifstream(path.c_str())) {}
+  SourceFile(const std::string &path) {
+    // 1. If BACKWARD_CXX_SOURCE_PREFIXES is set then assume it contains
+    //    a colon-separated list of path prefixes.  Try prepending each
+    //    to the given path until a valid file is found.
+    const std::vector<std::string> &prefixes = get_paths_from_env_variable();
+    for (size_t i = 0; i < prefixes.size(); ++i) {
+      // Double slashes (//) should not be a problem.
+      std::string new_path = prefixes[i] + '/' + path;
+      _file.reset(new std::ifstream(new_path.c_str()));
+      if (is_open())
+        break;
+    }
+    // 2. If no valid file found then fallback to opening the path as-is.
+    if (!_file || !is_open()) {
+      _file.reset(new std::ifstream(path.c_str()));
+    }
+  }
   bool is_open() const { return _file->is_open(); }
 
   lines_t &get_lines(unsigned line_start, unsigned line_count, lines_t &lines) {
@@ -3171,8 +3804,22 @@ public:
 #endif
 
 private:
-  details::handle<std::ifstream *, details::default_delete<std::ifstream *>>
+  details::handle<std::ifstream *, details::default_delete<std::ifstream *> >
       _file;
+
+  std::vector<std::string> get_paths_from_env_variable_impl() {
+    std::vector<std::string> paths;
+    const char *prefixes_str = std::getenv("BACKWARD_CXX_SOURCE_PREFIXES");
+    if (prefixes_str && prefixes_str[0]) {
+      paths = details::split_source_prefixes(prefixes_str);
+    }
+    return paths;
+  }
+
+  const std::vector<std::string> &get_paths_from_env_variable() {
+    static std::vector<std::string> paths = get_paths_from_env_variable_impl();
+    return paths;
+  }
 
 #ifdef BACKWARD_ATLEAST_CXX11
   SourceFile(const SourceFile &) = delete;
@@ -3248,7 +3895,7 @@ public:
   cfile_streambuf(FILE *_sink) : sink(_sink) {}
   int_type underflow() override { return traits_type::eof(); }
   int_type overflow(int_type ch) override {
-    if (traits_type::not_eof(ch) && fwrite(&ch, sizeof ch, 1, sink) == 1) {
+    if (traits_type::not_eof(ch) && fputc(ch, sink) != EOF) {
       return ch;
     }
     return traits_type::eof();
@@ -3378,6 +4025,8 @@ public:
     print_stacktrace(begin, end, os, thread_id, colorize);
     return os;
   }
+
+  TraceResolver const &resolver() const { return _resolver; }
 
 private:
   TraceResolver _resolver;
@@ -3569,10 +4218,19 @@ public:
 #elif defined(__arm__)
     error_addr = reinterpret_cast<void *>(uctx->uc_mcontext.arm_pc);
 #elif defined(__aarch64__)
-    error_addr = reinterpret_cast<void *>(uctx->uc_mcontext.pc);
+    #if defined(__APPLE__)
+      error_addr = reinterpret_cast<void *>(uctx->uc_mcontext->__ss.__pc);
+    #else
+      error_addr = reinterpret_cast<void *>(uctx->uc_mcontext.pc);
+    #endif
+#elif defined(__mips__)
+    error_addr = reinterpret_cast<void *>(
+        reinterpret_cast<struct sigcontext *>(&uctx->uc_mcontext)->sc_pc);
 #elif defined(__ppc__) || defined(__powerpc) || defined(__powerpc__) ||        \
     defined(__POWERPC__)
     error_addr = reinterpret_cast<void *>(uctx->uc_mcontext.regs->nip);
+#elif defined(__riscv)
+    error_addr = reinterpret_cast<void *>(uctx->uc_mcontext.__gregs[REG_PC]);
 #elif defined(__s390x__)
     error_addr = reinterpret_cast<void *>(uctx->uc_mcontext.psw.addr);
 #elif defined(__APPLE__) && defined(__x86_64__)
@@ -3583,16 +4241,18 @@ public:
 #warning ":/ sorry, ain't know no nothing none not of your architecture!"
 #endif
     if (error_addr) {
-      st.load_from(error_addr, 32);
+      st.load_from(error_addr, 32, reinterpret_cast<void *>(uctx),
+                   info->si_addr);
     } else {
-      st.load_here(32);
+      st.load_here(32, reinterpret_cast<void *>(uctx), info->si_addr);
     }
 
     Printer printer;
     printer.address = true;
     printer.print(st, stderr);
 
-#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
+#if (defined(_XOPEN_SOURCE) && _XOPEN_SOURCE >= 700) || \
+    (defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200809L)
     psiginfo(info, nullptr);
 #else
     (void)info;
@@ -3620,6 +4280,180 @@ private:
 };
 
 #endif // BACKWARD_SYSTEM_LINUX || BACKWARD_SYSTEM_DARWIN
+
+#ifdef BACKWARD_SYSTEM_WINDOWS
+
+class SignalHandling {
+public:
+  SignalHandling(const std::vector<int> & = std::vector<int>())
+      : reporter_thread_([]() {
+          /* We handle crashes in a utility thread:
+            backward structures and some Windows functions called here
+            need stack space, which we do not have when we encounter a
+            stack overflow.
+            To support reporting stack traces during a stack overflow,
+            we create a utility thread at startup, which waits until a
+            crash happens or the program exits normally. */
+
+          {
+            std::unique_lock<std::mutex> lk(mtx());
+            cv().wait(lk, [] { return crashed() != crash_status::running; });
+          }
+          if (crashed() == crash_status::crashed) {
+            handle_stacktrace(skip_recs());
+          }
+          {
+            std::unique_lock<std::mutex> lk(mtx());
+            crashed() = crash_status::ending;
+          }
+          cv().notify_one();
+        }) {
+    SetUnhandledExceptionFilter(crash_handler);
+
+    signal(SIGABRT, signal_handler);
+    _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
+
+    std::set_terminate(&terminator);
+#ifndef BACKWARD_ATLEAST_CXX17
+    std::set_unexpected(&terminator);
+#endif
+    _set_purecall_handler(&terminator);
+    _set_invalid_parameter_handler(&invalid_parameter_handler);
+  }
+  bool loaded() const { return true; }
+
+  ~SignalHandling() {
+    {
+      std::unique_lock<std::mutex> lk(mtx());
+      crashed() = crash_status::normal_exit;
+    }
+
+    cv().notify_one();
+
+    reporter_thread_.join();
+  }
+
+private:
+  static CONTEXT *ctx() {
+    static CONTEXT data;
+    return &data;
+  }
+
+  enum class crash_status { running, crashed, normal_exit, ending };
+
+  static crash_status &crashed() {
+    static crash_status data;
+    return data;
+  }
+
+  static std::mutex &mtx() {
+    static std::mutex data;
+    return data;
+  }
+
+  static std::condition_variable &cv() {
+    static std::condition_variable data;
+    return data;
+  }
+
+  static HANDLE &thread_handle() {
+    static HANDLE handle;
+    return handle;
+  }
+
+  std::thread reporter_thread_;
+
+  // TODO: how not to hardcode these?
+  static const constexpr int signal_skip_recs =
+#ifdef __clang__
+      // With clang, RtlCaptureContext also captures the stack frame of the
+      // current function Below that, there ar 3 internal Windows functions
+      4
+#else
+      // With MSVC cl, RtlCaptureContext misses the stack frame of the current
+      // function The first entries during StackWalk are the 3 internal Windows
+      // functions
+      3
+#endif
+      ;
+
+  static int &skip_recs() {
+    static int data;
+    return data;
+  }
+
+  static inline void terminator() {
+    crash_handler(signal_skip_recs);
+    abort();
+  }
+
+  static inline void signal_handler(int) {
+    crash_handler(signal_skip_recs);
+    abort();
+  }
+
+  static inline void __cdecl invalid_parameter_handler(const wchar_t *,
+                                                       const wchar_t *,
+                                                       const wchar_t *,
+                                                       unsigned int,
+                                                       uintptr_t) {
+    crash_handler(signal_skip_recs);
+    abort();
+  }
+
+  NOINLINE static LONG WINAPI crash_handler(EXCEPTION_POINTERS *info) {
+    // The exception info supplies a trace from exactly where the issue was,
+    // no need to skip records
+    crash_handler(0, info->ContextRecord);
+    return EXCEPTION_CONTINUE_SEARCH;
+  }
+
+  NOINLINE static void crash_handler(int skip, CONTEXT *ct = nullptr) {
+
+    if (ct == nullptr) {
+      RtlCaptureContext(ctx());
+    } else {
+      memcpy(ctx(), ct, sizeof(CONTEXT));
+    }
+    DuplicateHandle(GetCurrentProcess(), GetCurrentThread(),
+                    GetCurrentProcess(), &thread_handle(), 0, FALSE,
+                    DUPLICATE_SAME_ACCESS);
+
+    skip_recs() = skip;
+
+    {
+      std::unique_lock<std::mutex> lk(mtx());
+      crashed() = crash_status::crashed;
+    }
+
+    cv().notify_one();
+
+    {
+      std::unique_lock<std::mutex> lk(mtx());
+      cv().wait(lk, [] { return crashed() != crash_status::crashed; });
+    }
+  }
+
+  static void handle_stacktrace(int skip_frames = 0) {
+    // printer creates the TraceResolver, which can supply us a machine type
+    // for stack walking. Without this, StackTrace can only guess using some
+    // macros.
+    // StackTrace also requires that the PDBs are already loaded, which is done
+    // in the constructor of TraceResolver
+    Printer printer;
+
+    StackTrace st;
+    st.set_machine_type(printer.resolver().machine_type());
+    st.set_thread_handle(thread_handle());
+    st.load_here(32 + skip_frames, ctx());
+    st.skip_n_firsts(skip_frames);
+
+    printer.address = true;
+    printer.print(st, std::cerr);
+  }
+};
+
+#endif // BACKWARD_SYSTEM_WINDOWS
 
 #ifdef BACKWARD_SYSTEM_UNKNOWN
 
