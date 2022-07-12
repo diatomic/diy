@@ -144,7 +144,7 @@ namespace diy
   template<class T>
   void                  load_back(BinaryBuffer& bb, T& x)           { bb.load_binary_back((char*) &x, sizeof(T)); }
 
-  //@}
+  //!@}
 
 
   namespace detail
