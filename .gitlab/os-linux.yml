@@ -1,125 +1,111 @@
+---
 # Linux-specific builder configurations and build commands
-
-## Base images
-
+# yamllint disable rule:colons
 .linux:
-    variables:
-        GIT_CLONE_PATH: $CI_BUILDS_DIR/gitlab-kitware-sciviz-ci
+  variables:
+    GIT_CLONE_PATH:           "$CI_BUILDS_DIR/gitlab-kitware-sciviz-ci"
+    CCACHE_SECONDARY_STORAGE: "redis://redis.kitware.com:6380"
+    CCACHE_BASEDIR:           "$CI_PROJECT_DIR"
+    CCACHE_COMPILERCHECK:     "content"
+    CCACHE_NOHASHDIR:         "true"
+    CCACHE_RESHARE:           "true"
+    CCACHE_INSTALL_DIR:       "$CI_PROJECT_DIR/.gitlab"
 
 .fedora34:
-    extends: .linux
-    image: "diatomic/diy:ci-diy-fedora34-20211014"
-
-.fedora_mpich_addon:
-    variables:
-        MODULES: mpi/mpich-x86_64
-        # Even with SHM size of 512m, SIGBUS still happened. Let's just use the
-        # network instead for reliability.
-        # https://wiki.mpich.org/mpich/index.php/Frequently_Asked_Questions#Q:_Why_MPI_Put_raises_SIGBUS_error_inside_docker.3F
-        MPIR_CVAR_NOLOCAL: 1
-
-.fedora_openmpi_addon:
-    variables:
-        # Needed to work with OpenMPI
-        OMPI_ALLOW_RUN_AS_ROOT: 1
-        OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: 1
-        MODULES: mpi/openmpi-x86_64
+  extends: .linux
+  image: "diatomic/diy:ci-diy-fedora34-20211014"
 
 .fedora34_mpich: &fedora34_mpich
-    extends: .fedora34
-
-    variables:
-        CMAKE_CONFIGURATION: fedora34_mpich
+  extends: .fedora34
+  variables:
+    CMAKE_CONFIGURATION: fedora34_mpich
 
 .fedora34_mpich_nothreads: &fedora34_mpich_nothreads
-    extends: .fedora34_mpich
-
-    variables:
-        CMAKE_CONFIGURATION: fedora34_mpich_nothreads
+  extends: .fedora34_mpich
+  variables:
+    CMAKE_CONFIGURATION: fedora34_mpich_nothreads
 
 .fedora34_openmpi: &fedora34_openmpi
-    extends: .fedora34
-
-    variables:
-        CMAKE_CONFIGURATION: fedora34_openmpi
-        OMPI_ALLOW_RUN_AS_ROOT: 1
-        OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: 1
+  extends: .fedora34
+  variables:
+    CMAKE_CONFIGURATION: fedora34_openmpi
+    OMPI_ALLOW_RUN_AS_ROOT: 1
+    OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: 1
+    # Force BTL as the PML
+    OMPI_MCA_pml: "ob1"
+    # Exclude vader BTL due to shm limitations
+    OMPI_MCA_btl: "self,tcp"
+    # Use TCP BTL as UCX backend (as opposed to libfabric)
+    UCX_TLS: "tcp"
+    # Ignore hwloc warnings
+    HWLOC_HIDE_ERRORS: 0
+    # Be verbose
+    OMPI_MCA_btl_base_verbose: 20
 
 .fedora34_memcheck: &fedora34_memcheck
-    extends: .fedora34_mpich
-
-    variables:
-        CMAKE_BUILD_TYPE: RelWithDebInfo
+  extends: .fedora34_mpich
+  variables:
+    CMAKE_BUILD_TYPE: RelWithDebInfo
 
 .fedora34_asan: &fedora34_asan
-    extends: .fedora34_memcheck
-
-    variables:
-        CMAKE_CONFIGURATION: fedora34_asan
-        CTEST_MEMORYCHECK_TYPE: AddressSanitizer
-        # Disable LeakSanitizer for now. It's catching all kinds of errors that
-        # need investigated or suppressed.
-        CTEST_MEMORYCHECK_SANITIZER_OPTIONS: detect_leaks=0
+  extends: .fedora34_memcheck
+  variables:
+    CMAKE_CONFIGURATION: fedora34_asan
+    CTEST_MEMORYCHECK_TYPE: AddressSanitizer
 
 .fedora34_ubsan: &fedora34_ubsan
-    extends: .fedora34_memcheck
+  extends: .fedora34_memcheck
 
-    variables:
-        CMAKE_CONFIGURATION: fedora34_ubsan
-        CTEST_MEMORYCHECK_TYPE: UndefinedBehaviorSanitizer
+  variables:
+    CMAKE_CONFIGURATION: fedora34_ubsan
+    CTEST_MEMORYCHECK_TYPE: UndefinedBehaviorSanitizer
 
 .linux_builder_tags:
-    tags:
-        - diy
-        - build
-        - docker
-        - linux
+  tags:
+    - diy
+    - build
+    - docker
+    - linux
 
 .linux_tester_priv_tags:
-    tags:
-        - diy
-        - docker
-        - linux
-        - privileged
+  tags:
+    - diy
+    - docker
+    - linux
+    - privileged
 
 ## Linux-specific scripts
-
 .before_script_linux: &before_script_linux
-    - .gitlab/ci/cmake.sh
-    - .gitlab/ci/ninja.sh
-    - export PATH=$PWD/.gitlab:$PWD/.gitlab/cmake/bin:$PATH
-    - cmake --version
-    - ninja --version
-    # Load any modules that may be necessary.
-    - '[ -n "$MODULES" ] && . /etc/profile.d/modules.sh && module load $MODULES'
+  - .gitlab/ci/cmake.sh
+  - export PATH=$PWD/.gitlab/cmake/bin:$PATH
+  - cmake -VV -P .gitlab/ci/ninja.cmake
+  - export PATH=$PWD/.gitlab:$PWD/.gitlab/cmake/bin:$PATH
+  - cmake --version
+  - ninja --version
 
 .cmake_build_linux:
-    stage: build
-
-    script:
-        - *before_script_linux
-        - .gitlab/ci/sccache.sh
-        - sccache --start-server
-        - sccache --show-stats
-        - $LAUNCHER ctest -VV -S .gitlab/ci/ctest_configure.cmake
-        - $LAUNCHER ctest -VV -S .gitlab/ci/ctest_build.cmake &> $GIT_CLONE_PATH/compile_output.log
-        - sccache --show-stats
-
-    interruptible: true
+  stage: build
+  script:
+    - *before_script_linux
+    - export PATH=$PWD/.gitlab/ccache:$PATH
+    - cmake -VV -P .gitlab/ci/ccache.cmake
+    - ccache -z
+    - ccache -s
+    - ctest -VV -S .gitlab/ci/ctest_configure.cmake
+    - ctest -VV -S .gitlab/ci/ctest_build.cmake
+    - ccache -s
+  interruptible: true
 
 .cmake_test_linux:
-    stage: test
-
-    script:
-        - *before_script_linux
-        - ctest -V --output-on-failure -S .gitlab/ci/ctest_test.cmake
-
-    interruptible: true
+  stage: test
+  script:
+    - *before_script_linux
+    - ctest -V --output-on-failure -S .gitlab/ci/ctest_test.cmake
+  interruptible: true
 
 .cmake_memcheck_linux:
-    stage: test
-
-    script:
-        - *before_script_linux
-        - "$LAUNCHER ctest --output-on-failure -V -S .gitlab/ci/ctest_memcheck.cmake"
-    interruptible: true
+  stage: test
+  script:
+    - *before_script_linux
+    - ctest --output-on-failure -V -S .gitlab/ci/ctest_memcheck.cmake
+  interruptible: true

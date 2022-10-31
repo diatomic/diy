@@ -6,4 +6,5 @@ set(log ON CACHE BOOL "")
 set(mpi ON CACHE BOOL "")
 set(threads ON CACHE BOOL "")
 
-include("${CMAKE_CURRENT_LIST_DIR}/configure_sccache.cmake")
+set(CMAKE_CXX_STANDARD "11" CACHE STRING "")
+set(CMAKE_CXX_STANDARD_REQUIRED "11" CACHE STRING "")

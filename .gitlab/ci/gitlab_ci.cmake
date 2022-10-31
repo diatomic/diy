@@ -14,7 +14,7 @@ if ("$ENV{CMAKE_CONFIGURATION}" STREQUAL "")
 endif ()
 
 # Set the build metadata.
-set(CTEST_BUILD_NAME "$ENV{CI_PROJECT_NAME}-$ENV{CMAKE_CONFIGURATION}")
+set(CTEST_BUILD_NAME "$ENV{CMAKE_CONFIGURATION}")
 set(CTEST_SITE "gitlab-ci")
 
 # Default to Release builds.
@@ -37,10 +37,8 @@ endif ()
 set(ctest_track "Experimental")
 if (NOT "$ENV{CI_MERGE_REQUEST_ID}" STREQUAL "")
   set(ctest_track "merge-requests")
-elseif ("$ENV{CI_PROJECT_PATH}" STREQUAL "cmb/smtk")
+elseif ("$ENV{CI_PROJECT_PATH}" STREQUAL "diatomic/diy")
   if ("$ENV{CI_COMMIT_REF_NAME}" STREQUAL "master")
     set(ctest_track "master")
-  elseif ("$ENV{CI_COMMIT_REF_NAME}" STREQUAL "release")
-    set(ctest_track "release")
   endif ()
 endif ()
