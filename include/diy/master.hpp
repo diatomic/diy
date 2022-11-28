@@ -36,9 +36,13 @@ namespace diy
       using Deallocate = BinaryBlob::Deleter;
       using MemCopy = std::function<void(char*, const char*, size_t)>;
 
-      Allocate      allocate    = Allocate([](int /* gid */, size_t n) { return new char[n]; });
-      Deallocate    deallocate  = Deallocate([](const char* p) { delete[] p; });
-      MemCopy       copy        = MemCopy([](char* dest, const char* src, size_t count) { std::memcpy(dest, src, count); });
+      MemoryManagement()    = default;
+      MemoryManagement(Allocate allocate_, Deallocate deallocate_, MemCopy copy_):
+            allocate(allocate_), deallocate(deallocate_), copy(copy_)       {}
+
+      Allocate      allocate    = [](int /* gid */, size_t n) { return new char[n]; };
+      Deallocate    deallocate  = [](const char* p) { delete[] p; };
+      MemCopy       copy        = [](char* dest, const char* src, size_t count) { std::memcpy(dest, src, count); };
   };
 
 

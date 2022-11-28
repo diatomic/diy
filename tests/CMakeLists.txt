@@ -24,6 +24,7 @@ compile_test                (swap-reduce-test       swap-reduce.cpp)
 compile_test                (merge-swap-reduce-test merge-swap-reduce.cpp)
 compile_test                (io-test                io.cpp)
 compile_test                (simple-test            simple.cpp)
+compile_test                (blobs-test             blobs.cpp)
 compile_test                (mpi-collectives-test   mpi-collectives.cpp)
 compile_test                (mpi-window-test        mpi-window.cpp)
 compile_test                (dynamic-assigner-test  dynamic-assigner.cpp)
@@ -49,6 +50,7 @@ if                          (MSVC AND NOT(MSVC_VERSION LESS 1400))
     set_source_files_properties (swap-reduce.cpp        PROPERTIES COMPILE_FLAGS "/bigobj")
     set_source_files_properties (rexchange.cpp          PROPERTIES COMPILE_FLAGS "/bigobj")
     set_source_files_properties (simple.cpp             PROPERTIES COMPILE_FLAGS "/bigobj")
+    set_source_files_properties (blobs.cpp              PROPERTIES COMPILE_FLAGS "/bigobj")
 endif                       ()
 
 
@@ -158,6 +160,14 @@ if                          (mpi AND MPIEXEC)
                              COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:simple-test> -b ${b}
                             )
       set_tests_properties  (simple-test-p${p}-b${b} PROPERTIES TIMEOUT 300 RUN_SERIAL ON)
+  endforeach                (p)
+
+  foreach                   (p 2 3)
+      math                  (EXPR b "${p} + 1")
+      add_test              (NAME blobs-test-p${p}-b${b}
+                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:blobs-test> -b ${b}
+                            )
+      set_tests_properties  (blobs-test-p${p}-b${b} PROPERTIES TIMEOUT 300 RUN_SERIAL ON)
   endforeach                (p)
 
   foreach                   (p RANGE 1 ${maxp})
