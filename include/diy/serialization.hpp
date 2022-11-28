@@ -22,7 +22,7 @@ namespace diy
       using Deleter = std::function<void(const char[])>;
       using Pointer = std::unique_ptr<const char[], Deleter>;
       Pointer   pointer;
-      size_t    count;
+      size_t    size;
   };
 
   //! A serialization buffer. \ingroup Serialization
@@ -60,7 +60,9 @@ namespace diy
     virtual inline char* advance(size_t count) override;                     //!< advance buffer position by `count` bytes and return the pointer to the beginning
 
     virtual inline void save_binary_blob(const char* x, size_t count) override;
+            inline void save_binary_blob(const char* x, size_t count, Blob::Deleter deleter);
     virtual inline Blob load_binary_blob() override;
+    size_t              nblobs() const                              { return blobs.size(); }
 
     void                clear()                                     { buffer.clear(); reset(); }
     void                wipe()                                      { std::vector<char>().swap(buffer); reset(); }
@@ -557,7 +559,14 @@ diy::MemoryBuffer::
 save_binary_blob(const char* x, size_t count)
 {
     // empty deleter means we don't take ownership
-    blobs.emplace_back(Blob { Blob::Pointer {x, [](const char[]) {}}, count });
+    save_binary_blob(x, count, [](const char[]) {});
+}
+
+void
+diy::MemoryBuffer::
+save_binary_blob(const char* x, size_t count, Blob::Deleter deleter)
+{
+    blobs.emplace_back(Blob { Blob::Pointer {x, deleter}, count });
 }
 
 diy::MemoryBuffer::Blob
