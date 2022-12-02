@@ -35,7 +35,7 @@ stages:
 # Builders:
 #
 # - Fedora 34
-#   * ci/docker/fedora34
+#   * ci/docker/fedora36
 #     - includes mpich and openmpi
 # - Windows 10 VS2022
 #
@@ -45,101 +45,101 @@ stages:
 # - Checkers
 #   - clang-tidy?
 
-build:fedora34-mpich:
+build:fedora36-mpich:
   extends:
-    - .fedora34_mpich
+    - .fedora36_mpich
     - .cmake_build_linux
     - .linux_builder_tags
     - .cmake_build_artifacts
     - .run_automatically
 
-test:fedora34-mpich:
+test:fedora36-mpich:
   extends:
-    - .fedora34_mpich
+    - .fedora36_mpich
     - .cmake_test_linux
     - .linux_builder_tags
     - .run_automatically
   dependencies:
-    - build:fedora34-mpich
+    - build:fedora36-mpich
   needs:
-    - build:fedora34-mpich
+    - build:fedora36-mpich
 
-build:fedora34-mpich-nothreads:
+build:fedora36-mpich-nothreads:
   extends:
-    - .fedora34_mpich_nothreads
+    - .fedora36_mpich_nothreads
     - .cmake_build_linux
     - .linux_builder_tags
     - .cmake_build_artifacts
     - .run_automatically
 
-test:fedora34-mpich-nothreads:
+test:fedora36-mpich-nothreads:
   extends:
-    - .fedora34_mpich_nothreads
+    - .fedora36_mpich_nothreads
     - .cmake_test_linux
     - .linux_builder_tags
     - .run_automatically
   dependencies:
-    - build:fedora34-mpich-nothreads
+    - build:fedora36-mpich-nothreads
   needs:
-    - build:fedora34-mpich-nothreads
+    - build:fedora36-mpich-nothreads
 
-build:fedora34-openmpi:
+build:fedora36-openmpi:
   extends:
-    - .fedora34_openmpi
+    - .fedora36_openmpi
     - .cmake_build_linux
     - .linux_builder_tags
     - .cmake_build_artifacts
     - .run_automatically
 
-test:fedora34-openmpi:
+test:fedora36-openmpi:
   extends:
-    - .fedora34_openmpi
+    - .fedora36_openmpi
     - .cmake_test_linux
     - .linux_builder_tags
     - .cmake_build_artifacts
     - .run_automatically
   dependencies:
-    - build:fedora34-openmpi
+    - build:fedora36-openmpi
   needs:
-    - build:fedora34-openmpi
+    - build:fedora36-openmpi
 
-build:fedora34-asan:
+build:fedora36-asan:
   extends:
-    - .fedora34_asan
+    - .fedora36_asan
     - .cmake_build_linux
     - .linux_builder_tags
     - .cmake_build_artifacts
     - .run_automatically
 
-test:fedora34-asan:
+test:fedora36-asan:
   extends:
-    - .fedora34_asan
+    - .fedora36_asan
     - .cmake_memcheck_linux
     - .linux_tester_priv_tags
     - .cmake_build_artifacts
     - .run_automatically
   dependencies:
-    - build:fedora34-asan
+    - build:fedora36-asan
   needs:
-    - build:fedora34-asan
+    - build:fedora36-asan
 
-build:fedora34-ubsan:
+build:fedora36-ubsan:
   extends:
-    - .fedora34_ubsan
+    - .fedora36_ubsan
     - .cmake_build_linux
     - .linux_builder_tags
     - .cmake_build_artifacts
     - .run_automatically
 
-test:fedora34-ubsan:
+test:fedora36-ubsan:
   extends:
-    - .fedora34_ubsan
+    - .fedora36_ubsan
     - .cmake_memcheck_linux
     - .linux_tester_priv_tags
     - .cmake_build_artifacts
     - .run_automatically
   dependencies:
-    - build:fedora34-ubsan
+    - build:fedora36-ubsan
   needs:
     - build:fedora36-ubsan
 

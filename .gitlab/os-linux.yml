@@ -4,31 +4,30 @@
 .linux:
   variables:
     GIT_CLONE_PATH:           "$CI_BUILDS_DIR/gitlab-kitware-sciviz-ci"
-    CCACHE_SECONDARY_STORAGE: "redis://redis.kitware.com:6380"
     CCACHE_BASEDIR:           "$CI_PROJECT_DIR"
     CCACHE_COMPILERCHECK:     "content"
     CCACHE_NOHASHDIR:         "true"
     CCACHE_RESHARE:           "true"
     CCACHE_INSTALL_DIR:       "$CI_PROJECT_DIR/.gitlab"
 
-.fedora34:
+.fedora36:
   extends: .linux
-  image: "diatomic/diy:ci-diy-fedora34-20211014"
+  image: "diatomic/diy:ci-diy-fedora36-20221031"
 
-.fedora34_mpich: &fedora34_mpich
-  extends: .fedora34
+.fedora36_mpich: &fedora36_mpich
+  extends: .fedora36
   variables:
-    CMAKE_CONFIGURATION: fedora34_mpich
+    CMAKE_CONFIGURATION: fedora36_mpich
 
-.fedora34_mpich_nothreads: &fedora34_mpich_nothreads
-  extends: .fedora34_mpich
+.fedora36_mpich_nothreads: &fedora36_mpich_nothreads
+  extends: .fedora36_mpich
   variables:
-    CMAKE_CONFIGURATION: fedora34_mpich_nothreads
+    CMAKE_CONFIGURATION: fedora36_mpich_nothreads
 
-.fedora34_openmpi: &fedora34_openmpi
-  extends: .fedora34
+.fedora36_openmpi: &fedora36_openmpi
+  extends: .fedora36
   variables:
-    CMAKE_CONFIGURATION: fedora34_openmpi
+    CMAKE_CONFIGURATION: fedora36_openmpi
     OMPI_ALLOW_RUN_AS_ROOT: 1
     OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: 1
     # Force BTL as the PML
@@ -42,22 +41,22 @@
     # Be verbose
     OMPI_MCA_btl_base_verbose: 20
 
-.fedora34_memcheck: &fedora34_memcheck
-  extends: .fedora34_mpich
+.fedora36_memcheck: &fedora36_memcheck
+  extends: .fedora36_mpich
   variables:
     CMAKE_BUILD_TYPE: RelWithDebInfo
 
-.fedora34_asan: &fedora34_asan
-  extends: .fedora34_memcheck
+.fedora36_asan: &fedora36_asan
+  extends: .fedora36_memcheck
   variables:
-    CMAKE_CONFIGURATION: fedora34_asan
+    CMAKE_CONFIGURATION: fedora36_asan
     CTEST_MEMORYCHECK_TYPE: AddressSanitizer
 
-.fedora34_ubsan: &fedora34_ubsan
-  extends: .fedora34_memcheck
+.fedora36_ubsan: &fedora36_ubsan
+  extends: .fedora36_memcheck
 
   variables:
-    CMAKE_CONFIGURATION: fedora34_ubsan
+    CMAKE_CONFIGURATION: fedora36_ubsan
     CTEST_MEMORYCHECK_TYPE: UndefinedBehaviorSanitizer
 
 .linux_builder_tags:
@@ -65,13 +64,13 @@
     - diy
     - build
     - docker
-    - linux
+    - linux-x86_64
 
 .linux_tester_priv_tags:
   tags:
     - diy
     - docker
-    - linux
+    - linux-x86_64
     - privileged
 
 ## Linux-specific scripts

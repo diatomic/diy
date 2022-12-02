@@ -6,13 +6,13 @@
     paths:
       # The artifacts of the build.
       # Generated headers.
-      - build/examples/*/*
+      - build/examples/**
       - build/tests/*
       - build/tests/backward/*
       # CTest files.
       - build/CTestTestfile.cmake
       - build/*/CTestTestfile.cmake
-      - build/*/*/CTestTestfile.cmake
+      - build/**/CTestTestfile.cmake
       - build/Testing/
       # CDash files.
       - build/DartConfiguration.tcl
