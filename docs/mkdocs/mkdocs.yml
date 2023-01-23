@@ -1,0 +1,19 @@
+site_name: DIY
+site_url: https://example.com/
+nav:
+    - Home: index.md
+    - Initialization: initialization.md
+    - Domain decomposition: decomposition.md
+    - Callback functions: callbacks.md
+    - Communication:
+      - Local communication: local_comm.md
+      - Remote communication: remote_comm.md
+      - Global communication (reductions): reduce_comm.md
+    - Block I/O: io.md
+    - Serialization: serialization.md
+    - MPI convenience wrapper: mpi.md
+    - Algorithms: algorithms.md
+    - Writing out-of-core algorithms: ooc.md
+    - Automatic block threading: threads.md
+    - Examples: examples.md
+theme: material
