@@ -1,0 +1,799 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://example.com/initialization/">
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../decomposition/">
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.5">
+    
+    
+      
+        <title>Initialization - DIY</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.558e4712.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.2505c338.min.css">
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#block" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="DIY" class="md-header__button md-logo" aria-label="DIY" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            DIY
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Initialization
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="DIY" class="md-nav__button md-logo" aria-label="DIY" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    DIY
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Initialization
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Initialization
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#block" class="md-nav__link">
+    Block
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#master" class="md-nav__link">
+    Master
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#assigner" class="md-nav__link">
+    Assigner
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decomposer" class="md-nav__link">
+    Decomposer
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-complete-example" class="md-nav__link">
+    A complete example
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../decomposition/" class="md-nav__link">
+        Domain decomposition
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../callbacks/" class="md-nav__link">
+        Callback functions
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5" tabindex="0" aria-expanded="false">
+          Communication
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Communication" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          Communication
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../local_comm/" class="md-nav__link">
+        Local synchronous communication
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../remote_comm/" class="md-nav__link">
+        Remote communication
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../async_comm/" class="md-nav__link">
+        Asynchronous communication
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reduce_comm/" class="md-nav__link">
+        Global communication (reductions)
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../io/" class="md-nav__link">
+        Block I/O
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../serialization/" class="md-nav__link">
+        Serialization
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mpi/" class="md-nav__link">
+        MPI convenience wrapper
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../algorithms/" class="md-nav__link">
+        Algorithms
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ooc/" class="md-nav__link">
+        Writing out-of-core algorithms
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../threads/" class="md-nav__link">
+        Automatic block threading
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/" class="md-nav__link">
+        Examples
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#block" class="md-nav__link">
+    Block
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#master" class="md-nav__link">
+    Master
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#assigner" class="md-nav__link">
+    Assigner
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decomposer" class="md-nav__link">
+    Decomposer
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-complete-example" class="md-nav__link">
+    A complete example
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>Initialization</h1>
+
+<p>Most DIY programs follow a similar sequence of initial steps to setup DIY before the actual parallel computing happens.
+These steps include:</p>
+<ul>
+<li>Defining a block data structure</li>
+<li>Creating a <code>diy::Master</code> object to manage the blocks local to one MPI process</li>
+<li>Assigning the local blocks to the master with a <code>diy:Assigner</code> object</li>
+<li>Decomposing the global domain into blocks with the <code>diy::Decomposer</code> object</li>
+</ul>
+<p>The following is an example of the steps needed to initialize DIY.</p>
+<h2 id="block">Block</h2>
+<p>The block is the basic unit of everything (data, decomposition, communication) in DIY. Use it to define your data model
+and any state associated with the data that will be needed to accompany the data throughout its lifetime. In addition to
+the data in the block, you must define functions to <code>create</code> and <code>destroy</code> the block that DIY can call. (<em>Technically, if
+you choose to manage block memory yourself and don't pass <code>create</code> and <code>destroy</code> functions to <code>diy::Master</code>
+below, then you don't need to define <code>create</code> and <code>destroy</code> here. However, we recommend having <code>Master</code> manage block creation and destruction
+to prevent possible leaks.</em>) If the blocks are intended to be moved in and out of
+core, then the block must also define <code>save</code> and <code>load</code> functions. (<code>create</code>, <code>destroy</code>, and optionally <code>save</code> and
+<code>load</code> could also be defined globally outside of the block, if you wish.)</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">Block</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="p">{</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="o">*</span><span class="w">    </span><span class="nf">create</span><span class="p">()</span><span class="w">                                    </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Block</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w">     </span><span class="nf">destroy</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w">                            </span><span class="p">{</span><span class="w"> </span><span class="k">delete</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">Block</span><span class="o">*&gt;</span><span class="p">(</span><span class="n">b</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w">     </span><span class="nf">save</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">diy</span><span class="o">::</span><span class="n">BinaryBuffer</span><span class="o">&amp;</span><span class="w"> </span><span class="n">bb</span><span class="p">)</span><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="n">diy</span><span class="o">::</span><span class="n">save</span><span class="p">(</span><span class="n">bb</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="k">const</span><span class="w"> </span><span class="n">Block</span><span class="o">*&gt;</span><span class="p">(</span><span class="n">b</span><span class="p">));</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w">     </span><span class="nf">load</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">diy</span><span class="o">::</span><span class="n">BinaryBuffer</span><span class="o">&amp;</span><span class="w"> </span><span class="n">bb</span><span class="p">)</span><span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="n">diy</span><span class="o">::</span><span class="n">load</span><span class="p">(</span><span class="n">bb</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">Block</span><span class="o">*&gt;</span><span class="p">(</span><span class="n">b</span><span class="p">));</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span><span class="c1">// your user-defined member functions</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">  </span><span class="p">...</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">  </span><span class="c1">// your user-defined data members</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">  </span><span class="p">...</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="p">}</span>
+</code></pre></div>
+<h2 id="master">Master</h2>
+<p>diy::Master owns and manages the blocks that are assigned to the current MPI process. To set up a <code>Master</code> object, first
+define the MPI communicator and the file storage object (if blocks will be
+moved in and out of core), which you pass to the <code>Master</code> constructor.
+<code>Master</code> manages loading/saving blocks, executing their callback functions, and
+exchanging data between them.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="o">**</span><span class="w"> </span><span class="n">argv</span><span class="p">)</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="p">{</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="p">...</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="n">diy</span><span class="o">::</span><span class="n">mpi</span><span class="o">::</span><span class="n">communicator</span><span class="w">    </span><span class="n">world</span><span class="p">(</span><span class="n">comm</span><span class="p">);</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="n">diy</span><span class="o">::</span><span class="n">FileStorage</span><span class="w">          </span><span class="n">storage</span><span class="p">(</span><span class="s">&quot;./DIY.XXXXXX&quot;</span><span class="p">);</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="n">diy</span><span class="o">::</span><span class="n">Master</span><span class="w">               </span><span class="n">master</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w">           </span><span class="c1">// MPI world communicator</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">                                   </span><span class="n">num_threads</span><span class="p">,</span><span class="w">     </span><span class="c1">// # blocks to execute concurrently (1 means sequence through local blocks)</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">                                   </span><span class="n">mem_blocks</span><span class="p">,</span><span class="w">      </span><span class="c1">// # blocks to keep in memory (-1 means keep all blocks in memory)</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">                                   </span><span class="o">&amp;</span><span class="n">Block</span><span class="o">::</span><span class="n">create</span><span class="p">,</span><span class="w">  </span><span class="c1">// block create function</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">                                   </span><span class="o">&amp;</span><span class="n">Block</span><span class="o">::</span><span class="n">destroy</span><span class="p">,</span><span class="w"> </span><span class="c1">// block destroy function</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">                                   </span><span class="o">&amp;</span><span class="n">storage</span><span class="p">,</span><span class="w">        </span><span class="c1">// storage location for out-of-core blocks (optional)</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">                                   </span><span class="o">&amp;</span><span class="n">Block</span><span class="o">::</span><span class="n">save</span><span class="p">,</span><span class="w">    </span><span class="c1">// block save function for out-of-core blocks (optional)</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">                                   </span><span class="o">&amp;</span><span class="n">Block</span><span class="o">::</span><span class="n">load</span><span class="p">);</span><span class="w">   </span><span class="c1">// block load function for out-of-core blocks (otpional)</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">  </span><span class="p">...</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="p">}</span>
+</code></pre></div>
+<p>If all blocks are to remain in memory, there is no need to specify <code>storage</code>, <code>save</code>, and <code>load</code>, which are
+for block loading/unloading.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="w">  </span><span class="n">diy</span><span class="o">::</span><span class="n">mpi</span><span class="o">::</span><span class="n">communicator</span><span class="w">    </span><span class="nf">world</span><span class="p">(</span><span class="n">comm</span><span class="p">);</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="n">diy</span><span class="o">::</span><span class="n">Master</span><span class="w">               </span><span class="n">master</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w">            </span><span class="c1">// MPI world communicator</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">                                   </span><span class="n">num_threads</span><span class="p">,</span><span class="w">      </span><span class="c1">// # threads DIY can use to execute mulitple local blocks concurrently (optional, default 1)</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">                                   </span><span class="n">mem_blocks</span><span class="p">,</span><span class="w">       </span><span class="c1">// # blocks to keep in memory, -1 means all blocks (optional)</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">                                   </span><span class="o">&amp;</span><span class="n">Block</span><span class="o">::</span><span class="n">create</span><span class="p">,</span><span class="w">   </span><span class="c1">// block create function (optional)</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">                                   </span><span class="o">&amp;</span><span class="n">Block</span><span class="o">::</span><span class="n">destroy</span><span class="p">);</span><span class="w"> </span><span class="c1">// block destroy function (optional)</span>
+</code></pre></div>
+<h2 id="assigner">Assigner</h2>
+<p>diy::Assigner is an auxiliary object that determines what blocks lives on what MPI process.
+Blocks can be assigned to processes contiguously or in round-robin fashion:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">diy</span><span class="o">::</span><span class="n">ContiguousAssigner</span><span class="w">   </span><span class="n">assigner</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">size</span><span class="p">(),</span><span class="w">   </span><span class="c1">// total number of MPI ranks</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">                                   </span><span class="n">nblocks</span><span class="p">);</span><span class="w">       </span><span class="c1">// total number of blocks in global domain</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1">// --- or ---</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="n">diy</span><span class="o">::</span><span class="n">RoundRobinAssigner</span><span class="w">   </span><span class="nf">assigner</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">size</span><span class="p">(),</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">                                   </span><span class="n">nblocks</span><span class="p">);</span>
+</code></pre></div>
+<h2 id="decomposer">Decomposer</h2>
+<p>Any custom decomposition can be formed by creating blocks yourself and linking them together into communicating
+neighborhoods manually. However, for a regular grid of blocks, DIY
+provides a regular decomposition of blocks with either continuous
+(floating-point extents that share common boundaries) or discrete (integer
+extents that may or may not overlap) bounds.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">typedef</span><span class="w">  </span><span class="n">diy</span><span class="o">::</span><span class="n">ContinuousBounds</span><span class="w">       </span><span class="n">Bounds</span><span class="p">;</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">typedef</span><span class="w">  </span><span class="n">diy</span><span class="o">::</span><span class="n">RegularContinuousLink</span><span class="w">  </span><span class="n">RCLink</span><span class="p">;</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1">// --- or ---</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="k">typedef</span><span class="w">  </span><span class="n">diy</span><span class="o">::</span><span class="n">DiscreteBounds</span><span class="w">         </span><span class="n">Bounds</span><span class="p">;</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="k">typedef</span><span class="w">  </span><span class="n">diy</span><span class="o">::</span><span class="n">RegularGridLink</span><span class="w">        </span><span class="n">RGLink</span><span class="p">;</span>
+</code></pre></div>
+<p><code>RegularDecomposer</code> helps decompose a domain into a regular grid of blocks.
+It's initialized with the dimension of the domain, its extents, and the number
+of blocks used in the decomposition.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">diy</span><span class="o">::</span><span class="n">RegularDecomposer</span><span class="o">&lt;</span><span class="n">Bounds</span><span class="o">&gt;</span><span class="w"> </span><span class="n">decomposer</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span><span class="w">      </span><span class="c1">// dimensionality of global domain</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">                                          </span><span class="n">domain</span><span class="p">,</span><span class="w">   </span><span class="c1">// sizes of global domain</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">                                          </span><span class="n">nblocks</span><span class="p">);</span><span class="w"> </span><span class="c1">// global number of blocks</span>
+</code></pre></div>
+<p>Its member function <code>decompose</code> performs the actual decomposition. Besides the
+local MPI rank and an instance of <code>Assigner</code>, it takes a callback responsible
+for creating the block and adding it to a <code>Master</code>. In C++11, it's convenient to
+use a lambda function for this purpose.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">decomposer</span><span class="p">.</span><span class="n">decompose</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span><span class="w">                          </span><span class="c1">// MPI rank of this process</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">                     </span><span class="n">assigner</span><span class="p">,</span><span class="w">                      </span><span class="c1">// diy::Assigner object</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">                     </span><span class="p">[</span><span class="o">&amp;</span><span class="p">](</span><span class="kt">int</span><span class="w"> </span><span class="n">gid</span><span class="p">,</span><span class="w">                   </span><span class="c1">// block global id</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">                         </span><span class="k">const</span><span class="w"> </span><span class="n">Bounds</span><span class="o">&amp;</span><span class="w"> </span><span class="n">core</span><span class="p">,</span><span class="w">        </span><span class="c1">// block bounds without any ghost added</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">                         </span><span class="k">const</span><span class="w"> </span><span class="n">Bounds</span><span class="o">&amp;</span><span class="w"> </span><span class="n">bounds</span><span class="p">,</span><span class="w">      </span><span class="c1">// block bounds including any ghost region added</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">                         </span><span class="k">const</span><span class="w"> </span><span class="n">Bounds</span><span class="o">&amp;</span><span class="w"> </span><span class="n">domain</span><span class="p">,</span><span class="w">      </span><span class="c1">// global data bounds</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">                         </span><span class="k">const</span><span class="w"> </span><span class="n">RCLink</span><span class="o">&amp;</span><span class="w"> </span><span class="n">link</span><span class="p">)</span><span class="w">        </span><span class="c1">// neighborhood</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">                     </span><span class="p">{</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">                         </span><span class="n">Block</span><span class="o">*</span><span class="w">          </span><span class="n">b</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Block</span><span class="p">;</span><span class="w">             </span><span class="c1">// possibly use custom initialization</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">                         </span><span class="n">RCLink</span><span class="o">*</span><span class="w">         </span><span class="n">l</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RCLink</span><span class="p">(</span><span class="n">link</span><span class="p">);</span><span class="w">      </span><span class="c1">// link neighboring blocks</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">                         </span><span class="kt">int</span><span class="w">             </span><span class="n">lid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">master</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">l</span><span class="p">);</span><span class="w"> </span><span class="c1">// add block to the master (mandatory)</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">                         </span><span class="c1">// process any additional args here, load the data, etc.</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">                     </span><span class="p">});</span>
+</code></pre></div>
+<p>A shorter form is provided, if you only want to add the blocks to <code>Master</code>,
+without any additional processing.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">decomposer</span><span class="p">.</span><span class="n">decompose</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span><span class="w">          </span><span class="c1">// MPI rank of this process</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">                     </span><span class="n">assigner</span><span class="p">,</span><span class="w">      </span><span class="c1">// diy::Assigner object</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">                     </span><span class="n">master</span><span class="p">);</span><span class="w">       </span><span class="c1">// diy::Master object</span>
+</code></pre></div>
+<h2 id="a-complete-example">A complete example</h2>
+<p>Here is one version of each of the above options combined into a complete program, using a lambda function for the decomposer callback.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;diy/decomposition.hpp&gt;</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;diy/assigner.hpp&gt;</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;diy/master.hpp&gt;</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="k">typedef</span><span class="w">     </span><span class="n">diy</span><span class="o">::</span><span class="n">DiscreteBounds</span><span class="w">       </span><span class="n">Bounds</span><span class="p">;</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="k">typedef</span><span class="w">     </span><span class="n">diy</span><span class="o">::</span><span class="n">RegularGridLink</span><span class="w">      </span><span class="n">RGLink</span><span class="p">;</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="k">struct</span><span class="w"> </span><span class="nc">Block</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="p">{</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">  </span><span class="n">Block</span><span class="p">()</span><span class="w"> </span><span class="p">{}</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="o">*</span><span class="w">    </span><span class="n">create</span><span class="p">()</span><span class="w">            </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Block</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w">     </span><span class="n">destroy</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="k">delete</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">Block</span><span class="o">*&gt;</span><span class="p">(</span><span class="n">b</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="p">};</span>
+<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>
+<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">argv</span><span class="p">[])</span>
+<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="p">{</span>
+<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="w">  </span><span class="n">diy</span><span class="o">::</span><span class="n">mpi</span><span class="o">::</span><span class="n">environment</span><span class="w">     </span><span class="n">env</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">);</span><span class="w">             </span><span class="c1">// diy&#39;s version of MPI_Init</span>
+<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="w">  </span><span class="n">diy</span><span class="o">::</span><span class="n">mpi</span><span class="o">::</span><span class="n">communicator</span><span class="w">    </span><span class="n">world</span><span class="p">;</span><span class="w">                       </span><span class="c1">// diy&#39;s version of MPI communicator</span>
+<a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a>
+<a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="w">  </span><span class="kt">int</span><span class="w">                       </span><span class="n">dim</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w">                 </span><span class="c1">// dimensionality</span>
+<a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="w">  </span><span class="kt">int</span><span class="w">                       </span><span class="n">nprocs</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span><span class="p">;</span><span class="w">                 </span><span class="c1">// total number of MPI ranks</span>
+<a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="w">  </span><span class="kt">int</span><span class="w">                       </span><span class="n">nblocks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">32</span><span class="p">;</span><span class="w">                </span><span class="c1">// total number of blocks in global domain</span>
+<a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a>
+<a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a><span class="w">  </span><span class="n">diy</span><span class="o">::</span><span class="n">ContiguousAssigner</span><span class="w">   </span><span class="n">assigner</span><span class="p">(</span><span class="n">nprocs</span><span class="p">,</span><span class="w"> </span><span class="n">nblocks</span><span class="p">);</span><span class="w">   </span><span class="c1">// assign blocks to MPI ranks</span>
+<a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a>
+<a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a><span class="w">  </span><span class="n">Bounds</span><span class="w"> </span><span class="n">domain</span><span class="p">;</span><span class="w">                                         </span><span class="c1">// global data size</span>
+<a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a>
+<a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a><span class="w">  </span><span class="n">diy</span><span class="o">::</span><span class="n">Master</span><span class="w">               </span><span class="n">master</span><span class="p">(</span><span class="n">world</span><span class="p">,</span><span class="w">                </span><span class="c1">// communicator</span>
+<a id="__codelineno-8-29" name="__codelineno-8-29" href="#__codelineno-8-29"></a><span class="w">                                   </span><span class="mi">1</span><span class="p">,</span><span class="w">                    </span><span class="c1">// 1 thread in this example</span>
+<a id="__codelineno-8-30" name="__codelineno-8-30" href="#__codelineno-8-30"></a><span class="w">                                   </span><span class="mi">-1</span><span class="p">,</span><span class="w">                   </span><span class="c1">// all blocks in memory in this example</span>
+<a id="__codelineno-8-31" name="__codelineno-8-31" href="#__codelineno-8-31"></a><span class="w">                                   </span><span class="o">&amp;</span><span class="n">Block</span><span class="o">::</span><span class="n">create</span><span class="p">,</span><span class="w">       </span><span class="c1">// block create function</span>
+<a id="__codelineno-8-32" name="__codelineno-8-32" href="#__codelineno-8-32"></a><span class="w">                                   </span><span class="o">&amp;</span><span class="n">Block</span><span class="o">::</span><span class="n">destroy</span><span class="p">);</span><span class="w">     </span><span class="c1">// block destroy function</span>
+<a id="__codelineno-8-33" name="__codelineno-8-33" href="#__codelineno-8-33"></a>
+<a id="__codelineno-8-34" name="__codelineno-8-34" href="#__codelineno-8-34"></a><span class="w">  </span><span class="n">diy</span><span class="o">::</span><span class="n">RegularDecomposer</span><span class="o">&lt;</span><span class="n">Bounds</span><span class="o">&gt;</span><span class="w"> </span><span class="n">decomposer</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span><span class="w">         </span><span class="c1">// dimensionality of domain</span>
+<a id="__codelineno-8-35" name="__codelineno-8-35" href="#__codelineno-8-35"></a><span class="w">                                            </span><span class="n">domain</span><span class="p">,</span><span class="w">      </span><span class="c1">// global domain size</span>
+<a id="__codelineno-8-36" name="__codelineno-8-36" href="#__codelineno-8-36"></a><span class="w">                                            </span><span class="n">nblocks</span><span class="p">);</span><span class="w">    </span><span class="c1">// global number of blocks</span>
+<a id="__codelineno-8-37" name="__codelineno-8-37" href="#__codelineno-8-37"></a>
+<a id="__codelineno-8-38" name="__codelineno-8-38" href="#__codelineno-8-38"></a><span class="w">  </span><span class="n">decomposer</span><span class="p">.</span><span class="n">decompose</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">rank</span><span class="p">(),</span><span class="w">                     </span><span class="c1">// MPI rank of this process</span>
+<a id="__codelineno-8-39" name="__codelineno-8-39" href="#__codelineno-8-39"></a><span class="w">                       </span><span class="n">assigner</span><span class="p">,</span><span class="w">                         </span><span class="c1">// assigner object</span>
+<a id="__codelineno-8-40" name="__codelineno-8-40" href="#__codelineno-8-40"></a><span class="w">                       </span><span class="p">[</span><span class="o">&amp;</span><span class="p">](</span><span class="kt">int</span><span class="w"> </span><span class="n">gid</span><span class="p">,</span><span class="w">                      </span><span class="c1">// block global id</span>
+<a id="__codelineno-8-41" name="__codelineno-8-41" href="#__codelineno-8-41"></a><span class="w">                           </span><span class="k">const</span><span class="w"> </span><span class="n">Bounds</span><span class="o">&amp;</span><span class="w"> </span><span class="n">core</span><span class="p">,</span><span class="w">           </span><span class="c1">// block bounds without any ghost added</span>
+<a id="__codelineno-8-42" name="__codelineno-8-42" href="#__codelineno-8-42"></a><span class="w">                           </span><span class="k">const</span><span class="w"> </span><span class="n">Bounds</span><span class="o">&amp;</span><span class="w"> </span><span class="n">bounds</span><span class="p">,</span><span class="w">         </span><span class="c1">// block bounds including any ghost region added</span>
+<a id="__codelineno-8-43" name="__codelineno-8-43" href="#__codelineno-8-43"></a><span class="w">                           </span><span class="k">const</span><span class="w"> </span><span class="n">Bounds</span><span class="o">&amp;</span><span class="w"> </span><span class="n">domain</span><span class="p">,</span><span class="w">         </span><span class="c1">// global data bounds</span>
+<a id="__codelineno-8-44" name="__codelineno-8-44" href="#__codelineno-8-44"></a><span class="w">                           </span><span class="k">const</span><span class="w"> </span><span class="n">RGLink</span><span class="o">&amp;</span><span class="w"> </span><span class="n">link</span><span class="p">)</span><span class="w">           </span><span class="c1">// neighborhood</span>
+<a id="__codelineno-8-45" name="__codelineno-8-45" href="#__codelineno-8-45"></a><span class="w">                       </span><span class="p">{</span>
+<a id="__codelineno-8-46" name="__codelineno-8-46" href="#__codelineno-8-46"></a><span class="w">                           </span><span class="n">Block</span><span class="o">*</span><span class="w">  </span><span class="n">b</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Block</span><span class="p">;</span><span class="w">             </span><span class="c1">// create a new block, perform any custom initialization</span>
+<a id="__codelineno-8-47" name="__codelineno-8-47" href="#__codelineno-8-47"></a><span class="w">                           </span><span class="n">RGLink</span><span class="o">*</span><span class="w"> </span><span class="n">l</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RGLink</span><span class="p">(</span><span class="n">link</span><span class="p">);</span><span class="w">      </span><span class="c1">// copy the link so that master owns a copy</span>
+<a id="__codelineno-8-48" name="__codelineno-8-48" href="#__codelineno-8-48"></a><span class="w">                           </span><span class="kt">int</span><span class="w">     </span><span class="n">lid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">master</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">l</span><span class="p">);</span><span class="w"> </span><span class="c1">// add block to the master (mandatory)</span>
+<a id="__codelineno-8-49" name="__codelineno-8-49" href="#__codelineno-8-49"></a><span class="w">                       </span><span class="p">});</span>
+<a id="__codelineno-8-50" name="__codelineno-8-50" href="#__codelineno-8-50"></a><span class="p">}</span>
+</code></pre></div>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.e5c33ebb.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.51d95adb.min.js"></script>
+      
+    
+  </body>
+</html>
