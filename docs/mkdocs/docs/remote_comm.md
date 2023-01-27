@@ -4,7 +4,7 @@ block boundaries, the block containing a particle's final destination may need t
 by the particle (such as total number of hops) back to the originating block where the particle began its journey. For
 such cases, there is a remote version of `diy::Master::exchange()`.
 
-## Synchronous remote `exchange`
+## Synchronous remote `rexchange`
 
 Everything follows the synchronous `exchange` protocol of the [Local communication](local_comm.md) page, except that a
 `remote` flag set to `true` is passed to `master.exchange`, and the `master.foreach()` callback functions can access

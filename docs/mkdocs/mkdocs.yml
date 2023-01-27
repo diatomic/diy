@@ -6,8 +6,9 @@ nav:
     - Domain decomposition: decomposition.md
     - Callback functions: callbacks.md
     - Communication:
-      - Local communication: local_comm.md
+      - Local synchronous communication: local_comm.md
       - Remote communication: remote_comm.md
+      - Asynchronous communication: async_comm.md
       - Global communication (reductions): reduce_comm.md
     - Block I/O: io.md
     - Serialization: serialization.md
@@ -17,3 +18,12 @@ nav:
     - Automatic block threading: threads.md
     - Examples: examples.md
 theme: material
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - attr_list
+  - md_in_html
+

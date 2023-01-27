@@ -10,12 +10,13 @@ The following is an example of the steps needed to initialize DIY.
 
 ## Block
 
-The block is the basic unit of everything (data, decomposition, communication)
-in DIY. Use it to define your data model and any state associated with the data
-that will be needed to accompany the data throughout its lifetime. In addition
-to the data in the block, you must define functions to `create` and `destroy`
-the block that DIY can call. If the blocks are intended to be moved in and out
-of core, then the block must also define `save` and `load` functions. (`create`, `destroy`, and optionally `save` and
+The block is the basic unit of everything (data, decomposition, communication) in DIY. Use it to define your data model
+and any state associated with the data that will be needed to accompany the data throughout its lifetime. In addition to
+the data in the block, you must define functions to `create` and `destroy` the block that DIY can call. (*Technically, if
+you choose to manage block memory yourself and don't pass `create` and `destroy` functions to `diy::Master`
+below, then you don't need to define `create` and `destroy` here. However, we recommend having `Master` manage block creation and destruction
+to prevent possible leaks.*) If the blocks are intended to be moved in and out of
+core, then the block must also define `save` and `load` functions. (`create`, `destroy`, and optionally `save` and
 `load` could also be defined globally outside of the block, if you wish.)
 
 ~~~~{.cpp}
@@ -132,7 +133,7 @@ decomposer.decompose(rank,                          // MPI rank of this process
                          const RCLink& link)        // neighborhood
                      {
                          Block*          b   = new Block;             // possibly use custom initialization
-                         RGLink*         l   = new RGLink(link);      // link neighboring blocks
+                         RCLink*         l   = new RCLink(link);      // link neighboring blocks
                          int             lid = master.add(gid, b, l); // add block to the master (mandatory)
 
                          // process any additional args here, load the data, etc.
@@ -197,7 +198,7 @@ int main(int argc, char* argv[])
                            const Bounds& core,           // block bounds without any ghost added
                            const Bounds& bounds,         // block bounds including any ghost region added
                            const Bounds& domain,         // global data bounds
-                           const RCLink& link)           // neighborhood
+                           const RGLink& link)           // neighborhood
                        {
                            Block*  b   = new Block;             // create a new block, perform any custom initialization
                            RGLink* l   = new RGLink(link);      // copy the link so that master owns a copy

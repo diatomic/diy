@@ -28,6 +28,13 @@ communicating group (`ReduceProxy`) takes ownership of the merged result and con
 blocks in the group idle in the following rounds. In the final round, one block, the root of the reduction tree,
 has all of the data.
 
+<!---
+The figure below illustrates the first two rounds of a reduction of 16 blocks. The first round uses radix 4 while the
+second round uses radix 2.
+
+![Merge-reduce](figs/merge-reduce.png)
+--->
+
 ~~~~{.cpp}
 void foo(Block* b,                                  // local block
          const diy::ReduceProxy& rp,                // communication proxy
@@ -108,6 +115,13 @@ split and swapped among the neighboring blocks in each round, but the actual ope
 are up to the user to write in the callback function. DIY's role in the swap-reduce is to provide different neighbors in
 each round to the callback function, and to keep all blocks participating in all rounds. The usage is similar to
 the the prior examples, with `diy::RegularSwapPartners` being used for the partners object.
+
+<!---
+The figure below illustrates the first two rounds of a reduction of 16 blocks. The first round uses radix 4 while the
+second round uses radix 2.
+
+![Swap-reduce](figs/swap-reduce.png)
+--->
 
 ~~~~{.cpp}
 void foo(Block* b,                                  // local block
