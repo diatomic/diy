@@ -18,9 +18,16 @@ struct DoubleForeachFixture
 int DoubleForeachFixture::nblocks = 0;
 unsigned int DoubleForeachFixture::iter    = 2;
 
+template <typename T>
+void cpp_delete(void* p)
+{
+  T* tp = reinterpret_cast<T*>(p);
+  delete tp;
+}
+
 TEST_CASE_METHOD(DoubleForeachFixture, "Send/Receive", "[double-foreach]")
 {
-  diy::Master master(world);
+  diy::Master master(world, 1, -1, 0, cpp_delete<Block>);
   diy::RoundRobinAssigner assigner(world.size(), nblocks);
 
   // create a linear chain of blocks

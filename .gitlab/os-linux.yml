@@ -1,0 +1,110 @@
+---
+# Linux-specific builder configurations and build commands
+# yamllint disable rule:colons
+.linux:
+  variables:
+    GIT_CLONE_PATH:           "$CI_BUILDS_DIR/gitlab-kitware-sciviz-ci"
+    CCACHE_BASEDIR:           "$CI_PROJECT_DIR"
+    CCACHE_COMPILERCHECK:     "content"
+    CCACHE_NOHASHDIR:         "true"
+    CCACHE_RESHARE:           "true"
+    CCACHE_INSTALL_DIR:       "$CI_PROJECT_DIR/.gitlab"
+
+.fedora36:
+  extends: .linux
+  image: "diatomic/diy:ci-diy-fedora36-20221031"
+
+.fedora36_mpich: &fedora36_mpich
+  extends: .fedora36
+  variables:
+    CMAKE_CONFIGURATION: fedora36_mpich
+
+.fedora36_mpich_nothreads: &fedora36_mpich_nothreads
+  extends: .fedora36_mpich
+  variables:
+    CMAKE_CONFIGURATION: fedora36_mpich_nothreads
+
+.fedora36_openmpi: &fedora36_openmpi
+  extends: .fedora36
+  variables:
+    CMAKE_CONFIGURATION: fedora36_openmpi
+    OMPI_ALLOW_RUN_AS_ROOT: 1
+    OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: 1
+    # Force BTL as the PML
+    OMPI_MCA_pml: "ob1"
+    # Exclude vader BTL due to shm limitations
+    OMPI_MCA_btl: "self,tcp"
+    # Use TCP BTL as UCX backend (as opposed to libfabric)
+    UCX_TLS: "tcp"
+    # Ignore hwloc warnings
+    HWLOC_HIDE_ERRORS: 0
+    # Be verbose
+    OMPI_MCA_btl_base_verbose: 20
+
+.fedora36_memcheck: &fedora36_memcheck
+  extends: .fedora36_mpich
+  variables:
+    CMAKE_BUILD_TYPE: RelWithDebInfo
+
+.fedora36_asan: &fedora36_asan
+  extends: .fedora36_memcheck
+  variables:
+    CMAKE_CONFIGURATION: fedora36_asan
+    CTEST_MEMORYCHECK_TYPE: AddressSanitizer
+
+.fedora36_ubsan: &fedora36_ubsan
+  extends: .fedora36_memcheck
+
+  variables:
+    CMAKE_CONFIGURATION: fedora36_ubsan
+    CTEST_MEMORYCHECK_TYPE: UndefinedBehaviorSanitizer
+
+.linux_builder_tags:
+  tags:
+    - diy
+    - build
+    - docker
+    - linux-x86_64
+
+.linux_tester_priv_tags:
+  tags:
+    - diy
+    - docker
+    - linux-x86_64
+    - privileged
+
+## Linux-specific scripts
+.before_script_linux: &before_script_linux
+  - .gitlab/ci/cmake.sh
+  - export PATH=$PWD/.gitlab/cmake/bin:$PATH
+  - cmake -VV -P .gitlab/ci/ninja.cmake
+  - export PATH=$PWD/.gitlab:$PWD/.gitlab/cmake/bin:$PATH
+  - cmake --version
+  - ninja --version
+
+.cmake_build_linux:
+  stage: build
+  script:
+    - *before_script_linux
+    - export PATH=$PWD/.gitlab/ccache:$PATH
+    - cmake -VV -P .gitlab/ci/ccache.cmake
+    - ccache -z
+    - ccache -s
+    - ctest -VV -S .gitlab/ci/ctest_configure.cmake
+    - ctest -VV -S .gitlab/ci/ctest_build.cmake
+    - ccache -s
+  interruptible: true
+
+.cmake_test_linux:
+  stage: test
+  script:
+    - *before_script_linux
+    - ctest -V --output-on-failure -S .gitlab/ci/ctest_test.cmake
+  interruptible: true
+
+.cmake_memcheck_linux:
+  stage: test
+  script:
+    - *before_script_linux
+    - ctest --output-on-failure -V -S .gitlab/ci/ctest_memcheck.cmake
+  interruptible: true

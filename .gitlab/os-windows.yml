@@ -1,0 +1,71 @@
+---
+# yamllint disable rule:colons
+# yamllint disable rule:line-length
+.windows_tags:
+  tags:
+    - diy
+    - nonconcurrent
+    - windows-x86_64
+    - shell
+    - vs2022
+    - msvc-19.33
+
+.windows_build:
+  variables:
+    CCACHE_INSTALL_DIR: "$CI_PROJECT_DIR\\.gitlab"
+
+.windows_vs2022:
+  variables:
+    VCVARSALL:          "${VS170COMNTOOLS}\\..\\..\\VC\\Auxiliary\\Build\\vcvarsall.bat"
+    VCVARSPLATFORM:     "x64"
+    VCVARSVERSION:      "14.33"
+
+.windows_debug:
+  variables:
+    CMAKE_BUILD_TYPE:   "Debug"
+    CMAKE_CONFIGURATION: windows_vs2022_debug
+
+.windows_release:
+  variables:
+    CMAKE_BUILD_TYPE:   "Release"
+    CMAKE_CONFIGURATION: windows_vs2022_release
+
+.before_script_windows_test: &before_script_windows_test
+  - Invoke-Expression -Command .gitlab/ci/vcvarsall.ps1
+  - $pwdpath = $pwd.Path
+  - Invoke-Expression -Command .gitlab/ci/cmake.ps1
+  - Set-Item -Force -Path "env:PATH" -Value "$pwdpath\.gitlab\cmake\bin;$env:PATH"
+  - "cmake --version"
+
+.before_script_windows_build: &before_script_windows_build
+  - *before_script_windows_test
+  - "cmake -V -P .gitlab/ci/ninja.cmake"
+  - Set-Item -Force -Path "env:PATH" -Value "$pwdpath\.gitlab;$env:PATH"
+  - "ninja --version"
+
+.cmake_build_windows: &cmake_build_windows
+  extends:
+    - .windows_build
+    - .windows_vs2022
+  stage: build
+  timeout:  2 hours
+  interruptible: true
+  script:
+    - *before_script_windows_build
+    - "ctest -VV -S .gitlab/ci/ctest_configure.cmake"
+    - "ctest -VV -S .gitlab/ci/ctest_build.cmake"
+  artifacts:
+    expire_in: 24 hours
+    when: always
+    paths:
+      - build
+
+.cmake_test_windows: &cmake_test_windows
+  extends:
+    - .windows_build
+    - .windows_vs2022
+  stage: test
+  interruptible: true
+  script:
+    - *before_script_windows_test
+    - ctest -VV -C $Env:CMAKE_BUILD_TYPE -S .gitlab/ci/ctest_test.cmake

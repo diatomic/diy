@@ -1,0 +1,18 @@
+---
+# Lists of paths for artifacts of various stages.
+.cmake_build_artifacts:
+  artifacts:
+    expire_in: 1d
+    paths:
+      # The artifacts of the build.
+      # Generated headers.
+      - build/examples/**
+      - build/tests/*
+      - build/tests/backward/*
+      # CTest files.
+      - build/CTestTestfile.cmake
+      - build/*/CTestTestfile.cmake
+      - build/**/CTestTestfile.cmake
+      - build/Testing/
+      # CDash files.
+      - build/DartConfiguration.tcl

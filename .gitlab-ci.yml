@@ -1,0 +1,180 @@
+---
+# yamllint disable rule:colons
+include:
+  # Metadata shared my many jobs
+  - local: .gitlab/rules.yml
+  - local: .gitlab/artifacts.yml
+
+  # OS builds.
+  - local: .gitlab/os-linux.yml
+  - local: .gitlab/os-windows.yml
+
+stages:
+  - build
+  - test
+
+################################################################################
+# Job declarations
+#
+# Each job must pull in each of the following keys:
+#
+#   - a "base image"
+#   - a build script
+#   - tags for the jobs
+#     - already provided for upload and CI update jobs
+#   - rules for when to run the job
+#
+# Additionally, jobs may also contain:
+#
+#   - artifacts
+#   - dependency/needs jobs for required jobs
+################################################################################
+
+# CI strategy for DIY.
+#
+# Builders:
+#
+# - Fedora 34
+#   * ci/docker/fedora36
+#     - includes mpich and openmpi
+# - Windows 10 VS2022
+#
+# Wanted test sets:
+# - OS
+#   - macOS
+# - Checkers
+#   - clang-tidy?
+
+build:fedora36-mpich:
+  extends:
+    - .fedora36_mpich
+    - .cmake_build_linux
+    - .linux_builder_tags
+    - .cmake_build_artifacts
+    - .run_automatically
+
+test:fedora36-mpich:
+  extends:
+    - .fedora36_mpich
+    - .cmake_test_linux
+    - .linux_builder_tags
+    - .run_automatically
+  dependencies:
+    - build:fedora36-mpich
+  needs:
+    - build:fedora36-mpich
+
+build:fedora36-mpich-nothreads:
+  extends:
+    - .fedora36_mpich_nothreads
+    - .cmake_build_linux
+    - .linux_builder_tags
+    - .cmake_build_artifacts
+    - .run_automatically
+
+test:fedora36-mpich-nothreads:
+  extends:
+    - .fedora36_mpich_nothreads
+    - .cmake_test_linux
+    - .linux_builder_tags
+    - .run_automatically
+  dependencies:
+    - build:fedora36-mpich-nothreads
+  needs:
+    - build:fedora36-mpich-nothreads
+
+build:fedora36-openmpi:
+  extends:
+    - .fedora36_openmpi
+    - .cmake_build_linux
+    - .linux_builder_tags
+    - .cmake_build_artifacts
+    - .run_automatically
+
+test:fedora36-openmpi:
+  extends:
+    - .fedora36_openmpi
+    - .cmake_test_linux
+    - .linux_builder_tags
+    - .cmake_build_artifacts
+    - .run_automatically
+  dependencies:
+    - build:fedora36-openmpi
+  needs:
+    - build:fedora36-openmpi
+
+build:fedora36-asan:
+  extends:
+    - .fedora36_asan
+    - .cmake_build_linux
+    - .linux_builder_tags
+    - .cmake_build_artifacts
+    - .run_automatically
+
+test:fedora36-asan:
+  extends:
+    - .fedora36_asan
+    - .cmake_memcheck_linux
+    - .linux_tester_priv_tags
+    - .cmake_build_artifacts
+    - .run_automatically
+  dependencies:
+    - build:fedora36-asan
+  needs:
+    - build:fedora36-asan
+
+build:fedora36-ubsan:
+  extends:
+    - .fedora36_ubsan
+    - .cmake_build_linux
+    - .linux_builder_tags
+    - .cmake_build_artifacts
+    - .run_automatically
+
+test:fedora36-ubsan:
+  extends:
+    - .fedora36_ubsan
+    - .cmake_memcheck_linux
+    - .linux_tester_priv_tags
+    - .cmake_build_artifacts
+    - .run_automatically
+  dependencies:
+    - build:fedora36-ubsan
+  needs:
+    - build:fedora36-ubsan
+
+build:windows_vs2022_debug:
+  extends:
+    - .windows_debug
+    - .windows_tags
+    - .cmake_build_windows
+    - .run_automatically
+
+test:windows_vs2022_debug:
+  extends:
+    - .windows_debug
+    - .windows_tags
+    - .cmake_test_windows
+    - .run_automatically
+  dependencies:
+    - build:windows_vs2022_debug
+  needs:
+    - build:windows_vs2022_debug
+
+build:windows_vs2022_release:
+  extends:
+    - .windows_release
+    - .windows_tags
+    - .cmake_build_windows
+    - .run_automatically
+
+test:windows_vs2022_release:
+  extends:
+    - .windows_release
+    - .windows_tags
+    - .cmake_test_windows
+    - .run_automatically
+  dependencies:
+    - build:windows_vs2022_release
+  needs:
+    - build:windows_vs2022_release

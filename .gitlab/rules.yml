@@ -1,0 +1,27 @@
+---
+# Rules for where jobs can run
+# yamllint disable rule:line-length
+.run_automatically:
+  rules:
+    - if: '$CI_MERGE_REQUEST_ID'
+      when: on_success
+    - if: '$CI_PROJECT_PATH == "diatomic/diy"'
+      when: on_success
+    - when: never
+
+.run_scheduled:
+  rules:
+    - if: '$CI_MERGE_REQUEST_ID'
+      when: manual
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_PATH == "diatomic/diy"'
+      when: on_success
+    - when: never
+
+.run_manually:
+  rules:
+    - if: '$CI_MERGE_REQUEST_ID'
+      when: manual
+    - if: '$CI_PROJECT_PATH == "diatomic/diy"'
+      when: delayed
+      start_in: 30 minutes
+    - when: never

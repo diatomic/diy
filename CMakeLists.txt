@@ -33,6 +33,13 @@ macro (diy_dependent_option variable)
   endif ()
 endmacro ()
 
+set                         (compiler_supports_sanitizers OFF)
+if                          (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
+                             CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" OR
+                             CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set                     (compiler_supports_sanitizers ON)
+endif                       ()
+
 diy_option                  (threads             "Build DIY with threading"                                  ON)
 diy_option                  (log                 "Build DIY with logging"                                    OFF)
 diy_option                  (profile             "Build DIY with profiling"                                  OFF)
@@ -45,6 +52,7 @@ diy_dependent_option        (build_diy_nompi_lib "Also build the nompi version o
 diy_option                  (build_examples      "Build DIY examples"                                        ON)
 diy_option                  (build_tests         "Build DIY tests"                                           ON)
 diy_option                  (python              "Build Python bindings"                                     OFF)
+cmake_dependent_option      (enable_sanitizers   "Build DIY with sanitizer support"                          OFF "compiler_supports_sanitizers" OFF)
 
 # Default to Release
 if                          (NOT CMAKE_BUILD_TYPE)
@@ -230,6 +238,16 @@ elseif (${diy_prefix}mpi_nompi IN_LIST diy_targets)
     list(APPEND libraries ${diy_prefix}mpi_nompi)
 endif()
 list(APPEND libraries diy_developer_flags)
+
+# Sanitizers
+if                          (enable_sanitizers)
+    set(sanitizer           "address" CACHE STRING "The sanitizer to use")
+
+    string                  (APPEND CMAKE_CXX_FLAGS " -fsanitize=${sanitizer}")
+    string                  (APPEND CMAKE_C_FLAGS " -fsanitize=${sanitizer}")
+    string                  (APPEND CMAKE_EXE_LINKER_FLAGS " -fsanitize=${sanitizer}")
+    string                  (APPEND CMAKE_SHARED_LINKER_FLAGS " -fsanitize=${sanitizer}")
+endif                       ()
 
 # enable testing and CDash dashboard submission
 enable_testing              ()
