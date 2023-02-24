@@ -1,19 +1,19 @@
 #ifndef DIY_SERIALIZATION_HPP
 #define DIY_SERIALIZATION_HPP
 
-#include <vector>
-#include <valarray>
+#include <cassert>
+#include <fstream>
+#include <functional>
 #include <map>
+#include <memory>
 #include <set>
 #include <string>
-#include <fstream>
-
 #include <tuple>
+#include <type_traits>              // this is used for a safety check for default serialization
 #include <unordered_map>
 #include <unordered_set>
-#include <type_traits>              // this is used for a safety check for default serialization
-
-#include <cassert>
+#include <valarray>
+#include <vector>
 
 namespace diy
 {
