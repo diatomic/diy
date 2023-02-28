@@ -1,6 +1,8 @@
 #ifndef DIY_MPI_CONFIG_HPP
 #define DIY_MPI_CONFIG_HPP
 
+#include <utility>
+
 /// We want to allow the use of `diy::mpi` in either header-only or library mode.
 /// DIY_MPI_AS_LIB is defined when using library mode.
 /// This file contains some configuration macros. To maintain backwards compatibility
@@ -35,8 +37,6 @@
 #  include "mpitypes.hpp" // only configured in library mode
 #else // ifdef DIY_MPI_AS_LIB
 
-#include <utility>
-
 namespace diy
 {
 namespace mpi
@@ -59,6 +59,7 @@ struct DIY_##mpitype {                                                          
   DIY_##mpitype& operator=(const mpitype&) = delete;                                \
   DIY_##mpitype& operator=(mpitype&& obj) { data = std::move(obj); return *this; }  \
   operator const mpitype&() const { return data; }                                  \
+  void reset() { data = mpitype(); }                                                \
 private:                                                                            \
   mpitype data;                                                                     \
 };

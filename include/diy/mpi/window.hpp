@@ -162,7 +162,7 @@ window(window&& rhs):
   buffer_(rhs.buffer_), rank_(rhs.rank_), window_(std::move(rhs.window_))
 {
   rhs.buffer_ = nullptr;
-  rhs.window_ = MPI_WIN_NULL;
+  rhs.window_.reset();
 }
 
 template<class T>
@@ -180,7 +180,7 @@ operator=(window&& rhs)
   rhs.buffer_ = nullptr;
   rank_ = rhs.rank_;
   window_ = std::move(rhs.window_);
-  rhs.window_ = MPI_WIN_NULL;
+  rhs.window_.reset();
 
   return *this;
 }
