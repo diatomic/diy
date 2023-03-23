@@ -37,6 +37,14 @@ namespace diy
       virtual inline char* grow(size_t) override                              { throw std::runtime_error("Cannot grow a FileBuffer"); }
       virtual inline char* advance(size_t) override                           { throw std::runtime_error("Cannot advance a FileBuffer"); }
 
+      // TODO: for now, we just throw, but obviously it should be possile to store binary blobs in a file; might want to fall back
+      using Blob = BinaryBlob;
+      virtual inline void save_binary_blob(const char*, size_t) override      { throw std::runtime_error("Cannot save binary blobs in a FileBuffer"); }
+
+      virtual inline void save_binary_blob(const char*, size_t, Blob::Deleter) override { throw std::runtime_error("Cannot save binary blobs in a FileBuffer"); }
+
+      virtual inline Blob load_binary_blob() override                         { throw std::runtime_error("Cannot load binary blobs from a FileBuffer"); }
+
       size_t              size() const                                { return head; }
 
       FILE*  file;
