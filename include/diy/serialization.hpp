@@ -37,6 +37,7 @@ namespace diy
     virtual char*       advance(size_t count)                       =0;   //!< advance buffer position by `count` bytes and return the pointer to the beginning
 
     virtual void        save_binary_blob(const char*, size_t)       =0;
+    virtual void        save_binary_blob(const char*, size_t, BinaryBlob::Deleter) = 0;
     virtual BinaryBlob  load_binary_blob()                          =0;
   };
 
@@ -60,7 +61,7 @@ namespace diy
     virtual inline char* advance(size_t count) override;                     //!< advance buffer position by `count` bytes and return the pointer to the beginning
 
     virtual inline void save_binary_blob(const char* x, size_t count) override;
-            inline void save_binary_blob(const char* x, size_t count, Blob::Deleter deleter);
+    virtual inline void save_binary_blob(const char* x, size_t count, Blob::Deleter deleter) override;
     virtual inline Blob load_binary_blob() override;
     size_t              nblobs() const                              { return blobs.size(); }
 
