@@ -4,6 +4,7 @@
 #include <iostream>
 #include "constants.h"
 #include "dynamic-point.hpp"
+#include "point.hpp"
 
 namespace diy
 {
@@ -25,6 +26,33 @@ namespace diy
 
         Bounds(int dim): min(dim), max(dim)                                 {}
         Bounds(const Point& _min, const Point& _max) : min(_min), max(_max) {}
+
+        bool contains(const Point& p) const
+        {
+            assert(p.dimension() == min.dimension());
+
+            for(unsigned i = 0; i < min.dimension(); ++i)
+                if (p[i] < min[i] || p[i] > max[i])
+                    return false;
+            return true;
+        }
+
+        template<unsigned int D>
+        bool contains(const diy::Point<Coordinate_, D>& p) const
+        {
+            assert(p.dimension() == min.dimension());
+
+            for(unsigned i = 0; i < min.dimension(); ++i)
+                if (p[i] < min[i] || p[i] > max[i])
+                    return false;
+            return true;
+        }
+
+        inline friend std::ostream& operator<<(std::ostream& out, const Bounds& b)
+        {
+            out << "Bounds(min=" << b.min << ", max=" << b.max << ")";
+            return out;
+        }
 
         private:
             // make default constructor private to explicitly break old deprecated behavior;
