@@ -65,6 +65,8 @@ struct GridRef
         static constexpr
         unsigned    dimension()                                 { return D; }
 
+        bool        contains(const Vertex& v)                   { for (unsigned i = 0; i < D; ++i) { if (v[i] < 0 || v[i] >= shape_[i]) return false;} return true; }
+
     protected:
         static Index
                 size(const Vertex& v)                           { Index res = 1; for (unsigned i = 0; i < D; ++i) res *= v[i]; return res; }
