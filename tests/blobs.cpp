@@ -166,7 +166,7 @@ int main(int argc, char* argv[])
 
   Catch::Session session;
 
-  BlobsFixture::nblocks = std::max(world.size(), 2);
+  BlobsFixture::nblocks = (std::max)(world.size(), 2);
   bool help;
 
   std::string log_level   = "info";

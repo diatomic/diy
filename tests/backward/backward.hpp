@@ -888,7 +888,7 @@ public:
       }
     }
 
-    _stacktrace.resize(std::min(_stacktrace.size(), skip_n_firsts() + depth));
+    _stacktrace.resize((std::min)(_stacktrace.size(), skip_n_firsts() + depth));
     return size();
   }
 
@@ -1073,7 +1073,7 @@ public:
       }
     }
 
-    _stacktrace.resize(std::min(_stacktrace.size(), skip_n_firsts() + depth));
+    _stacktrace.resize((std::min)(_stacktrace.size(), skip_n_firsts() + depth));
     return size();
   }
 };
@@ -1111,7 +1111,7 @@ public:
       }
     }
 
-    _stacktrace.resize(std::min(_stacktrace.size(), skip_n_firsts() + depth));
+    _stacktrace.resize((std::min)(_stacktrace.size(), skip_n_firsts() + depth));
     return size();
   }
 };
@@ -1204,7 +1204,7 @@ public:
       }
     }
 
-    _stacktrace.resize(std::min(_stacktrace.size(), skip_n_firsts() + depth));
+    _stacktrace.resize((std::min)(_stacktrace.size(), skip_n_firsts() + depth));
     return size();
   }
 
@@ -3857,8 +3857,8 @@ public:
 
     using std::max;
     using std::min;
-    unsigned a = min(line_a, line_b);
-    unsigned b = max(line_a, line_b);
+    unsigned a = (min)(line_a, line_b);
+    unsigned b = (max)(line_a, line_b);
 
     if ((b - a) < (context_size / 3)) {
       return src_file.get_lines((a + b - context_size + 1) / 2, context_size);
