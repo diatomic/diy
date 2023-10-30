@@ -134,7 +134,7 @@ int main()
             }
 
             // record neighbors
-            for (int nbr_lev = std::max(0, lev-1); nbr_lev <= std::min(finest_level, lev+1); ++nbr_lev)
+            for (int nbr_lev = (std::max)(0, lev-1); nbr_lev <= (std::min)(finest_level, lev+1); ++nbr_lev)
             {
                 // gotta do this yoga to work around AMReX's static variables
                 const Box& nbr_lev_domain  = amr->getLevel(nbr_lev).Domain();

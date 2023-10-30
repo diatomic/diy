@@ -157,7 +157,7 @@ int main(int argc, char* argv[])
 
   Catch::Session session;
 
-  SimpleFixture::nblocks = std::max(world.size(), 2);
+  SimpleFixture::nblocks = (std::max)(world.size(), 2);
   bool help;
 
   std::string log_level   = "info";
