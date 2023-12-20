@@ -62,6 +62,9 @@ namespace mpi
       template<class T>
       void      send(int dest, int tag, const T& x) const   { detail::send(comm_, dest, tag, x); }
 
+      template<class T>
+      void      ssend(int dest, int tag, const T& x) const   { detail::ssend(comm_, dest, tag, x); }
+
       //! Receive `x` from `dest` using `tag` (blocking).
       //! If `T` is an `std::vector<...>`, `recv` will resize it to fit exactly the sent number of values.
       template<class T>

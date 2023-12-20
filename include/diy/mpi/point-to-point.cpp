@@ -31,6 +31,16 @@ void send(DIY_MPI_Comm comm, int dest, int tag, const void* data, int count, con
 #endif
 }
 
+void ssend(DIY_MPI_Comm comm, int dest, int tag, const void* data, int count, const datatype& type)
+{
+#if DIY_HAS_MPI
+  MPI_Ssend(data, count, mpi_cast(type.handle), dest, tag, mpi_cast(comm));
+#else
+  (void) comm; (void) dest; (void) tag; (void) data; (void) count; (void) type;
+  DIY_UNSUPPORTED_MPI_CALL(MPI_Ssend);
+#endif
+}
+
 status probe(DIY_MPI_Comm comm, int source, int tag)
 {
 #if DIY_HAS_MPI

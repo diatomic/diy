@@ -24,6 +24,7 @@ DIY_MPI_EXPORT extern const int any_tag;
 namespace detail
 {
   DIY_MPI_EXPORT_FUNCTION void send(DIY_MPI_Comm comm, int dest, int tag, const void* data, int count, const datatype& type);
+  DIY_MPI_EXPORT_FUNCTION void ssend(DIY_MPI_Comm comm, int dest, int tag, const void* data, int count, const datatype& type);
   DIY_MPI_EXPORT_FUNCTION request isend(DIY_MPI_Comm comm, int dest, int tag, const void* data, int count, const datatype& type);
   DIY_MPI_EXPORT_FUNCTION request issend(DIY_MPI_Comm comm, int dest, int tag, const void* data, int count, const datatype& type);
   DIY_MPI_EXPORT_FUNCTION status probe(DIY_MPI_Comm comm, int source, int tag);
@@ -35,6 +36,13 @@ namespace detail
   {
     static_assert(std::is_same<typename is_mpi_datatype<T>::type, true_type>::value, "is_mpi_datatype<T>::type must be true_type");
     send(comm, dest, tag, address(x), count(x), datatype_of(x));
+  }
+
+  template <class T>
+  inline void ssend(DIY_MPI_Comm comm, int dest, int tag, const T& x)
+  {
+    static_assert(std::is_same<typename is_mpi_datatype<T>::type, true_type>::value, "is_mpi_datatype<T>::type must be true_type");
+    ssend(comm, dest, tag, address(x), count(x), datatype_of(x));
   }
 
   template <class T>
