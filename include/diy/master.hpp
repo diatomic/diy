@@ -728,6 +728,7 @@ iexchange_(const ICallback<Block>& f, MemoryManagement mem)
     do
     {
         size_t work_done = 0;
+        DIY_UNUSED(work_done);
         for (int i = 0; i < static_cast<int>(size()); i++)     // for all blocks
         {
             int gid = this->gid(i);

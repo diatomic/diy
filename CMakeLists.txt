@@ -87,7 +87,7 @@ if                          (caliper)
 
     find_package            (caliper)
     list (APPEND diy_include_thirdparty_directories $<BUILD_INTERFACE:${caliper_INCLUDE_DIR}>)
-    list (APPEND diy_libraries caliper caliper-mpi)
+    list (APPEND diy_libraries caliper)
 endif()
 
 # Threads

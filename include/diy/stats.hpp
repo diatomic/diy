@@ -206,7 +206,7 @@ struct Profiler
     void    enter(std::string name)             { CALI_MARK_BEGIN(name.c_str()); }
     void    exit(std::string name)              { CALI_MARK_END(name.c_str()); }
 
-    void    output(std::ostream& out, std::string = "") const {}
+    void    output(std::ostream&, std::string = "") const {}
     void    clear()                             {}
 
     Scoped  scoped(std::string name)            { return Scoped(*this, name); }
