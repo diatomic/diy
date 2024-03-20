@@ -6,7 +6,7 @@ int main(int argc, char** argv)
     diy::mpi::environment   env(argc, argv);
     diy::mpi::communicator  world;
 
-    diy::io::SharedOutFile out("shared-output.txt", world);
+    diy::io::SharedOutFile out("shared-output.txt", world, -1);
 
     out << world.rank() << " out of " << world.size() << std::endl;
 }
