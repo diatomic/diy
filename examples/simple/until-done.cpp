@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
   {
     master.foreach(&flip_coin);
     master.exchange();
-    all_done = master.proxy(master.loaded_block()).read<bool>();
+    all_done = master.proxy(master.loaded_block()).read<int>();
   }
 
   if (world.rank() == 0)
