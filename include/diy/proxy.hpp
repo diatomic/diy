@@ -217,8 +217,7 @@ namespace diy
   };
 
   template<class T>
-  struct Master::Proxy::EnqueueIterator:
-    public std::iterator<std::output_iterator_tag, void, void, void, void>
+  struct Master::Proxy::EnqueueIterator
   {
     typedef     void (*SaveT)(BinaryBuffer&, const T&);
 
