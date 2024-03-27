@@ -51,7 +51,7 @@ inline cothread_struct*& co_running()
 }
 /**********************/
 
-static void springboard(int ignored) {
+static void springboard(int) {
   if(sigsetjmp(creating()->context, 0)) {
     co_running()->coentry();
   }
