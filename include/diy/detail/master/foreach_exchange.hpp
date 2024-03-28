@@ -17,7 +17,8 @@ launch_process_block_coroutine()
     int                     lid     = arg->lid;
     ProxyWithLink&          cp      = arg->proxy;
     cothread_t              main    = arg->main;
-    Master*                 master  = arg->master;
+    // unused
+    //Master*                 master  = arg->master;
     auto                    f       = arg->f;
 
     co_switch(main);        // give the argument back
