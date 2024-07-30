@@ -591,7 +591,11 @@ diy::Master::
 release(int i)
 {
   void* b = blocks_.release(i);
+
   delete link(i);   links_[i] = 0;
+  std::swap(links_[i], links_.back());
+  links_.pop_back();
+
   lids_.erase(gid(i));
   return b;
 }

@@ -40,7 +40,7 @@ namespace diy
       inline void   clear();
 
       int           add(Element e)                  { elements_.push_back(e); external_.push_back(-1); ++(*in_memory_.access()); return static_cast<int>(elements_.size()) - 1; }
-      void*         release(int i)                  { void* e = get(i); elements_[static_cast<size_t>(i)] = 0; return e; }
+      void*         release(int i);
 
       void*         find(int i) const               { return elements_[static_cast<size_t>(i)]; }                        // possibly returns 0, if the element is unloaded
       void*         get(int i)                      { if (!find(i)) load(i); return find(i); }      // loads the element first, and then returns its address
@@ -85,6 +85,23 @@ clear()
   elements_.clear();
   external_.clear();
   *in_memory_.access() = 0;
+}
+
+void*
+diy::Collection::
+release(int i)
+{
+  void* e = get(i);
+
+  elements_[static_cast<size_t>(i)] = 0;
+  std::swap(elements_[static_cast<size_t>(i)], elements_.back());
+  elements_.pop_back();
+
+  std::swap(external_[static_cast<size_t>(i)], external_.back());
+  external_.pop_back();
+  --(*in_memory_.access());
+
+  return e;
 }
 
 void
