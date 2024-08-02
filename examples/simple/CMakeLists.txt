@@ -13,6 +13,9 @@ target_link_libraries       (rexchange      ${libraries})
 add_executable              (iexchange-particles      iexchange-particles.cpp)
 target_link_libraries       (iexchange-particles      ${libraries})
 
+install                     (TARGETS simple read-blocks until-done rexchange iexchange-particles
+                             DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/diy/examples)
+
 if                          (mpi)
     add_executable          (intercomm      intercomm.cpp)
     target_link_libraries   (intercomm      ${libraries})
