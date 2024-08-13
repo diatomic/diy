@@ -18,6 +18,7 @@ cmake_minimum_required      (VERSION 3.9)
 list (APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 include(CMakeDependentOption)
+include(GNUInstallDirs)
 
 # Provides an option if it is not already defined.
 # This can be replaced when CMake 3.13 is our cmake_minimum_required
@@ -50,6 +51,7 @@ diy_option                  (build_diy_mpi_lib   "Build diy::mpi as a library"  
 diy_dependent_option        (BUILD_SHARED_LIBS   "Create shared libraries if on"                             ON  "build_diy_mpi_lib" OFF)
 diy_dependent_option        (build_diy_nompi_lib "Also build the nompi version of diy::mpi"                  OFF "mpi;build_diy_mpi_lib" OFF)
 diy_option                  (build_examples      "Build DIY examples"                                        ON)
+diy_option                  (install_examples    "Install DIY examples source code"                          ON)
 diy_option                  (build_tests         "Build DIY tests"                                           ON)
 diy_option                  (python              "Build Python bindings"                                     OFF)
 cmake_dependent_option      (enable_sanitizers   "Build DIY with sanitizer support"                          OFF "compiler_supports_sanitizers" OFF)
@@ -263,6 +265,10 @@ if                          (build_examples)
     add_subdirectory        (examples)
 endif                       (build_examples)
 
+if                          (install_examples)
+  install(DIRECTORY examples/smoke_test DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/DIY/examples)
+endif                       (install_examples)
+
 if                          (build_tests)
     add_subdirectory        (tests)
 endif                       (build_tests)
@@ -272,7 +278,7 @@ include(CMakePackageConfigHelpers)
 configure_package_config_file(
     "${PROJECT_SOURCE_DIR}/cmake/diy-config.cmake.in"
     "${PROJECT_BINARY_DIR}/diy-config.cmake"
-    INSTALL_DESTINATION ".")
+    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/DIY")
 
 # install targets
 if (NOT DEFINED diy_install_only_libraries) # defined by parent project if building for binary distribution
@@ -294,8 +300,8 @@ install(TARGETS ${diy_targets} EXPORT ${diy_export_name}
 
 if (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR) # Only generate these files when diy is the main project
   export(EXPORT ${diy_export_name} NAMESPACE DIY:: FILE "${PROJECT_BINARY_DIR}/diy-targets.cmake")
-  install(EXPORT ${diy_export_name} NAMESPACE DIY:: DESTINATION "." FILE diy-targets.cmake COMPONENT ${diy_development_component})
-  install(FILES "${PROJECT_BINARY_DIR}/diy-config.cmake" DESTINATION "." COMPONENT ${diy_development_component})
+  install(EXPORT ${diy_export_name} NAMESPACE DIY:: DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/DIY" FILE diy-targets.cmake COMPONENT ${diy_development_component})
+  install(FILES "${PROJECT_BINARY_DIR}/diy-config.cmake" DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/DIY" COMPONENT ${diy_development_component})
 endif()
 
 if      (python)
