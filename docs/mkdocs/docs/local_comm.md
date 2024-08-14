@@ -41,7 +41,7 @@ void bar(Block* b,                             // local block
     diy::Link*    l = cp.link();
 
     // for all neighbor blocks, dequeue data received from this neighbor block in the last exchange
-    for (int i = 0; i < l.size(); ++i)
+    for (int i = 0; i < l->size(); ++i)
     {
         int v;
         cp.dequeue(l->target(i).gid, v);

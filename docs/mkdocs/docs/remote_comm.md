@@ -11,8 +11,8 @@ Everything follows the synchronous `exchange` protocol of the [Local communicati
 blocks outside of their neighborhood.
 When enqueuing data remotely, DIY doesn't know the assignment of block global ID (`gid`) to MPI process rank; this
 information is only kept for the local link. Hence, the full `diy::BlockID` information (a tuple of block gid and MPI
-process rank) must be provided by the user. For dequeuing, nothing changes when receiving remote messages. Messages
-arrive over the link, and their gid is known just as if the source were local.
+process rank) must be provided by the user. For dequeuing, we iterate over a vector of incoming block gids
+extracted from the communication proxy, and then dequeue each of those messages.
 
 ~~~~{.cpp}
 void foo(Block* b,                             // local block
@@ -37,13 +37,18 @@ void foo(Block* b,                             // local block
 void bar(Block* b,                             // local block
          const diy::Master::ProxyWithLink& cp) // communication proxy for neighbor blocks
 {
-    diy::Link*    l = cp.link();
+    std::vector<int> incoming_gids;
+    cp.incoming(incoming_gids);
 
-    // for all neighbor blocks, dequeue data received from this neighbor block in the last exchange
-    for (int i = 0; i < l.size(); ++i)
+    // for anything incoming, dequeue data received in the last exchange
+    for (int i = 0; i < incoming_gids.size(); i++)
     {
-        int v;
-        cp.dequeue(l->target(i).gid, v);
+        int gid = incoming_gids[i];
+        if (cp.incoming(gid).size())
+        {
+            int v;
+            cp.dequeue(gid, v);
+        }
     }
 
     // compute some local value

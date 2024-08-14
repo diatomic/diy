@@ -15,10 +15,6 @@ There is only one callback function required, and it is passed directly to `iexc
 function includes both dequeuing and enqueuing. DIY handles the messaging internally as it calls this function repeatedly
 until the function returns that its local work is done, and DIY confirms that there are no pending messages in flight.
 
-A remote flag set to true can also be optionally passed to `iexchange`, combining the features of
-[remote communication](remote_comm.md) with
-`iexchange`.
-
 ~~~~{.cpp}
 // callback for asynchronous iexchange
 // return: true = I'm done unless more work arrives; false = I'm not done, please call me again
@@ -35,7 +31,7 @@ bool foo(Block* b,                             // local block
         cp.enqueue(l->target(i), value);
 
     // for all neighbor blocks, dequeue data received from this neighbor block
-    for (int i = 0; i < l.size(); ++i)
+    for (int i = 0; i < l->size(); ++i)
     {
         int v;
         while (cp.incomingl(l->target(i).gid))   // get everything available

@@ -36,7 +36,7 @@ be submitted in the GitHub repo.
 
 ## Documentation
 
-[Doxygen pages](https://diatomic.github.io/diy)
+[DIY project](https://diatomic.github.io/diy)
 
 ## Example
 
