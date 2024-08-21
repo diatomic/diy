@@ -597,6 +597,11 @@ release(int i)
   links_.pop_back();
 
   lids_.erase(gid(i));
+
+  std::swap(gids_[i], gids_.back());
+  gids_.pop_back();
+  lids_[gid(i)] = i;
+
   return b;
 }
 
