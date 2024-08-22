@@ -592,6 +592,7 @@ release(int i)
 {
   void* b = blocks_.release(i);
 
+  expected_ -= links_[i]->size_unique();
   delete link(i);   links_[i] = 0;
   std::swap(links_[i], links_.back());
   links_.pop_back();
