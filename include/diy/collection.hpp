@@ -40,7 +40,7 @@ namespace diy
       inline void   clear();
 
       int           add(Element e)                  { elements_.push_back(e); external_.push_back(-1); ++(*in_memory_.access()); return static_cast<int>(elements_.size()) - 1; }
-      void*         release(int i);
+      inline void*  release(int i);
 
       void*         find(int i) const               { return elements_[static_cast<size_t>(i)]; }                        // possibly returns 0, if the element is unloaded
       void*         get(int i)                      { if (!find(i)) load(i); return find(i); }      // loads the element first, and then returns its address
