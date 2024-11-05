@@ -98,6 +98,8 @@ int main(int argc, char* argv[])
     int                       in_memory = 8;   // allow diy to keep 8 local blocks in memory
     std::string               prefix    = "./DIY.XXXXXX"; // prefix for temp files for blocks
                                                           // moved out of core
+    bool                      coroutines = false;
+    std::string               log_level   = "info";
 
     bool help;
 
@@ -109,6 +111,8 @@ int main(int argc, char* argv[])
         >> Option('t', "thread",  threads,        "number of threads")
         >> Option('m', "memory",  in_memory,      "maximum blocks to store in memory")
         >> Option(     "prefix",  prefix,         "prefix for external storage")
+        >> Option('c', "coroutines", coroutines,  "use coroutines via foreach_exchange")
+        >> Option('l', "log",     log_level,      "log level")
         >> Option('h', "help",    help,           "show help")
         ;
     if (!ops.parse(argc,argv) || help)
@@ -117,6 +121,8 @@ int main(int argc, char* argv[])
             std::cout << ops;
         return 1;
     }
+
+    diy::create_logger(log_level);
 
     // diy initialization
     diy::FileStorage          storage(prefix); // used for blocks to be moved out of core
@@ -165,9 +171,18 @@ int main(int argc, char* argv[])
     }
 
     // compute, exchange, compute
-    master.foreach(&local_sum);          // callback function executed on each local block
-    master.exchange();                   // exchange data between blocks in the link
-    master.foreach(&average_neighbors);  // callback function executed on each local block
+    if (!coroutines)
+    {
+        master.foreach(&local_sum);          // callback function executed on each local block
+        master.exchange();                   // exchange data between blocks in the link
+        master.foreach(&average_neighbors);  // callback function executed on each local block
+    } else
+        master.foreach_exchange([](Block* const& b, const diy::Master::ProxyWithLink& cp)
+        {
+            local_sum(b,cp);
+            cp.yield();
+            average_neighbors(b,cp);
+        });
 
     // save the results in diy format
     diy::io::write_blocks("blocks.out", world, master);

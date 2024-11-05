@@ -160,6 +160,11 @@ if                          (mpi AND MPIEXEC)
                              COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:simple-test> -b ${b}
                             )
       set_tests_properties  (simple-test-p${p}-b${b} PROPERTIES TIMEOUT 300 RUN_SERIAL ON)
+
+      add_test              (NAME simple-test-p${p}-b${b}-c
+                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:simple-test> -b ${b} -c
+                            )
+      set_tests_properties  (simple-test-p${p}-b${b}-c PROPERTIES TIMEOUT 300 RUN_SERIAL ON)
   endforeach                (p)
 
   foreach                   (p 2 3)

@@ -1,6 +1,7 @@
 #ifndef DIY_PROXY_HPP
 #define DIY_PROXY_HPP
 
+#include "coroutine.hpp"
 
 namespace diy
 {
@@ -60,6 +61,11 @@ namespace diy
         if (!iexchange_)
             for (auto& x : incoming_)
                 incoming[x.first].access()->emplace_front(std::move(x.second));
+    }
+
+    void                init()
+    {
+        collectives_ = &master()->collectives(gid());
     }
 
     int                 gid() const                                     { return gid_; }
@@ -203,6 +209,12 @@ namespace diy
     Master*             master() const                                  { return master_; }
     IExchangeInfo*      iexchange() const                               { return iexchange_; }
 
+    // Coroutine machinery
+    void                set_main(coroutine::cothread_t main)            { main_ = main; }
+    void                yield() const                                   { coroutine::co_switch(main_); }
+    void                set_done(bool x)                                { done_ = x; }
+    bool                done() const                                    { return done_; }
+
     private:
       int               gid_;
       Master*           master_;
@@ -214,6 +226,9 @@ namespace diy
       mutable OutgoingQueues    outgoing_;
 
       CollectivesList*  collectives_;
+
+      coroutine::cothread_t main_;
+      bool                  done_ = false;
   };
 
   template<class T>
