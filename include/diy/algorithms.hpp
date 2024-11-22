@@ -8,6 +8,7 @@
 #include "reduce.hpp"
 #include "reduce-operations.hpp"
 #include "partners/swap.hpp"
+#include "resolve.hpp"
 
 #include "detail/algorithms/sort.hpp"
 #include "detail/algorithms/kdtree.hpp"
