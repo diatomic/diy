@@ -12,6 +12,8 @@
 #include "detail/algorithms/sort.hpp"
 #include "detail/algorithms/kdtree.hpp"
 #include "detail/algorithms/kdtree-sampling.hpp"
+#include "detail/algorithms/load-balance-collective.hpp"
+#include "detail/algorithms/load-balance-sampling.hpp"
 
 #include "log.hpp"
 
@@ -186,6 +188,73 @@ namespace diy
             expected += master.link(i)->size_unique();
         master.set_expected(expected);
     }
+
+    using Callback = std::function<void(Master&)>;
+
+    // load balancing using collective method
+    template<class Block>
+    void load_balance_collective(
+            diy::Master&                master,             // diy master
+            diy::DynamicAssigner&       dynamic_assigner,   // diy dynamic assigner
+            const Callback&             f)                  // callback for setting local work for each block
+    {
+        // get local work info for each block
+        f(master);
+
+        WorkInfo                my_work_info;               // my mpi process work info
+        std::vector<WorkInfo>   all_work_info;              // work info collected from all mpi processes
+        std::vector<MoveInfo>   all_move_info;              // move info for all moves
+
+        // exchange info about load balance
+        diy::detail::exchange_work_info<Block>(master, all_work_info);
+
+        // decide what to move where
+        diy::detail::decide_move_info(master, all_work_info, all_move_info);
+
+        // move blocks from src to dst proc
+        for (auto i = 0; i < all_move_info.size(); i++)
+            diy::detail::move_block<Block>(dynamic_assigner, master, all_move_info[i]);
+
+        // fix links
+        diy::fix_links(master, dynamic_assigner);
+    }
+
+    // load balancing using sampling method
+    template<class Block>
+    void load_balance_sampling(
+            diy::Master&                master,
+            diy::StaticAssigner&        static_assigner,    // diy static assigner
+            diy::DynamicAssigner&       dynamic_assigner,   // diy dynamic assigner
+            const Callback&             f,                  // callback for setting local work for each block
+            float                       sample_frac = 0.5,  // fraction of procs to sample 0.0 < sample_size <= 1.0
+            float                       quantile    = 0.8)  // quantile cutoff above which to move blocks (0.0 - 1.0)
+    {
+        // get local work info for each block
+        f(master);
+
+        WorkInfo                my_work_info;               // my mpi process work info
+        std::vector<WorkInfo>   sample_work_info;           // work info collecting from sampling other mpi processes
+        std::vector<MoveInfo>   multi_move_info;            // move info for moving multiple blocks
+
+        // "auxiliary" master and decomposer for using rexchange for load balancing, 1 block per process
+        diy::Master                     aux_master(master.communicator(), 1, -1, &AuxBlock::create, &AuxBlock::destroy);
+        diy::ContiguousAssigner         aux_assigner(aux_master.communicator().size(), aux_master.communicator().size());
+        diy::DiscreteBounds aux_domain(1);                               // any fake domain
+        aux_domain.min[0] = 0;
+        aux_domain.max[0] = aux_master.communicator().size() + 1;
+        diy::RegularDecomposer<diy::DiscreteBounds>  aux_decomposer(1, aux_domain, aux_master.communicator().size());
+        aux_decomposer.decompose(aux_master.communicator().rank(), aux_assigner, aux_master);
+
+        // exchange info about load balance
+        diy::detail::exchange_sample_work_info<Block>(master, aux_master, sample_frac, my_work_info, sample_work_info);
+
+        // move blocks
+        diy::detail::move_sample_blocks<Block>(master, aux_master, dynamic_assigner, sample_work_info, my_work_info, quantile);
+
+        // fix links
+        diy::fix_links(master, dynamic_assigner);
+    }
+
 }
 
 #endif

@@ -8,6 +8,18 @@
 
 namespace diy
 {
+    using Work      = int;
+    using LocalWork = std::vector<Work>;        // estimate of work for each block in the master
+
+    struct WorkInfo
+    {
+        int     proc_rank;          // mpi rank of this process
+        int     top_gid;            // gid of most expensive block in this process TODO: can be top-k-gids, as long as k is fixed and known by all
+        Work    top_work;           // work of top_gid TODO: can be vector of top-k work, as long as k is fixed and known by all
+        Work    proc_work;          // total work of this process
+        int     nlids;              // local number of blocks in this process
+    };
+
     struct BlockID
     {
         int gid, proc;
