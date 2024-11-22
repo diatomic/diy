@@ -13,6 +13,8 @@ void send_req(AuxBlock* b,                              // local block
               const diy::Master::ProxyWithLink& cp,     // communication proxy for neighbor blocks
               std::set<int>& procs)                     // processes to query
 {
+    b = b;                                              // silence unused parameter warning
+
     // send requests for work info to sample_procs
     int v = 1;                                          // any message will do
     for (auto proc_iter = procs.begin(); proc_iter != procs.end(); proc_iter++)
@@ -29,6 +31,9 @@ void recv_req(AuxBlock* b,                              // local block
               const diy::Master::ProxyWithLink& cp,     // communication proxy for neighbor blocks
               std::vector<int>& req_procs)              // processes requesting work info
 {
+    // quiet unused parameter warning
+    b = b;                                              // silence unused parameter warning
+
     std::vector<int> incoming_gids;
     cp.incoming(incoming_gids);
 

@@ -210,7 +210,7 @@ namespace diy
         diy::detail::exchange_work_info<Block>(master, all_work_info);
 
         // decide what to move where
-        diy::detail::decide_move_info(master, all_work_info, all_move_info);
+        diy::detail::decide_move_info(all_work_info, all_move_info);
 
         // move blocks from src to dst proc
         for (auto i = 0; i < all_move_info.size(); i++)

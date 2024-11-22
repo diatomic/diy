@@ -442,7 +442,7 @@ Master(mpi::communicator    comm,
 
     // seed random number generator, broadcast seed, offset by rank
     std::random_device rd;                      // seed source for the random number engine
-    uint s = rd();
+    unsigned int s = rd();
     diy::mpi::broadcast(communicator(), s, 0);
     std::mt19937 gen(s + communicator().rank());          // mersenne_twister random number generator
     mt_gen = gen;

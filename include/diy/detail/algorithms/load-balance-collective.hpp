@@ -42,7 +42,6 @@ void exchange_work_info(diy::Master&            master,
     };
     std::vector<std::vector<int>>   all_work_info_vec;
 
-    // exchange work info TODO: use something like distributed consensus protocol in iexchange?
     diy::mpi::all_gather(master.communicator(), my_work_info_vec, all_work_info_vec);
 
     // unpack received info into vector of structs
@@ -58,8 +57,7 @@ void exchange_work_info(diy::Master&            master,
 }
 
 // determine move info from work info
-void decide_move_info(diy::Master&                  master,
-                      std::vector<WorkInfo>&        all_work_info,          // global work info
+void decide_move_info(std::vector<WorkInfo>&        all_work_info,          // global work info
                       std::vector<MoveInfo>&        all_move_info)          // (output) move info for all moves
 {
     all_move_info.clear();
