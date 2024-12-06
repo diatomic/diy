@@ -243,10 +243,6 @@ namespace diy
       int           lid(int gid__) const                { return local(gid__) ?  lids_.find(gid__)->second : -1; }
       //! whether the block with global id gid is local
       bool          local(int gid__) const              { return lids_.find(gid__) != lids_.end(); }
-      // set work for i-th block
-      void          set_work(int i, Work work)          { work_[i] = work; }
-      // get work for i-th block
-      Work          get_work(int i)                     { return work_[i]; }
 
       //! exchange the queues between all the blocks (collective operation)
       inline void   exchange(bool remote = false, MemoryManagement mem = MemoryManagement());
@@ -366,7 +362,6 @@ namespace diy
       Collection            blocks_;
       std::vector<int>      gids_;
       std::map<int, int>    lids_;
-      std::vector<Work>     work_;
 
       QueuePolicy*          queue_policy_;
 
@@ -466,7 +461,6 @@ clear()
   links_.clear();
   gids_.clear();
   lids_.clear();
-  work_.clear();
   expected_ = 0;
 }
 
@@ -622,8 +616,6 @@ add(int gid__, void* b, Link* l)
   lids_[gid__] = lid__;
   add_expected(l->size_unique()); // NB: at every iteration we expect a message from each unique neighbor
 
-  work_.resize(lids_.size());
-
   return lid__;
 }
 
@@ -643,9 +635,6 @@ release(int i)
   std::swap(gids_[i], gids_.back());
   gids_.pop_back();
   lids_[gid(i)] = i;
-
-  std::swap(work_[i], work_.back());
-  work_.pop_back();
 
   return b;
 }

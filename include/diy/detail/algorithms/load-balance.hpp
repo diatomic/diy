@@ -3,6 +3,18 @@
 namespace diy
 {
 
+// mpi communication of WorkInfo assumes all elements of WorkInfo are sizeof(int)
+// any fields added later to WorkInfo need to also be sizeof(int)
+// Work can be typedef'ed as unsigned int, which is still same size
+struct WorkInfo
+{
+    int     proc_rank;          // mpi rank of this process
+    int     top_gid;            // gid of most expensive block in this process TODO: can be top-k-gids, as long as k is fixed and known by all
+    Work    top_work;           // work of top_gid TODO: can be vector of top-k work, as long as k is fixed and known by all
+    Work    proc_work;          // total work of this process
+    int     nlids;              // local number of blocks in this process
+};
+
 // information about a block that is moving
 struct MoveInfo
 {
@@ -19,7 +31,6 @@ struct AuxBlock
     static void*    create()            { return new AuxBlock; }
     static void     destroy(void* b)    { delete static_cast<AuxBlock*>(b); }
 };
-
 
 // set dynamic assigner blocks to local blocks of master
 void set_dynamic_assigner(diy::DynamicAssigner&   dynamic_assigner,

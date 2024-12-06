@@ -55,35 +55,11 @@ template<class Block>
 void exchange_sample_work_info(diy::Master&             master,                 // the real master with multiple blocks per process
                                diy::Master&             aux_master,             // auxiliary master with 1 block per process for communicating between procs
                                float                    sample_frac,            // fraction of procs to sample 0.0 < sample_size <= 1.0
-                               WorkInfo&                my_work_info,           // (output) my work info
+                               const WorkInfo&          my_work_info,           // my process' work info
                                std::vector<WorkInfo>&   sample_work_info)       // (output) vector of sorted sample work info, sorted by increasing total work per process
 {
-    auto nlids  = master.size();                    // my local number of blocks
     auto nprocs = master.communicator().size();     // global number of procs
     auto my_proc = master.communicator().rank();    // rank of my proc
-
-    // compile my work info
-    my_work_info = { master.communicator().rank(), -1, 0, 0, (int)nlids };
-    for (auto i = 0; i < master.size(); i++)
-    {
-        Block* block = static_cast<Block*>(master.block(i));
-        my_work_info.proc_work += master.get_work(i);
-        if (my_work_info.top_gid == -1 || my_work_info.top_work < master.get_work(i))
-        {
-            my_work_info.top_gid    = master.gid(i);
-            my_work_info.top_work   = master.get_work(i);
-        }
-    }
-
-    // vectors of integers from WorkInfo
-    std::vector<int> my_work_info_vec =
-    {
-        my_work_info.proc_rank,
-        my_work_info.top_gid,
-        my_work_info.top_work,
-        my_work_info.proc_work,
-        my_work_info.nlids
-    };
 
     // pick a random sample of processes, w/o duplicates, and excluding myself
     int nsamples = sample_frac * (nprocs - 1);
@@ -111,22 +87,14 @@ void exchange_sample_work_info(diy::Master&             master,                 
     int work_info_tag = 0;
     std::vector<diy::mpi::request> reqs(req_procs.size());
     for (auto i = 0; i < req_procs.size(); i++)
-        reqs[i] = master.communicator().isend(req_procs[i], work_info_tag, my_work_info_vec);
+        reqs[i] = mpi::detail::isend(MPI_Comm(master.communicator()), req_procs[i], work_info_tag, &my_work_info.proc_rank,
+                sizeof(WorkInfo) / sizeof(WorkInfo::proc_rank), MPI_INT);       // assumes all elements of WorkInfo are sizeof(int)
 
     // receive work info
-    // TODO: std::length error below when using aux_master instead of master.communicator()
-    std::vector<int>   other_work_info_vec(5);
     sample_work_info.resize(nsamples);
     for (auto i = 0; i < nsamples; i++)
-    {
-        master.communicator().recv(diy::mpi::any_source, work_info_tag, other_work_info_vec);
-
-        sample_work_info[i].proc_rank = other_work_info_vec[0];
-        sample_work_info[i].top_gid   = other_work_info_vec[1];
-        sample_work_info[i].top_work  = other_work_info_vec[2];
-        sample_work_info[i].proc_work = other_work_info_vec[3];
-        sample_work_info[i].nlids     = other_work_info_vec[4];
-    }
+        mpi::detail::recv(MPI_Comm(master.communicator()), diy::mpi::any_source, work_info_tag, &sample_work_info[i].proc_rank,
+                sizeof(WorkInfo) / sizeof(WorkInfo::proc_rank), MPI_INT);       // assumes all elements of WorkInfo are sizeof(int)
 
     // ensure all the send requests cleared
     for (auto i = 0; i < req_procs.size(); i++)
@@ -202,14 +170,8 @@ void send_block(AuxBlock*                           b,                  // local
             cp.enqueue(dest_block, bb.buffer);
 
             // remove the block from the master
-            Block* delete_block = static_cast<Block*>(master.get(master.lid(move_info.move_gid)));
-            master.release(master.lid(move_info.move_gid));
-            delete delete_block;
-
-            // debug
-//             if (master.communicator().rank() == move_info.src_proc)
-//                 fmt::print(stderr, "moving gid {} from src rank {} to dst rank {}\n",
-//                         move_info.move_gid, move_info.src_proc, move_info.dst_proc);
+            int move_lid = master.lid(move_info.move_gid);
+            delete master.release(move_lid);
         }
     }
 }
@@ -269,7 +231,7 @@ void move_sample_blocks(diy::Master&                    master,                 
             { recv_block<Block>(b, cp, master); });
 }
 
-}
+}   // detail
 
-}
+}   // diy
 

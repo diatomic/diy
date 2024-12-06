@@ -190,26 +190,36 @@ namespace diy
         master.set_expected(expected);
     }
 
-    using Callback = std::function<void(Master&)>;
+    template<class B>
+    using Callback = std::function<Work(B*)>;
 
     // load balancing using collective method
     template<class Block>
     void load_balance_collective(
             diy::Master&                master,             // diy master
             diy::DynamicAssigner&       dynamic_assigner,   // diy dynamic assigner
-            const Callback&             f)                  // callback for setting local work for each block
+            const Callback<Block>&      f)                  // callback to get work for a block
     {
-        // get local work info for each block
-        f(master);
-
-        WorkInfo                my_work_info;               // my mpi process work info
-        std::vector<WorkInfo>   all_work_info;              // work info collected from all mpi processes
-        std::vector<MoveInfo>   all_move_info;              // move info for all moves
+        // compile my work info
+        WorkInfo my_work_info = { master.communicator().rank(), -1, 0, 0, master.size() };
+        for (auto i = 0; i < master.size(); i++)
+        {
+            Block* block = static_cast<Block*>(master.block(i));
+            Work w = f(block);
+            my_work_info.proc_work += w;
+            if (my_work_info.top_gid == -1 || my_work_info.top_work < w)
+            {
+                my_work_info.top_gid    = master.gid(i);
+                my_work_info.top_work   = w;
+            }
+        }
 
         // exchange info about load balance
-        diy::detail::exchange_work_info<Block>(master, all_work_info);
+        std::vector<WorkInfo>   all_work_info;              // work info collected from all mpi processes
+        diy::detail::exchange_work_info<Block>(master, my_work_info, all_work_info);
 
         // decide what to move where
+        std::vector<MoveInfo>   all_move_info;              // move info for all moves
         diy::detail::decide_move_info(all_work_info, all_move_info);
 
         // move blocks from src to dst proc
@@ -226,16 +236,23 @@ namespace diy
             diy::Master&                master,
             diy::StaticAssigner&        static_assigner,    // diy static assigner
             diy::DynamicAssigner&       dynamic_assigner,   // diy dynamic assigner
-            const Callback&             f,                  // callback for setting local work for each block
+            const Callback<Block>&      f,                  // callback to get work for a block
             float                       sample_frac = 0.5,  // fraction of procs to sample 0.0 < sample_size <= 1.0
             float                       quantile    = 0.8)  // quantile cutoff above which to move blocks (0.0 - 1.0)
     {
-        // get local work info for each block
-        f(master);
-
-        WorkInfo                my_work_info;               // my mpi process work info
-        std::vector<WorkInfo>   sample_work_info;           // work info collecting from sampling other mpi processes
-        std::vector<MoveInfo>   multi_move_info;            // move info for moving multiple blocks
+        // compile my work info
+        WorkInfo my_work_info = { master.communicator().rank(), -1, 0, 0, master.size() };
+        for (auto i = 0; i < master.size(); i++)
+        {
+            Block* block = static_cast<Block*>(master.block(i));
+            Work w = f(block);
+            my_work_info.proc_work += w;
+            if (my_work_info.top_gid == -1 || my_work_info.top_work < w)
+            {
+                my_work_info.top_gid    = master.gid(i);
+                my_work_info.top_work   = w;
+            }
+        }
 
         // "auxiliary" master and decomposer for using rexchange for load balancing, 1 block per process
         diy::Master                     aux_master(master.communicator(), 1, -1, &AuxBlock::create, &AuxBlock::destroy);
@@ -247,6 +264,7 @@ namespace diy
         aux_decomposer.decompose(aux_master.communicator().rank(), aux_assigner, aux_master);
 
         // exchange info about load balance
+        std::vector<WorkInfo>   sample_work_info;           // work info collecting from sampling other mpi processes
         diy::detail::exchange_sample_work_info<Block>(master, aux_master, sample_frac, my_work_info, sample_work_info);
 
         // move blocks

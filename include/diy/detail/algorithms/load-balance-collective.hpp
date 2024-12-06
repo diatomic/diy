@@ -12,48 +12,13 @@ namespace detail
 // exchange work information among all processes using synchronous collective method
 template<class Block>
 void exchange_work_info(diy::Master&            master,
+                        const WorkInfo&         my_work_info,           // my process' work info
                         std::vector<WorkInfo>&  all_work_info)          // (output) global work info
 {
-    auto nlids  = master.size();                    // my local number of blocks
     auto nprocs = master.communicator().size();     // global number of procs
-
-    WorkInfo my_work_info = { master.communicator().rank(), -1, 0, 0, (int)nlids };
-
-    // compile my work info
-    for (auto i = 0; i < master.size(); i++)
-    {
-        Block* block = static_cast<Block*>(master.block(i));
-        my_work_info.proc_work += master.get_work(i);
-        if (my_work_info.top_gid == -1 || my_work_info.top_work < master.get_work(i))
-        {
-            my_work_info.top_gid    = master.gid(i);
-            my_work_info.top_work   = master.get_work(i);
-        }
-    }
-
-    // vectors of integers from WorkInfo
-    std::vector<int> my_work_info_vec =
-    {
-        my_work_info.proc_rank,
-        my_work_info.top_gid,
-        my_work_info.top_work,
-        my_work_info.proc_work,
-        my_work_info.nlids
-    };
-    std::vector<std::vector<int>>   all_work_info_vec;
-
-    diy::mpi::all_gather(master.communicator(), my_work_info_vec, all_work_info_vec);
-
-    // unpack received info into vector of structs
     all_work_info.resize(nprocs);
-    for (auto i = 0; i < nprocs; i++)
-    {
-        all_work_info[i].proc_rank = all_work_info_vec[i][0];
-        all_work_info[i].top_gid   = all_work_info_vec[i][1];
-        all_work_info[i].top_work  = all_work_info_vec[i][2];
-        all_work_info[i].proc_work = all_work_info_vec[i][3];
-        all_work_info[i].nlids     = all_work_info_vec[i][4];
-    }
+    diy::mpi::detail::all_gather(master.communicator(), &my_work_info.proc_rank,
+            sizeof(WorkInfo) / sizeof(WorkInfo::proc_rank), MPI_INT, &all_work_info[0].proc_rank);  // assumes all elements of WorkInfo are sizeof(int)
 }
 
 // determine move info from work info
@@ -111,15 +76,10 @@ void decide_move_info(std::vector<WorkInfo>&        all_work_info,          // g
 
 // move one block from src to dst proc
 template<class Block>
-void  move_block(diy::DynamicAssigner&   assigner,
-                 diy::Master&            master,
-                 const MoveInfo&         move_info)
+void move_block(diy::DynamicAssigner&   assigner,
+                diy::Master&            master,
+                const MoveInfo&         move_info)
 {
-    // debug
-//     if (master.communicator().rank() == move_info.src_proc)
-//         fmt::print(stderr, "moving gid {} from src rank {} to dst rank {}\n",
-//                 move_info.move_gid, move_info.src_proc, move_info.dst_proc);
-
     // update the dynamic assigner
     if (master.communicator().rank() == move_info.src_proc)
         assigner.set_rank(move_info.dst_proc, move_info.move_gid, true);
@@ -151,9 +111,8 @@ void  move_block(diy::DynamicAssigner&   assigner,
         master.communicator().send(move_info.dst_proc, 0, bb.buffer);
 
         // remove the block from the master
-        Block* delete_block = static_cast<Block*>(master.get(master.lid(move_info.move_gid)));
-        master.release(master.lid(move_info.move_gid));
-        delete delete_block;
+        int move_lid = master.lid(move_info.move_gid);
+        delete master.release(move_lid);
     }
     else if (master.communicator().rank() == move_info.dst_proc)
     {
@@ -167,7 +126,7 @@ void  move_block(diy::DynamicAssigner&   assigner,
     }
 }
 
-}
+}   // detail
 
-}
+}   // diy
 
