@@ -3,9 +3,10 @@
 namespace diy
 {
 
-// mpi communication of WorkInfo assumes all elements of WorkInfo are sizeof(int)
-// any fields added later to WorkInfo need to also be sizeof(int)
-// Work can be typedef'ed as unsigned int, which is still same size
+namespace detail
+{
+
+// information about work for one process
 struct WorkInfo
 {
     int     proc_rank;          // mpi rank of this process
@@ -32,6 +33,8 @@ struct AuxBlock
     static void     destroy(void* b)    { delete static_cast<AuxBlock*>(b); }
 };
 
+}   // namespace detail
+
 // set dynamic assigner blocks to local blocks of master
 void set_dynamic_assigner(diy::DynamicAssigner&   dynamic_assigner,
                           diy::Master&            master)
@@ -45,5 +48,5 @@ void set_dynamic_assigner(diy::DynamicAssigner&   dynamic_assigner,
     dynamic_assigner.set_ranks(rank_gids);
 }
 
-}
+} // namespace diy
 

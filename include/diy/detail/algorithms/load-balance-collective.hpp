@@ -10,7 +10,6 @@ namespace detail
 {
 
 // exchange work information among all processes using synchronous collective method
-template<class Block>
 void exchange_work_info(diy::Master&            master,
                         const WorkInfo&         my_work_info,           // my process' work info
                         std::vector<WorkInfo>&  all_work_info)          // (output) global work info
@@ -18,7 +17,7 @@ void exchange_work_info(diy::Master&            master,
     auto nprocs = master.communicator().size();     // global number of procs
     all_work_info.resize(nprocs);
     diy::mpi::detail::all_gather(master.communicator(), &my_work_info.proc_rank,
-            sizeof(WorkInfo) / sizeof(WorkInfo::proc_rank), MPI_INT, &all_work_info[0].proc_rank);  // assumes all elements of WorkInfo are sizeof(int)
+            sizeof(WorkInfo), MPI_BYTE, &all_work_info[0].proc_rank);
 }
 
 // determine move info from work info
@@ -75,7 +74,6 @@ void decide_move_info(std::vector<WorkInfo>&        all_work_info,          // g
 }
 
 // move one block from src to dst proc
-template<class Block>
 void move_block(diy::DynamicAssigner&   assigner,
                 diy::Master&            master,
                 const MoveInfo&         move_info)
@@ -85,21 +83,20 @@ void move_block(diy::DynamicAssigner&   assigner,
         assigner.set_rank(move_info.dst_proc, move_info.move_gid, true);
 
     // move the block from src to dst proc
-    void* send_b;
-    Block* recv_b;
+    void* recv_b;
     if (master.communicator().rank() == move_info.src_proc)
     {
-        send_b = master.block(master.lid(move_info.move_gid));
+        void* send_b = master.block(master.lid(move_info.move_gid));
         diy::MemoryBuffer bb;
         master.saver()(send_b, bb);
         master.communicator().send(move_info.dst_proc, 0, bb.buffer);
     }
     else if (master.communicator().rank() == move_info.dst_proc)
     {
-        recv_b = static_cast<Block*>(master.creator()());
+        recv_b = master.creator()();
         diy::MemoryBuffer bb;
         master.communicator().recv(move_info.src_proc, 0, bb.buffer);
-        recv_b->load(recv_b, bb);
+        master.loader()(recv_b, bb);
     }
 
     // move the link for the moving block from src to dst proc and update master on src and dst proc

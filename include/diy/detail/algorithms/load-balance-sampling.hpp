@@ -51,7 +51,6 @@ void recv_req(AuxBlock* b,                              // local block
 }
 
 // get work information from a random sample of processes
-template<class Block>
 void exchange_sample_work_info(diy::Master&             master,                 // the real master with multiple blocks per process
                                diy::Master&             aux_master,             // auxiliary master with 1 block per process for communicating between procs
                                float                    sample_frac,            // fraction of procs to sample 0.0 < sample_size <= 1.0
@@ -88,13 +87,13 @@ void exchange_sample_work_info(diy::Master&             master,                 
     std::vector<diy::mpi::request> reqs(req_procs.size());
     for (auto i = 0; i < req_procs.size(); i++)
         reqs[i] = mpi::detail::isend(MPI_Comm(master.communicator()), req_procs[i], work_info_tag, &my_work_info.proc_rank,
-                sizeof(WorkInfo) / sizeof(WorkInfo::proc_rank), MPI_INT);       // assumes all elements of WorkInfo are sizeof(int)
+                sizeof(WorkInfo), MPI_BYTE);
 
     // receive work info
     sample_work_info.resize(nsamples);
     for (auto i = 0; i < nsamples; i++)
         mpi::detail::recv(MPI_Comm(master.communicator()), diy::mpi::any_source, work_info_tag, &sample_work_info[i].proc_rank,
-                sizeof(WorkInfo) / sizeof(WorkInfo::proc_rank), MPI_INT);       // assumes all elements of WorkInfo are sizeof(int)
+                sizeof(WorkInfo), MPI_BYTE);
 
     // ensure all the send requests cleared
     for (auto i = 0; i < req_procs.size(); i++)
@@ -106,7 +105,6 @@ void exchange_sample_work_info(diy::Master&             master,                 
 }
 
 // send block
-template<class Block>
 void send_block(AuxBlock*                           b,                  // local block
                 const diy::Master::ProxyWithLink&   cp,                 // communication proxy for neighbor blocks
                 diy::Master&                        master,             // real master with multiple blocks per process
@@ -177,7 +175,6 @@ void send_block(AuxBlock*                           b,                  // local
 }
 
 // receive block
-template<class Block>
 void recv_block(AuxBlock*                           b,          // local block
                 const diy::Master::ProxyWithLink&   cp,         // communication proxy for neighbor blocks
                 diy::Master&                        master)     // real master with multiple blocks per process
@@ -185,7 +182,7 @@ void recv_block(AuxBlock*                           b,          // local block
     std::vector<int> incoming_gids;
     cp.incoming(incoming_gids);
 
-    Block* recv_b;
+    void* recv_b;
 
     // for anything incoming, dequeue data received in the last exchange
     for (int i = 0; i < incoming_gids.size(); i++)
@@ -198,10 +195,10 @@ void recv_block(AuxBlock*                           b,          // local block
             cp.dequeue(gid, move_gid);
 
             // dequeue the block
-            recv_b = static_cast<Block*>(master.creator()());
+            recv_b = master.creator()();
             diy::MemoryBuffer bb;
             cp.dequeue(gid, bb.buffer);
-            recv_b->load(recv_b, bb);
+            master.loader()(recv_b, bb);
 
             // dequeue the link
             diy::Link* recv_link;
@@ -215,7 +212,6 @@ void recv_block(AuxBlock*                           b,          // local block
 }
 
 // move blocks based on sampled work info
-template<class Block>
 void move_sample_blocks(diy::Master&                    master,                 // real master with multiple blocks per process
                         diy::Master&                    aux_master,             // auxiliary master with 1 block per process for communcating between procs
                         diy::DynamicAssigner&           dynamic_assigner,       // dynamic assigner
@@ -225,13 +221,13 @@ void move_sample_blocks(diy::Master&                    master,                 
 {
     // rexchange moving blocks
     aux_master.foreach([&](AuxBlock* b, const diy::Master::ProxyWithLink& cp)
-            { send_block<Block>(b, cp, master, dynamic_assigner, sample_work_info, my_work_info, quantile); });
+            { send_block(b, cp, master, dynamic_assigner, sample_work_info, my_work_info, quantile); });
     aux_master.exchange(true);      // true = remote
     aux_master.foreach([&](AuxBlock* b, const diy::Master::ProxyWithLink& cp)
-            { recv_block<Block>(b, cp, master); });
+            { recv_block(b, cp, master); });
 }
 
-}   // detail
+}   // namespace detail
 
-}   // diy
+}   // namespace diy
 
