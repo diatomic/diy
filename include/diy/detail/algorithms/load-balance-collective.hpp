@@ -16,8 +16,7 @@ void exchange_work_info(diy::Master&            master,
 {
     auto nprocs = master.communicator().size();     // global number of procs
     all_work_info.resize(nprocs);
-    diy::mpi::detail::all_gather(master.communicator(), &my_work_info.proc_rank,
-            sizeof(WorkInfo), MPI_BYTE, &all_work_info[0].proc_rank);
+    diy::mpi::detail::all_gather(master.communicator(), &my_work_info, sizeof(WorkInfo), MPI_BYTE, &all_work_info[0]);
 }
 
 // determine move info from work info
@@ -74,14 +73,9 @@ void decide_move_info(std::vector<WorkInfo>&        all_work_info,          // g
 }
 
 // move one block from src to dst proc
-void move_block(diy::DynamicAssigner&   assigner,
-                diy::Master&            master,
+void move_block(diy::Master&            master,
                 const MoveInfo&         move_info)
 {
-    // update the dynamic assigner
-    if (master.communicator().rank() == move_info.src_proc)
-        assigner.set_rank(move_info.dst_proc, move_info.move_gid, true);
-
     // move the block from src to dst proc
     void* recv_b;
     if (master.communicator().rank() == move_info.src_proc)
@@ -109,7 +103,7 @@ void move_block(diy::DynamicAssigner&   assigner,
 
         // remove the block from the master
         int move_lid = master.lid(move_info.move_gid);
-        delete master.release(move_lid);
+        master.destroyer()(master.release(move_lid));
     }
     else if (master.communicator().rank() == move_info.dst_proc)
     {
@@ -123,7 +117,6 @@ void move_block(diy::DynamicAssigner&   assigner,
     }
 }
 
-}   // detail
+}   // namespace detail
 
-}   // diy
-
+}   // namespace diy

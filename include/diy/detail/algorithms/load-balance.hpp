@@ -35,18 +35,4 @@ struct AuxBlock
 
 }   // namespace detail
 
-// set dynamic assigner blocks to local blocks of master
-void set_dynamic_assigner(diy::DynamicAssigner&   dynamic_assigner,
-                          diy::Master&            master)
-{
-    std::vector<std::tuple<int, int>> rank_gids(master.size());
-    int rank = master.communicator().rank();
-
-    for (auto i = 0; i < master.size(); i++)
-        rank_gids[i] = std::make_tuple(rank, master.gid(i));
-
-    dynamic_assigner.set_ranks(rank_gids);
-}
-
 } // namespace diy
-

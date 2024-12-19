@@ -191,7 +191,7 @@ namespace diy
     }
 
     template<class B>
-    using LBCallback = std::function<Work(B*)>;
+    using LBCallback = std::function<Work(B*, int)>;
 
     // load balancing using collective method
     template<class Callback>
@@ -200,15 +200,22 @@ namespace diy
             diy::DynamicAssigner&       dynamic_assigner,   // diy dynamic assigner
             const Callback&             f)                  // callback to get work for a block
     {
+        // assert that master.destroyer() exists, will be needed for moving blocks
+        if (!master.destroyer())
+        {
+            fmt::print(stderr, "DIY error: Master must have a block destroyer function in order to use load balancing. Please define one.\n");
+            abort();
+        }
+
         using Block = typename detail::block_traits<Callback>::type;
         const LBCallback<Block>& f_ = f;
 
         // compile my work info
-        diy::detail::WorkInfo my_work_info = { master.communicator().rank(), -1, 0, 0, master.size() };
+        diy::detail::WorkInfo my_work_info = { master.communicator().rank(), -1, 0, 0, static_cast<int>(master.size()) };
         for (auto i = 0; i < master.size(); i++)
         {
             Block* block = static_cast<Block*>(master.block(i));
-            Work w = f_(block);
+            Work w = f_(block, master.gid(i));
             my_work_info.proc_work += w;
             if (my_work_info.top_gid == -1 || my_work_info.top_work < w)
             {
@@ -227,7 +234,7 @@ namespace diy
 
         // move blocks from src to dst proc
         for (auto i = 0; i < all_move_info.size(); i++)
-            diy::detail::move_block(dynamic_assigner, master, all_move_info[i]);
+            diy::detail::move_block(master, all_move_info[i]);
 
         // fix links
         diy::fix_links(master, dynamic_assigner);
@@ -237,21 +244,27 @@ namespace diy
     template<class Callback>
     void load_balance_sampling(
             diy::Master&                master,
-            diy::StaticAssigner&        static_assigner,    // diy static assigner
             diy::DynamicAssigner&       dynamic_assigner,   // diy dynamic assigner
             const Callback&             f,                  // callback to get work for a block
             float                       sample_frac = 0.5,  // fraction of procs to sample 0.0 < sample_size <= 1.0
             float                       quantile    = 0.8)  // quantile cutoff above which to move blocks (0.0 - 1.0)
     {
+        // assert that master.destroyer() exists, will be needed for moving blocks
+        if (!master.destroyer())
+        {
+            fmt::print(stderr, "DIY error: Master must have a block destroyer function in order to use load balancing. Please define one.\n");
+            abort();
+        }
+
         using Block = typename detail::block_traits<Callback>::type;
         const LBCallback<Block>& f_ = f;
 
         // compile my work info
-        diy::detail::WorkInfo my_work_info = { master.communicator().rank(), -1, 0, 0, master.size() };
+        diy::detail::WorkInfo my_work_info = { master.communicator().rank(), -1, 0, 0, static_cast<int>(master.size()) };
         for (auto i = 0; i < master.size(); i++)
         {
             Block* block = static_cast<Block*>(master.block(i));
-            Work w = f_(block);
+            Work w = f_(block, master.gid(i));
             my_work_info.proc_work += w;
             if (my_work_info.top_gid == -1 || my_work_info.top_work < w)
             {
@@ -274,7 +287,7 @@ namespace diy
         diy::detail::exchange_sample_work_info(master, aux_master, sample_frac, my_work_info, sample_work_info);
 
         // move blocks
-        diy::detail::move_sample_blocks(master, aux_master, dynamic_assigner, sample_work_info, my_work_info, quantile);
+        diy::detail::move_sample_blocks(master, aux_master, sample_work_info, my_work_info, quantile);
 
         // fix links
         diy::fix_links(master, dynamic_assigner);

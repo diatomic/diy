@@ -9,12 +9,10 @@ namespace detail
 {
 
 // send requests for work info
-void send_req(AuxBlock* b,                              // local block
+void send_req(AuxBlock*,                                // local block (unused)
               const diy::Master::ProxyWithLink& cp,     // communication proxy for neighbor blocks
               std::set<int>& procs)                     // processes to query
 {
-    b = b;                                              // silence unused parameter warning
-
     // send requests for work info to sample_procs
     int v = 1;                                          // any message will do
     for (auto proc_iter = procs.begin(); proc_iter != procs.end(); proc_iter++)
@@ -27,13 +25,10 @@ void send_req(AuxBlock* b,                              // local block
 }
 
 // receive requests for work info
-void recv_req(AuxBlock* b,                              // local block
+void recv_req(AuxBlock*,                                // local block (unused)
               const diy::Master::ProxyWithLink& cp,     // communication proxy for neighbor blocks
               std::vector<int>& req_procs)              // processes requesting work info
 {
-    // quiet unused parameter warning
-    b = b;                                              // silence unused parameter warning
-
     std::vector<int> incoming_gids;
     cp.incoming(incoming_gids);
 
@@ -61,7 +56,7 @@ void exchange_sample_work_info(diy::Master&             master,                 
     auto my_proc = master.communicator().rank();    // rank of my proc
 
     // pick a random sample of processes, w/o duplicates, and excluding myself
-    int nsamples = sample_frac * (nprocs - 1);
+    int nsamples = static_cast<int>(sample_frac * (nprocs - 1));
     std::set<int> sample_procs;
     for (auto i = 0; i < nsamples; i++)
     {
@@ -86,14 +81,12 @@ void exchange_sample_work_info(diy::Master&             master,                 
     int work_info_tag = 0;
     std::vector<diy::mpi::request> reqs(req_procs.size());
     for (auto i = 0; i < req_procs.size(); i++)
-        reqs[i] = mpi::detail::isend(MPI_Comm(master.communicator()), req_procs[i], work_info_tag, &my_work_info.proc_rank,
-                sizeof(WorkInfo), MPI_BYTE);
+        reqs[i] = mpi::detail::isend(MPI_Comm(master.communicator()), req_procs[i], work_info_tag, &my_work_info, sizeof(WorkInfo), MPI_BYTE);
 
     // receive work info
     sample_work_info.resize(nsamples);
     for (auto i = 0; i < nsamples; i++)
-        mpi::detail::recv(MPI_Comm(master.communicator()), diy::mpi::any_source, work_info_tag, &sample_work_info[i].proc_rank,
-                sizeof(WorkInfo), MPI_BYTE);
+        mpi::detail::recv(MPI_Comm(master.communicator()), diy::mpi::any_source, work_info_tag, &sample_work_info[i], sizeof(WorkInfo), MPI_BYTE);
 
     // ensure all the send requests cleared
     for (auto i = 0; i < req_procs.size(); i++)
@@ -105,10 +98,9 @@ void exchange_sample_work_info(diy::Master&             master,                 
 }
 
 // send block
-void send_block(AuxBlock*                           b,                  // local block
+void send_block(AuxBlock*,                                              // local block (unused)
                 const diy::Master::ProxyWithLink&   cp,                 // communication proxy for neighbor blocks
                 diy::Master&                        master,             // real master with multiple blocks per process
-                diy::DynamicAssigner&               dynamic_assigner,   // dynamic assigner
                 const std::vector<WorkInfo>&        sample_work_info,   // sampled work info
                 const WorkInfo&                     my_work_info,       // my work info
                 float                               quantile)           // quantile cutoff above which to move blocks (0.0 - 1.0)
@@ -146,9 +138,6 @@ void send_block(AuxBlock*                           b,                  // local
             move_info.src_proc = my_work_info.proc_rank;
             move_info.dst_proc = sample_work_info[target].proc_rank;
 
-            // update the dynamic assigner
-            dynamic_assigner.set_rank(move_info.dst_proc, move_info.move_gid, true);
-
             // destination in aux_master, where gid = proc
             diy::BlockID dest_block = {move_info.dst_proc, move_info.dst_proc};
 
@@ -169,13 +158,13 @@ void send_block(AuxBlock*                           b,                  // local
 
             // remove the block from the master
             int move_lid = master.lid(move_info.move_gid);
-            delete master.release(move_lid);
+            master.destroyer()(master.release(move_lid));
         }
     }
 }
 
 // receive block
-void recv_block(AuxBlock*                           b,          // local block
+void recv_block(AuxBlock*,                                      // local block (unused)
                 const diy::Master::ProxyWithLink&   cp,         // communication proxy for neighbor blocks
                 diy::Master&                        master)     // real master with multiple blocks per process
 {
@@ -214,14 +203,13 @@ void recv_block(AuxBlock*                           b,          // local block
 // move blocks based on sampled work info
 void move_sample_blocks(diy::Master&                    master,                 // real master with multiple blocks per process
                         diy::Master&                    aux_master,             // auxiliary master with 1 block per process for communcating between procs
-                        diy::DynamicAssigner&           dynamic_assigner,       // dynamic assigner
                         const std::vector<WorkInfo>&    sample_work_info,       // sampled work info
                         const WorkInfo&                 my_work_info,           // my work info
                         float                           quantile)               // quantile cutoff above which to move blocks (0.0 - 1.0)
 {
     // rexchange moving blocks
     aux_master.foreach([&](AuxBlock* b, const diy::Master::ProxyWithLink& cp)
-            { send_block(b, cp, master, dynamic_assigner, sample_work_info, my_work_info, quantile); });
+            { send_block(b, cp, master, sample_work_info, my_work_info, quantile); });
     aux_master.exchange(true);      // true = remote
     aux_master.foreach([&](AuxBlock* b, const diy::Master::ProxyWithLink& cp)
             { recv_block(b, cp, master); });
@@ -230,4 +218,3 @@ void move_sample_blocks(diy::Master&                    master,                 
 }   // namespace detail
 
 }   // namespace diy
-
