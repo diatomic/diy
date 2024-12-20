@@ -1,4 +1,6 @@
 #include <vector>
+#include <chrono>
+#include <thread>
 
 #define WORK_MAX    100                 // maximum work a block can have (in some user-defined units)
 
@@ -56,7 +58,7 @@ struct Block
         // debug
 //         fmt::print(stderr, "iteration {} block gid {} computing for {} s.\n", iter, gid, double(usec) / 1e6);
 
-        usleep(usec);
+        std::this_thread::sleep_for(std::chrono::microseconds(usec));
     }
 
     // the block data
@@ -178,6 +180,3 @@ void summary_stats(const diy::Master& master)
     if (master.communicator().rank() == 0)
         stats_work_info(master, all_work_info);
 }
-
-
-
