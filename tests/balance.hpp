@@ -125,8 +125,7 @@ void gather_work_info(const diy::Master&        master,
 //             my_work_info.proc_rank, my_work_info.top_gid, my_work_info.top_work, my_work_info.proc_work, my_work_info.nlids);
 
     // gather work info
-    if (master.communicator().rank() == 0)
-        all_work_info.resize(nprocs);
+    all_work_info.resize(nprocs);
     diy::mpi::detail::gather(master.communicator(), &my_work_info.proc_rank,
             sizeof(WorkInfo) / sizeof(WorkInfo::proc_rank), MPI_INT, &all_work_info[0].proc_rank, 0);  // assumes all elements of WorkInfo are sizeof(int)
 }

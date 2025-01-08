@@ -145,8 +145,7 @@ void send_block(AuxBlock*,                                              // local
             cp.enqueue(dest_block, move_info.move_gid);
 
             // enqueue the block
-            void* send_b;
-            send_b = master.block(master.lid(move_info.move_gid));
+            void* send_b = master.block(master.lid(move_info.move_gid));
             diy::MemoryBuffer bb;
             master.saver()(send_b, bb);
             cp.enqueue(dest_block, bb.buffer);
@@ -171,8 +170,6 @@ void recv_block(AuxBlock*,                                      // local block (
     std::vector<int> incoming_gids;
     cp.incoming(incoming_gids);
 
-    void* recv_b;
-
     // for anything incoming, dequeue data received in the last exchange
     for (int i = 0; i < incoming_gids.size(); i++)
     {
@@ -184,7 +181,7 @@ void recv_block(AuxBlock*,                                      // local block (
             cp.dequeue(gid, move_gid);
 
             // dequeue the block
-            recv_b = master.creator()();
+            void* recv_b = master.creator()();
             diy::MemoryBuffer bb;
             cp.dequeue(gid, bb.buffer);
             master.loader()(recv_b, bb);

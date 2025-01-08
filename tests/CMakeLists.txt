@@ -211,7 +211,7 @@ if                          (mpi AND MPIEXEC)
                             )
   endforeach                (p)
 
-  foreach                   (p 8 16)
+  foreach                   (p 3 4)
           add_test          (NAME collective-balance-test-p${p}
                              COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:collective-balance-test> -i 3
                             )

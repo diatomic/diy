@@ -76,28 +76,24 @@ void decide_move_info(std::vector<WorkInfo>&        all_work_info,          // g
 void move_block(diy::Master&            master,
                 const MoveInfo&         move_info)
 {
-    // move the block from src to dst proc
-    void* recv_b;
-    if (master.communicator().rank() == move_info.src_proc)
+    // sanity check that source and destination are different
+    if (move_info.src_proc == move_info.dst_proc)
     {
-        void* send_b = master.block(master.lid(move_info.move_gid));
-        diy::MemoryBuffer bb;
-        master.saver()(send_b, bb);
-        master.communicator().send(move_info.dst_proc, 0, bb.buffer);
-    }
-    else if (master.communicator().rank() == move_info.dst_proc)
-    {
-        recv_b = master.creator()();
-        diy::MemoryBuffer bb;
-        master.communicator().recv(move_info.src_proc, 0, bb.buffer);
-        master.loader()(recv_b, bb);
+        fmt::print(stderr, "Error: move_block(): source and destination are same. This should not happen.\n");
+        abort();
     }
 
-    // move the link for the moving block from src to dst proc and update master on src and dst proc
     if (master.communicator().rank() == move_info.src_proc)
     {
-        diy::Link* send_link = master.link(master.lid(move_info.move_gid));
         diy::MemoryBuffer bb;
+
+        // move the block from src to dst proc
+        void* send_b = master.block(master.lid(move_info.move_gid));
+        master.saver()(send_b, bb);
+        master.communicator().send(move_info.dst_proc, 0, bb.buffer);
+
+        // move the link for the moving block
+        diy::Link* send_link = master.link(master.lid(move_info.move_gid));
         diy::LinkFactory::save(bb, send_link);
         master.communicator().send(move_info.dst_proc, 0, bb.buffer);
 
@@ -108,11 +104,18 @@ void move_block(diy::Master&            master,
     else if (master.communicator().rank() == move_info.dst_proc)
     {
         diy::MemoryBuffer bb;
+
+        // move the block from src to dst proc
+        void* recv_b = master.creator()();
+        master.communicator().recv(move_info.src_proc, 0, bb.buffer);
+        master.loader()(recv_b, bb);
+
+        // move the link for the moving block
         diy::Link* recv_link;
         master.communicator().recv(move_info.src_proc, 0, bb.buffer);
         recv_link = diy::LinkFactory::load(bb);
 
-        // add block to the master
+        // add the block to the master
         master.add(move_info.move_gid, recv_b, recv_link);
     }
 }
