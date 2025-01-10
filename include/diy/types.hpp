@@ -8,6 +8,8 @@
 
 namespace diy
 {
+    using Work = unsigned int;
+
     struct BlockID
     {
         int gid, proc;

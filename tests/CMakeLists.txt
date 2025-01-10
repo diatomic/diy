@@ -37,6 +37,8 @@ compile_test                (double-foreach         double-foreach.cpp)
 compile_test                (shared-output          shared-output.cpp)
 compile_test                (custom-bounds-test     custom-bounds.cpp)
 compile_test                (custom-bounds-load-test    custom-bounds-load.cpp)
+compile_test                (collective-balance-test    collective-balance.cpp)
+compile_test                (sampling-balance-test      sampling-balance.cpp)
 
 if (NOT build_diy_mpi_lib)
     compile_test            (mpi-type-conversions mpi-type-conversions.cpp)
@@ -206,6 +208,15 @@ if                          (mpi AND MPIEXEC)
   foreach                   (p RANGE 1 ${maxp})
           add_test          (NAME double-foreach-p${p}
                              COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:double-foreach>
+                            )
+  endforeach                (p)
+
+  foreach                   (p 3 4)
+          add_test          (NAME collective-balance-test-p${p}
+                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:collective-balance-test> -i 3
+                            )
+          add_test          (NAME sampling-balance-test-p${p}
+                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:sampling-balance-test> -i 3
                             )
   endforeach                (p)
 

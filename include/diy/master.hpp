@@ -11,6 +11,7 @@
 #include <memory>
 #include <chrono>
 #include <climits>
+#include <random>
 
 #include "link.hpp"
 #include "collection.hpp"
@@ -390,6 +391,7 @@ namespace diy
       std::shared_ptr<spd::logger>  log = get_logger();
       stats::Profiler               prof;
       stats::Annotation             exchange_round_annotation { "diy.exchange-round" };
+      std::mt19937 mt_gen;          // mersenne_twister random number generator
   };
 
   struct Master::SkipNoIncoming
@@ -432,6 +434,13 @@ Master(mpi::communicator    comm,
   (void) threads__;
 #endif
     comm_.duplicate(comm);
+
+    // seed random number generator, broadcast seed, offset by rank
+    std::random_device rd;                      // seed source for the random number engine
+    unsigned int s = rd();
+    diy::mpi::broadcast(communicator(), s, 0);
+    std::mt19937 gen(s + communicator().rank());          // mersenne_twister random number generator
+    mt_gen = gen;
 }
 
 diy::Master::
