@@ -45,6 +45,29 @@ stages:
 # - Checkers
 #   - clang-tidy?
 
+.linux_builder_tags:
+  tags:
+    - diy
+    - build
+    - docker
+    - linux-x86_64
+
+.linux_tester_priv_tags:
+  tags:
+    - diy
+    - docker
+    - linux-x86_64
+    - privileged
+
+.windows_tags:
+  tags:
+    - diy
+    - nonconcurrent
+    - windows-x86_64
+    - shell
+    - vs2022
+    - msvc-19.33
+
 build:fedora36-mpich:
   extends:
     - .fedora36_mpich
@@ -164,20 +187,3 @@ test:windows_vs2022_release:
     - .run_automatically
   needs:
     - build:windows_vs2022_release
-
-build:spack-fedora36-mpich:
-  extends:
-    - .fedora36_mpich
-    - .cmake_build_linux
-    - .linux_builder_tags_spack
-    - .cmake_build_artifacts
-    - .run_automatically_spack
-
-test:spack-fedora36-mpich:
-  extends:
-    - .fedora36_mpich
-    - .cmake_test_linux
-    - .linux_builder_tags_spack
-    - .run_automatically_spack
-  needs:
-    - build:spack-fedora36-mpich
