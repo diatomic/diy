@@ -3,25 +3,33 @@
 # yamllint disable rule:line-length
 .run_automatically:
   rules:
-    - if: '$CI_MERGE_REQUEST_ID'
+    - if: '$CI_MERGE_REQUEST_ID && $CI_SERVER_HOST == "gitlab.kitware.com"'
       when: on_success
-    - if: '$CI_PROJECT_PATH == "diatomic/diy"'
+    - if: '$CI_PROJECT_PATH == "diatomic/diy" && $CI_SERVER_HOST == "gitlab.kitware.com"'
       when: on_success
     - when: never
 
 .run_scheduled:
   rules:
-    - if: '$CI_MERGE_REQUEST_ID'
+    - if: '$CI_MERGE_REQUEST_ID && $CI_SERVER_HOST == "gitlab.kitware.com"'
       when: manual
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_PATH == "diatomic/diy"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_PATH == "diatomic/diy" && $CI_SERVER_HOST == "gitlab.kitware.com"'
       when: on_success
     - when: never
 
 .run_manually:
   rules:
-    - if: '$CI_MERGE_REQUEST_ID'
+    - if: '$CI_MERGE_REQUEST_ID && $CI_SERVER_HOST == "gitlab.kitware.com"'
       when: manual
-    - if: '$CI_PROJECT_PATH == "diatomic/diy"'
+    - if: '$CI_PROJECT_PATH == "diatomic/diy" && $CI_SERVER_HOST == "gitlab.kitware.com"'
       when: delayed
       start_in: 30 minutes
+    - when: never
+
+.run_automatically_spack:
+  rules:
+    - if: '$CI_MERGE_REQUEST_ID && $CI_SERVER_HOST == "gitlab.spack.io"'
+      when: on_success
+    - if: '$CI_PROJECT_PATH == "diatomic/diy" && $CI_SERVER_HOST == "gitlab.spack.io"'
+      when: on_success
     - when: never
