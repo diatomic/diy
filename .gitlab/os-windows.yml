@@ -1,15 +1,6 @@
 ---
 # yamllint disable rule:colons
 # yamllint disable rule:line-length
-.windows_tags:
-  tags:
-    - diy
-    - nonconcurrent
-    - windows-x86_64
-    - shell
-    - vs2022
-    - msvc-19.33
-
 .windows_build:
   variables:
     CCACHE_INSTALL_DIR: "$CI_PROJECT_DIR\\.gitlab"

@@ -1,0 +1,35 @@
+---
+include:
+  - local: .gitlab/artifacts.yml
+  - local: .gitlab/rules.yml
+
+  # OS builds.
+  - local: .gitlab/os-linux.yml
+
+stages:
+  - build
+  - test
+
+.linux_builder_tags:
+  tags:
+    - medium
+    - uo
+    - public
+    - x86_64
+
+build:fedora36-mpich:
+  extends:
+    - .fedora36_mpich
+    - .cmake_build_linux
+    - .linux_builder_tags
+    - .cmake_build_artifacts
+    - .run_automatically
+
+test:fedora36-mpich:
+  extends:
+    - .fedora36_mpich
+    - .cmake_test_linux
+    - .linux_builder_tags
+    - .run_automatically
+  needs:
+    - build:fedora36-mpich
