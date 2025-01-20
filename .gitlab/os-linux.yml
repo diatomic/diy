@@ -59,20 +59,6 @@
     CMAKE_CONFIGURATION: fedora36_ubsan
     CTEST_MEMORYCHECK_TYPE: UndefinedBehaviorSanitizer
 
-.linux_builder_tags:
-  tags:
-    - diy
-    - build
-    - docker
-    - linux-x86_64
-
-.linux_tester_priv_tags:
-  tags:
-    - diy
-    - docker
-    - linux-x86_64
-    - privileged
-
 ## Linux-specific scripts
 .before_script_linux: &before_script_linux
   - .gitlab/ci/cmake.sh

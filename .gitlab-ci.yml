@@ -45,6 +45,29 @@ stages:
 # - Checkers
 #   - clang-tidy?
 
+.linux_builder_tags:
+  tags:
+    - diy
+    - build
+    - docker
+    - linux-x86_64
+
+.linux_tester_priv_tags:
+  tags:
+    - diy
+    - docker
+    - linux-x86_64
+    - privileged
+
+.windows_tags:
+  tags:
+    - diy
+    - nonconcurrent
+    - windows-x86_64
+    - shell
+    - vs2022
+    - msvc-19.33
+
 build:fedora36-mpich:
   extends:
     - .fedora36_mpich
