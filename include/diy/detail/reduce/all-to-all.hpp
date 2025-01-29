@@ -34,7 +34,7 @@ namespace detail
 
           op(b, all_srp);
 
-          MemoryBuffer& in_queue = all_srp.incoming(all_srp.in_link().target(0).gid);
+          MemoryBuffer& in_queue = all_srp.incoming(all_srp.out_link().target(0).gid);
           in_queue.swap(all_srp.outgoing(all_srp.out_link().target(0)));
           in_queue.reset();
           all_srp.outgoing()->clear();
