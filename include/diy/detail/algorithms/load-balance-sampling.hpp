@@ -9,7 +9,7 @@ namespace detail
 {
 
 // send requests for work info
-void send_req(AuxBlock*,                                // local block (unused)
+inline void send_req(AuxBlock*,                                // local block (unused)
               const diy::Master::ProxyWithLink& cp,     // communication proxy for neighbor blocks
               std::set<int>& procs)                     // processes to query
 {
@@ -25,7 +25,7 @@ void send_req(AuxBlock*,                                // local block (unused)
 }
 
 // receive requests for work info
-void recv_req(AuxBlock*,                                // local block (unused)
+inline void recv_req(AuxBlock*,                                // local block (unused)
               const diy::Master::ProxyWithLink& cp,     // communication proxy for neighbor blocks
               std::vector<int>& req_procs)              // processes requesting work info
 {
@@ -46,7 +46,7 @@ void recv_req(AuxBlock*,                                // local block (unused)
 }
 
 // get work information from a random sample of processes
-void exchange_sample_work_info(diy::Master&             master,                 // the real master with multiple blocks per process
+inline void exchange_sample_work_info(diy::Master&             master,                 // the real master with multiple blocks per process
                                diy::Master&             aux_master,             // auxiliary master with 1 block per process for communicating between procs
                                float                    sample_frac,            // fraction of procs to sample 0.0 < sample_size <= 1.0
                                const WorkInfo&          my_work_info,           // my process' work info
@@ -98,7 +98,7 @@ void exchange_sample_work_info(diy::Master&             master,                 
 }
 
 // send block
-void send_block(AuxBlock*,                                              // local block (unused)
+inline void send_block(AuxBlock*,                                              // local block (unused)
                 const diy::Master::ProxyWithLink&   cp,                 // communication proxy for neighbor blocks
                 diy::Master&                        master,             // real master with multiple blocks per process
                 const std::vector<WorkInfo>&        sample_work_info,   // sampled work info
@@ -163,7 +163,7 @@ void send_block(AuxBlock*,                                              // local
 }
 
 // receive block
-void recv_block(AuxBlock*,                                      // local block (unused)
+inline void recv_block(AuxBlock*,                                      // local block (unused)
                 const diy::Master::ProxyWithLink&   cp,         // communication proxy for neighbor blocks
                 diy::Master&                        master)     // real master with multiple blocks per process
 {
@@ -198,7 +198,7 @@ void recv_block(AuxBlock*,                                      // local block (
 }
 
 // move blocks based on sampled work info
-void move_sample_blocks(diy::Master&                    master,                 // real master with multiple blocks per process
+inline void move_sample_blocks(diy::Master&                    master,                 // real master with multiple blocks per process
                         diy::Master&                    aux_master,             // auxiliary master with 1 block per process for communcating between procs
                         const std::vector<WorkInfo>&    sample_work_info,       // sampled work info
                         const WorkInfo&                 my_work_info,           // my work info
