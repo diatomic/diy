@@ -10,7 +10,7 @@ namespace detail
 {
 
 // exchange work information among all processes using synchronous collective method
-void exchange_work_info(diy::Master&            master,
+inline void exchange_work_info(diy::Master&            master,
                         const WorkInfo&         my_work_info,           // my process' work info
                         std::vector<WorkInfo>&  all_work_info)          // (output) global work info
 {
@@ -20,7 +20,7 @@ void exchange_work_info(diy::Master&            master,
 }
 
 // determine move info from work info
-void decide_move_info(std::vector<WorkInfo>&        all_work_info,          // global work info
+inline void decide_move_info(std::vector<WorkInfo>&        all_work_info,          // global work info
                       std::vector<MoveInfo>&        all_move_info)          // (output) move info for all moves
 {
     all_move_info.clear();
@@ -73,7 +73,7 @@ void decide_move_info(std::vector<WorkInfo>&        all_work_info,          // g
 }
 
 // move one block from src to dst proc
-void move_block(diy::Master&            master,
+inline void move_block(diy::Master&            master,
                 const MoveInfo&         move_info)
 {
     // sanity check that source and destination are different
