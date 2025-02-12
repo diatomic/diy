@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
     if (world.rank() == 0)
         t = time(0);
     diy::mpi::broadcast(world, t, 0);
-    srand(t + world.rank());
+    srand((unsigned)t + world.rank());
 
     // create master for managing blocks in this process
     diy::Master master(world,

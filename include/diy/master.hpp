@@ -90,7 +90,6 @@ namespace diy
       template<class Block>
       using Callback = std::function<void(Block*, const ProxyWithLink&)>;
 
-      // foreach_exchange callback
       template<class Block>
       using CoroutineCallback = std::function<void(Block* const&, const ProxyWithLink&)>;
 
@@ -294,6 +293,17 @@ namespace diy
       {
           using Block = typename detail::block_traits<F>::type;
           foreach_<Block>(f, s);
+      }
+
+      //! call `f` with every block
+      template<class Block>
+      void          dynamic_foreach_(const Callback<Block>& f, void (*dlb_func_ptr)(), const Skip& s = NeverSkip());
+
+      template<class F>
+      void          dynamic_foreach(const F& f, void (*dlb_func_ptr)(), const Skip& s = NeverSkip())
+      {
+          using Block = typename detail::block_traits<F>::type;
+          dynamic_foreach_<Block>(f, dlb_func_ptr, s);
       }
 
       inline void   execute();
@@ -667,6 +677,26 @@ foreach_(const Callback<Block>& f, const Skip& skip)
 
     if (immediate())
         execute();
+}
+
+template<class Block>
+void
+diy::Master::
+dynamic_foreach_(const Callback<Block>& f, void (*dlb_func_ptr)(), const Skip& skip)
+{
+    exchange_round_annotation.set(exchange_round_);
+
+    auto scoped = prof.scoped("foreach");
+    DIY_UNUSED(scoped);
+
+    commands_.emplace_back(new Command<Block>(f, skip));
+
+    std::thread t1(dlb_func_ptr);
+
+    if (immediate())
+        execute();
+
+    t1.join();
 }
 
 void

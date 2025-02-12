@@ -1,6 +1,7 @@
 set                         (targets    collective
                                         sampling
-                                        none)
+                                        none
+                                        dynamic)
 
 foreach                     (t ${targets})
   add_executable            (${t} ${t}.cpp)
