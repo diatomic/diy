@@ -1,0 +1,5 @@
+build
+.cache
+docs/mkdocs/site
+**/__pycache__
+tags
