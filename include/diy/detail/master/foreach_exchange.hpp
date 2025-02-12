@@ -59,7 +59,7 @@ foreach_exchange_(const CoroutineCallback<Block>& f, bool remote, unsigned int s
         coroutines.push_back(c);
         proxies.emplace_back(make_unique<ProxyWithLink>(proxy(i)));
 
-        auto trampoline = [&f,&blocks,this](int lid, const ProxyWithLink& cp)
+        auto trampoline = [&f,&blocks](int lid, const ProxyWithLink& cp)
         {
             Block* const& b = blocks[lid];
             f(b, cp);

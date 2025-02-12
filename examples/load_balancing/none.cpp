@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
     if (world.rank() == 0)
         t = time(0);
     diy::mpi::broadcast(world, t, 0);
-    srand(t + world.rank());
+    srand((unsigned)t + world.rank());
 
     // create master for managing blocks in this process
     diy::Master master(world,
@@ -87,8 +87,8 @@ int main(int argc, char* argv[])
                          });
 
     // debug: print each block
-//     master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
-//             { b->show_block(cp); });
+    // master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
+    //      { b->show_block(cp); });
 
     // collect summary stats before beginning
     if (world.rank() == 0)

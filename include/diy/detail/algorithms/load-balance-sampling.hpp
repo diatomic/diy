@@ -108,7 +108,7 @@ inline void send_block(AuxBlock*,                                              /
     MoveInfo move_info = {-1, -1, -1};
 
     // my rank's position in the sampled work info, sorted by proc_work
-    int my_work_idx = sample_work_info.size();                                          // index where my work would be in the sample_work
+    int my_work_idx = (int)(sample_work_info.size());                   // index where my work would be in the sample_work
     for (auto i = 0; i < sample_work_info.size(); i++)
     {
         if (my_work_info.proc_work < sample_work_info[i].proc_work)
@@ -123,7 +123,7 @@ inline void send_block(AuxBlock*,                                              /
     {
         // pick the destination process to be the mirror image of my work location in the samples
         // ie, the heavier my process, the lighter the destination process
-        int target = sample_work_info.size() - my_work_idx;
+        int target = (int)(sample_work_info.size()) - my_work_idx;
 
         auto src_work_info = my_work_info;
         auto dst_work_info = sample_work_info[target];
