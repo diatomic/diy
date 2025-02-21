@@ -89,9 +89,10 @@ int main(int argc, char* argv[])
                              b->gid         = gid;
 
                              b->bounds      = bounds;
-                             // TODO: comment out the following line for actual random work
+                             // TODO: comment out the following 2 lines for actual random work
                              // generation, leave uncommented for reproducible work generation
                              std::srand(gid + 1);
+                             std::rand();
 
                              b->work        = static_cast<diy::Work>(double(std::rand()) / RAND_MAX * WORK_MAX);
                              master.add(gid, b, l);

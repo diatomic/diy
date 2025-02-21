@@ -13,6 +13,8 @@
 #include <climits>
 #include <random>
 
+#include "assigner.hpp"
+#include "constants.h"
 #include "link.hpp"
 #include "collection.hpp"
 
@@ -31,8 +33,15 @@
 #include "log.hpp"
 #include "stats.hpp"
 
+#include "detail/algorithms/load-balance.hpp"
+
 namespace diy
 {
+  namespace detail
+  {
+    // forward declaration; defined in detail/algorithms/load-balance-dynamic.hpp
+    struct MasterDynamicLoadBalancer;
+  }
 
   struct MemoryManagement
   {
@@ -96,6 +105,10 @@ namespace diy
       // iexchange callback
       template<class Block>
       using ICallback = std::function<bool(Block*, const ProxyWithLink&)>;
+
+      // local work callback
+      template<class Block>
+      using WCallback = std::function<Work(Block*, int gid)>;
 
       struct QueuePolicy
       {
@@ -295,15 +308,15 @@ namespace diy
           foreach_<Block>(f, s);
       }
 
-      //! call `f` with every block
+      //! call `f` and `g` with every block
       template<class Block>
-      void          dynamic_foreach_(const Callback<Block>& f, void (*dlb_func_ptr)(), const Skip& s = NeverSkip());
+      void          dynamic_foreach_(const Callback<Block>& f, const WCallback<Block>& g, const Skip& s = NeverSkip());
 
-      template<class F>
-      void          dynamic_foreach(const F& f, void (*dlb_func_ptr)(), const Skip& s = NeverSkip())
+      template<class F, class G>
+      void          dynamic_foreach(const F& f, const G& g, const Skip& s = NeverSkip())
       {
           using Block = typename detail::block_traits<F>::type;
-          dynamic_foreach_<Block>(f, dlb_func_ptr, s);
+          dynamic_foreach_<Block>(f, g, s);
       }
 
       inline void   execute();
@@ -366,6 +379,8 @@ namespace diy
                                     queue,
                                     iexchange
                                 }; };
+    public:
+      inline detail::MasterDynamicLoadBalancer&  dlb() { return *dlb_; }
 
     private:
       std::vector<Link*>    links_;
@@ -402,6 +417,9 @@ namespace diy
       stats::Profiler               prof;
       stats::Annotation             exchange_round_annotation { "diy.exchange-round" };
       std::mt19937 mt_gen;          // mersenne_twister random number generator
+
+   private:
+     detail::MasterDynamicLoadBalancer*    dlb_;
   };
 
   struct Master::SkipNoIncoming
@@ -415,6 +433,7 @@ namespace diy
 #include "proxy.hpp"
 #include "detail/master/execution.hpp"
 #include "detail/master/foreach_exchange.hpp"
+#include "detail/master/dynamic.hpp"
 
 diy::Master::
 Master(mpi::communicator    comm,
@@ -451,6 +470,8 @@ Master(mpi::communicator    comm,
     diy::mpi::broadcast(communicator(), s, 0);
     std::mt19937 gen(s + communicator().rank());          // mersenne_twister random number generator
     mt_gen = gen;
+
+    dlb_ = new detail::MasterDynamicLoadBalancer;
 }
 
 diy::Master::
@@ -459,6 +480,7 @@ diy::Master::
     set_immediate(true);
     clear();
     delete queue_policy_;
+    delete dlb_;
 }
 
 void
@@ -682,8 +704,22 @@ foreach_(const Callback<Block>& f, const Skip& skip)
 template<class Block>
 void
 diy::Master::
-dynamic_foreach_(const Callback<Block>& f, void (*dlb_func_ptr)(), const Skip& skip)
+dynamic_foreach_(const Callback<Block>& f, const WCallback<Block>& g, const Skip& skip)
 {
+    // compile my work info
+    diy::detail::WorkInfo my_work_info = { communicator().rank(), -1, 0, 0, static_cast<int>(size()) };
+    for (auto i = 0; i < size(); i++)
+    {
+        Block* b = static_cast<Block*>(block(i));
+        Work w = g(b, gid(i));
+        my_work_info.proc_work += w;
+        if (my_work_info.top_gid == -1 || my_work_info.top_work < w)
+        {
+            my_work_info.top_gid    = gid(i);
+            my_work_info.top_work   = w;
+        }
+    }
+
     exchange_round_annotation.set(exchange_round_);
 
     auto scoped = prof.scoped("foreach");
@@ -691,7 +727,10 @@ dynamic_foreach_(const Callback<Block>& f, void (*dlb_func_ptr)(), const Skip& s
 
     commands_.emplace_back(new Command<Block>(f, skip));
 
-    std::thread t1(dlb_func_ptr);
+    // load balance in a separate thread
+    // TODO: don't forget to use MPI_THREAD_FUNNELED or MPI_THREAD_MULTIPLE
+    // TODO: not everything in this thread needs to be in a separate thread
+    std::thread t1(detail::dynamic_sample, dlb().master(), dlb().aux_master(), dlb().dynamic_assigner(), dlb().sample_frac(), dlb().quantile(), my_work_info);
 
     if (immediate())
         execute();
