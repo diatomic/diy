@@ -6,11 +6,6 @@
 #include "../opts.h"
 #include "common.hpp"
 
-void hello()
-{
-    ;
-}
-
 int main(int argc, char* argv[])
 {
     diy::mpi::environment     env(argc, argv);                          // diy equivalent of MPI_Init
@@ -83,9 +78,10 @@ int main(int argc, char* argv[])
                              b->gid         = gid;
                              b->bounds      = bounds;
 
-                             // TODO: comment out the following line for actual random work
+                             // TODO: comment out the following 2 lines for actual random work
                              // generation, leave uncommented for reproducible work generation
                              std::srand(gid + 1);
+                             std::rand();
 
                              b->work        = static_cast<diy::Work>(double(std::rand()) / RAND_MAX * WORK_MAX);
 
@@ -111,12 +107,6 @@ int main(int argc, char* argv[])
     // initialize dynamic load balancer
     diy::detail::DynamicLoadBalancer dynamic_load_balancer(master, dynamic_assigner);
 
-    // pointer to the member function 'dynamic_load_balance' of dynamic_load_balancer
-    void (diy::detail::DynamicLoadBalancer::*dlb_func_ptr)() =
-        &diy::detail::DynamicLoadBalancer::dynamic_load_balance;
-
-    void (*func_ptr)() = static_cast<void (*)()>(dlb_func_ptr);
-
     // perform some iterative algorithm
     for (auto n = 0; n < iters; n++)
     {
@@ -126,8 +116,7 @@ int main(int argc, char* argv[])
 
         // some block computation
         master.dynamic_foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
-                { b->dynamic_compute(cp, max_time, n); },
-                func_ptr);
+                { b->dynamic_compute(cp, max_time, n); }, &get_block_work);
     }
 
     world.barrier();                                    // barrier to synchronize clocks over procs, do not remove
