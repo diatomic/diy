@@ -81,6 +81,7 @@ test:fedora36-mpich:
     - .fedora36_mpich
     - .cmake_test_linux
     - .linux_builder_tags
+    - .cmake_annotation_artifacts
     - .run_automatically
   needs:
     - build:fedora36-mpich
@@ -98,6 +99,7 @@ test:fedora36-mpich-nothreads:
     - .fedora36_mpich_nothreads
     - .cmake_test_linux
     - .linux_builder_tags
+    - .cmake_annotation_artifacts
     - .run_automatically
   needs:
     - build:fedora36-mpich-nothreads
@@ -115,7 +117,7 @@ test:fedora36-openmpi:
     - .fedora36_openmpi
     - .cmake_test_linux
     - .linux_builder_tags
-    - .cmake_build_artifacts
+    - .cmake_annotation_artifacts
     - .run_automatically
   needs:
     - build:fedora36-openmpi
@@ -133,7 +135,7 @@ test:fedora36-asan:
     - .fedora36_asan
     - .cmake_memcheck_linux
     - .linux_tester_priv_tags
-    - .cmake_build_artifacts
+    - .cmake_annotation_artifacts
     - .run_automatically
   needs:
     - build:fedora36-asan
@@ -151,7 +153,7 @@ test:fedora36-ubsan:
     - .fedora36_ubsan
     - .cmake_memcheck_linux
     - .linux_tester_priv_tags
-    - .cmake_build_artifacts
+    - .cmake_annotation_artifacts
     - .run_automatically
   needs:
     - build:fedora36-ubsan
@@ -161,6 +163,7 @@ build:windows_vs2022_debug:
     - .windows_debug
     - .windows_tags
     - .cmake_build_windows
+    - .cmake_build_artifacts
     - .run_automatically
 
 test:windows_vs2022_debug:
@@ -168,6 +171,7 @@ test:windows_vs2022_debug:
     - .windows_debug
     - .windows_tags
     - .cmake_test_windows
+    - .cmake_annotation_artifacts
     - .run_automatically
   needs:
     - build:windows_vs2022_debug
@@ -177,6 +181,7 @@ build:windows_vs2022_release:
     - .windows_release
     - .windows_tags
     - .cmake_build_windows
+    - .cmake_build_artifacts
     - .run_automatically
 
 test:windows_vs2022_release:
@@ -184,6 +189,7 @@ test:windows_vs2022_release:
     - .windows_release
     - .windows_tags
     - .cmake_test_windows
+    - .cmake_annotation_artifacts
     - .run_automatically
   needs:
     - build:windows_vs2022_release
