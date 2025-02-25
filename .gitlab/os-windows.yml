@@ -45,11 +45,6 @@
     - *before_script_windows_build
     - "ctest -VV -S .gitlab/ci/ctest_configure.cmake"
     - "ctest -VV -S .gitlab/ci/ctest_build.cmake"
-  artifacts:
-    expire_in: 24 hours
-    when: always
-    paths:
-      - build
 
 .cmake_test_windows: &cmake_test_windows
   extends:

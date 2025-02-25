@@ -161,6 +161,7 @@ build:windows_vs2022_debug:
     - .windows_debug
     - .windows_tags
     - .cmake_build_windows
+    - .cmake_build_artifacts
     - .run_automatically
 
 test:windows_vs2022_debug:
@@ -177,6 +178,7 @@ build:windows_vs2022_release:
     - .windows_release
     - .windows_tags
     - .cmake_build_windows
+    - .cmake_build_artifacts
     - .run_automatically
 
 test:windows_vs2022_release:
