@@ -3,6 +3,7 @@
 .cmake_build_artifacts:
   artifacts:
     expire_in: 1d
+    when: always
     paths:
       # The artifacts of the build.
       # Generated headers.
