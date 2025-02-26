@@ -63,18 +63,6 @@ struct Block
         std::this_thread::sleep_for(std::chrono::microseconds(usec));
     }
 
-    void dynamic_compute(const diy::Master::ProxyWithLink&,                 // communication proxy (unused)
-                         int                                max_time,       // maximum time for a block to compute
-                         int)                                               // curent iteration (unused)
-    {
-        unsigned int usec = max_time * work * 10000L;
-
-        // debug
-//         fmt::print(stderr, "iteration {} block gid {} computing for {} s.\n", iter, gid, double(usec) / 1e6);
-
-        std::this_thread::sleep_for(std::chrono::microseconds(usec));
-    }
-
     // the block data
     int                 gid;
     Bounds              bounds;

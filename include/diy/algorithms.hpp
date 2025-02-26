@@ -294,33 +294,6 @@ namespace diy
         diy::fix_links(master, dynamic_assigner);
     }
 
-// not used for now
-//     // load balancing using dynamic method
-//     // only initializes the dynamic load balancer; actual dynamic balancing done during calls to dynamic_foreach
-//     void load_balance_dynamic(
-//             diy::Master&                master,
-//             diy::DynamicAssigner&       dynamic_assigner,   // diy dynamic assigner
-//             float                       sample_frac = 0.5f, // fraction of procs to sample 0.0 < sample_size <= 1.0
-//             float                       quantile    = 0.8f) // quantile cutoff above which to move blocks (0.0 - 1.0)
-//     {
-//         // assert that master.destroyer() exists, will be needed for moving blocks
-//         if (!master.destroyer())
-//         {
-//             fmt::print(stderr, "DIY error: Master must have a block destroyer function in order to use load balancing. Please define one.\n");
-//             abort();
-//         }
-
-//         diy::detail::DynamicLoadBalancer dynamic_load_balancer(dynamic_assigner, sample_frac, quantile);
-
-//         // "auxiliary" master and decomposer for using rexchange for load balancing, 1 block per process
-//         diy::Master                     aux_master(master.communicator(), 1, -1, &diy::detail::AuxBlock::create, &diy::detail::AuxBlock::destroy);
-//         diy::ContiguousAssigner         aux_assigner(aux_master.communicator().size(), aux_master.communicator().size());
-//         diy::DiscreteBounds aux_domain(1);                               // any fake domain
-//         aux_domain.min[0] = 0;
-//         aux_domain.max[0] = aux_master.communicator().size() + 1;
-//         diy::RegularDecomposer<diy::DiscreteBounds>  aux_decomposer(1, aux_domain, aux_master.communicator().size());
-//         aux_decomposer.decompose(aux_master.communicator().rank(), aux_assigner, aux_master);
-//     }
 }
 
 #endif
