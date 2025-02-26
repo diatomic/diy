@@ -730,7 +730,13 @@ dynamic_foreach_(const Callback<Block>& f, const WCallback<Block>& g, const Skip
     // load balance in a separate thread
     // TODO: don't forget to use MPI_THREAD_FUNNELED or MPI_THREAD_MULTIPLE
     // TODO: not everything in this thread needs to be in a separate thread
-    std::thread t1(detail::dynamic_sample, dlb().master(), dlb().aux_master(), dlb().dynamic_assigner(), dlb().sample_frac(), dlb().quantile(), my_work_info);
+    std::thread t1(detail::dynamic_balance,
+                   dlb().master(),
+                   dlb().aux_master(),
+                   dlb().dynamic_assigner(),
+                   dlb().sample_frac(),
+                   dlb().quantile(),
+                   my_work_info);
 
     if (immediate())
         execute();

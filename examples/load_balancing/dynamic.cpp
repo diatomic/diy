@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
 
         // some block computation
         master.dynamic_foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
-                { b->dynamic_compute(cp, max_time, n); }, &get_block_work);
+                { b->compute(cp, max_time, n); }, &get_block_work);
     }
 
     world.barrier();                                    // barrier to synchronize clocks over procs, do not remove
