@@ -15,6 +15,7 @@
 
 #include "assigner.hpp"
 #include "constants.h"
+#include "diy/assigner.hpp"
 #include "link.hpp"
 #include "collection.hpp"
 
@@ -310,13 +311,23 @@ namespace diy
 
       //! call `f` and `g` with every block
       template<class Block>
-      void          dynamic_foreach_(const Callback<Block>& f, const WCallback<Block>& g, const Skip& s = NeverSkip());
+      void          dynamic_foreach_(const Callback<Block>& f,
+                                     const WCallback<Block>& g,
+                                     DynamicAssigner& dynamic_assigner,
+                                     float sample_frac,
+                                     float quantile,
+                                     const Skip& s = NeverSkip());
 
       template<class F, class G>
-      void          dynamic_foreach(const F& f, const G& g, const Skip& s = NeverSkip())
+      void          dynamic_foreach(const F& f,
+                                    const G& g,
+                                    DynamicAssigner& dynamic_assigner,
+                                    float sample_frac,
+                                    float quantile,
+                                    const Skip& s = NeverSkip())
       {
           using Block = typename detail::block_traits<F>::type;
-          dynamic_foreach_<Block>(f, g, s);
+          dynamic_foreach_<Block>(f, g, dynamic_assigner, sample_frac, quantile, s);
       }
 
       inline void   execute();
@@ -379,8 +390,6 @@ namespace diy
                                     queue,
                                     iexchange
                                 }; };
-    public:
-      inline detail::MasterDynamicLoadBalancer&  dlb() { return *dlb_; }
 
     private:
       std::vector<Link*>    links_;
@@ -417,9 +426,6 @@ namespace diy
       stats::Profiler               prof;
       stats::Annotation             exchange_round_annotation { "diy.exchange-round" };
       std::mt19937 mt_gen;          // mersenne_twister random number generator
-
-   private:
-     detail::MasterDynamicLoadBalancer*    dlb_;
   };
 
   struct Master::SkipNoIncoming
@@ -470,8 +476,6 @@ Master(mpi::communicator    comm,
     diy::mpi::broadcast(communicator(), s, 0);
     std::mt19937 gen(s + communicator().rank());          // mersenne_twister random number generator
     mt_gen = gen;
-
-    dlb_ = new detail::MasterDynamicLoadBalancer;
 }
 
 diy::Master::
@@ -480,7 +484,6 @@ diy::Master::
     set_immediate(true);
     clear();
     delete queue_policy_;
-    delete dlb_;
 }
 
 void
@@ -704,7 +707,12 @@ foreach_(const Callback<Block>& f, const Skip& skip)
 template<class Block>
 void
 diy::Master::
-dynamic_foreach_(const Callback<Block>& f, const WCallback<Block>& g, const Skip& skip)
+dynamic_foreach_(const Callback<Block>&   f,
+                 const WCallback<Block>&  g,
+                 DynamicAssigner&         dynamic_assigner,
+                 float                    sample_frac,
+                 float                    quantile,
+                 const Skip&              skip)
 {
     // compile my work info
     diy::detail::WorkInfo my_work_info = { communicator().rank(), -1, 0, 0, static_cast<int>(size()) };
@@ -720,6 +728,26 @@ dynamic_foreach_(const Callback<Block>& f, const WCallback<Block>& g, const Skip
         }
     }
 
+    // assert that destroyer() exists, will be needed for moving blocks
+    if (!destroyer())
+    {
+      fmt::print(stderr,
+                 "DIY error: Master must have a block destroyer function in "
+                 "order to use load balancing. Please define one.\n");
+      abort();
+    }
+
+    // "auxiliary" master and decomposer for using rexchange for load balancing,
+    // 1 block per process
+    Master aux_master(communicator(), 1, -1, &diy::detail::AuxBlock::create, &diy::detail::AuxBlock::destroy);
+    diy::ContiguousAssigner aux_assigner(aux_master.communicator().size(), aux_master.communicator().size());
+
+    // add one block for this rank to aux_master
+    diy::Link *link = new diy::Link;
+    detail::AuxBlock* b = new detail::AuxBlock;
+    int gid = aux_master.communicator().rank();
+    aux_master.add(gid, b, link);
+
     exchange_round_annotation.set(exchange_round_);
 
     auto scoped = prof.scoped("foreach");
@@ -731,11 +759,7 @@ dynamic_foreach_(const Callback<Block>& f, const WCallback<Block>& g, const Skip
     // TODO: don't forget to use MPI_THREAD_FUNNELED or MPI_THREAD_MULTIPLE
     // TODO: not everything in this thread needs to be in a separate thread
     std::thread t1(detail::dynamic_balance,
-                   dlb().master(),
-                   dlb().aux_master(),
-                   dlb().dynamic_assigner(),
-                   dlb().sample_frac(),
-                   dlb().quantile(),
+                   this, &aux_master, &dynamic_assigner, sample_frac, quantile,
                    my_work_info);
 
     if (immediate())

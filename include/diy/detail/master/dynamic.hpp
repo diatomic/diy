@@ -10,30 +10,6 @@ namespace diy
 namespace detail
 {
 
-       struct MasterDynamicLoadBalancer
-       {
-           void init(Master& master__, Master& aux_master__, DynamicAssigner& dynamic_assigner__, float sample_frac__, float quantile__)
-           {
-               master_            = &master__;
-               aux_master_        = &aux_master__;
-               dynamic_assigner_  = &dynamic_assigner__;
-               sample_frac_       = sample_frac__;
-               quantile_          = quantile__;
-           }
-
-           Master* master()                       { return master_; }
-           Master* aux_master()                   { return aux_master_; }
-           DynamicAssigner* dynamic_assigner()    { return dynamic_assigner_; }
-           float sample_frac()                    { return sample_frac_; }
-           float quantile()                       { return quantile_; }
-
-       Master*                     master_;
-       Master*                     aux_master_;
-       DynamicAssigner*            dynamic_assigner_;
-       float                       sample_frac_;
-       float                       quantile_;
-   };
-
 void dynamic_balance(Master*               master,                 // the real master with multiple blocks per process
                      Master*               aux_master,             // auxiliary master with 1 block per process for communicating between procs
                      DynamicAssigner*      dynamic_assigner,       // dynamic assigner

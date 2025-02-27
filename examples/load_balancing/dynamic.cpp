@@ -14,6 +14,8 @@ int main(int argc, char* argv[])
     int                       iters = 1;                                // number of iterations to run
     int                       max_time = 1;                             // maximum time to compute a block (sec.)
     double                    wall_time;                                // wall clock execution time for entire code
+    float                     sample_frac = 0.5f;                       // fraction of world procs to sample (0.0 - 1.0)
+    float                     quantile = 0.8f;                          // quantile cutoff above which to move blocks (0.0 - 1.0)
     bool                      help;
 
     using namespace opts;
@@ -23,6 +25,8 @@ int main(int argc, char* argv[])
         >> Option('b', "bpr",           bpr,            "number of diy blocks per mpi rank")
         >> Option('i', "iters",         iters,          "number of iterations")
         >> Option('t', "max_time",      max_time,       "maximum time to compute a block (in seconds)")
+        >> Option('s', "sample_frac",   sample_frac,    "fraction of world procs to sample (0.0 - 1.0)")
+        >> Option('q', "quantile",      quantile,       "quantile cutoff above which to move blocks (0.0 - 1.0)")
         ;
 
     if (!ops.parse(argc,argv) || help)
@@ -104,9 +108,6 @@ int main(int argc, char* argv[])
 
     wall_time = MPI_Wtime();
 
-    // initialize dynamic load balancer
-    diy::detail::DynamicLoadBalancer dynamic_load_balancer(master, dynamic_assigner);
-
     // perform some iterative algorithm
     for (auto n = 0; n < iters; n++)
     {
@@ -115,8 +116,12 @@ int main(int argc, char* argv[])
             fmt::print(stderr, "iteration {}\n", n);
 
         // some block computation
-        master.dynamic_foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
-                { b->compute(cp, max_time, n); }, &get_block_work);
+        master.dynamic_foreach(
+                [&](Block* b, const diy::Master::ProxyWithLink& cp) { b->compute(cp, max_time, n); },
+                &get_block_work,
+                dynamic_assigner,
+                sample_frac,
+                quantile);
     }
 
     world.barrier();                                    // barrier to synchronize clocks over procs, do not remove
