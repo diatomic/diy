@@ -82,12 +82,12 @@ int main(int argc, char* argv[])
                              b->gid         = gid;
                              b->bounds      = bounds;
 
-                             // TODO: comment out the following 2 lines for actual random work
-                             // generation, leave uncommented for reproducible work generation
-                             std::srand(gid + 1);
-                             std::rand();
+                             // // TODO: comment out the following 2 lines for actual random work
+                             // // generation, leave uncommented for reproducible work generation
+                             // std::srand(gid + 1);
+                             // std::rand();
 
-                             b->work        = static_cast<diy::Work>(double(std::rand()) / RAND_MAX * WORK_MAX);
+                             // b->work        = static_cast<diy::Work>(double(std::rand()) / RAND_MAX * WORK_MAX);
 
                              master.add(gid, b, l);
                          });
@@ -95,11 +95,6 @@ int main(int argc, char* argv[])
     // debug: print each block
     // master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
     //      { b->show_block(cp); });
-
-    // collect summary stats before beginning
-    if (world.rank() == 0)
-        fmt::print(stderr, "Summary stats before beginning\n");
-    summary_stats(master);
 
     // copy dynamic assigner from master
     diy::DynamicAssigner    dynamic_assigner(world, world.size(), nblocks);
@@ -115,22 +110,31 @@ int main(int argc, char* argv[])
         if (world.rank() == 0)
             fmt::print(stderr, "iteration {}\n", n);
 
+        // assign random work to do
+        master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp) { b->dynamic_assign_work(cp, n); });
+
+        // collect summary stats before beginning iteration
+        if (world.rank() == 0)
+            fmt::print(stderr, "Summary stats before beginning iteration {}\n", n);
+        dynamic_summary_stats(master);
+
         // some block computation
         master.dynamic_foreach(
-                [&](Block* b, const diy::Master::ProxyWithLink& cp) { b->compute(cp, max_time, n); },
+                [&](Block* b, const diy::Master::ProxyWithLink& cp) { b->dynamic_compute(cp, max_time, n); },
                 &get_block_work,
                 dynamic_assigner,
                 sample_frac,
                 quantile);
+
+        // collect summary stats after ending iteration
+        if (world.rank() == 0)
+            fmt::print(stderr, "Summary stats after ending iteration {}\n", n);
+        dynamic_summary_stats(master);
+
     }
 
     world.barrier();                                    // barrier to synchronize clocks over procs, do not remove
     wall_time = MPI_Wtime() - wall_time;
     if (world.rank() == 0)
         fmt::print(stderr, "Total elapsed wall time {:.3} sec.\n", wall_time);
-
-    // load balance summary stats
-    if (world.rank() == 0)
-        fmt::print(stderr, "Summary stats upon completion\n");
-    summary_stats(master);
 }
