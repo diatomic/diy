@@ -310,9 +310,10 @@ namespace diy
       }
 
       //! call `f` and `g` with every block
-      template<class Block>
-      void          dynamic_foreach_(const Callback<Block>& f,
-                                     const WCallback<Block>& g,
+      // template<class Block>
+      template<class F, class G>
+      void          dynamic_foreach_(const F& f, // const Callback<Block>& f,
+                                     const G& g, // const WCallback<Block>& g,
                                      DynamicAssigner& dynamic_assigner,
                                      float sample_frac,
                                      float quantile,
@@ -326,8 +327,9 @@ namespace diy
                                     float quantile,
                                     const Skip& s = NeverSkip())
       {
-          using Block = typename detail::block_traits<F>::type;
-          dynamic_foreach_<Block>(f, g, dynamic_assigner, sample_frac, quantile, s);
+          // using Block = typename detail::block_traits<F>::type;
+          // dynamic_foreach_<Block>(f, g, dynamic_assigner, sample_frac, quantile, s);
+          dynamic_foreach_<F, G>(f, g, dynamic_assigner, sample_frac, quantile, s);
       }
 
       inline void   execute();
@@ -704,30 +706,16 @@ foreach_(const Callback<Block>& f, const Skip& skip)
         execute();
 }
 
-template<class Block>
+template<class F, class G>
 void
 diy::Master::
-dynamic_foreach_(const Callback<Block>&   f,
-                 const WCallback<Block>&  g,
+dynamic_foreach_(const F&                 f,
+                 const G&                 g,
                  DynamicAssigner&         dynamic_assigner,
                  float                    sample_frac,
                  float                    quantile,
                  const Skip&              skip)
 {
-    // compile my work info
-    diy::detail::WorkInfo my_work_info = { communicator().rank(), -1, 0, 0, static_cast<int>(size()) };
-    for (auto i = 0; i < size(); i++)
-    {
-        Block* b = static_cast<Block*>(block(i));
-        Work w = g(b, gid(i));
-        my_work_info.proc_work += w;
-        if (my_work_info.top_gid == -1 || my_work_info.top_work < w)
-        {
-            my_work_info.top_gid    = gid(i);
-            my_work_info.top_work   = w;
-        }
-    }
-
     // assert that destroyer() exists, will be needed for moving blocks
     if (!destroyer())
     {
@@ -737,8 +725,7 @@ dynamic_foreach_(const Callback<Block>&   f,
       abort();
     }
 
-    // "auxiliary" master and decomposer for using rexchange for load balancing,
-    // 1 block per process
+    // "auxiliary" master and decomposer for using rexchange for load balancing, 1 block per process
     Master aux_master(communicator(), 1, -1, &diy::detail::AuxBlock::create, &diy::detail::AuxBlock::destroy);
     diy::ContiguousAssigner aux_assigner(aux_master.communicator().size(), aux_master.communicator().size());
 
@@ -747,6 +734,8 @@ dynamic_foreach_(const Callback<Block>&   f,
     detail::AuxBlock* b = new detail::AuxBlock;
     int gid = aux_master.communicator().rank();
     aux_master.add(gid, b, link);
+
+    using Block = typename detail::block_traits<F>::type;
 
     exchange_round_annotation.set(exchange_round_);
 
@@ -757,10 +746,7 @@ dynamic_foreach_(const Callback<Block>&   f,
 
     // load balance in a separate thread
     // TODO: don't forget to use MPI_THREAD_FUNNELED or MPI_THREAD_MULTIPLE
-    // TODO: not everything in this thread needs to be in a separate thread
-    std::thread t1(detail::dynamic_balance,
-                   this, &aux_master, &dynamic_assigner, sample_frac, quantile,
-                   my_work_info);
+    std::thread t1(detail::dynamic_balance<G>, this, &aux_master, &dynamic_assigner, sample_frac, quantile, g);
 
     if (immediate())
         execute();
