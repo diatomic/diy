@@ -15,7 +15,6 @@
 #include "detail/algorithms/kdtree-sampling.hpp"
 #include "detail/algorithms/load-balance-collective.hpp"
 #include "detail/algorithms/load-balance-sampling.hpp"
-#include "detail/algorithms/load-balance-dynamic.hpp"
 
 #include "log.hpp"
 
