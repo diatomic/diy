@@ -1,10 +1,19 @@
 #pragma once
 
+#include "diy/dynamic-point.hpp"
+#include <stdatomic.h>
 namespace diy
 {
 
 namespace detail
 {
+
+enum MsgType
+{
+    work_info_req,
+    work_info,
+    block,
+};
 
 // information about work for one process
 struct WorkInfo
@@ -31,8 +40,37 @@ struct AuxBlock
 {
     static void*    create()            { return new AuxBlock; }
     static void     destroy(void* b)    { delete static_cast<AuxBlock*>(b); }
+
+    AuxBlock() : nwork_info_recvd(0), sent_reqs(false), sent_block(false) {}
+
+    std::vector<WorkInfo>    sample_work_info;    // work info from procs I sampled
+    int                      nwork_info_recvd;    // number of work info items received
+    bool                     sent_reqs;           // sent requests for work info
+    bool                     sent_block;          // sent block, if one was necessary to move
 };
 
 }   // namespace detail
+
+template<>
+struct Serialization<detail::WorkInfo>
+{
+    static void save(BinaryBuffer& bb, const detail::WorkInfo& w)
+    {
+        diy::save(bb, w.proc_rank);
+        diy::save(bb, w.top_gid);
+        diy::save(bb, w.top_work);
+        diy::save(bb, w.proc_work);
+        diy::save(bb, w.nlids);
+    }
+
+    static void load(BinaryBuffer& bb, detail::WorkInfo& w)
+    {
+        diy::load(bb, w.proc_rank);
+        diy::load(bb, w.top_gid);
+        diy::load(bb, w.top_work);
+        diy::load(bb, w.proc_work);
+        diy::load(bb, w.nlids);
+    }
+};
 
 } // namespace diy

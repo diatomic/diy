@@ -85,7 +85,7 @@ struct Block
         work = 0;        // mark this block as done
 
         // debug
-//         fmt::print(stderr, "iteration {} block gid {} computing for {} s.\n", iter, gid, double(usec) / 1e6);
+        // fmt::print(stderr, "iteration {} block gid {} computing for {} s. and is now marked as done, work {}\n", iter, gid, double(usec) / 1e6, work);
 
         std::this_thread::sleep_for(std::chrono::microseconds(usec));
     }
