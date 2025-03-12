@@ -710,7 +710,7 @@ template<class F, class G>
 void
 diy::Master::
 dynamic_foreach_(const F&                 f,
-                 const G&                 g,
+                 const G&                 get_block_work,
                  DynamicAssigner&         dynamic_assigner,
                  float                    sample_frac,
                  float                    quantile,
@@ -719,17 +719,14 @@ dynamic_foreach_(const F&                 f,
     // assert that destroyer() exists, will be needed for moving blocks
     if (!destroyer())
     {
-      fmt::print(stderr,
-                 "DIY error: Master must have a block destroyer function in "
+        fmt::print(stderr, "DIY error: Master must have a block destroyer function in "
                  "order to use load balancing. Please define one.\n");
-      abort();
+        abort();
     }
 
-    // "auxiliary" master and decomposer for using rexchange for load balancing, 1 block per process
+    // "auxiliary" master for using iexchange for load balancing, 1 block per process
     Master aux_master(communicator(), 1, -1, &diy::detail::AuxBlock::create, &diy::detail::AuxBlock::destroy);
     diy::ContiguousAssigner aux_assigner(aux_master.communicator().size(), aux_master.communicator().size());
-
-    // add one block for this rank to aux_master
     diy::Link *link = new diy::Link;
     detail::AuxBlock* b = new detail::AuxBlock;
     int gid = aux_master.communicator().rank();
@@ -745,8 +742,7 @@ dynamic_foreach_(const F&                 f,
     commands_.emplace_back(new Command<Block>(f, skip));
 
     // load balance in a separate thread
-    // TODO: don't forget to use MPI_THREAD_FUNNELED or MPI_THREAD_MULTIPLE
-    std::thread t1(detail::dynamic_balance<G>, this, &aux_master, &dynamic_assigner, sample_frac, quantile, g);
+    std::thread t1(detail::dynamic_balance<G>, this, &aux_master, &dynamic_assigner, sample_frac, quantile, get_block_work);
 
     if (immediate())
         execute();
