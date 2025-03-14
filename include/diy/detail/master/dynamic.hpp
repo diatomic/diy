@@ -6,6 +6,7 @@
 #include "diy/thirdparty/fmt/core.h"
 #include "diy/thirdparty/fmt/format-inl.h"
 #include <cstdio>
+#include <iterator>
 
 namespace diy
 {
@@ -30,17 +31,17 @@ inline void dynamic_send_req(const diy::Master::ProxyWithLink&  cp,             
 // send block
 inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,                 // communication proxy for aux_master
                                diy::Master&                        master,             // real master with multiple blocks per process
-                               const std::vector<WorkInfo>&        sample_work_info,   // sampled work info
+                               diy::detail::AuxBlock*              ab,                 // current block
                                const WorkInfo&                     my_work_info,       // my work info
                                float                               quantile)           // quantile cutoff above which to move blocks (0.0 - 1.0)
 {
     MoveInfo move_info = {-1, -1, -1};
 
     // my rank's position in the sampled work info, sorted by proc_work
-    int my_work_idx = (int)(sample_work_info.size());                   // index where my work would be in the sample_work
-    for (auto i = 0; i < sample_work_info.size(); i++)
+    int my_work_idx = (int)(ab->sample_work_info.size());                   // index where my work would be in the sample_work
+    for (auto i = 0; i < ab->sample_work_info.size(); i++)
     {
-        if (my_work_info.proc_work < sample_work_info[i].proc_work)
+        if (my_work_info.proc_work < ab->sample_work_info[i].proc_work)
         {
             my_work_idx = i;
             break;
@@ -48,50 +49,69 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
     }
 
     // send my heaviest block if it passes the quantile cutoff
-    if (my_work_idx >= quantile * sample_work_info.size())
+    if (my_work_idx >= quantile * ab->sample_work_info.size())
     {
         // pick the destination process to be the mirror image of my work location in the samples
         // ie, the heavier my process, the lighter the destination process
-        int target = (int)(sample_work_info.size()) - my_work_idx;
+        int target = (int)(ab->sample_work_info.size()) - my_work_idx;
 
         auto src_work_info = my_work_info;
-        auto dst_work_info = sample_work_info[target];
+        auto dst_work_info = ab->sample_work_info[target];
 
         // sanity check that the move makes sense
         if (src_work_info.proc_work - dst_work_info.proc_work > src_work_info.top_work &&   // improve load balance
                 src_work_info.proc_rank != dst_work_info.proc_rank &&                       // not self
                 src_work_info.nlids > 1)                                                    // don't leave a proc with no blocks
         {
-
             move_info.move_gid = my_work_info.top_gid;
             move_info.src_proc = my_work_info.proc_rank;
-            move_info.dst_proc = sample_work_info[target].proc_rank;
+            move_info.dst_proc = ab->sample_work_info[target].proc_rank;
 
-            // destination in aux_master, where gid = proc
-            diy::BlockID dest_block = {move_info.dst_proc, move_info.dst_proc};
-
-            // enqueue the message type
-            cp.enqueue(dest_block, MsgType::block);
-
-            // enqueue the gid of the moving block
-            cp.enqueue(dest_block, move_info.move_gid);
-
-            fmt::print(stderr, "sending gid {} to rank {}\n", move_info.move_gid, move_info.dst_proc);
-
-            // enqueue the block
-            void* send_b = master.block(master.lid(move_info.move_gid));
-            diy::MemoryBuffer bb;
-            master.saver()(send_b, bb);
-            cp.enqueue(dest_block, bb.buffer);
-
-            // enqueue the link for the block
-            diy::Link* send_link = master.link(master.lid(move_info.move_gid));
-            diy::LinkFactory::save(bb, send_link);
-            cp.enqueue(dest_block, bb.buffer);
-
-            // remove the block from the master
             int move_lid = master.lid(move_info.move_gid);
-            master.destroyer()(master.release(move_lid));
+
+            if ((*ab->free_blocks.access())[move_lid] >= 0)    // block is free to move
+            {
+                // debug
+                fmt::print(stderr, "dynamic_send_block(): move_lid {} is free, locking and moving the block\n", move_lid);
+
+                (*ab->free_blocks.access())[move_lid] = -1;     // lock the block
+
+                // destination in aux_master, where gid = proc
+                diy::BlockID dest_block = {move_info.dst_proc, move_info.dst_proc};
+
+                // enqueue the message type
+                cp.enqueue(dest_block, MsgType::block);
+
+                // enqueue the gid of the moving block
+                cp.enqueue(dest_block, move_info.move_gid);
+
+                fmt::print(stderr, "sending gid {} to rank {}\n", move_info.move_gid, move_info.dst_proc);
+
+                // enqueue the block
+                void* send_b = master.block(move_lid);
+                diy::MemoryBuffer bb;
+                master.saver()(send_b, bb);
+                cp.enqueue(dest_block, bb.buffer);
+
+                // enqueue the link for the block
+                diy::Link* send_link = master.link(move_lid);
+                diy::LinkFactory::save(bb, send_link);
+                cp.enqueue(dest_block, bb.buffer);
+
+                // remove the block from the master
+                master.destroyer()(master.release(move_lid));
+
+                // update free_blocks in case another block is moved in the same iteration
+                // not done currently, but multi-block moving is a possible future implementation
+                ab->free_blocks.access()->resize(master.size());
+                for (auto i = 0; i < master.size(); i++)
+                      (*ab->free_blocks.access())[i] = i;
+            }
+            else // block is not free
+            {
+                // debug
+                fmt::print(stderr, "dynamic_send_block(): lid {} is locked, skipping moving it.\n", move_lid);
+            }
         }
     }
 }
@@ -200,7 +220,7 @@ bool iexchange_balance(diy::detail::AuxBlock*              ab,                  
 
     if (!ab->sent_block && ab->sample_work_info.size())
     {
-        dynamic_send_block(cp, master, ab->sample_work_info, my_work_info, quantile);
+        dynamic_send_block(cp, master, ab, my_work_info, quantile);
         ab->sent_block = true;
     }
 

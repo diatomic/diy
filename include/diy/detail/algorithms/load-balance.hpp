@@ -2,6 +2,7 @@
 
 #include "diy/dynamic-point.hpp"
 #include <stdatomic.h>
+
 namespace diy
 {
 
@@ -41,12 +42,22 @@ struct AuxBlock
     static void*    create()            { return new AuxBlock; }
     static void     destroy(void* b)    { delete static_cast<AuxBlock*>(b); }
 
-    AuxBlock() : nwork_info_recvd(0), sent_reqs(false), sent_block(false) {}
+    AuxBlock() : nwork_info_recvd(0), sent_reqs(false), sent_block(false)
+    {}
+
+    AuxBlock(int nlids)                 // number of blocks in real master
+    : nwork_info_recvd(0), sent_reqs(false), sent_block(false)
+    {
+        free_blocks.access()->resize(nlids);
+        for (auto i = 0; i < nlids; i++)
+            (*free_blocks.access())[i] = i;
+    }
 
     std::vector<WorkInfo>    sample_work_info;    // work info from procs I sampled
     int                      nwork_info_recvd;    // number of work info items received
     bool                     sent_reqs;           // sent requests for work info
     bool                     sent_block;          // sent block, if one was necessary to move
+    critical_resource<std::vector<int>>    free_blocks;    // lids of blocks in main master that are free to use (not locked by another thread)
 };
 
 }   // namespace detail
