@@ -69,12 +69,14 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
 
             int move_lid = master.lid(move_info.move_gid);
 
-            if ((*ab->free_blocks.access())[move_lid] >= 0)    // block is free to move
+            auto free_blocks_access = ab->free_blocks.access();
+            if ((*free_blocks_access)[move_lid] >= 0)    // block is free to move
             {
                 // debug
                 fmt::print(stderr, "dynamic_send_block(): move_lid {} is free, locking and moving the block\n", move_lid);
 
-                (*ab->free_blocks.access())[move_lid] = -1;     // lock the block
+                (*free_blocks_access)[move_lid] = -1;     // lock the block
+                free_blocks_access.unlock();
 
                 // destination in aux_master, where gid = proc
                 diy::BlockID dest_block = {move_info.dst_proc, move_info.dst_proc};
@@ -103,15 +105,14 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
 
                 // update free_blocks in case another block is moved in the same iteration
                 // not done currently, but multi-block moving is a possible future implementation
-                ab->free_blocks.access()->resize(master.size());
-                for (auto i = 0; i < master.size(); i++)
-                      (*ab->free_blocks.access())[i] = i;
+                ab->reset_free_blocks(master.size());
             }
             else // block is not free
             {
                 // debug
                 fmt::print(stderr, "dynamic_send_block(): lid {} is locked, skipping moving it.\n", move_lid);
             }
+            // NB, free_blocks_access will unlock automatically when it goes out of scope here
         }
     }
 }

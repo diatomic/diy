@@ -335,6 +335,7 @@ namespace diy
 
       inline void   execute();
       inline void   dynamic_execute(critical_resource<std::vector<int>>& free_blocks);
+      inline void   dynamic_process_block(Master& master, int lid);
 
       bool          immediate() const                   { return immediate_; }
       void          set_immediate(bool i)               { if (i && !immediate_) execute(); immediate_ = i; }
@@ -730,9 +731,9 @@ dynamic_foreach_(const F&                 f,
     Master aux_master(communicator(), 1, -1, &diy::detail::AuxBlock::create, &diy::detail::AuxBlock::destroy);
     diy::ContiguousAssigner aux_assigner(aux_master.communicator().size(), aux_master.communicator().size());
     diy::Link *link = new diy::Link;
-    detail::AuxBlock* b = new detail::AuxBlock(size());
+    detail::AuxBlock aux_block(size());
     int gid = aux_master.communicator().rank();
-    aux_master.add(gid, b, link);
+    aux_master.add(gid, &aux_block, link);
 
     using Block = typename detail::block_traits<F>::type;
 
@@ -747,7 +748,7 @@ dynamic_foreach_(const F&                 f,
     std::thread t1(detail::dynamic_balance<G>, this, &aux_master, &dynamic_assigner, sample_frac, quantile, get_block_work);
 
     if (immediate())
-        dynamic_execute(b->free_blocks);
+        dynamic_execute(aux_block.free_blocks);
 
     t1.join();
 }

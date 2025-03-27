@@ -45,12 +45,20 @@ struct AuxBlock
     AuxBlock() : nwork_info_recvd(0), sent_reqs(false), sent_block(false)
     {}
 
+    typedef           resource_accessor<std::vector<int>, fast_mutex>         accessor;
+
     AuxBlock(int nlids)                 // number of blocks in real master
     : nwork_info_recvd(0), sent_reqs(false), sent_block(false)
     {
-        free_blocks.access()->resize(nlids);
+        reset_free_blocks(nlids);
+    }
+
+    void reset_free_blocks(int nlids)
+    {
+        auto free_blocks_access = free_blocks.access();
+        free_blocks_access->resize(nlids);
         for (auto i = 0; i < nlids; i++)
-            (*free_blocks.access())[i] = i;
+            (*free_blocks_access)[i] = i;
     }
 
     std::vector<WorkInfo>    sample_work_info;    // work info from procs I sampled
