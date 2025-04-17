@@ -39,9 +39,6 @@ struct MoveInfo
 // auxiliary empty block structure
 struct AuxBlock
 {
-    static void*    create()            { return new AuxBlock; }
-    static void     destroy(void* b)    { delete static_cast<AuxBlock*>(b); }
-
     AuxBlock() : nwork_info_recvd(0), sent_reqs(false), sent_block(false)
     {}
 
@@ -53,6 +50,7 @@ struct AuxBlock
         reset_free_blocks(nlids);
     }
 
+    // reset free blocks to all local blocks being free
     void reset_free_blocks(int nlids)
     {
         auto free_blocks_access = free_blocks.access();
@@ -61,11 +59,44 @@ struct AuxBlock
             (*free_blocks_access)[i] = i;
     }
 
-    std::vector<WorkInfo>    sample_work_info;    // work info from procs I sampled
-    int                      nwork_info_recvd;    // number of work info items received
-    bool                     sent_reqs;           // sent requests for work info
-    bool                     sent_block;          // sent block, if one was necessary to move
-    critical_resource<std::vector<int>>    free_blocks;    // lids of blocks in main master that are free to use (not locked by another thread)
+    // return next free block, or -1 if none available
+    // requires locked accessor supplied by caller
+    int next_free_block(int nlids, resource_accessor<std::vector<int>, fast_mutex>& free_blocks_access)
+    {
+        int retval = -1;
+        for(auto i = 0; i < nlids; i++)
+        {
+            if ((*free_blocks_access)[i] >= 0)
+            {
+                retval = i;
+                break;
+            }
+        }
+        return retval;
+    }
+
+    // remove a block from the free blocks list
+    void remove_free_block(int lid)
+    {
+        auto free_blocks_access = free_blocks.access();
+        std::swap((*free_blocks_access)[static_cast<size_t>(lid)], (*free_blocks_access).back());
+        (*free_blocks_access).pop_back();
+    }
+
+    // add a block to the end of the free blocks list
+    void add_free_block()
+    {
+        auto free_blocks_access = free_blocks.access();
+        int lid = static_cast<int>((*free_blocks_access).size());
+        (*free_blocks_access).push_back(lid);
+    }
+
+    std::vector<WorkInfo>                  sample_work_info;        // work info from procs I sampled
+    int                                    nwork_info_recvd;        // number of work info items received
+    bool                                   sent_reqs;               // sent requests for work info
+    bool                                   sent_block;              // sent block, if one was necessary to move
+    critical_resource<std::vector<int>>    free_blocks;             // lids of blocks in main master that are free to use (not locked by another thread)
+    std::atomic<bool>                      iexchange_done{false};   // whether iexchange_balance is still running or is done
 };
 
 }   // namespace detail

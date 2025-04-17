@@ -274,7 +274,7 @@ namespace diy
         }
 
         // "auxiliary" master and decomposer for using rexchange for load balancing, 1 block per process
-        diy::Master                     aux_master(master.communicator(), 1, -1, &diy::detail::AuxBlock::create, &diy::detail::AuxBlock::destroy);
+        diy::Master                     aux_master(master.communicator());
         diy::ContiguousAssigner         aux_assigner(aux_master.communicator().size(), aux_master.communicator().size());
         diy::DiscreteBounds aux_domain(1);                               // any fake domain
         aux_domain.min[0] = 0;

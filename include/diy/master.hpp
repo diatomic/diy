@@ -334,7 +334,7 @@ namespace diy
       }
 
       inline void   execute();
-      inline void   dynamic_execute(critical_resource<std::vector<int>>& free_blocks);
+      inline void   dynamic_execute(detail::AuxBlock& aux_block);
       inline void   dynamic_process_block(Master& master, int lid);
 
       bool          immediate() const                   { return immediate_; }
@@ -728,9 +728,9 @@ dynamic_foreach_(const F&                 f,
     }
 
     // "auxiliary" master for using iexchange for load balancing, 1 block per process
-    Master aux_master(communicator(), 1, -1, &diy::detail::AuxBlock::create, &diy::detail::AuxBlock::destroy);
+    Master aux_master(communicator());
     diy::ContiguousAssigner aux_assigner(aux_master.communicator().size(), aux_master.communicator().size());
-    diy::Link *link = new diy::Link;
+    diy::Link *link = new diy::Link;                // diy will delete this link, will not leak memory
     detail::AuxBlock aux_block(size());
     int gid = aux_master.communicator().rank();
     aux_master.add(gid, &aux_block, link);
@@ -748,7 +748,7 @@ dynamic_foreach_(const F&                 f,
     std::thread t1(detail::dynamic_balance<G>, this, &aux_master, &dynamic_assigner, sample_frac, quantile, get_block_work);
 
     if (immediate())
-        dynamic_execute(aux_block.free_blocks);
+        dynamic_execute(aux_block);
 
     t1.join();
 }

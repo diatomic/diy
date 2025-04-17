@@ -182,7 +182,7 @@ dynamic_process_block(Master&                             master,
 
 void
 diy::Master::
-dynamic_execute(critical_resource<std::vector<int>>& free_blocks)
+dynamic_execute(detail::AuxBlock& aux_block)
 {
     log->debug("Entered execute()");
     auto scoped = prof.scoped("execute");
@@ -191,41 +191,31 @@ dynamic_execute(critical_resource<std::vector<int>>& free_blocks)
     if (commands_.empty())
         return;
 
-    // grab first free local block, lock it, execute it, unlock it
-    for (auto i = 0; i < size(); i++)
+    // while dynamic balance is not done and while there are free blocks
+    // grab the first free local block, lock and execute it
+    int free_lid;
+    auto free_blocks_access = aux_block.free_blocks.access();     // locked when created, unlocks automatically when out of scope
+    while (!aux_block.iexchange_done.load())
     {
-        auto free_blocks_access = free_blocks.access();     // free_blocks_access is locked when created
-        if ((*free_blocks_access)[i] >= 0)    // block is free
+        while ((free_lid = aux_block.next_free_block(size(), free_blocks_access)) >= 0)
         {
             // debug
-            fmt::print(stderr, "dynamic_execute(): lid {} is free, locking and executing the block\n", i);
+            fmt::print(stderr, "dynamic_execute(): gid {} is free, locking and executing the block\n", gid(free_lid));
 
-            (*free_blocks_access)[i] = -1;     // lock the block
+            // lock the block and execute it
+            (*free_blocks_access)[free_lid] = -1;
             free_blocks_access.unlock();
-
-            dynamic_process_block(*this, i);     // execute the block
-
-            // debug
-            fmt::print(stderr, "dynamic_execute(): unlocking lid {}\n", i);
-
+            dynamic_process_block(*this, free_lid);
             free_blocks_access.lock();
-            (*free_blocks_access)[i] = i;      // unlock the block
-            free_blocks_access.unlock();
         }
-        else
-        {
-            // debug
-            fmt::print(stderr, "dynamic_execute(): lid {} is locked, skipping execution\n", i);
-        }
-        // NB, free_blocks_access will unlock automatically when it goes out of scope here
-      }
+    }
 
-      // clear incoming queues
-      incoming_[exchange_round_].map.clear();
+    // clear incoming queues
+    incoming_[exchange_round_].map.clear();
 
-      if (limit() != -1 && in_memory() > limit())
-          throw std::runtime_error(fmt::format("Fatal: {} blocks in memory, with limit {}", in_memory(), limit()));
+    if (limit() != -1 && in_memory() > limit())
+        throw std::runtime_error(fmt::format("Fatal: {} blocks in memory, with limit {}", in_memory(), limit()));
 
-      // clear commands
-      commands_.clear();
+    // clear commands
+    commands_.clear();
 }
