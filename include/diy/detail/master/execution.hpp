@@ -194,19 +194,14 @@ dynamic_execute(detail::AuxBlock& aux_block)
     // while dynamic balance is not done and while there are free blocks
     // grab the first free local block, lock and execute it
     int free_lid;
-    auto free_blocks_access = aux_block.free_blocks.access();     // locked when created, unlocks automatically when out of scope
     while (!aux_block.iexchange_done.load())
     {
-        while ((free_lid = aux_block.next_free_block(size(), free_blocks_access)) >= 0)
+        while ((free_lid = aux_block.grab_free_block(size())) >= 0)
         {
             // debug
             fmt::print(stderr, "dynamic_execute(): gid {} is free, locking and executing the block\n", gid(free_lid));
 
-            // lock the block and execute it
-            (*free_blocks_access)[free_lid] = -1;
-            free_blocks_access.unlock();
             dynamic_process_block(*this, free_lid);
-            free_blocks_access.lock();
         }
     }
 

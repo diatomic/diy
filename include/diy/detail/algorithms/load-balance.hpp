@@ -60,14 +60,32 @@ struct AuxBlock
     }
 
     // return next free block, or -1 if none available
-    // requires locked accessor supplied by caller
-    int next_free_block(int nlids, resource_accessor<std::vector<int>, fast_mutex>& free_blocks_access)
+    int next_free_block(int nlids)
     {
         int retval = -1;
+        auto free_blocks_access = free_blocks.access();
         for(auto i = 0; i < nlids; i++)
         {
             if ((*free_blocks_access)[i] >= 0)
             {
+                retval = i;
+                break;
+            }
+        }
+        return retval;
+    }
+
+    // grab next free block, locking it
+    // return lid of the block or -1 if none available
+    int grab_free_block(int nlids)
+    {
+        int retval = -1;
+        auto free_blocks_access = free_blocks.access();
+        for(auto i = 0; i < nlids; i++)
+        {
+            if ((*free_blocks_access)[i] >= 0)
+            {
+                (*free_blocks_access)[i] = -1;
                 retval = i;
                 break;
             }
@@ -93,8 +111,8 @@ struct AuxBlock
 
     std::vector<WorkInfo>                  sample_work_info;        // work info from procs I sampled
     int                                    nwork_info_recvd;        // number of work info items received
-    bool                                   sent_reqs;               // sent requests for work info
-    bool                                   sent_block;              // sent block, if one was necessary to move
+    bool                                   sent_reqs;               // sent requests for work info already
+    bool                                   sent_block;              // sent block already
     critical_resource<std::vector<int>>    free_blocks;             // lids of blocks in main master that are free to use (not locked by another thread)
     std::atomic<bool>                      iexchange_done{false};   // whether iexchange_balance is still running or is done
 };

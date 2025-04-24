@@ -137,9 +137,7 @@ inline void dynamic_recv(const diy::Master::ProxyWithLink&  cp,                 
                     cp.enqueue(dest_block, my_work_info);
                 }
                 else if (t == MsgType::work_info)
-                {
                     cp.dequeue(gid, ab->sample_work_info[ab->nwork_info_recvd++]);
-                }
                 else if (t == MsgType::block)
                 {
                     // dequeue the gid of the moving block
@@ -178,8 +176,6 @@ bool iexchange_balance(diy::detail::AuxBlock*              ab,                  
                        float                               quantile,               // quantile cutoff above which to move blocks (0.0 - 1.0)
                        WorkInfo&                           my_work_info)           // my work info, empty, filled later
 {
-    ab->iexchange_done.store(false);
-
     auto nprocs = master.communicator().size();     // global number of procs
     auto my_proc = master.communicator().rank();    // rank of my proc
     bool done;
@@ -219,12 +215,11 @@ bool iexchange_balance(diy::detail::AuxBlock*              ab,                  
 
     // I think I'm done after I sent requests for work info and any blocks
     // Receives will come in automatically via iexchange, even after I think I'm done
-    if (ab->sent_reqs && ab->sent_block)
+    if (ab->next_free_block(master.size()) == -1)
         done = true;
     else
         done = false;
 
-    ab->iexchange_done.store(done);
     return done;
 }
 
@@ -256,6 +251,8 @@ void dynamic_balance(Master*                         master,                 // 
     // do the actual load balancing using iexchange
     aux_master->iexchange([&](diy::detail::AuxBlock* b, const diy::Master::ProxyWithLink& cp) -> bool
       { return iexchange_balance(b, cp, *master, sample_frac, quantile, my_work_info); } );
+    diy::detail::AuxBlock* ab = static_cast<diy::detail::AuxBlock*>(aux_master->block(0));
+    ab->iexchange_done.store(true);
 
     // fix links
     diy::fix_links(*master, *dynamic_assigner);
