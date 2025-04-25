@@ -737,6 +737,24 @@ dynamic_foreach_(const F&                 f,
 
     using Block = typename detail::block_traits<F>::type;
 
+    // compile my work info
+    aux_block.my_work_info.proc_rank = communicator().rank();
+    aux_block.my_work_info.top_gid = -1;
+    aux_block.my_work_info.top_work = 0;
+    aux_block.my_work_info.proc_work = 0;
+    aux_block.my_work_info.nlids = size();
+    for (auto i = 0; i < size(); i++)
+    {
+        Block* b = static_cast<Block*>(block(i));
+        Work w = get_block_work(b, this->gid(i));
+        aux_block.my_work_info.proc_work += w;
+        if (aux_block.my_work_info.top_gid == -1 || aux_block.my_work_info.top_work < w)
+        {
+            aux_block.my_work_info.top_gid    = this->gid(i);
+            aux_block.my_work_info.top_work   = w;
+        }
+    }
+
     exchange_round_annotation.set(exchange_round_);
 
     auto scoped = prof.scoped("foreach");
@@ -745,8 +763,9 @@ dynamic_foreach_(const F&                 f,
     commands_.emplace_back(new Command<Block>(f, skip));
 
     // load balance in a separate thread
-    std::thread t1(detail::dynamic_balance<G>, this, &aux_master, &dynamic_assigner, sample_frac, quantile, get_block_work);
+    std::thread t1(detail::dynamic_balance, this, &aux_master, &dynamic_assigner, sample_frac, quantile);
 
+    // execute the block in the parent thread
     if (immediate())
         dynamic_execute(aux_block);
 

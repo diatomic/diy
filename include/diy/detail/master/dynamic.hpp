@@ -32,7 +32,6 @@ inline void dynamic_send_req(const diy::Master::ProxyWithLink&  cp,             
 inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,                 // communication proxy for aux_master
                                diy::Master&                        master,             // real master with multiple blocks per process
                                diy::detail::AuxBlock*              ab,                 // current block
-                               const WorkInfo&                     my_work_info,       // my work info
                                float                               quantile)           // quantile cutoff above which to move blocks (0.0 - 1.0)
 {
     MoveInfo move_info = {-1, -1, -1};
@@ -41,7 +40,7 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
     int my_work_idx = (int)(ab->sample_work_info.size());                   // index where my work would be in the sample_work
     for (auto i = 0; i < ab->sample_work_info.size(); i++)
     {
-        if (my_work_info.proc_work < ab->sample_work_info[i].proc_work)
+        if (ab->my_work_info.proc_work < ab->sample_work_info[i].proc_work)
         {
             my_work_idx = i;
             break;
@@ -55,7 +54,7 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
         // ie, the heavier my process, the lighter the destination process
         int target = (int)(ab->sample_work_info.size()) - my_work_idx;
 
-        auto src_work_info = my_work_info;
+        auto src_work_info = ab->my_work_info;
         auto dst_work_info = ab->sample_work_info[target];
 
         // sanity check that the move makes sense
@@ -63,8 +62,8 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
                 src_work_info.proc_rank != dst_work_info.proc_rank &&                       // not self
                 src_work_info.nlids > 1)                                                    // don't leave a proc with no blocks
         {
-            move_info.move_gid = my_work_info.top_gid;
-            move_info.src_proc = my_work_info.proc_rank;
+            move_info.move_gid = ab->my_work_info.top_gid;
+            move_info.src_proc = ab->my_work_info.proc_rank;
             move_info.dst_proc = ab->sample_work_info[target].proc_rank;
 
             int move_lid = master.lid(move_info.move_gid);
@@ -111,7 +110,6 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
 // receive requests for work info, send work info, and receive work info
 inline void dynamic_recv(const diy::Master::ProxyWithLink&  cp,                     // communication proxy
                          diy::Master&                       master,                 // real master with multiple blocks per process
-                         WorkInfo&                          my_work_info,           // my work info
                          diy::detail::AuxBlock*             ab)                     // current auxiliary block
 {
     std::vector<int> incoming_gids;
@@ -134,7 +132,7 @@ inline void dynamic_recv(const diy::Master::ProxyWithLink&  cp,                 
                     diy::BlockID dest_block = {gid, gid};
                     // fmt::print(stderr, "sending work info to gid {}\n", gid);
                     cp.enqueue(dest_block, MsgType::work_info);
-                    cp.enqueue(dest_block, my_work_info);
+                    cp.enqueue(dest_block, ab->my_work_info);
                 }
                 else if (t == MsgType::work_info)
                     cp.dequeue(gid, ab->sample_work_info[ab->nwork_info_recvd++]);
@@ -173,8 +171,7 @@ bool iexchange_balance(diy::detail::AuxBlock*              ab,                  
                        const diy::Master::ProxyWithLink&   cp,                     // communication proxy for aux_master
                        Master&                             master,                 // the real master with multiple blocks per process
                        float                               sample_frac,            // fraction of procs to sample 0.0 < sample_size <= 1.0
-                       float                               quantile,               // quantile cutoff above which to move blocks (0.0 - 1.0)
-                       WorkInfo&                           my_work_info)           // my work info, empty, filled later
+                       float                               quantile)               // quantile cutoff above which to move blocks (0.0 - 1.0)
 {
     auto nprocs = master.communicator().size();     // global number of procs
     auto my_proc = master.communicator().rank();    // rank of my proc
@@ -183,7 +180,7 @@ bool iexchange_balance(diy::detail::AuxBlock*              ab,                  
     // sample other procs for their workload
     int nsamples = 0;
     std::set<int> sample_procs;                     // procs to ask for work info when sampling
-    if (my_work_info.proc_work && !ab->sent_reqs)   // only if I have work and have not already sent requests
+    if (ab->my_work_info.proc_work && !ab->sent_reqs)   // only if I have work and have not already sent requests
     {
         // pick a random sample of processes, w/o duplicates, and excluding myself
         nsamples = static_cast<int>(sample_frac * (nprocs - 1));
@@ -206,12 +203,12 @@ bool iexchange_balance(diy::detail::AuxBlock*              ab,                  
 
     if (!ab->sent_block && ab->sample_work_info.size())
     {
-        dynamic_send_block(cp, master, ab, my_work_info, quantile);
+        dynamic_send_block(cp, master, ab, quantile);
         ab->sent_block = true;
     }
 
     // receive requests for work info and blocks
-    dynamic_recv(cp, master, my_work_info, ab);
+    dynamic_recv(cp, master, ab);
 
     // I think I'm done after I sent requests for work info and any blocks
     // Receives will come in automatically via iexchange, even after I think I'm done
@@ -223,34 +220,17 @@ bool iexchange_balance(diy::detail::AuxBlock*              ab,                  
     return done;
 }
 
-template<class G>
+// template<class G>
 void dynamic_balance(Master*                         master,                 // the real master with multiple blocks per process
                      Master*                         aux_master,             // auxiliary master with 1 block per process for communicating between procs
                      DynamicAssigner*                dynamic_assigner,       // dynamic assigner
                      float                           sample_frac,            // fraction of procs to sample 0.0 < sample_size <= 1.0
-                     float                           quantile,               // quantile cutoff above which to move blocks (0.0 - 1.0)
-                     const G&                        get_work)               // callback function to get amount of local work
+                     float                           quantile)               // quantile cutoff above which to move blocks (0.0 - 1.0)
+                     // const G&                        get_work)               // callback function to get amount of local work
 {
-    using Block = typename detail::block_traits<G>::type;
-
-    // compile my work info
-    diy::detail::WorkInfo my_work_info = { master->communicator().rank(), -1, 0, 0, static_cast<int>(master->size()) };
-    my_work_info = { master->communicator().rank(), -1, 0, 0, static_cast<int>(master->size()) };
-    for (auto i = 0; i < master->size(); i++)
-    {
-        Block* b = static_cast<Block*>(master->block(i));
-        Work w = get_work(b, master->gid(i));
-        my_work_info.proc_work += w;
-        if (my_work_info.top_gid == -1 || my_work_info.top_work < w)
-        {
-            my_work_info.top_gid    = master->gid(i);
-            my_work_info.top_work   = w;
-        }
-    }
-
     // do the actual load balancing using iexchange
     aux_master->iexchange([&](diy::detail::AuxBlock* b, const diy::Master::ProxyWithLink& cp) -> bool
-      { return iexchange_balance(b, cp, *master, sample_frac, quantile, my_work_info); } );
+      { return iexchange_balance(b, cp, *master, sample_frac, quantile); } );
     diy::detail::AuxBlock* ab = static_cast<diy::detail::AuxBlock*>(aux_master->block(0));
     ab->iexchange_done.store(true);
 

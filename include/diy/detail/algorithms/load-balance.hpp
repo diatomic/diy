@@ -109,6 +109,7 @@ struct AuxBlock
         (*free_blocks_access).push_back(lid);
     }
 
+    WorkInfo                               my_work_info;            // work info for blocks in the main master
     std::vector<WorkInfo>                  sample_work_info;        // work info from procs I sampled
     int                                    nwork_info_recvd;        // number of work info items received
     bool                                   sent_reqs;               // sent requests for work info already
