@@ -34,8 +34,6 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
                                diy::detail::AuxBlock*              ab,                 // current block
                                float                               quantile)           // quantile cutoff above which to move blocks (0.0 - 1.0)
 {
-    MoveInfo move_info = {-1, -1, -1};
-
     // my rank's position in the sampled work info, sorted by proc_work
     int my_work_idx = (int)(ab->sample_work_info.size());                   // index where my work would be in the sample_work
     for (auto i = 0; i < ab->sample_work_info.size(); i++)
@@ -62,29 +60,31 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
                 src_work_info.proc_rank != dst_work_info.proc_rank &&                       // not self
                 src_work_info.nlids > 1)                                                    // don't leave a proc with no blocks
         {
-            move_info.move_gid = ab->my_work_info.top_gid;
-            move_info.src_proc = ab->my_work_info.proc_rank;
-            move_info.dst_proc = ab->sample_work_info[target].proc_rank;
-
-            int move_lid = master.lid(move_info.move_gid);
+            int move_gid = ab->my_work_info.top_gid;
+            int move_lid = master.lid(move_gid);
+            int dst_proc = ab->sample_work_info[target].proc_rank;
+            int move_work = ab->my_work_info.top_work;
 
             auto free_blocks_access = ab->free_blocks.access();    // locked upon creation, unlocks automatically when leaving scope
-            if ((*free_blocks_access)[move_lid] >= 0)    // block is free to move
+            if ((*free_blocks_access)[move_lid].first >= 0)    // block is free to move
             {
-                (*free_blocks_access)[move_lid] = -1;     // lock the block
+                (*free_blocks_access)[move_lid].first = -1;     // lock the block
                 free_blocks_access.unlock();
 
                 // destination in aux_master, where gid = proc
-                diy::BlockID dest_block = {move_info.dst_proc, move_info.dst_proc};
+                diy::BlockID dest_block = {dst_proc, dst_proc};
 
                 // enqueue the message type
                 cp.enqueue(dest_block, MsgType::block);
 
                 // enqueue the gid of the moving block
-                cp.enqueue(dest_block, move_info.move_gid);
+                cp.enqueue(dest_block, move_gid);
+
+                // enqueue the work of the moving block
+                cp.enqueue(dest_block, move_work);
 
                 // debug
-                fmt::print(stderr, "dynamic_send_block(): gid {} is free, sending to rank {}\n", move_info.move_gid, move_info.dst_proc);
+                fmt::print(stderr, "dynamic_send_block(): gid {} is free, sending to rank {}\n", move_gid, dst_proc);
 
                 // enqueue the block
                 void* send_b = master.block(move_lid);
@@ -128,9 +128,7 @@ inline void dynamic_recv(const diy::Master::ProxyWithLink&  cp,                 
                 cp.dequeue(gid, t);
                 if (t == MsgType::work_info_req)
                 {
-                    // fmt::print(stderr, "t {}: recvd req for work info from gid {}\n", t, gid);
                     diy::BlockID dest_block = {gid, gid};
-                    // fmt::print(stderr, "sending work info to gid {}\n", gid);
                     cp.enqueue(dest_block, MsgType::work_info);
                     cp.enqueue(dest_block, ab->my_work_info);
                 }
@@ -142,7 +140,11 @@ inline void dynamic_recv(const diy::Master::ProxyWithLink&  cp,                 
                     int move_gid;
                     cp.dequeue(gid, move_gid);
 
-                    fmt::print(stderr, "receiving gid {}\n", move_gid);
+                    // dequeue the work of the moving block
+                    Work move_work;
+                    cp.dequeue(gid, move_work);
+
+                    fmt::print(stderr, "dynamic_recv(): receiving gid {}\n", move_gid);
 
                     // dequeue the block
                     void* recv_b = master.creator()();
@@ -159,7 +161,7 @@ inline void dynamic_recv(const diy::Master::ProxyWithLink&  cp,                 
                     master.add(move_gid, recv_b, recv_link);
 
                     // update free blocks
-                    ab->add_free_block();
+                    ab->add_free_block(move_work);
                 }
             }
         }
@@ -210,7 +212,7 @@ bool iexchange_balance(diy::detail::AuxBlock*              ab,                  
     // receive requests for work info and blocks
     dynamic_recv(cp, master, ab);
 
-    // I think I'm done after I sent requests for work info and any blocks
+    // I think I'm done when I have no more free blocks
     // Receives will come in automatically via iexchange, even after I think I'm done
     if (ab->next_free_block(master.size()) == -1)
         done = true;
@@ -220,13 +222,11 @@ bool iexchange_balance(diy::detail::AuxBlock*              ab,                  
     return done;
 }
 
-// template<class G>
 void dynamic_balance(Master*                         master,                 // the real master with multiple blocks per process
                      Master*                         aux_master,             // auxiliary master with 1 block per process for communicating between procs
                      DynamicAssigner*                dynamic_assigner,       // dynamic assigner
                      float                           sample_frac,            // fraction of procs to sample 0.0 < sample_size <= 1.0
                      float                           quantile)               // quantile cutoff above which to move blocks (0.0 - 1.0)
-                     // const G&                        get_work)               // callback function to get amount of local work
 {
     // do the actual load balancing using iexchange
     aux_master->iexchange([&](diy::detail::AuxBlock* b, const diy::Master::ProxyWithLink& cp) -> bool

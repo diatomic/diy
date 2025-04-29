@@ -743,10 +743,12 @@ dynamic_foreach_(const F&                 f,
     aux_block.my_work_info.top_work = 0;
     aux_block.my_work_info.proc_work = 0;
     aux_block.my_work_info.nlids = size();
+    auto free_blocks_access = aux_block.free_blocks.access();    // locked upon creation, unlocks automatically when leaving scope
     for (auto i = 0; i < size(); i++)
     {
         Block* b = static_cast<Block*>(block(i));
         Work w = get_block_work(b, this->gid(i));
+        (*free_blocks_access)[i].second = w;        // append the block work to the free_blocks vector
         aux_block.my_work_info.proc_work += w;
         if (aux_block.my_work_info.top_gid == -1 || aux_block.my_work_info.top_work < w)
         {
@@ -754,6 +756,7 @@ dynamic_foreach_(const F&                 f,
             aux_block.my_work_info.top_work   = w;
         }
     }
+    free_blocks_access.unlock();
 
     exchange_round_annotation.set(exchange_round_);
 

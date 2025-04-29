@@ -56,17 +56,21 @@ struct AuxBlock
         auto free_blocks_access = free_blocks.access();
         free_blocks_access->resize(nlids);
         for (auto i = 0; i < nlids; i++)
-            (*free_blocks_access)[i] = i;
+        {
+            (*free_blocks_access)[i].first = i;
+            (*free_blocks_access)[i].second = 0;        // caller needs to fill in the work; AuxBlock does not have access to master
+        }
     }
 
     // return next free block, or -1 if none available
+    // does not lock the returned block
     int next_free_block(int nlids)
     {
         int retval = -1;
         auto free_blocks_access = free_blocks.access();
         for(auto i = 0; i < nlids; i++)
         {
-            if ((*free_blocks_access)[i] >= 0)
+            if ((*free_blocks_access)[i].first >= 0)
             {
                 retval = i;
                 break;
@@ -75,17 +79,17 @@ struct AuxBlock
         return retval;
     }
 
-    // grab next free block, locking it
     // return lid of the block or -1 if none available
+    // locks the returned block
     int grab_free_block(int nlids)
     {
         int retval = -1;
         auto free_blocks_access = free_blocks.access();
         for(auto i = 0; i < nlids; i++)
         {
-            if ((*free_blocks_access)[i] >= 0)
+            if ((*free_blocks_access)[i].first >= 0)
             {
-                (*free_blocks_access)[i] = -1;
+                (*free_blocks_access)[i].first = -1;
                 retval = i;
                 break;
             }
@@ -102,19 +106,20 @@ struct AuxBlock
     }
 
     // add a block to the end of the free blocks list
-    void add_free_block()
+    void add_free_block(Work work)        // work associated with the block
     {
         auto free_blocks_access = free_blocks.access();
         int lid = static_cast<int>((*free_blocks_access).size());
-        (*free_blocks_access).push_back(lid);
+        (*free_blocks_access).push_back(std::make_pair(lid, work));
     }
 
+    using FreeBlock = std::pair<int, Work>;                         // [block lid in master (-1 indicates locked), block work]
     WorkInfo                               my_work_info;            // work info for blocks in the main master
     std::vector<WorkInfo>                  sample_work_info;        // work info from procs I sampled
     int                                    nwork_info_recvd;        // number of work info items received
     bool                                   sent_reqs;               // sent requests for work info already
     bool                                   sent_block;              // sent block already
-    critical_resource<std::vector<int>>    free_blocks;             // lids of blocks in main master that are free to use (not locked by another thread)
+    critical_resource<std::vector<FreeBlock>> free_blocks;          // lids of blocks in main master that are free to use (not locked by another thread)
     std::atomic<bool>                      iexchange_done{false};   // whether iexchange_balance is still running or is done
 };
 
