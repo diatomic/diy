@@ -36,94 +36,169 @@ struct MoveInfo
     int dst_proc;
 };
 
+// block in free_blocks vector
+struct FreeBlock
+{
+    int      gid;                // gid of the block
+    Work     work;               // amount of work that computing the block takes
+    int      src_proc;           // sender of the block, if it migrated from elsewhere
+
+    FreeBlock(): gid(-1), work(0), src_proc(-1) {}
+    FreeBlock(int gid_, Work work_, int src_proc_):
+    gid(gid_), work(work_), src_proc(src_proc_) {}
+};
+
 // auxiliary empty block structure
 struct AuxBlock
 {
-    AuxBlock() : nwork_info_recvd(0), sent_reqs(false), sent_block(false)
-    {}
-
     typedef           resource_accessor<std::vector<int>, fast_mutex>         accessor;
 
-    AuxBlock(int nlids)                 // number of blocks in real master
-    : nwork_info_recvd(0), sent_reqs(false), sent_block(false)
+    AuxBlock(Master* master_)            // real master, (not auxiliary master)
+    : master(master_), nsent_reqs(0), proc_work(0), prev_proc_work(0) {}
+
+    // initialize free blocks
+    template<class GetWork>
+    void init_free_blocks(const GetWork& get_block_work)
     {
-        reset_free_blocks(nlids);
+        using Block = typename detail::block_traits<GetWork>::type;
+        auto free_blocks_access = free_blocks.access();
+        free_blocks_access->resize(master->size());
+        Work tot_work = 0;
+        for (auto i = 0; i < master->size(); i++)
+        {
+            (*free_blocks_access)[i].gid = master->gid(i);
+            Block* b = static_cast<Block*>(master->block(i));
+            Work w = get_block_work(b, master->gid(i));
+            (*free_blocks_access)[i].work = w;
+            tot_work += w;
+        }
+        proc_work.store(tot_work);
+        prev_proc_work = tot_work;
     }
 
-    // reset free blocks to all local blocks being free
-    void reset_free_blocks(int nlids)
+    // whether there are any free blocks
+    bool any_free_blocks()
     {
         auto free_blocks_access = free_blocks.access();
-        free_blocks_access->resize(nlids);
-        for (auto i = 0; i < nlids; i++)
-        {
-            (*free_blocks_access)[i].first = i;
-            (*free_blocks_access)[i].second = 0;        // caller needs to fill in the work; AuxBlock does not have access to master
-        }
+        return (*free_blocks_access).size();
     }
 
-    // return next free block, or -1 if none available
-    // does not lock the returned block
-    int next_free_block(int nlids)
+    // return gid of the heaviest free block or -1 if none available, and remove the block
+    // fill free block with the block being grabbed
+    int grab_heaviest_free_block(FreeBlock& free_block)
     {
         int retval = -1;
+        size_t heaviest_idx = -1;
+        Work max_work = 0;
         auto free_blocks_access = free_blocks.access();
-        for(auto i = 0; i < nlids; i++)
+        for (auto i = 0; i < (*free_blocks_access).size(); i++)
         {
-            if ((*free_blocks_access)[i].first >= 0)
+            if (i == 0 || (*free_blocks_access)[i].work > max_work)
             {
-                retval = i;
-                break;
+                retval = (*free_blocks_access)[i].gid;
+                max_work = (*free_blocks_access)[i].work;
+                heaviest_idx = i;
+
+                // debug
+                // if (retval == -1)
+                //     fmt::print(stderr, "Error: grab_heaviest_free_block() has gid -1\n");
             }
+        }
+        if (retval >= 0)
+        {
+            std::swap((*free_blocks_access)[heaviest_idx], (*free_blocks_access).back());
+            proc_work.store(proc_work.load() - (*free_blocks_access).back().work);
+            free_block.gid      = (*free_blocks_access).back().gid;
+            free_block.work     = (*free_blocks_access).back().work;
+            free_block.src_proc = (*free_blocks_access).back().src_proc;
+            (*free_blocks_access).pop_back();
         }
         return retval;
     }
 
-    // return lid of the block or -1 if none available
-    // locks the returned block
-    int grab_free_block(int nlids)
-    {
-        int retval = -1;
-        auto free_blocks_access = free_blocks.access();
-        for(auto i = 0; i < nlids; i++)
-        {
-            if ((*free_blocks_access)[i].first >= 0)
-            {
-                (*free_blocks_access)[i].first = -1;
-                retval = i;
-                break;
-            }
-        }
-        return retval;
-    }
-
-    // remove a block from the free blocks list
-    void remove_free_block(int lid)
-    {
-        auto free_blocks_access = free_blocks.access();
-        std::swap((*free_blocks_access)[static_cast<size_t>(lid)], (*free_blocks_access).back());
-        (*free_blocks_access).pop_back();
-    }
+    // for debugging only
+    // return gid of the heaviest free block or -1 if none available, but don't remove the block
+    // fill free block with the block being grabbed
+    // int read_heaviest_free_block(FreeBlock& free_block)
+    // {
+    //     int retval = -1;
+    //     size_t heaviest_idx = -1;
+    //     Work max_work = 0;
+    //     auto free_blocks_access = free_blocks.access();
+    //     for (auto i = 0; i < (*free_blocks_access).size(); i++)
+    //     {
+    //         if (i == 0 || (*free_blocks_access)[i].work > max_work)
+    //         {
+    //             retval = (*free_blocks_access)[i].gid;
+    //             max_work = (*free_blocks_access)[i].work;
+    //             heaviest_idx = i;
+    //         }
+    //     }
+    //     if (retval >= 0)
+    //     {
+    //         free_block.gid      = (*free_blocks_access)[heaviest_idx].gid;
+    //         free_block.work     = (*free_blocks_access)[heaviest_idx].work;
+    //         free_block.src_proc = (*free_blocks_access)[heaviest_idx].src_proc;
+    //     }
+    //     return retval;
+    // }
 
     // add a block to the end of the free blocks list
-    void add_free_block(Work work)        // work associated with the block
+    void add_free_block(FreeBlock& free_block)
     {
         auto free_blocks_access = free_blocks.access();
-        int lid = static_cast<int>((*free_blocks_access).size());
-        (*free_blocks_access).push_back(std::make_pair(lid, work));
+        (*free_blocks_access).push_back(free_block);
+        proc_work.store(proc_work.load() + (*free_blocks_access).back().work);
     }
 
-    using FreeBlock = std::pair<int, Work>;                         // [block lid in master (-1 indicates locked), block work]
-    WorkInfo                               my_work_info;            // work info for blocks in the main master
+    // update my work info based on current state of free blocks
+    void update_my_work_info(WorkInfo& work_info)
+    {
+        auto free_blocks_access = free_blocks.access();
+
+        // initialize
+        work_info.proc_rank = master->communicator().rank();
+        work_info.top_gid   = -1;
+        work_info.top_work  = 0;
+        work_info.proc_work = proc_work.load();
+        work_info.nlids     = static_cast<int>((*free_blocks_access).size());
+
+        for (auto i = 0; i < (*free_blocks_access).size(); i++)
+        {
+            if (i == 0 || work_info.top_work < (*free_blocks_access)[i].work)
+            {
+                work_info.top_gid    = (*free_blocks_access)[i].gid;
+                work_info.top_work   = (*free_blocks_access)[i].work;
+            }
+        }
+    }
+
+    // update sampled work info with incoming work info
+    void update_sample_work_info(WorkInfo& work_info)
+    {
+        size_t i = 0;
+        for (i = 0; i < sample_work_info.size(); i++)
+        {
+            if (sample_work_info[i].proc_rank == work_info.proc_rank)
+                break;
+        }
+        if (i < sample_work_info.size())
+            sample_work_info[i] = work_info;
+        else
+            sample_work_info.push_back(work_info);
+    }
+
     std::vector<WorkInfo>                  sample_work_info;        // work info from procs I sampled
-    int                                    nwork_info_recvd;        // number of work info items received
-    bool                                   sent_reqs;               // sent requests for work info already
-    bool                                   sent_block;              // sent block already
+    std::vector<int>                       requesters;              // procs that requested work info from me
+    Master*                                master;                  // real (not auxiliary) master
+    int                                    nsent_reqs;              // number of sent requests for work info
     critical_resource<std::vector<FreeBlock>> free_blocks;          // lids of blocks in main master that are free to use (not locked by another thread)
     std::atomic<bool>                      iexchange_done{false};   // whether iexchange_balance is still running or is done
+    std::atomic<Work>                      proc_work;               // total work for my process
+    Work                                   prev_proc_work;          // previous proc_work, to know if it changed
 };
 
-}   // namespace detail
+}  // namespace detail
 
 template<>
 struct Serialization<detail::WorkInfo>

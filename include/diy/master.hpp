@@ -34,14 +34,12 @@
 #include "log.hpp"
 #include "stats.hpp"
 
-#include "detail/algorithms/load-balance.hpp"
-
 namespace diy
 {
   namespace detail
   {
-    // forward declaration; defined in detail/algorithms/load-balance-dynamic.hpp
-    struct MasterDynamicLoadBalancer;
+    // forward declaration; defined in detail/algorithms/load-balance.hpp
+    struct AuxBlock;
   }
 
   struct MemoryManagement
@@ -311,6 +309,7 @@ namespace diy
       }
 
       //! call `f` and `g` with every block
+      // 'f' is the compute callback, 'g' is the callback to get the amount of work that 'f' takes
       // template<class Block>
       template<class F, class G>
       void          dynamic_foreach_(const F& f, // const Callback<Block>& f,
@@ -328,8 +327,6 @@ namespace diy
                                     float quantile,
                                     const Skip& s = NeverSkip())
       {
-          // using Block = typename detail::block_traits<F>::type;
-          // dynamic_foreach_<Block>(f, g, dynamic_assigner, sample_frac, quantile, s);
           dynamic_foreach_<F, G>(f, g, dynamic_assigner, sample_frac, quantile, s);
       }
 
@@ -442,6 +439,7 @@ namespace diy
 #include "detail/master/collectives.hpp"
 #include "detail/master/commands.hpp"
 #include "proxy.hpp"
+#include "detail/algorithms/load-balance.hpp"
 #include "detail/master/execution.hpp"
 #include "detail/master/foreach_exchange.hpp"
 #include "detail/master/dynamic.hpp"
@@ -727,36 +725,16 @@ dynamic_foreach_(const F&                 f,
         abort();
     }
 
-    // "auxiliary" master for using iexchange for load balancing, 1 block per process
-    Master aux_master(communicator());
-    diy::ContiguousAssigner aux_assigner(aux_master.communicator().size(), aux_master.communicator().size());
-    diy::Link *link = new diy::Link;                // diy will delete this link, will not leak memory
-    detail::AuxBlock aux_block(size());
-    int gid = aux_master.communicator().rank();
-    aux_master.add(gid, &aux_block, link);
-
     using Block = typename detail::block_traits<F>::type;
 
-    // compile my work info
-    aux_block.my_work_info.proc_rank = communicator().rank();
-    aux_block.my_work_info.top_gid = -1;
-    aux_block.my_work_info.top_work = 0;
-    aux_block.my_work_info.proc_work = 0;
-    aux_block.my_work_info.nlids = size();
-    auto free_blocks_access = aux_block.free_blocks.access();    // locked upon creation, unlocks automatically when leaving scope
-    for (auto i = 0; i < size(); i++)
-    {
-        Block* b = static_cast<Block*>(block(i));
-        Work w = get_block_work(b, this->gid(i));
-        (*free_blocks_access)[i].second = w;        // append the block work to the free_blocks vector
-        aux_block.my_work_info.proc_work += w;
-        if (aux_block.my_work_info.top_gid == -1 || aux_block.my_work_info.top_work < w)
-        {
-            aux_block.my_work_info.top_gid    = this->gid(i);
-            aux_block.my_work_info.top_work   = w;
-        }
-    }
-    free_blocks_access.unlock();
+    // "auxiliary" master for using iexchange for load balancing, 1 aux_block per process
+    Master aux_master(communicator());
+    diy::ContiguousAssigner aux_assigner(aux_master.communicator().size(), aux_master.communicator().size());
+    diy::Link *link = new diy::Link;                             // diy will delete this link, will not leak memory
+    detail::AuxBlock aux_block(this);
+    int gid = aux_master.communicator().rank();
+    aux_master.add(gid, &aux_block, link);
+    aux_block.init_free_blocks<G>(get_block_work);        // initialize free blocks
 
     exchange_round_annotation.set(exchange_round_);
 
@@ -765,13 +743,15 @@ dynamic_foreach_(const F&                 f,
 
     commands_.emplace_back(new Command<Block>(f, skip));
 
-    // load balance in a separate thread
+    // load balance in the parent thread and execute the block in a child thread
+    // TODO: does not compile, no matching constructor for Master::dynamic_execute
+    // std::thread t1(&Master::dynamic_execute, this, aux_block);
+    // detail::dynamic_balance(this, &aux_master, &dynamic_assigner, sample_frac, quantile);
+    // t1.join();
+
+    // load balance in a child thread and execute the block in the parent thread
     std::thread t1(detail::dynamic_balance, this, &aux_master, &dynamic_assigner, sample_frac, quantile);
-
-    // execute the block in the parent thread
-    if (immediate())
-        dynamic_execute(aux_block);
-
+    dynamic_execute(aux_block);
     t1.join();
 }
 

@@ -163,7 +163,7 @@ execute()
 void
 diy::Master::
 dynamic_process_block(Master&                             master,
-                    int                                 lid)
+                      int                                 lid)
 {
     master.log->debug("Processing with thread: {}",  this_thread::get_id());
 
@@ -191,18 +191,15 @@ dynamic_execute(detail::AuxBlock& aux_block)
     if (commands_.empty())
         return;
 
-    // while dynamic balance is not done and while there are free blocks
-    // grab the first free local block, lock and execute it
-    int free_lid;
-    while (!aux_block.iexchange_done.load())
+    // while dynamic balance is not done and while there are free blocks, grab a block, lock and execute it
+    int gid;
+    detail::FreeBlock free_block;
+    while (!aux_block.iexchange_done.load() && (gid = aux_block.grab_heaviest_free_block(free_block)) >= 0)
     {
-        while ((free_lid = aux_block.grab_free_block(size())) >= 0)
-        {
-            // debug
-            fmt::print(stderr, "dynamic_execute(): gid {} is free, locking and executing the block\n", gid(free_lid));
+        // debug
+        fmt::print(stderr, "dynamic_execute(): gid {} is free, locking and executing the block\n", gid);
 
-            dynamic_process_block(*this, free_lid);
-        }
+        dynamic_process_block(*this, lid(gid));
     }
 
     // clear incoming queues
