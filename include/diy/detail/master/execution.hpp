@@ -194,12 +194,16 @@ dynamic_execute(detail::AuxBlock& aux_block)
     // while dynamic balance is not done and while there are free blocks, grab a block, lock and execute it
     int gid;
     detail::FreeBlock free_block;
+
     while (!aux_block.iexchange_done.load() && (gid = aux_block.grab_heaviest_free_block(free_block)) >= 0)
     {
         // debug
         fmt::print(stderr, "dynamic_execute(): gid {} is free, locking and executing the block\n", gid);
 
         dynamic_process_block(*this, lid(gid));
+
+        // debug
+        // aux_block.print_free_blocks();
     }
 
     // clear incoming queues

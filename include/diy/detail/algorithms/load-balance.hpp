@@ -1,7 +1,15 @@
 #pragma once
 
 #include "diy/dynamic-point.hpp"
+#include <cstdlib>
 #include <stdatomic.h>
+
+// uninitialized values
+#define NO_GID      -1
+#define NO_WORK     0
+#define NO_PROC     -1
+#define NO_IDX      -1
+#define NO_REQS     0
 
 namespace diy
 {
@@ -29,7 +37,7 @@ struct WorkInfo
 // information about a block that is moving
 struct MoveInfo
 {
-    MoveInfo(): move_gid(-1), src_proc(-1), dst_proc(-1)   {}
+    MoveInfo(): move_gid(NO_GID), src_proc(NO_PROC), dst_proc(NO_PROC)   {}
     MoveInfo(int move_gid_, int src_proc_, int dst_proc_) : move_gid(move_gid_), src_proc(src_proc_), dst_proc(dst_proc_) {}
     int move_gid;
     int src_proc;
@@ -43,7 +51,7 @@ struct FreeBlock
     Work     work;               // amount of work that computing the block takes
     int      src_proc;           // sender of the block, if it migrated from elsewhere
 
-    FreeBlock(): gid(-1), work(0), src_proc(-1) {}
+    FreeBlock(): gid(NO_GID), work(NO_WORK), src_proc(NO_PROC) {}
     FreeBlock(int gid_, Work work_, int src_proc_):
     gid(gid_), work(work_), src_proc(src_proc_) {}
 };
@@ -54,7 +62,7 @@ struct AuxBlock
     typedef           resource_accessor<std::vector<int>, fast_mutex>         accessor;
 
     AuxBlock(Master* master_)            // real master, (not auxiliary master)
-    : master(master_), nsent_reqs(0), proc_work(0), prev_proc_work(0) {}
+    : master(master_), nsent_reqs(NO_REQS), proc_work(NO_WORK), prev_proc_work(NO_WORK) {}
 
     // initialize free blocks
     template<class GetWork>
@@ -72,8 +80,17 @@ struct AuxBlock
             (*free_blocks_access)[i].work = w;
             tot_work += w;
         }
-        proc_work.store(tot_work);
+        proc_work = tot_work;
         prev_proc_work = tot_work;
+    }
+
+    // debug: print free blocks
+    void print_free_blocks()
+    {
+        auto free_blocks_access = free_blocks.access();
+        for (auto i = 0; i < (*free_blocks_access).size(); i++)
+            fmt::print(stderr, "free_blocks[{}]: gid {} work {} src_proc {}\n",
+                       i, (*free_blocks_access)[i].gid, (*free_blocks_access)[i].work, (*free_blocks_access)[i].src_proc);
     }
 
     // whether there are any free blocks
@@ -85,11 +102,15 @@ struct AuxBlock
 
     // return gid of the heaviest free block or -1 if none available, and remove the block
     // fill free block with the block being grabbed
+    // if no block is available, fill free block with uninitialized values
     int grab_heaviest_free_block(FreeBlock& free_block)
     {
-        int retval = -1;
-        size_t heaviest_idx = -1;
-        Work max_work = 0;
+        int retval          = NO_GID;
+        size_t heaviest_idx = NO_IDX;
+        Work max_work       = NO_WORK;
+        free_block.gid      = NO_GID;
+        free_block.work     = NO_WORK;
+        free_block.src_proc = NO_PROC;
         auto free_blocks_access = free_blocks.access();
         for (auto i = 0; i < (*free_blocks_access).size(); i++)
         {
@@ -100,55 +121,36 @@ struct AuxBlock
                 heaviest_idx = i;
 
                 // debug
-                // if (retval == -1)
-                //     fmt::print(stderr, "Error: grab_heaviest_free_block() has gid -1\n");
+                if (retval == -1)
+                    fmt::print(stderr, "grab_heaviest_block(): free_blocks size {} i {} gid {} work {}\n",
+                               (*free_blocks_access).size(), i, (*free_blocks_access)[i].gid, (*free_blocks_access)[i].work);
             }
         }
         if (retval >= 0)
         {
+            // debug
+            // fmt::print(stderr, "grab_heaviest_block(): retval {} heaviest_idx {} size {}\n", retval, heaviest_idx, (*free_blocks_access).size());
+
             std::swap((*free_blocks_access)[heaviest_idx], (*free_blocks_access).back());
-            proc_work.store(proc_work.load() - (*free_blocks_access).back().work);
+            proc_work           -= (*free_blocks_access).back().work;
             free_block.gid      = (*free_blocks_access).back().gid;
             free_block.work     = (*free_blocks_access).back().work;
             free_block.src_proc = (*free_blocks_access).back().src_proc;
             (*free_blocks_access).pop_back();
+
+            // debug
+            // fmt::print(stderr, "grab_heaviest_block(): free_block.gid {} free_block.work {} size after popping back {}\n",
+            //            free_block.gid, free_block.work, (*free_blocks_access).size());
         }
         return retval;
     }
-
-    // for debugging only
-    // return gid of the heaviest free block or -1 if none available, but don't remove the block
-    // fill free block with the block being grabbed
-    // int read_heaviest_free_block(FreeBlock& free_block)
-    // {
-    //     int retval = -1;
-    //     size_t heaviest_idx = -1;
-    //     Work max_work = 0;
-    //     auto free_blocks_access = free_blocks.access();
-    //     for (auto i = 0; i < (*free_blocks_access).size(); i++)
-    //     {
-    //         if (i == 0 || (*free_blocks_access)[i].work > max_work)
-    //         {
-    //             retval = (*free_blocks_access)[i].gid;
-    //             max_work = (*free_blocks_access)[i].work;
-    //             heaviest_idx = i;
-    //         }
-    //     }
-    //     if (retval >= 0)
-    //     {
-    //         free_block.gid      = (*free_blocks_access)[heaviest_idx].gid;
-    //         free_block.work     = (*free_blocks_access)[heaviest_idx].work;
-    //         free_block.src_proc = (*free_blocks_access)[heaviest_idx].src_proc;
-    //     }
-    //     return retval;
-    // }
 
     // add a block to the end of the free blocks list
     void add_free_block(FreeBlock& free_block)
     {
         auto free_blocks_access = free_blocks.access();
         (*free_blocks_access).push_back(free_block);
-        proc_work.store(proc_work.load() + (*free_blocks_access).back().work);
+        proc_work += (*free_blocks_access).back().work;
     }
 
     // update my work info based on current state of free blocks
@@ -158,9 +160,9 @@ struct AuxBlock
 
         // initialize
         work_info.proc_rank = master->communicator().rank();
-        work_info.top_gid   = -1;
-        work_info.top_work  = 0;
-        work_info.proc_work = proc_work.load();
+        work_info.top_gid   = NO_GID;
+        work_info.top_work  = NO_WORK;
+        work_info.proc_work = proc_work;
         work_info.nlids     = static_cast<int>((*free_blocks_access).size());
 
         for (auto i = 0; i < (*free_blocks_access).size(); i++)
@@ -186,6 +188,10 @@ struct AuxBlock
             sample_work_info[i] = work_info;
         else
             sample_work_info.push_back(work_info);
+
+        // sort sample_work_info by proc_work
+        std::sort(sample_work_info.begin(), sample_work_info.end(),
+                [&](WorkInfo& a, WorkInfo& b) { return a.proc_work < b.proc_work; });
     }
 
     std::vector<WorkInfo>                  sample_work_info;        // work info from procs I sampled

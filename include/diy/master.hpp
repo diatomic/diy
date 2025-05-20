@@ -736,6 +736,9 @@ dynamic_foreach_(const F&                 f,
     aux_master.add(gid, &aux_block, link);
     aux_block.init_free_blocks<G>(get_block_work);        // initialize free blocks
 
+    // debug
+    // aux_block.print_free_blocks();
+
     exchange_round_annotation.set(exchange_round_);
 
     auto scoped = prof.scoped("foreach");

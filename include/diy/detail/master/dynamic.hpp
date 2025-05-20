@@ -38,7 +38,10 @@ inline void dynamic_send_work_info(const diy::Master::ProxyWithLink&      cp,   
     diy::BlockID dest_block = {dest_proc, dest_proc};
     cp.enqueue(dest_block, MsgType::work_info);
     cp.enqueue(dest_block, work_info);
-    fmt::print(stderr, "dynamic_send_work_info() to {}\n", dest_proc);
+
+    // debug
+    // fmt::print(stderr, "dynamic_send_work_info() top_gid {} top_work {} proc_rank {} proc_work {} to {}\n",
+    //            work_info.top_gid, work_info.top_work, work_info.proc_rank, work_info.proc_work, dest_proc);
 }
 
 // send block
@@ -47,12 +50,11 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
                                diy::detail::AuxBlock*              ab,                 // current block
                                float                               quantile)           // quantile cutoff above which to move blocks (0.0 - 1.0)
 {
-    auto proc_work = ab->proc_work.load();
-    FreeBlock heaviest_block;
-    // auto proc_rank = master.communicator().rank();
+    Work proc_work = ab->proc_work;                                                    // total work of my proc
+    FreeBlock heaviest_block;                                                          // my heaviest block
 
     // my rank's position in the sampled work info, sorted by proc_work
-    int my_work_idx = (int)(ab->sample_work_info.size());                               // index where my work would be in the sample_work
+    int my_work_idx = (int)(ab->sample_work_info.size());                              // index where my work would be in the sample_work
     for (auto i = 0; i < ab->sample_work_info.size(); i++)
     {
         if (proc_work < ab->sample_work_info[i].proc_work)
@@ -76,7 +78,8 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
     //     fmt::print(stderr, "heaviest_block: gid {} work {} src_proc {}\n", heaviest_block.gid, heaviest_block.work, heaviest_block.src_proc);
 
     // send my heaviest block if it passes multiple tests
-    if (ab->grab_heaviest_free_block(heaviest_block) >= 0                &&                // heaviest block is free to grab
+    int retval;
+    if ((retval = ab->grab_heaviest_free_block(heaviest_block)) >= 0     &&                // heaviest block is free to grab
         proc_work - dst_work_info.proc_work > heaviest_block.work        &&                // improves load balance
         // heaviest_block.src_proc != dst_work_info.proc_rank               &&                // not immediately returning block to sender TODO: necessary?
         ab->any_free_blocks())                                                             // doesn't leave me with no blocks
@@ -115,8 +118,11 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
 
         // remove the block from the master
         master.destroyer()(master.release(move_lid));
+
+        // debug
+        // ab->print_free_blocks();
     }
-    else        // replace the block if it wasn't used
+    else if (retval >= 0)        // replace the block if there was one but it wasn't used
         ab->add_free_block(heaviest_block);
 }
 
@@ -142,26 +148,29 @@ inline void dynamic_recv(const diy::Master::ProxyWithLink&  cp,                 
                 // switch on the type of message (work info request, work info, migrated block)
                 if (t == MsgType::work_info_req)
                 {
-                    fmt::print(stderr, "dynamic_recv(): got work_info_req\n");
+                    // debug
+                    // fmt::print(stderr, "dynamic_recv(): got work_info_req\n");
 
                     dynamic_send_work_info(cp, ab, gid);
                     ab->requesters.push_back(gid);
 
+                    // debug
                     // fmt::print(stderr, "dynamic_recv() work_info_req requesters.size() {}\n", ab->requesters.size());
+                    // ab->print_free_blocks();
                 }
                 else if (t == MsgType::work_info)
                 {
-                    fmt::print(stderr, "dynamic_recv(): got work_info from {}\n", gid);
+                    // debug
+                    // fmt::print(stderr, "dynamic_recv(): got work_info from {}\n", gid);
 
                     WorkInfo work_info;
                     cp.dequeue(gid, work_info);
                     ab->update_sample_work_info(work_info);
-
-                    // fmt::print(stderr, "dynamic_recv() 2:\n");
                 }
                 else if (t == MsgType::block)
                 {
-                    fmt::print(stderr, "dynamic_recv(): got block\n");
+                    // debug
+                    // fmt::print(stderr, "dynamic_recv(): got block\n");
 
                     // dequeue the gid of the moving block
                     int move_gid;
@@ -188,8 +197,6 @@ inline void dynamic_recv(const diy::Master::ProxyWithLink&  cp,                 
                     // update free blocks
                     FreeBlock free_block(move_gid, move_work, gid);
                     ab->add_free_block(free_block);
-
-                    // fmt::print(stderr, "dynamic_recv() 3:\n");
                 }
             }
         }
@@ -197,27 +204,22 @@ inline void dynamic_recv(const diy::Master::ProxyWithLink&  cp,                 
 }
 
 // callback function for iexchange to execute dynamic load balancing
-bool iexchange_balance(diy::detail::AuxBlock*              ab,                     // current block
+bool iexchange_balance(diy::detail::AuxBlock*              ab,                     // auxiliary block
                        const diy::Master::ProxyWithLink&   cp,                     // communication proxy for aux_master
                        Master&                             master,                 // the real master with multiple blocks per process
                        float                               sample_frac,            // fraction of procs to sample 0.0 < sample_size <= 1.0
                        float                               quantile)               // quantile cutoff above which to move blocks (0.0 - 1.0)
 {
-    // fmt::print(stderr, "1:\n");
-
     auto nprocs = master.communicator().size();     // global number of procs
     auto my_proc = master.communicator().rank();    // rank of my proc
 
     // update requesters of my work info if it changed
-    if (ab->prev_proc_work != ab->proc_work.load())
+    if (ab->prev_proc_work != ab->proc_work)
     {
-        // fmt::print(stderr, "iexchange_balance(): requesters.size {}\n", ab->requesters.size());
         for (auto i = 0; i < ab->requesters.size(); i++)
             dynamic_send_work_info(cp, ab, ab->requesters[i]);
-        ab->prev_proc_work = ab->proc_work.load();
+        ab->prev_proc_work = ab->proc_work;
     }
-
-    // fmt::print(stderr, "2:\n");
 
     // sample other procs for their workload
     int nsamples = 0;
@@ -242,25 +244,11 @@ bool iexchange_balance(diy::detail::AuxBlock*              ab,                  
         ab->nsent_reqs = nsamples;
     }
 
-    // // update requesters of my work info if it changed
-    // if (ab->prev_proc_work != ab->proc_work.load())
-    // {
-    //     fmt::print(stderr, "iexchange_balance(): requesters.size {}\n", ab->requesters.size());
-    //     for (auto i = 0; i < ab->requesters.size(); i++)
-    //         dynamic_send_work_info(cp, ab, ab->requesters[i]);
-    //     ab->prev_proc_work = ab->proc_work.load();
-    // }
-
-    // fmt::print(stderr, "2:\n");
-
     if (ab->nsent_reqs && ab->sample_work_info.size() == ab->nsent_reqs)
         dynamic_send_block(cp, master, ab, quantile);
 
     // receive requests for work info and blocks
     dynamic_recv(cp, master, ab);
-
-    // if (!ab->any_free_blocks())
-    //     fmt::print(stderr, "iexchange_balance(): done\n");
 
     // I think I'm done when I have no more free blocks
     // Receives will come in automatically via iexchange, even after I think I'm done
