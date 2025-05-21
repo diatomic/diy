@@ -38,10 +38,6 @@ inline void dynamic_send_work_info(const diy::Master::ProxyWithLink&      cp,   
     diy::BlockID dest_block = {dest_proc, dest_proc};
     cp.enqueue(dest_block, MsgType::work_info);
     cp.enqueue(dest_block, work_info);
-
-    // debug
-    // fmt::print(stderr, "dynamic_send_work_info() top_gid {} top_work {} proc_rank {} proc_work {} to {}\n",
-    //            work_info.top_gid, work_info.top_work, work_info.proc_rank, work_info.proc_work, dest_proc);
 }
 
 // send block
@@ -71,21 +67,12 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
     int target = (int)(ab->sample_work_info.size()) - my_work_idx;
     auto dst_work_info = ab->sample_work_info[target];
 
-    // debug
-    // fmt::print(stderr, "sample_size {} proc_rank {} proc_work {} target {} dst_work_info: proc_rank {} proc_work {}\n",
-    //            ab->sample_work_info.size(), proc_rank, proc_work, target, dst_work_info.proc_rank, dst_work_info.proc_work);
-    // if (ab->read_heaviest_free_block(heaviest_block) >= 0)
-    //     fmt::print(stderr, "heaviest_block: gid {} work {} src_proc {}\n", heaviest_block.gid, heaviest_block.work, heaviest_block.src_proc);
-
     // send my heaviest block if it passes multiple tests
     int retval;
     if ((retval = ab->grab_heaviest_free_block(heaviest_block)) >= 0     &&                // heaviest block is free to grab
         proc_work - dst_work_info.proc_work > heaviest_block.work        &&                // improves load balance
-        // heaviest_block.src_proc != dst_work_info.proc_rank               &&                // not immediately returning block to sender TODO: necessary?
         ab->any_free_blocks())                                                             // doesn't leave me with no blocks
     {
-        // fmt::print(stderr, "heaviest_block: gid {} work {} src_proc {}\n", heaviest_block.gid, heaviest_block.work, heaviest_block.src_proc);
-
         int move_gid = heaviest_block.gid;
         int move_lid = master.lid(move_gid);
         int dst_proc = dst_work_info.proc_rank;
@@ -103,7 +90,7 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
         cp.enqueue(dest_block, move_work);
 
         // debug
-        fmt::print(stderr, "dynamic_send_block(): gid {} is free, sending to rank {}\n", move_gid, dst_proc);
+        // fmt::print(stderr, "dynamic_send_block(): gid {} is free, sending to rank {}\n", move_gid, dst_proc);
 
         // enqueue the block
         void* send_b = master.block(move_lid);
@@ -118,9 +105,6 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
 
         // remove the block from the master
         master.destroyer()(master.release(move_lid));
-
-        // debug
-        // ab->print_free_blocks();
     }
     else if (retval >= 0)        // replace the block if there was one but it wasn't used
         ab->add_free_block(heaviest_block);
@@ -148,30 +132,17 @@ inline void dynamic_recv(const diy::Master::ProxyWithLink&  cp,                 
                 // switch on the type of message (work info request, work info, migrated block)
                 if (t == MsgType::work_info_req)
                 {
-                    // debug
-                    // fmt::print(stderr, "dynamic_recv(): got work_info_req\n");
-
                     dynamic_send_work_info(cp, ab, gid);
                     ab->requesters.push_back(gid);
-
-                    // debug
-                    // fmt::print(stderr, "dynamic_recv() work_info_req requesters.size() {}\n", ab->requesters.size());
-                    // ab->print_free_blocks();
                 }
                 else if (t == MsgType::work_info)
                 {
-                    // debug
-                    // fmt::print(stderr, "dynamic_recv(): got work_info from {}\n", gid);
-
                     WorkInfo work_info;
                     cp.dequeue(gid, work_info);
                     ab->update_sample_work_info(work_info);
                 }
                 else if (t == MsgType::block)
                 {
-                    // debug
-                    // fmt::print(stderr, "dynamic_recv(): got block\n");
-
                     // dequeue the gid of the moving block
                     int move_gid;
                     cp.dequeue(gid, move_gid);
@@ -265,7 +236,7 @@ void dynamic_balance(Master*                         master,                 // 
     aux_master->iexchange([&](diy::detail::AuxBlock* b, const diy::Master::ProxyWithLink& cp) -> bool
       { return iexchange_balance(b, cp, *master, sample_frac, quantile); } );
     diy::detail::AuxBlock* ab = static_cast<diy::detail::AuxBlock*>(aux_master->block(0));
-    ab->iexchange_done.store(true);
+    ab->iexchange_done = true;
 
     // fix links
     diy::fix_links(*master, *dynamic_assigner);

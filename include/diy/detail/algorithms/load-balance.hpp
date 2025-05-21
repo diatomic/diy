@@ -87,6 +87,7 @@ struct AuxBlock
     // debug: print free blocks
     void print_free_blocks()
     {
+        fmt::print(stderr, "print_free_blocks():\n");
         auto free_blocks_access = free_blocks.access();
         for (auto i = 0; i < (*free_blocks_access).size(); i++)
             fmt::print(stderr, "free_blocks[{}]: gid {} work {} src_proc {}\n",
@@ -119,28 +120,16 @@ struct AuxBlock
                 retval = (*free_blocks_access)[i].gid;
                 max_work = (*free_blocks_access)[i].work;
                 heaviest_idx = i;
-
-                // debug
-                if (retval == -1)
-                    fmt::print(stderr, "grab_heaviest_block(): free_blocks size {} i {} gid {} work {}\n",
-                               (*free_blocks_access).size(), i, (*free_blocks_access)[i].gid, (*free_blocks_access)[i].work);
             }
         }
         if (retval >= 0)
         {
-            // debug
-            // fmt::print(stderr, "grab_heaviest_block(): retval {} heaviest_idx {} size {}\n", retval, heaviest_idx, (*free_blocks_access).size());
-
             std::swap((*free_blocks_access)[heaviest_idx], (*free_blocks_access).back());
             proc_work           -= (*free_blocks_access).back().work;
             free_block.gid      = (*free_blocks_access).back().gid;
             free_block.work     = (*free_blocks_access).back().work;
             free_block.src_proc = (*free_blocks_access).back().src_proc;
             (*free_blocks_access).pop_back();
-
-            // debug
-            // fmt::print(stderr, "grab_heaviest_block(): free_block.gid {} free_block.work {} size after popping back {}\n",
-            //            free_block.gid, free_block.work, (*free_blocks_access).size());
         }
         return retval;
     }
