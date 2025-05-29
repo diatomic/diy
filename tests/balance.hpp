@@ -49,6 +49,20 @@ struct Block
                 gid, bounds.min, bounds.max, work);
     }
 
+    void dynamic_assign_work(const diy::Master::ProxyWithLink&,      // communication proxy (unused)
+                             int iter)                               // current iteration
+    {
+         // TODO: comment out the following 2 lines for actual random work
+         // generation, leave uncommented for reproducible work generation
+         std::srand(gid + iter + 1);
+         std::rand();
+         work = static_cast<diy::Work>(double(std::rand()) / RAND_MAX * WORK_MAX);
+         assigned_work = work;
+
+         // debug
+         // fmt::print(stderr, "dynamic_assign_work: iter {} gid {} work {}\n", iter, gid, work);
+     }
+
     void compute(const diy::Master::ProxyWithLink&,                         // communication proxy (unused)
                  int                                max_time,               // maximum time for a block to compute
                  int)                                                       // curent iteration (unused)
@@ -61,11 +75,25 @@ struct Block
         std::this_thread::sleep_for(std::chrono::microseconds(usec));
     }
 
+    void dynamic_compute(const diy::Master::ProxyWithLink&,                 // communication proxy (unused)
+                 int                                max_time,               // maximum time for a block to compute
+                 int)                                                       // curent iteration (unused)
+    {
+        unsigned int usec = max_time * work * 10000L;
+        work = 0;        // mark this block as done
+
+        // debug
+        // fmt::print(stderr, "iteration {} block gid {} computing for {} s. and is now marked as done, work {}\n", iter, gid, double(usec) / 1e6, work);
+
+        std::this_thread::sleep_for(std::chrono::microseconds(usec));
+    }
+
     // the block data
     int                 gid;
     Bounds              bounds;
     std::vector<double> x;                                              // some block data, e.g.
     diy::Work           work;                                           // some estimate of how much work this block involves
+    diy::Work           assigned_work;                                  // work that was assigned (not updated dynamically)
 };
 
 // callback function returns the work for a block
@@ -174,6 +202,20 @@ void summary_stats(const diy::Master& master)
 
     for (auto i = 0; i < master.size(); i++)
         local_work[i] = static_cast<Block*>(master.block(i))->work;
+
+    gather_work_info(master, local_work, all_work_info);
+    if (master.communicator().rank() == 0)
+        stats_work_info(master, all_work_info);
+}
+
+// gather dynamic summary stats on work information from all processes
+void dynamic_summary_stats(const diy::Master& master)
+{
+    std::vector<WorkInfo>  all_work_info;
+    std::vector<diy::Work>      local_work(master.size());
+
+    for (auto i = 0; i < master.size(); i++)
+        local_work[i] = static_cast<Block*>(master.block(i))->assigned_work;
 
     gather_work_info(master, local_work, all_work_info);
     if (master.communicator().rank() == 0)

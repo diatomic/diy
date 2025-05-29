@@ -273,14 +273,13 @@ namespace diy
             }
         }
 
-        // "auxiliary" master and decomposer for using rexchange for load balancing, 1 block per process
-        diy::Master                     aux_master(master.communicator());
-        diy::ContiguousAssigner         aux_assigner(aux_master.communicator().size(), aux_master.communicator().size());
-        diy::DiscreteBounds aux_domain(1);                               // any fake domain
-        aux_domain.min[0] = 0;
-        aux_domain.max[0] = aux_master.communicator().size() + 1;
-        diy::RegularDecomposer<diy::DiscreteBounds>  aux_decomposer(1, aux_domain, aux_master.communicator().size());
-        aux_decomposer.decompose(aux_master.communicator().rank(), aux_assigner, aux_master);
+        // "auxiliary" master for using iexchange for load balancing, 1 aux_block per process
+        Master aux_master(master.communicator());
+        diy::ContiguousAssigner aux_assigner(aux_master.communicator().size(), aux_master.communicator().size());
+        diy::Link *link = new diy::Link;                             // diy will delete this link, will not leak memory
+        detail::AuxBlock aux_block(&master);
+        int gid = aux_master.communicator().rank();
+        aux_master.add(gid, &aux_block, link);
 
         // exchange info about load balance
         std::vector<diy::detail::WorkInfo>   sample_work_info;           // work info collecting from sampling other mpi processes
