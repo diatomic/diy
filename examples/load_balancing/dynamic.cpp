@@ -16,6 +16,7 @@ int main(int argc, char* argv[])
     double                    wall_time;                                // wall clock execution time for entire code
     float                     sample_frac = 0.5f;                       // fraction of world procs to sample (0.0 - 1.0)
     float                     quantile = 0.8f;                          // quantile cutoff above which to move blocks (0.0 - 1.0)
+    int                       vary_work = 0;                            // whether to vary workload between iterations
     bool                      help;
 
     using namespace opts;
@@ -27,6 +28,7 @@ int main(int argc, char* argv[])
         >> Option('t', "max_time",      max_time,       "maximum time to compute a block (in seconds)")
         >> Option('s', "sample_frac",   sample_frac,    "fraction of world procs to sample (0.0 - 1.0)")
         >> Option('q', "quantile",      quantile,       "quantile cutoff above which to move blocks (0.0 - 1.0)")
+        >> Option('v', "vary_work",     vary_work,      "vary workload per iteration (0 or 1, default 0)")
         ;
 
     if (!ops.parse(argc,argv) || help)
@@ -96,6 +98,11 @@ int main(int argc, char* argv[])
 //     master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
 //          { b->show_block(cp); });
 
+    // collect summary stats before beginning
+    if (world.rank() == 0)
+        fmt::print(stderr, "Summary stats before beginning\n");
+    summary_stats(master);
+
     // copy dynamic assigner from master
     diy::DynamicAssigner    dynamic_assigner(world, world.size(), nblocks);
     diy::record_local_gids(master, dynamic_assigner);
@@ -110,13 +117,16 @@ int main(int argc, char* argv[])
         if (world.rank() == 0)
             fmt::print(stderr, "iteration {}\n", n);
 
-        // assign random work to do
-        master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp) { b->dynamic_assign_work(cp, n); });
+        if (vary_work)
+        {
+            // assign random work to do
+            master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp) { b->dynamic_assign_work(cp, n); });
 
-        // collect summary stats before beginning iteration
-        if (world.rank() == 0)
-            fmt::print(stderr, "Summary stats before beginning iteration {}\n", n);
-        summary_stats(master);
+            // collect summary stats before beginning iteration
+            if (world.rank() == 0)
+                fmt::print(stderr, "Summary stats before beginning iteration {}\n", n);
+            summary_stats(master);
+        }
 
         // some block computation
         master.dynamic_foreach(
@@ -126,10 +136,13 @@ int main(int argc, char* argv[])
                 sample_frac,
                 quantile);
 
-        // collect summary stats after ending iteration
-        if (world.rank() == 0)
-            fmt::print(stderr, "Summary stats after ending iteration {}\n", n);
-        summary_stats(master);
+        if (vary_work)
+        {
+            // collect summary stats after ending iteration
+            if (world.rank() == 0)
+                fmt::print(stderr, "Summary stats after ending iteration {}\n", n);
+            summary_stats(master);
+        }
 
     }
 
@@ -137,4 +150,9 @@ int main(int argc, char* argv[])
     wall_time = MPI_Wtime() - wall_time;
     if (world.rank() == 0)
         fmt::print(stderr, "Total elapsed wall time {:.3} sec.\n", wall_time);
+
+    // load balance summary stats
+    if (world.rank() == 0)
+        fmt::print(stderr, "Summary stats upon completion\n");
+    summary_stats(master);
 }
