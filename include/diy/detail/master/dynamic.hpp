@@ -46,6 +46,9 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
                                diy::detail::AuxBlock*              ab,                 // current block
                                float                               quantile)           // quantile cutoff above which to move blocks (0.0 - 1.0)
 {
+    if (!ab->sample_work_info.size())                              // do nothing in the degenerate case (1 or 2 total mpi ranks)
+        return;
+
     Work proc_work = ab->proc_work;                                                    // total work of my proc
     FreeBlock heaviest_block;                                                          // my heaviest block
 

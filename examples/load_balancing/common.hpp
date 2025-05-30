@@ -59,7 +59,6 @@ struct Block
          std::srand(gid + iter + 1);
          std::rand();
          work = static_cast<diy::Work>(double(std::rand()) / RAND_MAX * WORK_MAX);
-         assigned_work = work;
 
          // debug
          // fmt::print(stderr, "dynamic_assign_work: iter {} gid {} work {}\n", iter, gid, work);
@@ -77,25 +76,11 @@ struct Block
         std::this_thread::sleep_for(std::chrono::microseconds(usec));
     }
 
-    void dynamic_compute(const diy::Master::ProxyWithLink&,                 // communication proxy (unused)
-                 int                                max_time,               // maximum time for a block to compute
-                 int)                                                       // curent iteration (unused)
-    {
-        unsigned int usec = max_time * work * 10000L;
-        work = 0;        // mark this block as done
-
-        // debug
-        // fmt::print(stderr, "iteration {} block gid {} computing for {} s. and is now marked as done, work {}\n", iter, gid, double(usec) / 1e6, work);
-
-        std::this_thread::sleep_for(std::chrono::microseconds(usec));
-    }
-
     // the block data
     int                 gid;
     Bounds              bounds;
     std::vector<double> x;                                              // some block data, e.g.
     diy::Work           work;                                           // some estimate of how much work this block involves
-    diy::Work           assigned_work;                                  // work that was assigned (not updated dynamically)
 };
 
 // callback function returns the work for a block
@@ -150,10 +135,6 @@ void gather_work_info(const diy::Master&        master,
         }
     }
 
-    // debug
-//     fmt::print(stderr, "exchange_work_info(): proc_rank {} top_gid {} top_work {} proc_work {} nlids {}\n",
-//             my_work_info.proc_rank, my_work_info.top_gid, my_work_info.top_work, my_work_info.proc_work, my_work_info.nlids);
-
     // gather work info
     all_work_info.resize(nprocs);
     diy::mpi::detail::gather(master.communicator(), &my_work_info.proc_rank,
@@ -204,20 +185,6 @@ void summary_stats(const diy::Master& master)
 
     for (auto i = 0; i < master.size(); i++)
         local_work[i] = static_cast<Block*>(master.block(i))->work;
-
-    gather_work_info(master, local_work, all_work_info);
-    if (master.communicator().rank() == 0)
-        stats_work_info(master, all_work_info);
-}
-
-// gather dynamic summary stats on work information from all processes
-void dynamic_summary_stats(const diy::Master& master)
-{
-    std::vector<WorkInfo>  all_work_info;
-    std::vector<diy::Work>      local_work(master.size());
-
-    for (auto i = 0; i < master.size(); i++)
-        local_work[i] = static_cast<Block*>(master.block(i))->assigned_work;
 
     gather_work_info(master, local_work, all_work_info);
     if (master.communicator().rank() == 0)

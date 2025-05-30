@@ -57,7 +57,6 @@ struct Block
          std::srand(gid + iter + 1);
          std::rand();
          work = static_cast<diy::Work>(double(std::rand()) / RAND_MAX * WORK_MAX);
-         assigned_work = work;
 
          // debug
          // fmt::print(stderr, "dynamic_assign_work: iter {} gid {} work {}\n", iter, gid, work);
@@ -93,7 +92,6 @@ struct Block
     Bounds              bounds;
     std::vector<double> x;                                              // some block data, e.g.
     diy::Work           work;                                           // some estimate of how much work this block involves
-    diy::Work           assigned_work;                                  // work that was assigned (not updated dynamically)
 };
 
 // callback function returns the work for a block
@@ -202,20 +200,6 @@ void summary_stats(const diy::Master& master)
 
     for (auto i = 0; i < master.size(); i++)
         local_work[i] = static_cast<Block*>(master.block(i))->work;
-
-    gather_work_info(master, local_work, all_work_info);
-    if (master.communicator().rank() == 0)
-        stats_work_info(master, all_work_info);
-}
-
-// gather dynamic summary stats on work information from all processes
-void dynamic_summary_stats(const diy::Master& master)
-{
-    std::vector<WorkInfo>  all_work_info;
-    std::vector<diy::Work>      local_work(master.size());
-
-    for (auto i = 0; i < master.size(); i++)
-        local_work[i] = static_cast<Block*>(master.block(i))->assigned_work;
 
     gather_work_info(master, local_work, all_work_info);
     if (master.communicator().rank() == 0)

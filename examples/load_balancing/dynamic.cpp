@@ -84,17 +84,17 @@ int main(int argc, char* argv[])
 
                              // // TODO: comment out the following 2 lines for actual random work
                              // // generation, leave uncommented for reproducible work generation
-                             // std::srand(gid + 1);
-                             // std::rand();
+                             std::srand(gid + 1);
+                             std::rand();
 
-                             // b->work        = static_cast<diy::Work>(double(std::rand()) / RAND_MAX * WORK_MAX);
+                             b->work        = static_cast<diy::Work>(double(std::rand()) / RAND_MAX * WORK_MAX);
 
                              master.add(gid, b, l);
                          });
 
     // debug: print each block
-    // master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
-    //      { b->show_block(cp); });
+//     master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
+//          { b->show_block(cp); });
 
     // copy dynamic assigner from master
     diy::DynamicAssigner    dynamic_assigner(world, world.size(), nblocks);
@@ -116,11 +116,11 @@ int main(int argc, char* argv[])
         // collect summary stats before beginning iteration
         if (world.rank() == 0)
             fmt::print(stderr, "Summary stats before beginning iteration {}\n", n);
-        dynamic_summary_stats(master);
+        summary_stats(master);
 
         // some block computation
         master.dynamic_foreach(
-                [&](Block* b, const diy::Master::ProxyWithLink& cp) { b->dynamic_compute(cp, max_time, n); },
+                [&](Block* b, const diy::Master::ProxyWithLink& cp) { b->compute(cp, max_time, n); },
                 &get_block_work,
                 dynamic_assigner,
                 sample_frac,
@@ -129,7 +129,7 @@ int main(int argc, char* argv[])
         // collect summary stats after ending iteration
         if (world.rank() == 0)
             fmt::print(stderr, "Summary stats after ending iteration {}\n", n);
-        dynamic_summary_stats(master);
+        summary_stats(master);
 
     }
 

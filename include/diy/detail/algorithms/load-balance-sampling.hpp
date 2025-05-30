@@ -105,6 +105,9 @@ inline void send_block(AuxBlock*,                                       // local
                 const WorkInfo&                     my_work_info,       // my work info
                 float                               quantile)           // quantile cutoff above which to move blocks (0.0 - 1.0)
 {
+    if (!sample_work_info.size())                   // do nothing in the degenerate case (1 or 2 total mpi ranks)
+        return;
+
     MoveInfo move_info = {-1, -1, -1};
 
     // my rank's position in the sampled work info, sorted by proc_work

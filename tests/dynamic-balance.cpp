@@ -119,11 +119,11 @@ int main(int argc, char* argv[])
         // collect summary stats before beginning iteration
         if (world.rank() == 0)
             fmt::print(stderr, "Summary stats before beginning iteration {}\n", n);
-        dynamic_summary_stats(master);
+        summary_stats(master);
 
         // some block computation
         master.dynamic_foreach(
-                [&](Block* b, const diy::Master::ProxyWithLink& cp) { b->dynamic_compute(cp, max_time, n); },
+                [&](Block* b, const diy::Master::ProxyWithLink& cp) { b->compute(cp, max_time, n); },
                 &get_block_work,
                 dynamic_assigner,
                 sample_frac,
@@ -132,7 +132,7 @@ int main(int argc, char* argv[])
         // collect summary stats after ending iteration
         if (world.rank() == 0)
             fmt::print(stderr, "Summary stats after ending iteration {}\n", n);
-        dynamic_summary_stats(master);
+        summary_stats(master);
 
     }
 
