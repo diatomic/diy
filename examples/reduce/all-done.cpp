@@ -10,7 +10,7 @@
 #include <diy/decomposition.hpp>
 #include <diy/assigner.hpp>
 
-#include <diy/thirdparty/fmt/format.h>
+#include <diy/fmt/format.h>
 
 using namespace std;
 

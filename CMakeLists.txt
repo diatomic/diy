@@ -105,6 +105,13 @@ if (mpi AND NOT wrapped_mpi)
     find_package(MPI REQUIRED)
 endif()
 
+# fmt
+find_package(fmt)
+if (fmt_FOUND)
+    list (APPEND diy_definitions "-DDIY_SYSTEM_FMT")
+    list (APPEND diy_libraries fmt::fmt)
+endif()
+
 # configuration variables for diy build and install
 # if diy is a sub-project, the following variables allow the parent project to
 # easily customize the library
