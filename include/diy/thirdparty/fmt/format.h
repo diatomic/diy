@@ -33,6 +33,8 @@
 #ifndef FMT_FORMAT_H_
 #define FMT_FORMAT_H_
 
+#define FMT_HEADER_ONLY     // Added by diy for header-only usage
+
 #ifndef _LIBCPP_REMOVE_TRANSITIVE_INCLUDES
 #  define _LIBCPP_REMOVE_TRANSITIVE_INCLUDES
 #  define FMT_REMOVE_TRANSITIVE_INCLUDES
