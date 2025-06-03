@@ -8,6 +8,7 @@
 
 #include "constants.h"
 #include "thirdparty/itlib/small_vector.hpp"
+#include "fmt/ostream.h"
 
 namespace diy
 {
@@ -154,5 +155,7 @@ struct Serialization<DynamicPoint<C, s_>>
 };
 
 }
+
+template <class C, size_t D> struct fmt::formatter<diy::DynamicPoint<C,D>> : ostream_formatter {};
 
 #endif // DIY_POINT_HPP

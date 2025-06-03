@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <diy/fmt/std.h>
 
 struct diy::Master::ProcessBlock
 {
