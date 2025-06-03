@@ -12,8 +12,8 @@
 # specified when linking againts diy.
 #=============================================================================
 
-project                     (DIY)
 cmake_minimum_required      (VERSION 3.15)
+project                     (DIY)
 
 list (APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
