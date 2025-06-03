@@ -105,6 +105,10 @@ if (mpi AND NOT wrapped_mpi)
     find_package(MPI REQUIRED)
 endif()
 
+if (MSVC)
+    add_compile_options(/utf-8)
+endif()
+
 # fmt
 find_package(fmt)
 if (fmt_FOUND)
