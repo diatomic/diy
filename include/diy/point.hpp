@@ -10,6 +10,8 @@
 
 #include "constants.h"      // for DEPRECATED
 
+#include "fmt/ostream.h"
+
 namespace diy
 {
 
@@ -120,5 +122,9 @@ operator>>(std::istream& in, Point<C,D>& p)
 { return p.operator>>(in); }
 
 }
+
+#if FMT_VERSION >= 100000
+template <class C, unsigned D> struct fmt::formatter<diy::Point<C,D>> : ostream_formatter {};
+#endif
 
 #endif // DIY_POINT_HPP

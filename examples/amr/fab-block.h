@@ -2,8 +2,8 @@
 
 #include <diy/serialization.hpp>
 #include <diy/grid.hpp>
-#include <diy/thirdparty/fmt/format.h>
-#include <diy/thirdparty/fmt/ostream.h>
+#include <diy/fmt/format.h>
+#include <diy/fmt/ostream.h>
 
 template<class T>
 struct FabBlock

@@ -17,7 +17,7 @@ struct diy::Master::ProcessBlock
 
   void    operator()()
   {
-    master.log->debug("Processing with thread: {}",  this_thread::get_id());
+    // master.log->debug("Processing with thread: {}",  this_thread::get_id());
 
     std::vector<int>      local;
     do

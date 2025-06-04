@@ -1,5 +1,5 @@
+cmake_minimum_required(VERSION 3.15)
 project(diy_smoke_test CXX)
-cmake_minimum_required(VERSION 3.9)
 include(CTest)
 
 add_executable(smoke_test block.h opts.h smoke_test.cxx)

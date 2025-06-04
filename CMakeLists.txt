@@ -12,8 +12,8 @@
 # specified when linking againts diy.
 #=============================================================================
 
-project                     (DIY)
 cmake_minimum_required      (VERSION 3.15)
+project                     (DIY)
 
 list (APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
@@ -103,6 +103,17 @@ endif                       (NOT threads)
 # MPI
 if (mpi AND NOT wrapped_mpi)
     find_package(MPI REQUIRED)
+endif()
+
+if (MSVC)
+    add_compile_options(/utf-8)
+endif()
+
+# fmt
+find_package(fmt)
+if (fmt_FOUND)
+    list (APPEND diy_definitions "-DDIY_SYSTEM_FMT")
+    list (APPEND diy_libraries fmt::fmt)
 endif()
 
 # configuration variables for diy build and install
