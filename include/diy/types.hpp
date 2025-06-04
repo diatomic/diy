@@ -174,7 +174,9 @@ namespace diy
     };
 }
 
+#if FMT_VERSION >= 100000
 template <class C> struct fmt::formatter<diy::Bounds<C>> : ostream_formatter {};
 template <> struct fmt::formatter<diy::Direction> : ostream_formatter {};
+#endif
 
 #endif

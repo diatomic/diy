@@ -156,6 +156,8 @@ struct Serialization<DynamicPoint<C, s_>>
 
 }
 
+#if FMT_VERSION >= 100000
 template <class C, size_t D> struct fmt::formatter<diy::DynamicPoint<C,D>> : ostream_formatter {};
+#endif
 
 #endif // DIY_POINT_HPP
