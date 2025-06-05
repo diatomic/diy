@@ -1,10 +1,9 @@
 #pragma once
 
 #include "../algorithms/load-balance.hpp"
-#include "diy/assigner.hpp"
-#include "diy/resolve.hpp"
-#include "diy/thirdparty/fmt/core.h"
-#include "diy/thirdparty/fmt/format-inl.h"
+#include <diy/assigner.hpp>
+#include <diy/resolve.hpp>
+#include <diy/fmt/format.h>
 #include <cstdio>
 #include <iterator>
 
