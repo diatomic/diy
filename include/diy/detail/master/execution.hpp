@@ -165,7 +165,7 @@ diy::Master::
 dynamic_process_block(Master&                             master,
                       int                                 lid)
 {
-    master.log->debug("Processing with thread: {}",  this_thread::get_id());
+    // master.log->debug("Processing with thread: {}",  this_thread::get_id());
 
     outgoing(gid(lid));
     incoming(gid(lid));           // implicitly touches queue records
