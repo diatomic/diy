@@ -747,15 +747,15 @@ dynamic_foreach_(const F&                 f,
     commands_.emplace_back(new Command<Block>(f, skip));
 
     // load balance in the parent thread and execute the block in a child thread
-    // TODO: does not compile, no matching constructor for Master::dynamic_execute
-    // std::thread t1(&Master::dynamic_execute, this, aux_block);
-    // detail::dynamic_balance(this, &aux_master, &dynamic_assigner, sample_frac, quantile);
-    // t1.join();
-
-    // load balance in a child thread and execute the block in the parent thread
-    std::thread t1(detail::dynamic_balance, this, &aux_master, &dynamic_assigner, sample_frac, quantile);
-    dynamic_execute(aux_block);
+    // prefer this option in case MPI_SINGLE is used, all dynamic load balancing communication remains in parent thread
+    std::thread t1(&Master::dynamic_execute, this, std::ref(aux_block));
+    detail::dynamic_balance(this, &aux_master, &dynamic_assigner, sample_frac, quantile);
     t1.join();
+
+    // alternative is to load balance in a child thread and execute the block in the parent thread
+    // std::thread t1(detail::dynamic_balance, this, &aux_master, &dynamic_assigner, sample_frac, quantile);
+    // dynamic_execute(aux_block);
+    // t1.join();
 }
 
 void
