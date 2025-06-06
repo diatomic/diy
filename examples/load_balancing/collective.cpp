@@ -20,6 +20,7 @@ int main(int argc, char* argv[])
     double                    comp_time = 0.0;                          // total computation time (sec.)
     double                    balance_time = 0.0;                       // total load balancing time (sec.)
     double                    t0;                                       // starting time (sec.)
+    float                     noise_factor = 0.0;                       // multiplier for noise in predicted -> actual work
     bool                      help;
 
     using namespace opts;
@@ -29,6 +30,7 @@ int main(int argc, char* argv[])
         >> Option('b', "bpr",           bpr,            "number of diy blocks per mpi rank")
         >> Option('i', "iters",         iters,          "number of iterations")
         >> Option('t', "max_time",      max_time,       "maximum time to compute a block (in seconds)")
+        >> Option('n', "noise_factor",  noise_factor,   "multiplier for noise in predicted -> actual work")
         ;
 
     if (!ops.parse(argc,argv) || help)
@@ -83,17 +85,16 @@ int main(int argc, char* argv[])
                              RGLink*    l   = new RGLink(link);
                              b->gid         = gid;
                              b->bounds      = bounds;
-
-                             // TODO: comment out the following 2 lines for actual random work
-                             // generation, leave uncommented for reproducible work generation
-                             std::srand(gid + 1);
-                             std::rand();
-
-                             b->work        = static_cast<diy::Work>(double(std::rand()) / RAND_MAX * WORK_MAX);
-
                              master.add(gid, b, l);
                          });
 
+
+    // assign work
+    master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp) { b->assign_work(cp, 0, noise_factor); });
+
+    // debug: print each block
+    // master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
+    //      { b->show_block(cp); });
 
     // collect summary stats before beginning
     if (world.rank() == 0)

@@ -32,7 +32,8 @@ struct Block
         diy::save(bb, b->gid);
         diy::save(bb, b->bounds);
         diy::save(bb, b->x);
-        diy::save(bb, b->work);
+        diy::save(bb, b->pred_work);
+        diy::save(bb, b->act_work);
     }
 
     static void load(void* b_, diy::BinaryBuffer& bb)
@@ -42,33 +43,41 @@ struct Block
         diy::load(bb, b->gid);
         diy::load(bb, b->bounds);
         diy::load(bb, b->x);
-        diy::load(bb, b->work);
+        diy::load(bb, b->pred_work);
+        diy::load(bb, b->act_work);
     }
 
     void show_block(const diy::Master::ProxyWithLink&)      // communication proxy (unused)
     {
-        fmt::print(stderr, "Block {} bounds min [{}] max [{}] work {}\n",
-                gid, bounds.min, bounds.max, work);
+        fmt::print(stderr, "Block {} bounds min [{}] max [{}] pred_work {} act_work {}\n",
+                gid, bounds.min, bounds.max, pred_work, act_work);
     }
 
-    void dynamic_assign_work(const diy::Master::ProxyWithLink&,      // communication proxy (unused)
-                             int iter)                               // current iteration
+    void assign_work(const diy::Master::ProxyWithLink&,      // communication proxy (unused)
+                     int iter,                               // current iteration
+                     float noise_factor)                     // scaling factor on noise for predicted work -> actual work
     {
          // TODO: comment out the following 2 lines for actual random work
          // generation, leave uncommented for reproducible work generation
          std::srand(gid + iter + 1);
          std::rand();
-         work = static_cast<diy::Work>(double(std::rand()) / RAND_MAX * WORK_MAX);
+         pred_work = static_cast<diy::Work>(double(std::rand()) / RAND_MAX * WORK_MAX);
+
+         // actual work is a perturbation of the predicted work
+         // act_work = pred_work +- noise_factor * rand[0,  pred_work]
+         int perturb = static_cast<int>(double(std::rand()) / RAND_MAX * 2 * pred_work) - pred_work;
+         act_work = static_cast<diy::Work>(pred_work + noise_factor * perturb);
 
          // debug
-         // fmt::print(stderr, "dynamic_assign_work: iter {} gid {} work {}\n", iter, gid, work);
+         // fmt::print(stderr, "assign_work: iter {} gid {} pred_work {} act_work {} noise_factor * perturb {}\n",
+         //            iter, gid, pred_work, act_work, noise_factor * perturb);
      }
 
     void compute(const diy::Master::ProxyWithLink&,                         // communication proxy (unused)
                  int                                max_time,               // maximum time for a block to compute
                  int)                                                       // curent iteration (unused)
     {
-        unsigned int usec = max_time * work * 10000L;
+        unsigned int usec = max_time * act_work * 10000L;
 
         // debug
 //         fmt::print(stderr, "iteration {} block gid {} computing for {} s.\n", iter, gid, double(usec) / 1e6);
@@ -80,15 +89,16 @@ struct Block
     int                 gid;
     Bounds              bounds;
     std::vector<double> x;                                              // some block data, e.g.
-    diy::Work           work;                                           // some estimate of how much work this block involves
+    diy::Work           pred_work;                                      // some estimate of how much work this block involves
+    diy::Work           act_work;                                       // actual work this block involves
 };
 
-// callback function returns the work for a block
+// callback function returns the predicted work for a block
 diy::Work get_block_work(Block* block,
                          int    gid)
 {
     DIY_UNUSED(gid);
-    return block->work;
+    return block->pred_work;
 }
 
 // print DynamicAssigner
@@ -181,10 +191,10 @@ void stats_work_info(const diy::Master&             master,
 void summary_stats(const diy::Master& master)
 {
     std::vector<WorkInfo>  all_work_info;
-    std::vector<diy::Work>      local_work(master.size());
+    std::vector<diy::Work> local_work(master.size());
 
     for (auto i = 0; i < master.size(); i++)
-        local_work[i] = static_cast<Block*>(master.block(i))->work;
+        local_work[i] = static_cast<Block*>(master.block(i))->pred_work;
 
     gather_work_info(master, local_work, all_work_info);
     if (master.communicator().rank() == 0)
