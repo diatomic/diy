@@ -23,6 +23,7 @@ int main(int argc, char* argv[])
     double                    comp_time = 0.0;                          // total computation time (sec.)
     double                    balance_time = 0.0;                       // total load balancing time (sec.)
     double                    t0;                                       // starting time (sec.)
+    float                     noise_factor = 0.0;                       // multiplier for noise in predicted -> actual work
     bool                      help;
 
     using namespace opts;
@@ -32,6 +33,7 @@ int main(int argc, char* argv[])
         >> Option('b', "bpr",           bpr,            "number of diy blocks per mpi rank")
         >> Option('i', "iters",         iters,          "number of iterations")
         >> Option('t', "max_time",      max_time,       "maximum time to compute a block (in seconds)")
+        >> Option('n', "noise_factor",  noise_factor,   "multiplier for noise in predicted -> actual work")
         ;
 
     if (!ops.parse(argc,argv) || help)
@@ -53,6 +55,9 @@ int main(int argc, char* argv[])
     Bounds domain(3);                                                   // global data size
     domain.min[0] = domain.min[1] = domain.min[2] = 0;
     domain.max[0] = domain.max[1] = domain.max[2] = 255;
+
+    // record of block movements
+    std::vector<diy::detail::MoveInfo> moved_blocks;
 
     // seed random number generator for user code, broadcast seed, offset by rank
     time_t t;
@@ -86,21 +91,17 @@ int main(int argc, char* argv[])
                              RGLink*    l   = new RGLink(link);
                              b->gid         = gid;
                              b->bounds      = bounds;
-
-                             // TODO: comment out the following line for actual random work
-                             // generation, leave uncommented for reproducible work generation
-                             std::srand(gid + 1);
-
-                             b->work        = static_cast<diy::Work>(double(std::rand()) / RAND_MAX * WORK_MAX);
-
                              master.add(gid, b, l);
                          });
+
+    // assign work
+    master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp) { b->assign_work(cp, 0, noise_factor); });
 
 
     // collect summary stats before beginning
     if (world.rank() == 0)
         fmt::print(stderr, "Summary stats before beginning\n");
-    summary_stats(master);
+    summary_stats(master, moved_blocks);
 
     // timing
     world.barrier();                                                    // barrier to synchronize clocks across procs, do not remove
@@ -144,7 +145,7 @@ int main(int argc, char* argv[])
         t0 = MPI_Wtime();
 
         // synchronous collective load balancing
-        diy::load_balance_collective(master, dynamic_assigner, &get_block_work);
+        diy::load_balance_collective(master, dynamic_assigner, &get_block_work, moved_blocks);
 
         // timing
         world.barrier();
@@ -164,5 +165,5 @@ int main(int argc, char* argv[])
     // load balance summary stats
     if (world.rank() == 0)
         fmt::print(stderr, "Summary stats upon completion\n");
-    summary_stats(master);
+    summary_stats(master, moved_blocks);
 }

@@ -37,11 +37,15 @@ struct WorkInfo
 // information about a block that is moving
 struct MoveInfo
 {
-    MoveInfo(): move_gid(NO_GID), src_proc(NO_PROC), dst_proc(NO_PROC)   {}
+    MoveInfo(): move_gid(NO_GID), src_proc(NO_PROC), dst_proc(NO_PROC), pred_work(NO_WORK), act_work(NO_WORK)   {}
     MoveInfo(int move_gid_, int src_proc_, int dst_proc_) : move_gid(move_gid_), src_proc(src_proc_), dst_proc(dst_proc_) {}
+    MoveInfo(int move_gid_, int src_proc_, int dst_proc_, Work pred_work_, Work act_work_) :
+        move_gid(move_gid_), src_proc(src_proc_), dst_proc(dst_proc_), pred_work(pred_work_), act_work(act_work_) {}
     int move_gid;
     int src_proc;
     int dst_proc;
+    Work pred_work;            // optional
+    Work act_work;             // optional
 };
 
 // block in free_blocks vector

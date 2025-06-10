@@ -3,6 +3,8 @@
 #include <vector>
 #include <chrono>
 #include <thread>
+#include <diy/fmt/format.h>
+#include <diy/fmt/ostream.h>
 
 #define WORK_MAX    100                 // maximum work a block can have (in some user-defined units)
 
@@ -124,10 +126,13 @@ void print_links(const diy::Master& master)
         fmt::print(stderr, "\n");
     }
 }
-// gather work information from all processes in order to collect summary stats
-void gather_work_info(const diy::Master&        master,
-                      std::vector<diy::Work>&   local_work,             // work for each local block
-                      std::vector<WorkInfo>&    all_work_info)          // (output) global work info
+
+// gather information from all processes in order to collect summary stats
+void gather_stats(const diy::Master&                  master,
+                  std::vector<diy::Work>&             local_work,          // work for each local block
+                  std::vector<WorkInfo>&              all_work_info,       // (output) global work info
+                  std::vector<diy::detail::MoveInfo>& moved_blocks,        // local blocks that moved
+                  std::vector<diy::detail::MoveInfo>& all_moved_blocks)    // all blocks that moved
 {
     auto nlids  = master.size();                    // my local number of blocks
     auto nprocs = master.communicator().size();     // global number of procs
@@ -149,11 +154,59 @@ void gather_work_info(const diy::Master&        master,
     all_work_info.resize(nprocs);
     diy::mpi::detail::gather(master.communicator(), &my_work_info.proc_rank,
             sizeof(WorkInfo) / sizeof(WorkInfo::proc_rank), MPI_INT, &all_work_info[0].proc_rank, 0);  // assumes all elements of WorkInfo are sizeof(int)
+
+    // empty moved_blocks list still needs to send something to the gather
+    if (moved_blocks.size() == 0)
+    {
+        diy::detail::MoveInfo empty(-1, -1, -1, 0, 0);
+        moved_blocks.push_back(empty);
+    }
+
+    // gather number of move info records
+    int num_move_info = int(moved_blocks.size());
+    int tot_num_move_info = 0;
+    std::vector<int> counts(master.communicator().size());
+    std::vector<int> offsets(master.communicator().size(), 0);
+    diy::mpi::detail::gather(master.communicator(), &num_move_info, 1, MPI_INT, &counts[0], 0);
+    for (auto i = 0; i < counts.size(); i++)
+    {
+        tot_num_move_info += counts[i];
+        counts[i] *= sizeof(diy::detail::MoveInfo) / sizeof(diy::detail::MoveInfo::move_gid);
+        if (i < counts.size() - 1)
+            offsets[i + 1] = offsets[i] + counts[i];
+    }
+
+    // debug
+    // if (master.communicator().rank() == 0)
+    // {
+    //     fmt::print(stderr, "counts: [ ");
+    //     for (auto i = 0; i < counts.size(); i++)
+    //         fmt::print(stderr, "{} ", counts[i]);
+    //     fmt::print(stderr, "]\n");
+    //     fmt::print(stderr, "offsets: [ ");
+    //     for (auto i = 0; i < offsets.size(); i++)
+    //         fmt::print(stderr, "{} ", offsets[i]);
+    //     fmt::print(stderr, "]\n");
+
+    //     fmt::print(stderr, "num_move_info {} tot_num_move_info {}\n", num_move_info, tot_num_move_info);
+    // }
+
+    // gather move info
+    all_moved_blocks.resize(tot_num_move_info);
+    diy::mpi::detail::gather_v(master.communicator(),
+                             &moved_blocks[0].move_gid,
+                             num_move_info * sizeof(diy::detail::MoveInfo) / sizeof(diy::detail::MoveInfo::move_gid),
+                             MPI_INT,
+                             &all_moved_blocks[0].move_gid,
+                             &counts[0],
+                             &offsets[0],
+                             0);  // assumes all elements of MoveInfo are sizeof(int)
 }
 
-// compute summary stats on work information on root process
-void stats_work_info(const diy::Master&             master,
-                     std::vector<WorkInfo>&         all_work_info)
+// compute and print summary stats on root process
+void print_stats(const diy::Master&                     master,
+                 std::vector<WorkInfo>&                 all_work_info,
+                 std::vector<diy::detail::MoveInfo>&    all_moved_blocks)
 {
     diy::Work tot_work = 0;
     diy::Work max_work = 0;
@@ -172,13 +225,34 @@ void stats_work_info(const diy::Master&             master,
             tot_work += all_work_info[i].proc_work;
         }
 
-        avg_work = tot_work / all_work_info.size();
+        avg_work        = float(tot_work) / all_work_info.size();
         rel_imbalance   = float(max_work - min_work) / max_work;
 
         if (master.communicator().rank() == 0)
         {
             fmt::print(stderr, "Max process work {} Min process work {} Avg process work {} Rel process imbalance [(max - min) / max] {:.3}\n",
                     max_work, min_work, avg_work, rel_imbalance);
+
+            // count nonempty moved blocks
+            int num_moved = 0;
+            for (auto i = 0; i < all_moved_blocks.size(); i++)
+            {
+                if (all_moved_blocks[i].move_gid >= 0)
+                    num_moved++;
+            }
+
+            if (num_moved)
+            {
+                fmt::print(stderr, "List of all moved blocks:\n");
+                for (auto i = 0; i < all_moved_blocks.size(); i++)
+                {
+                    if (all_moved_blocks[i].move_gid >= 0)
+                    {
+                        fmt::print(stderr, "gid {} src_proc {} dst_proc {} pred_work {} act_work {}\n",
+                        all_moved_blocks[i].move_gid, all_moved_blocks[i].src_proc, all_moved_blocks[i].dst_proc, all_moved_blocks[i].pred_work, all_moved_blocks[i].act_work);
+                    }
+                }
+            }
 //             fmt::print(stderr, "Detailed list of all procs work:\n");
 //             for (auto i = 0; i < all_work_info.size(); i++)
 //                 fmt::print(stderr, "proc rank {} proc work {} top gid {} top gid work {}\n",
@@ -188,15 +262,17 @@ void stats_work_info(const diy::Master&             master,
 }
 
 // gather summary stats on work information from all processes
-void summary_stats(const diy::Master& master)
+void summary_stats(const diy::Master&                     master,
+                   std::vector<diy::detail::MoveInfo>&    moved_blocks)
 {
     std::vector<WorkInfo>  all_work_info;
     std::vector<diy::Work> local_work(master.size());
+    std::vector<diy::detail::MoveInfo> all_moved_blocks;
 
     for (auto i = 0; i < master.size(); i++)
         local_work[i] = static_cast<Block*>(master.block(i))->pred_work;
 
-    gather_work_info(master, local_work, all_work_info);
+    gather_stats(master, local_work, all_work_info, moved_blocks, all_moved_blocks);
     if (master.communicator().rank() == 0)
-        stats_work_info(master, all_work_info);
+        print_stats(master, all_work_info, all_moved_blocks);
 }

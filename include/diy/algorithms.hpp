@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "detail/algorithms/load-balance.hpp"
 #include "master.hpp"
 #include "assigner.hpp"
 #include "reduce.hpp"
@@ -195,10 +196,10 @@ namespace diy
 
     // load balancing using collective method
     template<class Callback>
-    void load_balance_collective(
-            diy::Master&                master,             // diy master
-            diy::DynamicAssigner&       dynamic_assigner,   // diy dynamic assigner
-            const Callback&             f)                  // callback to get work for a block
+    void load_balance_collective(Master&                          master,             // diy master
+                                 DynamicAssigner&                 dynamic_assigner,   // diy dynamic assigner
+                                 const Callback&                  f,                  // callback to get work for a block
+                                 std::vector<detail::MoveInfo>&   moved_blocks)       // (output) blocks that were moved
     {
         // assert that master.destroyer() exists, will be needed for moving blocks
         if (!master.destroyer())
@@ -211,7 +212,7 @@ namespace diy
         const LBCallback<Block>& f_ = f;
 
         // compile my work info
-        diy::detail::WorkInfo my_work_info = { master.communicator().rank(), -1, 0, 0, static_cast<int>(master.size()) };
+        detail::WorkInfo my_work_info = { master.communicator().rank(), -1, 0, 0, static_cast<int>(master.size()) };
         for (auto i = 0; i < master.size(); i++)
         {
             Block* block = static_cast<Block*>(master.block(i));
@@ -226,28 +227,35 @@ namespace diy
 
         // exchange info about load balance
         std::vector<diy::detail::WorkInfo>   all_work_info; // work info collected from all mpi processes
-        diy::detail::exchange_work_info(master, my_work_info, all_work_info);
+        detail::exchange_work_info(master, my_work_info, all_work_info);
 
         // decide what to move where
         std::vector<diy::detail::MoveInfo>   all_move_info; // move info for all moves
-        diy::detail::decide_move_info(all_work_info, all_move_info);
+        detail::decide_move_info(all_work_info, all_move_info);
 
         // move blocks from src to dst proc
         for (auto i = 0; i < all_move_info.size(); i++)
-            diy::detail::move_block(master, all_move_info[i]);
+        {
+            detail::move_block(master, all_move_info[i]);
+
+            // record the move for later record keeping
+            // keep the moved blocks record with the destination proc, since that's where the block will be
+            if (master.communicator().rank() == all_move_info[i].dst_proc)
+                moved_blocks.push_back(all_move_info[i]);
+        }
 
         // fix links
-        diy::fix_links(master, dynamic_assigner);
+        fix_links(master, dynamic_assigner);
     }
 
     // load balancing using sampling method
     template<class Callback>
-    void load_balance_sampling(
-            diy::Master&                master,
-            diy::DynamicAssigner&       dynamic_assigner,   // diy dynamic assigner
-            const Callback&             f,                  // callback to get work for a block
-            float                       sample_frac = 0.5f, // fraction of procs to sample 0.0 < sample_size <= 1.0
-            float                       quantile    = 0.8f) // quantile cutoff above which to move blocks (0.0 - 1.0)
+    void load_balance_sampling(Master&                         master,
+                               DynamicAssigner&                dynamic_assigner,   // diy dynamic assigner
+                               const Callback&                 f,                  // callback to get work for a block
+                               std::vector<detail::MoveInfo>&  moved_blocks,       // (output) blocks that were moved
+                               float                           sample_frac = 0.5f, // fraction of procs to sample 0.0 < sample_size <= 1.0
+                               float                           quantile    = 0.8f) // quantile cutoff above which to move blocks (0.0 - 1.0)
     {
         // assert that master.destroyer() exists, will be needed for moving blocks
         if (!master.destroyer())
@@ -260,7 +268,7 @@ namespace diy
         const LBCallback<Block>& f_ = f;
 
         // compile my work info
-        diy::detail::WorkInfo my_work_info = { master.communicator().rank(), -1, 0, 0, static_cast<int>(master.size()) };
+        detail::WorkInfo my_work_info = { master.communicator().rank(), -1, 0, 0, static_cast<int>(master.size()) };
         for (auto i = 0; i < master.size(); i++)
         {
             Block* block = static_cast<Block*>(master.block(i));
@@ -275,21 +283,27 @@ namespace diy
 
         // "auxiliary" master for using iexchange for load balancing, 1 aux_block per process
         Master aux_master(master.communicator());
-        diy::ContiguousAssigner aux_assigner(aux_master.communicator().size(), aux_master.communicator().size());
-        diy::Link *link = new diy::Link;                             // diy will delete this link, will not leak memory
+        ContiguousAssigner aux_assigner(aux_master.communicator().size(), aux_master.communicator().size());
+        Link *link = new diy::Link;                             // diy will delete this link, will not leak memory
         detail::AuxBlock aux_block(&master);
         int gid = aux_master.communicator().rank();
         aux_master.add(gid, &aux_block, link);
 
         // exchange info about load balance
         std::vector<diy::detail::WorkInfo>   sample_work_info;           // work info collecting from sampling other mpi processes
-        diy::detail::exchange_sample_work_info(master, aux_master, sample_frac, my_work_info, sample_work_info);
+        detail::exchange_sample_work_info(master, aux_master, sample_frac, my_work_info, sample_work_info);
 
         // move blocks
-        diy::detail::move_sample_blocks(master, aux_master, sample_work_info, my_work_info, quantile);
+        detail::MoveInfo move_info;
+        detail::move_sample_blocks(master, aux_master, sample_work_info, my_work_info, quantile, move_info);
+
+        // record the move for later record keeping
+        // keep the moved blocks record with the destination proc, since that's where the block will be
+        if (master.communicator().rank() == move_info.dst_proc)
+            moved_blocks.push_back(move_info);
 
         // fix links
-        diy::fix_links(master, dynamic_assigner);
+        fix_links(master, dynamic_assigner);
     }
 
 }

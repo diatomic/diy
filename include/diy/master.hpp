@@ -38,8 +38,9 @@ namespace diy
 {
   namespace detail
   {
-    // forward declaration; defined in detail/algorithms/load-balance.hpp
+    // forward declarations; defined in detail/algorithms/load-balance.hpp
     struct AuxBlock;
+    struct MoveInfo;
   }
 
   struct MemoryManagement
@@ -317,6 +318,7 @@ namespace diy
                                      DynamicAssigner& dynamic_assigner,
                                      float sample_frac,
                                      float quantile,
+                                     std::vector<detail::MoveInfo>& moved_blocks,
                                      const Skip& s = NeverSkip());
 
       template<class F, class G>
@@ -325,9 +327,10 @@ namespace diy
                                     DynamicAssigner& dynamic_assigner,
                                     float sample_frac,
                                     float quantile,
+                                    std::vector<detail::MoveInfo>& moved_blocks,
                                     const Skip& s = NeverSkip())
       {
-          dynamic_foreach_<F, G>(f, g, dynamic_assigner, sample_frac, quantile, s);
+          dynamic_foreach_<F, G>(f, g, dynamic_assigner, sample_frac, quantile, moved_blocks, s);
       }
 
       inline void   execute();
@@ -710,12 +713,13 @@ foreach_(const Callback<Block>& f, const Skip& skip)
 template<class F, class G>
 void
 diy::Master::
-dynamic_foreach_(const F&                 f,
-                 const G&                 get_block_work,
-                 DynamicAssigner&         dynamic_assigner,
-                 float                    sample_frac,
-                 float                    quantile,
-                 const Skip&              skip)
+dynamic_foreach_(const F&                         f,
+                 const G&                         get_block_work,
+                 DynamicAssigner&                 dynamic_assigner,
+                 float                            sample_frac,
+                 float                            quantile,
+                 std::vector<detail::MoveInfo>&   moved_blocks,
+                 const Skip&                      skip)
 {
     // assert that destroyer() exists, will be needed for moving blocks
     if (!destroyer())
@@ -749,7 +753,7 @@ dynamic_foreach_(const F&                 f,
     // load balance in the parent thread and execute the block in a child thread
     // prefer this option in case MPI_SINGLE is used, all dynamic load balancing communication remains in parent thread
     std::thread t1(&Master::dynamic_execute, this, std::ref(aux_block));
-    detail::dynamic_balance(this, &aux_master, &dynamic_assigner, sample_frac, quantile);
+    detail::dynamic_balance(this, &aux_master, &dynamic_assigner, sample_frac, quantile, moved_blocks);
     t1.join();
 
     // alternative is to load balance in a child thread and execute the block in the parent thread

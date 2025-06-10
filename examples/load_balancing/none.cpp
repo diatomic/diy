@@ -46,6 +46,9 @@ int main(int argc, char* argv[])
     domain.min[0] = domain.min[1] = domain.min[2] = 0;
     domain.max[0] = domain.max[1] = domain.max[2] = 255;
 
+    // record of block movements (unused)
+    std::vector<diy::detail::MoveInfo> moved_blocks;
+
     // seed random number generator for user code, broadcast seed, offset by rank
     time_t t;
     if (world.rank() == 0)
@@ -85,13 +88,13 @@ int main(int argc, char* argv[])
     master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp) { b->assign_work(cp, 0, noise_factor); });
 
     // debug: print each block
-    master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
-         { b->show_block(cp); });
+    // master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
+    //      { b->show_block(cp); });
 
     // collect summary stats before beginning
     if (world.rank() == 0)
         fmt::print(stderr, "Summary stats before beginning\n");
-    summary_stats(master);
+    summary_stats(master, moved_blocks);
 
     world.barrier();                                                    // barrier to synchronize clocks across procs, do not remove
     wall_time = MPI_Wtime();
@@ -116,5 +119,5 @@ int main(int argc, char* argv[])
     // load balance summary stats
     if (world.rank() == 0)
         fmt::print(stderr, "Summary stats upon completion\n");
-    summary_stats(master);
+    summary_stats(master, moved_blocks);
 }

@@ -42,7 +42,7 @@ inline void dynamic_send_work_info(const diy::Master::ProxyWithLink&      cp,   
 // send block
 inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,                 // communication proxy for aux_master
                                diy::Master&                        master,             // real master with multiple blocks per process
-                               diy::detail::AuxBlock*              ab,                 // current block
+                               AuxBlock*                           ab,                 // current block
                                float                               quantile)           // quantile cutoff above which to move blocks (0.0 - 1.0)
 {
     if (!ab->sample_work_info.size())                              // do nothing in the degenerate case (1 or 2 total mpi ranks)
@@ -73,6 +73,7 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
     int retval;
     if ((retval = ab->grab_heaviest_free_block(heaviest_block)) >= 0     &&                // heaviest block is free to grab
         proc_work - dst_work_info.proc_work > heaviest_block.work        &&                // improves load balance
+        heaviest_block.src_proc != dst_work_info.proc_rank               &&                // doesn't return block immediately to sender
         ab->any_free_blocks())                                                             // doesn't leave me with no blocks
     {
         int move_gid = heaviest_block.gid;
@@ -92,7 +93,7 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
         cp.enqueue(dest_block, move_work);
 
         // debug
-        // fmt::print(stderr, "dynamic_send_block(): gid {} is free, sending to rank {}\n", move_gid, dst_proc);
+        fmt::print(stderr, "src {} -> gid {} -> dst {}\n", master.communicator().rank(), move_gid, dst_proc);
 
         // enqueue the block
         void* send_b = master.block(move_lid);
@@ -115,7 +116,8 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
 // receive requests for work info, work info, and migrated blocks
 inline void dynamic_recv(const diy::Master::ProxyWithLink&  cp,                     // communication proxy
                          diy::Master&                       master,                 // real master with multiple blocks per process
-                         diy::detail::AuxBlock*             ab)                     // current auxiliary block
+                         AuxBlock*                          ab,                     // current auxiliary block
+                         std::vector<MoveInfo>&             moved_blocks)           // record of moved blocks
 {
     std::vector<int> incoming_gids;
     do
@@ -170,6 +172,13 @@ inline void dynamic_recv(const diy::Master::ProxyWithLink&  cp,                 
                     // update free blocks
                     FreeBlock free_block(move_gid, move_work, gid);
                     ab->add_free_block(free_block);
+
+                    // record the move for later record keeping
+                    MoveInfo move_info;
+                    move_info.move_gid = move_gid;
+                    move_info.src_proc = gid;
+                    move_info.dst_proc = master.communicator().rank();
+                    moved_blocks.push_back(move_info);
                 }
             }
         }
@@ -177,11 +186,12 @@ inline void dynamic_recv(const diy::Master::ProxyWithLink&  cp,                 
 }
 
 // callback function for iexchange to execute dynamic load balancing
-bool iexchange_balance(diy::detail::AuxBlock*              ab,                     // auxiliary block
+bool iexchange_balance(AuxBlock*                           ab,                     // auxiliary block
                        const diy::Master::ProxyWithLink&   cp,                     // communication proxy for aux_master
-                       Master&                             master,                 // the real master with multiple blocks per process
+                       diy::Master&                        master,                 // the real master with multiple blocks per process
                        float                               sample_frac,            // fraction of procs to sample 0.0 < sample_size <= 1.0
-                       float                               quantile)               // quantile cutoff above which to move blocks (0.0 - 1.0)
+                       float                               quantile,               // quantile cutoff above which to move blocks (0.0 - 1.0)
+                       std::vector<MoveInfo>&              moved_blocks)           // record of moved blocks
 {
     auto nprocs = master.communicator().size();     // global number of procs
     auto my_proc = master.communicator().rank();    // rank of my proc
@@ -221,29 +231,30 @@ bool iexchange_balance(diy::detail::AuxBlock*              ab,                  
         dynamic_send_block(cp, master, ab, quantile);
 
     // receive requests for work info and blocks
-    dynamic_recv(cp, master, ab);
+    dynamic_recv(cp, master, ab, moved_blocks);
 
     // I think I'm done when I have no more free blocks
     // Receives will come in automatically via iexchange, even after I think I'm done
     return(!ab->any_free_blocks());
 }
 
-void dynamic_balance(Master*                         master,                 // the real master with multiple blocks per process
-                     Master*                         aux_master,             // auxiliary master with 1 block per process for communicating between procs
-                     DynamicAssigner*                dynamic_assigner,       // dynamic assigner
+void dynamic_balance(diy::Master*                    master,                 // the real master with multiple blocks per process
+                     diy::Master*                    aux_master,             // auxiliary master with 1 block per process for communicating between procs
+                     diy::DynamicAssigner*           dynamic_assigner,       // dynamic assigner
                      float                           sample_frac,            // fraction of procs to sample 0.0 < sample_size <= 1.0
-                     float                           quantile)               // quantile cutoff above which to move blocks (0.0 - 1.0)
+                     float                           quantile,               // quantile cutoff above which to move blocks (0.0 - 1.0)
+                     std::vector<MoveInfo>&          moved_blocks)           // record of moved blocks
 {
     // do the actual load balancing using iexchange
-    aux_master->iexchange([&](diy::detail::AuxBlock* b, const diy::Master::ProxyWithLink& cp) -> bool
-      { return iexchange_balance(b, cp, *master, sample_frac, quantile); } );
-    diy::detail::AuxBlock* ab = static_cast<diy::detail::AuxBlock*>(aux_master->block(0));
+    aux_master->iexchange([&](AuxBlock* b, const diy::Master::ProxyWithLink& cp) -> bool
+      { return iexchange_balance(b, cp, *master, sample_frac, quantile, moved_blocks); } );
+    AuxBlock* ab = static_cast<AuxBlock*>(aux_master->block(0));
     ab->iexchange_done = true;
 
     // fix links
     diy::fix_links(*master, *dynamic_assigner);
 }
 
-}
+}    // namespace detail
 
-}
+}    // namespace diy

@@ -53,6 +53,9 @@ int main(int argc, char* argv[])
     domain.min[0] = domain.min[1] = domain.min[2] = 0;
     domain.max[0] = domain.max[1] = domain.max[2] = 255;
 
+    // record of block movements
+    std::vector<diy::detail::MoveInfo> moved_blocks;
+
     // seed random number generator for user code, broadcast seed, offset by rank
     time_t t;
     if (world.rank() == 0)
@@ -98,7 +101,7 @@ int main(int argc, char* argv[])
     // collect summary stats before beginning
     if (world.rank() == 0)
         fmt::print(stderr, "Summary stats before beginning\n");
-    summary_stats(master);
+    summary_stats(master, moved_blocks);
 
     // copy dynamic assigner from master
     diy::DynamicAssigner    dynamic_assigner(world, world.size(), nblocks);
@@ -122,7 +125,7 @@ int main(int argc, char* argv[])
             // collect summary stats before beginning iteration
             if (world.rank() == 0)
                 fmt::print(stderr, "Summary stats before beginning iteration {}\n", n);
-            summary_stats(master);
+            summary_stats(master, moved_blocks);
         }
 
         // some block computation
@@ -131,14 +134,27 @@ int main(int argc, char* argv[])
                 &get_block_work,
                 dynamic_assigner,
                 sample_frac,
-                quantile);
+                quantile,
+                moved_blocks);
+
+        // for record keeping, append the block work to the moved blocks
+        int lid;
+        for (auto i = 0; i < moved_blocks.size(); i++)
+        {
+            if ((lid = master.lid(moved_blocks[i].move_gid) >= 0))
+            {
+                Block* b = static_cast<Block*>(master.block(lid));
+                moved_blocks[i].pred_work = b->pred_work;
+                moved_blocks[i].act_work  = b->act_work;
+            }
+        }
 
         if (vary_work)
         {
             // collect summary stats after ending iteration
             if (world.rank() == 0)
                 fmt::print(stderr, "Summary stats after ending iteration {}\n", n);
-            summary_stats(master);
+            summary_stats(master, moved_blocks);
         }
 
     }
@@ -151,5 +167,5 @@ int main(int argc, char* argv[])
     // load balance summary stats
     if (world.rank() == 0)
         fmt::print(stderr, "Summary stats upon completion\n");
-    summary_stats(master);
+    summary_stats(master, moved_blocks);
 }

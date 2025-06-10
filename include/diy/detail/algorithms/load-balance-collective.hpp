@@ -11,8 +11,8 @@ namespace detail
 
 // exchange work information among all processes using synchronous collective method
 inline void exchange_work_info(diy::Master&            master,
-                        const WorkInfo&         my_work_info,           // my process' work info
-                        std::vector<WorkInfo>&  all_work_info)          // (output) global work info
+                               const WorkInfo&         my_work_info,           // my process' work info
+                               std::vector<WorkInfo>&  all_work_info)          // (output) global work info
 {
     auto nprocs = master.communicator().size();     // global number of procs
     all_work_info.resize(nprocs);
@@ -21,7 +21,7 @@ inline void exchange_work_info(diy::Master&            master,
 
 // determine move info from work info
 inline void decide_move_info(std::vector<WorkInfo>&        all_work_info,          // global work info
-                      std::vector<MoveInfo>&        all_move_info)          // (output) move info for all moves
+                             std::vector<MoveInfo>&        all_move_info)          // (output) move info for all moves
 {
     all_move_info.clear();
 
@@ -74,7 +74,7 @@ inline void decide_move_info(std::vector<WorkInfo>&        all_work_info,       
 
 // move one block from src to dst proc
 inline void move_block(diy::Master&            master,
-                const MoveInfo&         move_info)
+                       const MoveInfo&         move_info)
 {
     // sanity check that source and destination are different
     if (move_info.src_proc == move_info.dst_proc)
@@ -100,6 +100,9 @@ inline void move_block(diy::Master&            master,
         // remove the block from the master
         int move_lid = master.lid(move_info.move_gid);
         master.destroyer()(master.release(move_lid));
+
+        // debug
+        fmt::print(stderr, "move_block(): moving gid {} from proc {} to proc {}\n", move_info.move_gid, move_info.src_proc, move_info.dst_proc);
     }
     else if (master.communicator().rank() == move_info.dst_proc)
     {

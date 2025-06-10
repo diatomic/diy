@@ -19,6 +19,8 @@ int main(int argc, char* argv[])
     double                    wall_time;                                // wall clock execution time for entire code
     float                     sample_frac = 0.5f;                       // fraction of world procs to sample (0.0 - 1.0)
     float                     quantile = 0.8f;                          // quantile cutoff above which to move blocks (0.0 - 1.0)
+    int                       vary_work = 0;                            // whether to vary workload between iterations
+    float                     noise_factor = 0.0;                       // multiplier for noise in predicted -> actual work
     bool                      help;
 
     using namespace opts;
@@ -30,6 +32,8 @@ int main(int argc, char* argv[])
         >> Option('t', "max_time",      max_time,       "maximum time to compute a block (in seconds)")
         >> Option('s', "sample_frac",   sample_frac,    "fraction of world procs to sample (0.0 - 1.0)")
         >> Option('q', "quantile",      quantile,       "quantile cutoff above which to move blocks (0.0 - 1.0)")
+        >> Option('v', "vary_work",     vary_work,      "vary workload per iteration (0 or 1, default 0)")
+        >> Option('n', "noise_factor",  noise_factor,   "multiplier for noise in predicted -> actual work")
         ;
 
     if (!ops.parse(argc,argv) || help)
@@ -51,6 +55,9 @@ int main(int argc, char* argv[])
     Bounds domain(3);                                                   // global data size
     domain.min[0] = domain.min[1] = domain.min[2] = 0;
     domain.max[0] = domain.max[1] = domain.max[2] = 255;
+
+    // record of block movements
+    std::vector<diy::detail::MoveInfo> moved_blocks;
 
     // seed random number generator for user code, broadcast seed, offset by rank
     time_t t;
@@ -84,16 +91,11 @@ int main(int argc, char* argv[])
                              RGLink*    l   = new RGLink(link);
                              b->gid         = gid;
                              b->bounds      = bounds;
-
-                             // // TODO: comment out the following 2 lines for actual random work
-                             // // generation, leave uncommented for reproducible work generation
-                             // std::srand(gid + 1);
-                             // std::rand();
-
-                             // b->work        = static_cast<diy::Work>(double(std::rand()) / RAND_MAX * WORK_MAX);
-
                              master.add(gid, b, l);
                          });
+
+    // assign work
+    master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp) { b->assign_work(cp, 0, noise_factor); });
 
     // debug: print each block
     // master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
@@ -113,13 +115,16 @@ int main(int argc, char* argv[])
         if (world.rank() == 0)
             fmt::print(stderr, "iteration {}\n", n);
 
-        // assign random work to do
-        master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp) { b->dynamic_assign_work(cp, n); });
+        if (vary_work)
+        {
+            // assign random work to do
+            master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp) { b->assign_work(cp, n, noise_factor); });
 
-        // collect summary stats before beginning iteration
-        if (world.rank() == 0)
-            fmt::print(stderr, "Summary stats before beginning iteration {}\n", n);
-        summary_stats(master);
+            // collect summary stats before beginning iteration
+            if (world.rank() == 0)
+                fmt::print(stderr, "Summary stats before beginning iteration {}\n", n);
+            summary_stats(master, moved_blocks);
+        }
 
         // some block computation
         master.dynamic_foreach(
@@ -127,13 +132,16 @@ int main(int argc, char* argv[])
                 &get_block_work,
                 dynamic_assigner,
                 sample_frac,
-                quantile);
+                quantile,
+                moved_blocks);
 
-        // collect summary stats after ending iteration
-        if (world.rank() == 0)
-            fmt::print(stderr, "Summary stats after ending iteration {}\n", n);
-        summary_stats(master);
-
+        if (vary_work)
+        {
+            // collect summary stats after ending iteration
+            if (world.rank() == 0)
+                fmt::print(stderr, "Summary stats after ending iteration {}\n", n);
+            summary_stats(master, moved_blocks);
+        }
     }
 
     world.barrier();                                    // barrier to synchronize clocks over procs, do not remove

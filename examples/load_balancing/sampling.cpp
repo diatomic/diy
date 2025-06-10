@@ -58,6 +58,9 @@ int main(int argc, char* argv[])
     domain.min[0] = domain.min[1] = domain.min[2] = 0;
     domain.max[0] = domain.max[1] = domain.max[2] = 255;
 
+    // record of block movements
+    std::vector<diy::detail::MoveInfo> moved_blocks;
+
     // seed random number generator for user code, broadcast seed, offset by rank
     time_t t;
     if (world.rank() == 0)
@@ -103,7 +106,7 @@ int main(int argc, char* argv[])
     // collect summary stats before beginning
     if (world.rank() == 0)
         fmt::print(stderr, "Summary stats before beginning\n");
-    summary_stats(master);
+    summary_stats(master, moved_blocks);
 
     // timing
     world.barrier();                                                    // barrier to synchronize clocks across procs, do not remove
@@ -147,16 +150,24 @@ int main(int argc, char* argv[])
         t0 = MPI_Wtime();
 
         // sampling load balancing method
-        diy::load_balance_sampling(master, dynamic_assigner, &get_block_work, sample_frac, quantile);
+        diy::load_balance_sampling(master, dynamic_assigner, &get_block_work, moved_blocks, sample_frac, quantile);
 
         // timing
         world.barrier();
         balance_time += (MPI_Wtime() - t0);
-    }
 
-    // debug: print the master
-//     for (auto i = 0; i < master.size(); i++)
-//         fmt::print(stderr, "lid {} gid {}\n", i, master.gid(i));
+        // for record keeping, append the block work to the moved blocks
+        int lid;
+        for (auto i = 0; i < moved_blocks.size(); i++)
+        {
+            if ((lid = master.lid(moved_blocks[i].move_gid) >= 0))
+            {
+                Block* b = static_cast<Block*>(master.block(lid));
+                moved_blocks[i].pred_work = b->pred_work;
+                moved_blocks[i].act_work  = b->act_work;
+            }
+        }
+    }
 
     world.barrier();                                    // barrier to synchronize clocks over procs, do not remove
     wall_time = MPI_Wtime() - wall_time;
@@ -168,5 +179,5 @@ int main(int argc, char* argv[])
     // load balance summary stats
     if (world.rank() == 0)
         fmt::print(stderr, "Summary stats upon completion\n");
-    summary_stats(master);
+    summary_stats(master, moved_blocks);
 }
