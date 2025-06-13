@@ -55,15 +55,22 @@ struct Block
                 gid, bounds.min, bounds.max, pred_work, act_work);
     }
 
-    void assign_work(const diy::Master::ProxyWithLink&,      // communication proxy (unused)
-                     int iter,                               // current iteration
-                     float noise_factor)                     // scaling factor on noise for predicted work -> actual work
+    // assign work drawn from some type of distribution
+    template<class Distribution, class Generator>
+    void assign_work(const diy::Master::ProxyWithLink&,                       // communication proxy (unused)
+                     int                                       iter,          // current iteration
+                     float                                     noise_factor,  // scaling factor on noise for predicted work -> actual work
+                     Distribution&                             distribution,  // distribution
+                     Generator&                                generator)     // random number generator
     {
+         pred_work = static_cast<diy::Work>(distribution(generator) * WORK_MAX);
+         if (pred_work > WORK_MAX)
+             pred_work = WORK_MAX;
+
          // TODO: comment out the following 2 lines for actual random work
          // generation, leave uncommented for reproducible work generation
          std::srand(gid + iter + 1);
          std::rand();
-         pred_work = static_cast<diy::Work>(double(std::rand()) / RAND_MAX * WORK_MAX);
 
          // actual work is a perturbation of the predicted work
          // act_work = pred_work +- noise_factor * rand[0,  pred_work]

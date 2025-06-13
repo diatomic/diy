@@ -93,7 +93,7 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
         cp.enqueue(dest_block, move_work);
 
         // debug
-        fmt::print(stderr, "src {} -> gid {} -> dst {}\n", master.communicator().rank(), move_gid, dst_proc);
+        // fmt::print(stderr, "src {} -> gid {} -> dst {}\n", master.communicator().rank(), move_gid, dst_proc);
 
         // enqueue the block
         void* send_b = master.block(move_lid);

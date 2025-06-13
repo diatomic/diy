@@ -18,6 +18,8 @@ int main(int argc, char* argv[])
     float                     quantile = 0.8f;                          // quantile cutoff above which to move blocks (0.0 - 1.0)
     int                       vary_work = 0;                            // whether to vary workload between iterations
     float                     noise_factor = 0.0;                       // multiplier for noise in predicted -> actual work
+    int                       distribution = 0;                         // type of distribution for assigning work (0: uniform (default), 1: normal, 2: exponential)
+    unsigned int              seed = 0;                                 // seed for random number generator (0: ignore)
     bool                      help;
 
     using namespace opts;
@@ -31,6 +33,8 @@ int main(int argc, char* argv[])
         >> Option('q', "quantile",      quantile,       "quantile cutoff above which to move blocks (0.0 - 1.0)")
         >> Option('v', "vary_work",     vary_work,      "vary workload per iteration (0 or 1, default 0)")
         >> Option('n', "noise_factor",  noise_factor,   "multiplier for noise in predicted -> actual work")
+        >> Option('d', "distribution",  distribution,   "distribution for assigning work (0 uniform (default), 1 normal, 2 exponential)")
+        >> Option('s', "seed",          seed,           "seed for random number generator (default: 0 = ignore")
         ;
 
     if (!ops.parse(argc,argv) || help)
@@ -55,13 +59,6 @@ int main(int argc, char* argv[])
 
     // record of block movements
     std::vector<diy::detail::MoveInfo> moved_blocks;
-
-    // seed random number generator for user code, broadcast seed, offset by rank
-    time_t t;
-    if (world.rank() == 0)
-        t = time(0);
-    diy::mpi::broadcast(world, t, 0);
-    srand((unsigned)t + world.rank());
 
     // create master for managing blocks in this process
     diy::Master master(world,
@@ -91,8 +88,29 @@ int main(int argc, char* argv[])
                              master.add(gid, b, l);
                          });
 
+    // seed random number generator, broadcast seed, offset by rank
+    std::random_device rd;                      // seed source for the random number engine
+    unsigned int s;
+    if (seed)
+        s = seed;
+    else
+        s = rd();
+    diy::mpi::broadcast(master.communicator(), s, 0);
+    std::mt19937 mt_gen(s + master.communicator().rank());          // mersenne_twister random number generator
+
     // assign work
-    master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp) { b->assign_work(cp, 0, noise_factor); });
+    std::uniform_real_distribution<double> uni_distr(0.0, 1.0);
+    std::normal_distribution<double> norm_distr(0.5 , 0.5);
+    std::exponential_distribution<double> exp_distr(3.0);
+    if (distribution == 0)
+        master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
+                       { b->assign_work<std::uniform_real_distribution<double>, std::mt19937>(cp, 0, noise_factor, uni_distr, mt_gen); });
+    else if (distribution == 1)
+        master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
+                       { b->assign_work<std::normal_distribution<double>, std::mt19937>(cp, 0, noise_factor, norm_distr, mt_gen); });
+    else if (distribution == 2)
+        master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
+                       { b->assign_work<std::exponential_distribution<double>, std::mt19937>(cp, 0, noise_factor, exp_distr, mt_gen); });
 
     // debug: print each block
     // master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
@@ -120,7 +138,15 @@ int main(int argc, char* argv[])
         if (vary_work)
         {
             // assign random work to do
-            master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp) { b->assign_work(cp, n, noise_factor); });
+            if (distribution == 0)
+                master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
+                               { b->assign_work<std::uniform_real_distribution<double>, std::mt19937>(cp, 0, noise_factor, uni_distr, mt_gen); });
+            else if (distribution == 1)
+                master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
+                               { b->assign_work<std::normal_distribution<double>, std::mt19937>(cp, 0, noise_factor, norm_distr, mt_gen); });
+            else if (distribution == 2)
+                master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
+                               { b->assign_work<std::exponential_distribution<double>, std::mt19937>(cp, 0, noise_factor, exp_distr, mt_gen); });
 
             // collect summary stats before beginning iteration
             if (world.rank() == 0)
@@ -156,7 +182,6 @@ int main(int argc, char* argv[])
                 fmt::print(stderr, "Summary stats after ending iteration {}\n", n);
             summary_stats(master, moved_blocks);
         }
-
     }
 
     world.barrier();                                    // barrier to synchronize clocks over procs, do not remove

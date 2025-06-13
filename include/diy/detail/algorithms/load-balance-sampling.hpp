@@ -163,7 +163,7 @@ inline void send_block(AuxBlock*,                                              /
             master.destroyer()(master.release(move_lid));
 
             // debug
-            fmt::print(stderr, "move_block(): moving gid {} from proc {} to proc {}\n", move_info.move_gid, move_info.src_proc, move_info.dst_proc);
+            // fmt::print(stderr, "move_block(): moving gid {} from proc {} to proc {}\n", move_info.move_gid, move_info.src_proc, move_info.dst_proc);
         }
     }
 }
