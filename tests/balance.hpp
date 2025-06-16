@@ -180,7 +180,10 @@ void gather_stats(const diy::Master&                  master,
     }
 
     // gather move info
-    all_moved_blocks.resize(tot_num_move_info);
+    if (master.communicator().rank() == 0)
+        all_moved_blocks.resize(tot_num_move_info);
+    else
+        all_moved_blocks.resize(nprocs);     // not used except at root, but quiets undefined sanitizer runtime error
     diy::mpi::detail::gather_v(master.communicator(),
                              &moved_blocks[0].move_gid,
                              num_move_info * sizeof(diy::detail::MoveInfo) / sizeof(diy::detail::MoveInfo::move_gid),
