@@ -57,6 +57,7 @@ int main()
 
     int nblocks = 0;
     std::vector<int> gid_offsets = { 0 };
+    // refinement w.r.t. the coarsest level (level 0)
     std::vector<int> refinements = { 1 };
     for (int lev = 0; lev <= finest_level; lev++)
     {
@@ -69,7 +70,9 @@ int main()
         if (refinement[0] != refinement[1] || refinement[0] != refinement[2])
             throw std::runtime_error("Unexpected uneven refinement");
 
-        refinements.push_back(refinements.back() * refinement[0]);
+        if (lev > 0) {
+            refinements.push_back(refinements.back() * refinement[0]);
+        }
     }
 
     for (int lev = 0; lev <= finest_level; lev++)
