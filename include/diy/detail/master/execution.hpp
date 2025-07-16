@@ -162,8 +162,7 @@ execute()
 
 void
 diy::Master::
-dynamic_process_block(Master&                             master,
-                      int                                 lid)
+dynamic_process_block(int lid)
 {
     // master.log->debug("Processing with thread: {}",  this_thread::get_id());
 
@@ -171,9 +170,9 @@ dynamic_process_block(Master&                             master,
     incoming(gid(lid));           // implicitly touches queue records
     collectives(gid(lid));
 
-    for (auto& cmd : master.commands_)
+    for (auto& cmd : this->commands_)
     {
-        cmd->execute(master.block(lid), master.proxy(lid));
+        cmd->execute(this->block(lid), this->proxy(lid));
 
         // clear incoming queues TODO: needed?
         incoming_[exchange_round_].map.clear();
@@ -202,7 +201,7 @@ dynamic_execute(detail::AuxBlock& aux_block)
             // debug
             // fmt::print(stderr, "dynamic_execute(): gid {} is free, locking and executing the block\n", gid);
 
-            dynamic_process_block(*this, lid(gid));
+            dynamic_process_block(lid(gid));
         }
     }
 

@@ -128,4 +128,3 @@ process_collectives()
     ++iters[0];
   }
 }
-

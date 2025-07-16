@@ -335,7 +335,7 @@ namespace diy
 
       inline void   execute();
       inline void   dynamic_execute(detail::AuxBlock& aux_block);
-      inline void   dynamic_process_block(Master& master, int lid);
+      inline void   dynamic_process_block(int lid);
 
       bool          immediate() const                   { return immediate_; }
       void          set_immediate(bool i)               { if (i && !immediate_) execute(); immediate_ = i; }

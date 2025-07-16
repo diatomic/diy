@@ -58,5 +58,3 @@ struct RegularBroadcastPartners: public RegularMergePartners
 } // diy
 
 #endif
-
-

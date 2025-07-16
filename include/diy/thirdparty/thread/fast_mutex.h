@@ -245,4 +245,3 @@ class fast_mutex {
 }
 
 #endif // _FAST_MUTEX_H_
-

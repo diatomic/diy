@@ -76,10 +76,11 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
         heaviest_block.src_proc != dst_work_info.proc_rank               &&                // doesn't return block immediately to sender
         ab->any_free_blocks())                                                             // doesn't leave me with no blocks
     {
-        int move_gid = heaviest_block.gid;
-        int move_lid = master.lid(move_gid);
-        int dst_proc = dst_work_info.proc_rank;
-        int move_work = heaviest_block.work;
+        int move_gid    = heaviest_block.gid;
+        int move_lid    = master.lid(move_gid);
+        int dst_proc    = dst_work_info.proc_rank;
+        int move_work   = heaviest_block.work;
+        int origin_proc = heaviest_block.origin_proc;
 
         diy::BlockID dest_block = {dst_proc, dst_proc};
 
@@ -91,6 +92,24 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
 
         // enqueue the work of the moving block
         cp.enqueue(dest_block, move_work);
+
+        // enqueue the origin_proc of the moving block
+        cp.enqueue(dest_block, origin_proc);
+
+        // enqueue the incoming queues
+        // derived from Master::unload_incoming(), but only current exchange round TODO: is this correct?
+        Master::IncomingQueues &in_qs = master.incoming(move_gid);
+        for (auto &x : in_qs)
+        {
+            int from = x.first;
+            for (Master::QueueRecord &qr : *x.second.access())
+            {
+                // debug
+                fmt::print(stderr, "Enqueuing incoming queue: {} <- {}", move_gid, from);
+
+                cp.enqueue(dest_block, qr.buffer());
+            }
+        }
 
         // debug
         // fmt::print(stderr, "src {} -> gid {} -> dst {}\n", master.communicator().rank(), move_gid, dst_proc);
@@ -155,9 +174,33 @@ inline void dynamic_recv(const diy::Master::ProxyWithLink&  cp,                 
                     Work move_work;
                     cp.dequeue(gid, move_work);
 
+                    // dequeue the origin proc of the moving block
+                    int origin_proc;
+                    cp.dequeue(gid, origin_proc);
+
+                    // dequeue the incoming queues
+                    // derived from Master::load_incoming(), but only current exchange round TODO: is this correct?
+                    diy::MemoryBuffer bb;
+                    Master::IncomingQueues &in_qs = master.incoming(move_gid);
+                    for (auto &x : in_qs)
+                    {
+                        int from = x.first;
+                        auto access = x.second.access();
+                        if (!access->empty())
+                        {
+                            // NB: we only load the front queue, TODO: is this correct?
+                            auto& qr = access->front();
+
+                            // debug
+                            fmt::print(stderr, "Loading queue: {} <- {}\n", move_gid, from);
+
+                            cp.dequeue(gid, bb.buffer);
+                            qr.buffer() = std::move(bb);
+                        }
+                    }
+
                     // dequeue the block
                     void* recv_b = master.creator()();
-                    diy::MemoryBuffer bb;
                     cp.dequeue(gid, bb.buffer);
                     master.loader()(recv_b, bb);
 
@@ -170,7 +213,7 @@ inline void dynamic_recv(const diy::Master::ProxyWithLink&  cp,                 
                     master.add(move_gid, recv_b, recv_link);
 
                     // update free blocks
-                    FreeBlock free_block(move_gid, move_work, gid);
+                    FreeBlock free_block(move_gid, move_work, gid, origin_proc);
                     ab->add_free_block(free_block);
 
                     // record the move for later record keeping

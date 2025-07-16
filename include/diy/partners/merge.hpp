@@ -57,4 +57,3 @@ active(int round, int gid, const Master&) const
 }
 
 #endif
-

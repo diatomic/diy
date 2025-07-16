@@ -4,15 +4,15 @@
 #include <cstdlib>
 #include <stdatomic.h>
 
-// uninitialized values
-#define NO_GID      -1
-#define NO_WORK     0
-#define NO_PROC     -1
-#define NO_IDX      -1
-#define NO_REQS     0
-
 namespace diy
 {
+
+// uninitialized values
+static const int NO_GID    = -1;
+static const int NO_WORK   = 0;
+static const int NO_PROC   = -1;
+static const int NO_IDX    = -1;
+static const int NO_REQS   = 0;
 
 namespace detail
 {
@@ -54,10 +54,11 @@ struct FreeBlock
     int      gid;                // gid of the block
     Work     work;               // amount of work that computing the block takes
     int      src_proc;           // sender of the block, if it migrated from elsewhere
+    int      origin_proc;        // original owner of the block
 
-    FreeBlock(): gid(NO_GID), work(NO_WORK), src_proc(NO_PROC) {}
-    FreeBlock(int gid_, Work work_, int src_proc_):
-    gid(gid_), work(work_), src_proc(src_proc_) {}
+    FreeBlock(): gid(NO_GID), work(NO_WORK), src_proc(NO_PROC), origin_proc(NO_PROC) {}
+    FreeBlock(int gid_, Work work_, int src_proc_, int origin_proc_):
+    gid(gid_), work(work_), src_proc(src_proc_), origin_proc(origin_proc_) {}
 };
 
 // auxiliary empty block structure
@@ -78,10 +79,12 @@ struct AuxBlock
         Work tot_work = 0;
         for (auto i = 0; i < master->size(); i++)
         {
-            (*free_blocks_access)[i].gid = master->gid(i);
+            (*free_blocks_access)[i].gid          = master->gid(i);
+            (*free_blocks_access)[i].src_proc     = master->communicator().rank();
+            (*free_blocks_access)[i].origin_proc  = master->communicator().rank();
             Block* b = static_cast<Block*>(master->block(i));
             Work w = get_block_work(b, master->gid(i));
-            (*free_blocks_access)[i].work = w;
+            (*free_blocks_access)[i].work         = w;
             tot_work += w;
         }
         proc_work = tot_work;
