@@ -215,6 +215,7 @@ namespace diy
       inline int    add(int gid, void* b, Link* l);     //!< add a block
       inline int    add(int gid, void* b, const Link& l){ return add(gid, b, l.clone()); }
       inline void*  release(int i);                     //!< release ownership of the block
+      inline void*  dynamic_release(int gid);           // dynamic thread-safe version TODO: eventually replace release with this one
 
       //!< return the `i`-th block
       inline void*  block(int i) const                  { return blocks_.find(i); }
@@ -424,7 +425,7 @@ namespace diy
       Commands              commands_;
 
     private:
-      fast_mutex            add_mutex_;
+      fast_mutex            block_mutex_;
 
     public:
       std::shared_ptr<spd::logger>  log = get_logger();
@@ -647,7 +648,7 @@ add(int gid__, void* b, Link* l)
   if (*blocks_.in_memory().const_access() == limit_)
     unload_all();
 
-  lock_guard<fast_mutex>    lock(add_mutex_);       // allow to add blocks from multiple threads
+  lock_guard<fast_mutex>    lock(block_mutex_);       // allow to add blocks from multiple threads
 
   blocks_.add(b);
   links_.push_back(l);
@@ -676,6 +677,34 @@ release(int i)
   std::swap(gids_[i], gids_.back());
   gids_.pop_back();
   lids_[gid(i)] = i;
+
+  return b;
+}
+
+// new dynamic thread-safe version of release
+// TODO: eventually replace release, for now renamed to dynamic_release
+void*
+diy::Master::
+dynamic_release(int gid)
+{
+
+  int lid = this->lid(gid);
+
+  lock_guard<fast_mutex>    lock(block_mutex_);       // allow to release blocks from multiple threads
+
+  void* b = blocks_.release(lid);
+
+  expected_ -= links_[lid]->size_unique();
+  delete link(lid);
+  links_[lid] = 0;
+  std::swap(links_[lid], links_.back());
+  links_.pop_back();
+
+  lids_.erase(gid);
+
+  std::swap(gids_[lid], gids_.back());
+  gids_.pop_back();
+  lids_[this->gid(lid)] = lid;    // NB this->gid(lid) != gid because of the swap
 
   return b;
 }

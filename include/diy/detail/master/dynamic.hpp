@@ -114,19 +114,18 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
         // debug
         // fmt::print(stderr, "src {} -> gid {} -> dst {}\n", master.communicator().rank(), move_gid, dst_proc);
 
-        // enqueue the block
-        void* send_b = master.block(move_lid);
-        diy::MemoryBuffer bb;
-        master.saver()(send_b, bb);
-        cp.enqueue(dest_block, bb.buffer);
+        diy::MemoryBuffer block_bb, link_bb;
 
-        // enqueue the link for the block
+        // serialize the block and the link and remove the block from the master
         diy::Link* send_link = master.link(move_lid);
-        diy::LinkFactory::save(bb, send_link);
-        cp.enqueue(dest_block, bb.buffer);
+        diy::LinkFactory::save(link_bb, send_link);
+        void* send_block = master.dynamic_release(move_gid);
+        master.saver()(send_block, block_bb);
+        master.destroyer()(send_block);
 
-        // remove the block from the master
-        master.destroyer()(master.release(move_lid));
+        // enqueue the block and the link
+        cp.enqueue(dest_block, block_bb.buffer);
+        cp.enqueue(dest_block, link_bb.buffer);
     }
     else if (retval >= 0)        // replace the block if there was one but it wasn't used
         ab->add_free_block(heaviest_block);
@@ -200,14 +199,16 @@ inline void dynamic_recv(const diy::Master::ProxyWithLink&  cp,                 
                     }
 
                     // dequeue the block
+                    diy::MemoryBuffer block_bb;
                     void* recv_b = master.creator()();
-                    cp.dequeue(gid, bb.buffer);
-                    master.loader()(recv_b, bb);
+                    cp.dequeue(gid, block_bb.buffer);
+                    master.loader()(recv_b, block_bb);
 
                     // dequeue the link
+                    diy::MemoryBuffer link_bb;
                     diy::Link* recv_link;
-                    cp.dequeue(gid, bb.buffer);
-                    recv_link = diy::LinkFactory::load(bb);
+                    cp.dequeue(gid, link_bb.buffer);
+                    recv_link = diy::LinkFactory::load(link_bb);
 
                     // add block to the master
                     master.add(move_gid, recv_b, recv_link);
