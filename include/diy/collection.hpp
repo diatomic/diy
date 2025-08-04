@@ -23,6 +23,8 @@ namespace diy
       using Load    = detail::Load;
 
     public:
+                    Collection():
+                       in_memory_(0)                {}
                     Collection(Create               create__,
                                Destroy              destroy__,
                                ExternalStorage*     storage__,
@@ -34,6 +36,12 @@ namespace diy
                         save_(save__),
                         load_(load__),
                         in_memory_(0)               {}
+
+      void          set_create(Create create__)             { create_  = create__; }
+      void          set_destroy(Destroy destroy__)          { destroy_ = destroy__; }
+      void          set_storage(ExternalStorage* storage__) { storage_ = storage__; }
+      void          set_save(Save save__)                   { save_    = save__; }
+      void          set_load(Load load__)                   { load_    = load__; }
 
       size_t        size() const                    { return elements_.size(); }
       const CInt&   in_memory() const               { return in_memory_; }

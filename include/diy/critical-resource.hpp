@@ -1,6 +1,8 @@
 #ifndef DIY_CRITICAL_RESOURCE_HPP
 #define DIY_CRITICAL_RESOURCE_HPP
 
+#include "thread.hpp"
+
 namespace diy
 {
   template<class T, class Mutex>
