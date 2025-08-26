@@ -19,13 +19,7 @@ typedef     diy::ContinuousBounds       Bounds;
 static const unsigned DIM = 2;
 
 template<unsigned D>
-struct SimplePoint
-{
-    float   coords[D];
-
-    float&  operator[](unsigned i)                          { return coords[i]; }
-    float   operator[](unsigned i) const                    { return coords[i]; }
-};
+using SimplePoint = diy::Point<float,D>;
 
 struct Block
 {
@@ -94,28 +88,27 @@ void print_block(Block* b, const diy::Master::ProxyWithLink& cp, bool verbose)
 {
   RCLink*  link      = static_cast<RCLink*>(cp.link());
 
-  fmt::print("{}: [{},{},{}] - [{},{},{}] ({} neighbors): {} points\n",
+  fmt::print("{}\n", cp.gid());
+
+  fmt::print("{}: [{}] - [{}] ({} neighbors): {} points\n",
                   cp.gid(),
-                  link->bounds().min[0], link->bounds().min[1], link->bounds().min[2],
-                  link->bounds().max[0], link->bounds().max[1], link->bounds().max[2],
+                  link->bounds().min,
+                  link->bounds().max,
                   link->size(), b->points.size());
 
   for (int i = 0; i < link->size(); ++i)
   {
-      fmt::print("  ({},{},({},{},{})):",
+      fmt::print("  ({},{},({})):",
                       link->target(i).gid, link->target(i).proc,
-                      link->direction(i)[0],
-                      link->direction(i)[1],
-                      link->direction(i)[2]);
+                      link->direction(i));
       const Bounds& bounds = link->bounds(i);
-      fmt::print(" [{},{},{}] - [{},{},{}]\n",
-              bounds.min[0], bounds.min[1], bounds.min[2],
-              bounds.max[0], bounds.max[1], bounds.max[2]);
+      fmt::print(" [{}] - [{}]\n",
+              bounds.min, bounds.max);
   }
 
   if (verbose)
     for (size_t i = 0; i < b->points.size(); ++i)
-      fmt::print("  {} {} {}\n", b->points[i][0], b->points[i][1], b->points[i][2]);
+      fmt::print("  {}\n", b->points[i]);
 }
 
 inline
@@ -167,12 +160,10 @@ void verify_block(Block* b, const diy::Master::ProxyWithLink& cp, bool wrap, con
       if (link->bounds(i) != b->block_bounds[nbr_gid])
       {
           fmt::print(stderr, "Warning: bounds don't match {} -> {}\n", cp.gid(), link->target(i).gid);
-          fmt::print(stderr, "  expected: [{},{},{}] - [{},{},{}]\n",
-                             link->bounds(i).min[0], link->bounds(i).min[1], link->bounds(i).min[2],
-                             link->bounds(i).max[0], link->bounds(i).max[1], link->bounds(i).max[2]);
-          fmt::print(stderr, "  got:      [{},{},{}] - [{},{},{}]\n",
-                             b->block_bounds[nbr_gid].min[0], b->block_bounds[nbr_gid].min[1], b->block_bounds[nbr_gid].min[2],
-                             b->block_bounds[nbr_gid].max[0], b->block_bounds[nbr_gid].max[1], b->block_bounds[nbr_gid].max[2]);
+          fmt::print(stderr, "  expected: [{}] - [{}]\n",
+                             link->bounds(i).min, link->bounds(i).max);
+          fmt::print(stderr, "  got:      [{}] - [{}]\n",
+                             b->block_bounds[nbr_gid].min, b->block_bounds[nbr_gid].max);
       }
   }
 
@@ -187,9 +178,9 @@ void verify_block(Block* b, const diy::Master::ProxyWithLink& cp, bool wrap, con
                 continue;
 
             fmt::print(stderr, "Warning: wrap doesn't match:\n");
-            fmt::print(stderr, "  [{}] -> {}: wrap = ({},{},{}), mismatch in {}\n",
+            fmt::print(stderr, "  [{}] -> {}: wrap = ({}), mismatch in {}\n",
                                cp.gid(), link->target(i).gid,
-                               link->wrap(i)[0], link->wrap(i)[1], link->wrap(i)[2], j);
+                               link->wrap(i), j);
           }
       }
 
