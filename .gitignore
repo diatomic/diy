@@ -3,3 +3,6 @@ build
 docs/mkdocs/site
 **/__pycache__
 tags
+myconfig
+mytest.py
+install

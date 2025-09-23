@@ -159,3 +159,58 @@ execute()
   // clear commands
   commands_.clear();
 }
+
+void
+diy::Master::
+dynamic_process_block(int gid)
+{
+    // master.log->debug("Processing with thread: {}",  this_thread::get_id());
+
+    outgoing(gid);
+    incoming(gid);           // implicitly touches queue records
+    collectives(gid);
+
+    for (auto& cmd : this->commands_)
+    {
+        cmd->execute(this->block(lid(gid)), this->proxy(lid(gid)));
+
+        // clear incoming queues TODO: needed?
+        incoming_[exchange_round_].map.clear();
+    }
+}
+
+void
+diy::Master::
+dynamic_execute(detail::AuxBlock& aux_block)
+{
+    log->debug("Entered execute()");
+    auto scoped = prof.scoped("execute");
+    DIY_UNUSED(scoped);
+
+    if (commands_.empty())
+        return;
+
+    // while dynamic balance is not done and while there are free blocks, grab a block, lock and execute it
+    int gid;
+    detail::FreeBlock free_block;
+
+    while (!aux_block.iexchange_done)
+    {
+        while ((gid = aux_block.grab_heaviest_free_block(free_block)) >= 0)
+        {
+            // debug
+            // fmt::print(stderr, "dynamic_execute(): gid {} is free, locking and executing the block\n", gid);
+
+            dynamic_process_block(gid);
+        }
+    }
+
+    // clear incoming queues
+    incoming_[exchange_round_].map.clear();
+
+    if (limit() != -1 && in_memory() > limit())
+        throw std::runtime_error(fmt::format("Fatal: {} blocks in memory, with limit {}", in_memory(), limit()));
+
+    // clear commands
+    commands_.clear();
+}

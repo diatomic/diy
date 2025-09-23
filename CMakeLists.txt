@@ -107,10 +107,11 @@ endif()
 
 if (MSVC)
     add_compile_options(/utf-8)
+    add_compile_options(/bigobj)
 endif()
 
 # fmt
-find_package(fmt)
+find_package(fmt QUIET)
 if (fmt_FOUND)
     list (APPEND diy_definitions "-DDIY_SYSTEM_FMT")
     list (APPEND diy_libraries fmt::fmt)

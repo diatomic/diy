@@ -10,8 +10,8 @@ namespace detail
 
 // send requests for work info
 inline void send_req(AuxBlock*,                                // local block (unused)
-              const diy::Master::ProxyWithLink& cp,     // communication proxy for neighbor blocks
-              std::set<int>& procs)                     // processes to query
+                     const diy::Master::ProxyWithLink& cp,     // communication proxy for neighbor blocks
+                     std::set<int>& procs)                     // processes to query
 {
     // send requests for work info to sample_procs
     int v = 1;                                          // any message will do
@@ -26,8 +26,8 @@ inline void send_req(AuxBlock*,                                // local block (u
 
 // receive requests for work info
 inline void recv_req(AuxBlock*,                                // local block (unused)
-              const diy::Master::ProxyWithLink& cp,     // communication proxy for neighbor blocks
-              std::vector<int>& req_procs)              // processes requesting work info
+                     const diy::Master::ProxyWithLink& cp,     // communication proxy for neighbor blocks
+                     std::vector<int>& req_procs)              // processes requesting work info
 {
     std::vector<int> incoming_gids;
     cp.incoming(incoming_gids);
@@ -47,10 +47,10 @@ inline void recv_req(AuxBlock*,                                // local block (u
 
 // get work information from a random sample of processes
 inline void exchange_sample_work_info(diy::Master&             master,                 // the real master with multiple blocks per process
-                               diy::Master&             aux_master,             // auxiliary master with 1 block per process for communicating between procs
-                               float                    sample_frac,            // fraction of procs to sample 0.0 < sample_size <= 1.0
-                               const WorkInfo&          my_work_info,           // my process' work info
-                               std::vector<WorkInfo>&   sample_work_info)       // (output) vector of sorted sample work info, sorted by increasing total work per process
+                                      diy::Master&             aux_master,             // auxiliary master with 1 block per process for communicating between procs
+                                      float                    sample_frac,            // fraction of procs to sample 0.0 < sample_size <= 1.0
+                                      const WorkInfo&          my_work_info,           // my process' work info
+                                      std::vector<WorkInfo>&   sample_work_info)       // (output) vector of sorted sample work info, sorted by increasing total work per process
 {
     auto nprocs = master.communicator().size();     // global number of procs
     auto my_proc = master.communicator().rank();    // rank of my proc
@@ -99,16 +99,19 @@ inline void exchange_sample_work_info(diy::Master&             master,          
 
 // send block
 inline void send_block(AuxBlock*,                                              // local block (unused)
-                const diy::Master::ProxyWithLink&   cp,                 // communication proxy for neighbor blocks
-                diy::Master&                        master,             // real master with multiple blocks per process
-                const std::vector<WorkInfo>&        sample_work_info,   // sampled work info
-                const WorkInfo&                     my_work_info,       // my work info
-                float                               quantile)           // quantile cutoff above which to move blocks (0.0 - 1.0)
+                       const diy::Master::ProxyWithLink&   cp,                 // communication proxy for neighbor blocks
+                       diy::Master&                        master,             // real master with multiple blocks per process
+                       const std::vector<WorkInfo>&        sample_work_info,   // sampled work info
+                       const WorkInfo&                     my_work_info,       // my work info
+                       float                               quantile)           // quantile cutoff above which to move blocks (0.0 - 1.0)
 {
+    if (!sample_work_info.size())                   // do nothing in the degenerate case (1 or 2 total mpi ranks)
+        return;
+
     MoveInfo move_info = {-1, -1, -1};
 
     // my rank's position in the sampled work info, sorted by proc_work
-    int my_work_idx = sample_work_info.size();                                          // index where my work would be in the sample_work
+    int my_work_idx = (int)(sample_work_info.size());                   // index where my work would be in the sample_work
     for (auto i = 0; i < sample_work_info.size(); i++)
     {
         if (my_work_info.proc_work < sample_work_info[i].proc_work)
@@ -123,7 +126,7 @@ inline void send_block(AuxBlock*,                                              /
     {
         // pick the destination process to be the mirror image of my work location in the samples
         // ie, the heavier my process, the lighter the destination process
-        int target = sample_work_info.size() - my_work_idx;
+        int target = (int)(sample_work_info.size()) - my_work_idx;
 
         auto src_work_info = my_work_info;
         auto dst_work_info = sample_work_info[target];
@@ -158,14 +161,18 @@ inline void send_block(AuxBlock*,                                              /
             // remove the block from the master
             int move_lid = master.lid(move_info.move_gid);
             master.destroyer()(master.release(move_lid));
+
+            // debug
+            // fmt::print(stderr, "move_block(): moving gid {} from proc {} to proc {}\n", move_info.move_gid, move_info.src_proc, move_info.dst_proc);
         }
     }
 }
 
 // receive block
 inline void recv_block(AuxBlock*,                                      // local block (unused)
-                const diy::Master::ProxyWithLink&   cp,         // communication proxy for neighbor blocks
-                diy::Master&                        master)     // real master with multiple blocks per process
+                       const Master::ProxyWithLink&        cp,         // communication proxy for neighbor blocks
+                       Master&                             master,     // real master with multiple blocks per process
+                       MoveInfo&                           move_info)  // block that was moved
 {
     std::vector<int> incoming_gids;
     cp.incoming(incoming_gids);
@@ -193,23 +200,29 @@ inline void recv_block(AuxBlock*,                                      // local 
 
             // add block to the master
             master.add(move_gid, recv_b, recv_link);
+
+            // record the move
+            move_info.move_gid = move_gid;
+            move_info.src_proc = gid;
+            move_info.dst_proc = master.communicator().rank();
         }
     }
 }
 
 // move blocks based on sampled work info
-inline void move_sample_blocks(diy::Master&                    master,                 // real master with multiple blocks per process
-                        diy::Master&                    aux_master,             // auxiliary master with 1 block per process for communcating between procs
-                        const std::vector<WorkInfo>&    sample_work_info,       // sampled work info
-                        const WorkInfo&                 my_work_info,           // my work info
-                        float                           quantile)               // quantile cutoff above which to move blocks (0.0 - 1.0)
+inline void move_sample_blocks(Master&                         master,                 // real master with multiple blocks per process
+                               Master&                         aux_master,             // auxiliary master with 1 block per process for communcating between procs
+                               const std::vector<WorkInfo>&    sample_work_info,       // sampled work info
+                               const WorkInfo&                 my_work_info,           // my work info
+                               float                           quantile,               // quantile cutoff above which to move blocks (0.0 - 1.0)
+                               MoveInfo&                       move_info)              // block that was moved
 {
     // rexchange moving blocks
     aux_master.foreach([&](AuxBlock* b, const diy::Master::ProxyWithLink& cp)
             { send_block(b, cp, master, sample_work_info, my_work_info, quantile); });
     aux_master.exchange(true);      // true = remote
     aux_master.foreach([&](AuxBlock* b, const diy::Master::ProxyWithLink& cp)
-            { recv_block(b, cp, master); });
+            { recv_block(b, cp, master, move_info); });
 }
 
 }   // namespace detail

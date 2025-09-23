@@ -68,5 +68,3 @@ struct RegularAllReducePartners: public RegularMergePartners
 } // diy
 
 #endif
-
-

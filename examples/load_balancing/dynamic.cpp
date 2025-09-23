@@ -1,7 +1,3 @@
-#include <vector>
-#include <random>
-#include <time.h>
-
 #include <diy/decomposition.hpp>
 #include <diy/assigner.hpp>
 #include <diy/master.hpp>
@@ -17,12 +13,10 @@ int main(int argc, char* argv[])
     int                       bpr = 4;                                  // blocks per rank
     int                       iters = 1;                                // number of iterations to run
     int                       max_time = 1;                             // maximum time to compute a block (sec.)
+    double                    wall_time;                                // wall clock execution time for entire code
     float                     sample_frac = 0.5f;                       // fraction of world procs to sample (0.0 - 1.0)
     float                     quantile = 0.8f;                          // quantile cutoff above which to move blocks (0.0 - 1.0)
-    double                    wall_time;                                // wall clock execution time for entire code
-    double                    comp_time = 0.0;                          // total computation time (sec.)
-    double                    balance_time = 0.0;                       // total load balancing time (sec.)
-    double                    t0;                                       // starting time (sec.)
+    int                       vary_work = 0;                            // whether to vary workload between iterations
     float                     noise_factor = 0.0;                       // multiplier for noise in predicted -> actual work
     int                       distribution = 0;                         // type of distribution for assigning work (0: uniform (default), 1: normal, 2: exponential)
     unsigned int              seed = 0;                                 // seed for random number generator (0: ignore)
@@ -37,6 +31,7 @@ int main(int argc, char* argv[])
         >> Option('t', "max_time",      max_time,       "maximum time to compute a block (in seconds)")
         >> Option('f', "sample_frac",   sample_frac,    "fraction of world procs to sample (0.0 - 1.0)")
         >> Option('q', "quantile",      quantile,       "quantile cutoff above which to move blocks (0.0 - 1.0)")
+        >> Option('v', "vary_work",     vary_work,      "vary workload per iteration (0 or 1, default 0)")
         >> Option('n', "noise_factor",  noise_factor,   "multiplier for noise in predicted -> actual work")
         >> Option('d', "distribution",  distribution,   "distribution for assigning work (0 uniform (default), 1 normal, 2 exponential)")
         >> Option('s', "seed",          seed,           "seed for random number generator (default: 0 = ignore")
@@ -126,22 +121,12 @@ int main(int argc, char* argv[])
         fmt::print(stderr, "Summary stats before beginning\n");
     summary_stats(master, moved_blocks);
 
-    // timing
-    world.barrier();                                                    // barrier to synchronize clocks across procs, do not remove
-    wall_time = MPI_Wtime();
-    t0 = MPI_Wtime();
-
     // copy dynamic assigner from master
     diy::DynamicAssigner    dynamic_assigner(world, world.size(), nblocks);
     diy::record_local_gids(master, dynamic_assigner);
+    world.barrier();                                                    // barrier to synchronize dynamic assigner and clocks across procs, do not remove
 
-    // timing
-    world.barrier();
-    balance_time += (MPI_Wtime() - t0);
-
-    // this barrier is mandatory, do not remove
-    // dynamic assigner needs to be fully updated and sync'ed across all procs before proceeding
-    world.barrier();
+    wall_time = MPI_Wtime();
 
     // perform some iterative algorithm
     for (auto n = 0; n < iters; n++)
@@ -150,25 +135,33 @@ int main(int argc, char* argv[])
         if (world.rank() == 0)
             fmt::print(stderr, "iteration {}\n", n);
 
-        // timing
-        world.barrier();
-        t0 = MPI_Wtime();
+        if (vary_work)
+        {
+            // assign random work to do
+            if (distribution == 0)
+                master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
+                               { b->assign_work<std::uniform_real_distribution<double>, std::mt19937>(cp, 0, noise_factor, uni_distr, mt_gen); });
+            else if (distribution == 1)
+                master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
+                               { b->assign_work<std::normal_distribution<double>, std::mt19937>(cp, 0, noise_factor, norm_distr, mt_gen); });
+            else if (distribution == 2)
+                master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
+                               { b->assign_work<std::exponential_distribution<double>, std::mt19937>(cp, 0, noise_factor, exp_distr, mt_gen); });
+
+            // collect summary stats before beginning iteration
+            if (world.rank() == 0)
+                fmt::print(stderr, "Summary stats before beginning iteration {}\n", n);
+            summary_stats(master, moved_blocks);
+        }
 
         // some block computation
-        master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
-                { b->compute(cp, max_time, n); });
-
-        // timing
-        world.barrier();
-        comp_time += (MPI_Wtime() - t0);
-        t0 = MPI_Wtime();
-
-        // sampling load balancing method
-        diy::load_balance_sampling(master, dynamic_assigner, &get_block_work, moved_blocks, sample_frac, quantile);
-
-        // timing
-        world.barrier();
-        balance_time += (MPI_Wtime() - t0);
+        master.dynamic_foreach(
+                [&](Block* b, const diy::Master::ProxyWithLink& cp) { b->compute(cp, max_time, n); },
+                &get_block_work,
+                dynamic_assigner,
+                sample_frac,
+                quantile,
+                moved_blocks);
 
         // for record keeping, append the block work to the moved blocks
         int lid;
@@ -181,14 +174,20 @@ int main(int argc, char* argv[])
                 moved_blocks[i].act_work  = b->act_work;
             }
         }
+
+        if (vary_work)
+        {
+            // collect summary stats after ending iteration
+            if (world.rank() == 0)
+                fmt::print(stderr, "Summary stats after ending iteration {}\n", n);
+            summary_stats(master, moved_blocks);
+        }
     }
 
     world.barrier();                                    // barrier to synchronize clocks over procs, do not remove
     wall_time = MPI_Wtime() - wall_time;
     if (world.rank() == 0)
-    if (world.rank() == 0)
-        fmt::print(stderr, "Total elapsed wall time {:.4} s = computation time {:.4} s + balancing time {:.4} s.\n",
-                wall_time, comp_time, balance_time);
+        fmt::print(stderr, "Total elapsed wall time {:.3} sec.\n", wall_time);
 
     // load balance summary stats
     if (world.rank() == 0)

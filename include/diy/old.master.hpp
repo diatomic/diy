@@ -147,10 +147,6 @@ namespace diy
       struct CollectivesList;       // std::list<Collective>
       struct CollectivesMap;        // std::map<int, CollectivesList>       // gid -> [collectives]
 
-      private:
-      struct BlockInfo;
-
-      public:
       struct QueueRecord
       {
                         QueueRecord(MemoryBuffer&& b):
@@ -222,6 +218,10 @@ namespace diy
           block_info_access->blocks_.destroy(i);
       }
 
+      private:
+      struct BlockInfo;                                 // forward declaration
+      using resource_accessor = resource_accessor<BlockInfo, recursive_mutex>;
+
       public:
       inline int    add(int gid, void* b, Link* l);     //!< add a block
       inline int    add(int gid, void* b, const Link& l){ return add(gid, b, l.clone()); }
@@ -230,6 +230,10 @@ namespace diy
 
       //!< return the `i`-th block
       inline void*  block(int i) const                  { return block_info_.const_access()->blocks_.find(i); }
+      inline void*  block(int i, resource_accessor& block_info_access)
+      {
+          return block_info_access->blocks_.find(i);
+      }
 
       template<class Block>
       Block*        block(int i) const                  { return static_cast<Block*>(block(i)); }
@@ -248,26 +252,30 @@ namespace diy
 
       inline void   unload(int i);
       inline void   load(int i);
+      inline void   unload(int i, resource_accessor& block_info_access);
+      inline void   load(int i, resource_accessor& block_info_access);
       void          unload(std::vector<int>& loaded)
       {
           auto block_info_access = block_info_.access();
           for(unsigned i = 0; i < loaded.size(); ++i)
-              unload(loaded[i]);
+              unload(loaded[i], block_info_access);
           loaded.clear();
       }
-      void          unload_all()
+      void          unload_all(resource_accessor& block_info_access)
       {
-          for(unsigned i = 0; i < size(); ++i)
-              if (block(i) != 0)
-                  unload(i);
+          for(unsigned i = 0; i < size(block_info_access); ++i)
+              if (block(i, block_info_access) != 0)
+                  unload(i, block_info_access);
       }
 
       inline bool   has_incoming(int i) const;
 
       inline void   unload_queues(int i);
+      inline void   unload_queues(int i, resource_accessor& block_info_access);
       inline void   unload_incoming(int gid);
       inline void   unload_outgoing(int gid);
       inline void   load_queues(int i);
+      inline void   load_queues(int i, resource_accessor& block_info_access);
       inline void   load_incoming(int gid);
       inline void   load_outgoing(int gid);
 
@@ -278,6 +286,7 @@ namespace diy
 
       //! return gid of the `i`-th block
       int           gid(int i) const                    { return block_info_.const_access()->gids_[i]; }
+      int           gid(int i, resource_accessor& block_info_access) { return block_info_access->gids_[i]; }
 
       //! return the local id of the local block with global id gid, or -1 if not local
       int           lid(int gid__) const                { return local(gid__) ?  block_info_.const_access()->lids_.find(gid__)->second : -1; }
@@ -306,6 +315,7 @@ namespace diy
 
       //! return the number of local blocks
       unsigned int  size() const                        { return static_cast<unsigned int>(block_info_.const_access()->blocks_.size()); }
+      unsigned int  size(resource_accessor& block_info_access) { return static_cast<unsigned int>(block_info_access->blocks_.size()); }
 
       void*         create() const                      { return block_info_.const_access()->blocks_.create(); }
 
@@ -553,6 +563,7 @@ clear()
   expected_ = 0;
 }
 
+// unload a block without previously acquiring block_info critical resource
 void
 diy::Master::
 unload(int i)
@@ -563,12 +574,33 @@ unload(int i)
   unload_queues(i);
 }
 
+// unload a block using previously acquired block_info critical resource
+void
+diy::Master::
+unload(int i, resource_accessor& block_info_access)
+{
+  log->debug("Unloading block: {}", gid(i, block_info_access));
+
+  block_info_access->blocks_.unload(i);
+  unload_queues(i, block_info_access);
+}
+
+// unload queues without previously acquiring block_info critical resource
 void
 diy::Master::
 unload_queues(int i)
 {
   unload_incoming(gid(i));
   unload_outgoing(gid(i));
+}
+
+// unload queues using previously acquired block_info critical resource
+void
+diy::Master::
+unload_queues(int i, resource_accessor& block_info_access)
+{
+  unload_incoming(gid(i, block_info_access));
+  unload_outgoing(gid(i, block_info_access));
 }
 
 void
@@ -616,6 +648,7 @@ unload_outgoing(int gid__)
   }
 }
 
+// load a block without having previously acquired block_info critical resource
 void
 diy::Master::
 load(int i)
@@ -626,12 +659,33 @@ load(int i)
   load_queues(i);
 }
 
+// load a block using previously acquired block_info critical resource
+void
+diy::Master::
+load(int i, resource_accessor& block_info_access)
+{
+  log->debug("Loading block: {}", gid(i));
+
+  block_info_access->blocks_.load(i);
+  load_queues(i);
+}
+
+// unload queues without previously acquiring block_info critical resource
 void
 diy::Master::
 load_queues(int i)
 {
   load_incoming(gid(i));
   load_outgoing(gid(i));
+}
+
+// unload queues using previously acquired block_info critical resource
+void
+diy::Master::
+load_queues(int i, resource_accessor& block_info_access)
+{
+  load_incoming(gid(i, block_info_access));
+  load_outgoing(gid(i, block_info_access));
 }
 
 void
@@ -694,7 +748,7 @@ add(int gid__, void* b, Link* l)
 {
   auto block_info_access = block_info_.access();
   if (*block_info_access->blocks_.in_memory().const_access() == limit_)
-    unload_all();
+    unload_all(block_info_access);
 
   lock_guard<fast_mutex>    lock(block_mutex_);       // allow to add blocks from multiple threads
 
