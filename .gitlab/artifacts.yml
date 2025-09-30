@@ -16,16 +16,6 @@
       annotations:
         - build/annotations.json
     paths:
-      # The artifacts of the build.
-      # Generated headers.
-      - build/examples/**
-      - build/tests/*
-      - build/tests/backward/*
-      # CTest files.
-      - build/CTestTestfile.cmake
-      - build/*/CTestTestfile.cmake
-      - build/**/CTestTestfile.cmake
-      - build/Testing/
-      # CDash files.
-      - build/DartConfiguration.tcl
-      - build/cdash-build-id
+      - build/
+    exclude:
+      - build/**/*.o
