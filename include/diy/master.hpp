@@ -225,8 +225,7 @@ namespace diy
       public:
       inline int    add(int gid, void* b, Link* l);     //!< add a block
       inline int    add(int gid, void* b, const Link& l){ return add(gid, b, l.clone()); }
-      inline void*  release(int i);                     //!< release ownership of the block
-      inline void*  dynamic_release(int gid);           // dynamic thread-safe version TODO: eventually replace release with this one
+      inline void*  release(int gid);
 
       //!< return the `i`-th block
       inline void*  block(int i) const                  { return block_info_.const_access()->blocks_.find(i); }
@@ -711,30 +710,7 @@ add(int gid__, void* b, Link* l)
 
 void*
 diy::Master::
-release(int i)
-{
-  auto block_info_access = block_info_.access();
-  void* b = block_info_access->blocks_.release(i);
-
-  expected_ -= block_info_access->links_[i]->size_unique();
-  delete link(i);   block_info_access->links_[i] = 0;
-  std::swap(block_info_access->links_[i], block_info_access->links_.back());
-  block_info_access->links_.pop_back();
-
-  block_info_access->lids_.erase(gid(i));
-
-  std::swap(block_info_access->gids_[i], block_info_access->gids_.back());
-  block_info_access->gids_.pop_back();
-  block_info_access->lids_[gid(i)] = i;
-
-  return b;
-}
-
-// new dynamic thread-safe version of release
-// TODO: eventually replace release, for now renamed to dynamic_release
-void*
-diy::Master::
-dynamic_release(int gid)
+release(int gid)
 {
 
   auto block_info_access = block_info_.access();
@@ -744,17 +720,21 @@ dynamic_release(int gid)
 
   void* b = block_info_access->blocks_.release(lid);
 
+  // update links
   expected_ -= block_info_access->links_[lid]->size_unique();
   delete link(lid);
   block_info_access->links_[lid] = 0;
   std::swap(block_info_access->links_[lid], block_info_access->links_.back());
   block_info_access->links_.pop_back();
 
-  block_info_access->lids_.erase(gid);
-
+  // update gids
+  int swapped_gid = block_info_access->gids_.back();
   std::swap(block_info_access->gids_[lid], block_info_access->gids_.back());
   block_info_access->gids_.pop_back();
-  block_info_access->lids_[this->gid(lid)] = lid;    // NB this->gid(lid) != gid because of the swap
+
+  // update lids
+  block_info_access->lids_[swapped_gid] = lid;
+  block_info_access->lids_.erase(gid);
 
   return b;
 }

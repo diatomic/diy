@@ -159,8 +159,7 @@ inline void send_block(AuxBlock*,                                              /
             cp.enqueue(dest_block, bb.buffer);
 
             // remove the block from the master
-            int move_lid = master.lid(move_info.move_gid);
-            master.destroyer()(master.release(move_lid));
+            master.destroyer()(master.release(move_info.move_gid));
 
             // debug
             // fmt::print(stderr, "move_block(): moving gid {} from proc {} to proc {}\n", move_info.move_gid, move_info.src_proc, move_info.dst_proc);
