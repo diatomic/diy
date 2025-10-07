@@ -1,6 +1,4 @@
----
 # Rules for where jobs can run
-# yamllint disable rule:line-length
 
 # When to even consider running a pipeline
 workflow:
