@@ -22,7 +22,9 @@ stages:
 #   - a build script
 #   - tags for the jobs
 #     - already provided for upload and CI update jobs
-#   - rules for when to run the job
+#   - the `.rules` block
+#     - see `.gitlab/rules.yml` for variables jobs may set to control when the
+#       job is executed
 #
 # Additionally, jobs may also contain:
 #
@@ -74,7 +76,7 @@ build:fedora36-mpich:
     - .cmake_build_linux
     - .linux_builder_tags
     - .cmake_build_artifacts
-    - .run_automatically
+    - .rules
 
 test:fedora36-mpich:
   extends:
@@ -82,7 +84,7 @@ test:fedora36-mpich:
     - .cmake_test_linux
     - .linux_builder_tags
     - .cmake_annotation_artifacts
-    - .run_automatically
+    - .rules
   needs:
     - build:fedora36-mpich
 
@@ -92,7 +94,7 @@ build:fedora36-mpich-nothreads:
     - .cmake_build_linux
     - .linux_builder_tags
     - .cmake_build_artifacts
-    - .run_automatically
+    - .rules
 
 test:fedora36-mpich-nothreads:
   extends:
@@ -100,7 +102,7 @@ test:fedora36-mpich-nothreads:
     - .cmake_test_linux
     - .linux_builder_tags
     - .cmake_annotation_artifacts
-    - .run_automatically
+    - .rules
   needs:
     - build:fedora36-mpich-nothreads
 
@@ -110,7 +112,7 @@ build:fedora36-openmpi:
     - .cmake_build_linux
     - .linux_builder_tags
     - .cmake_build_artifacts
-    - .run_automatically
+    - .rules
 
 test:fedora36-openmpi:
   extends:
@@ -118,7 +120,7 @@ test:fedora36-openmpi:
     - .cmake_test_linux
     - .linux_builder_tags
     - .cmake_annotation_artifacts
-    - .run_automatically
+    - .rules
   needs:
     - build:fedora36-openmpi
 
@@ -128,7 +130,7 @@ build:fedora36-asan:
     - .cmake_build_linux
     - .linux_builder_tags
     - .cmake_build_artifacts
-    - .run_automatically
+    - .rules
 
 test:fedora36-asan:
   extends:
@@ -136,7 +138,7 @@ test:fedora36-asan:
     - .cmake_memcheck_linux
     - .linux_tester_priv_tags
     - .cmake_annotation_artifacts
-    - .run_automatically
+    - .rules
   needs:
     - build:fedora36-asan
 
@@ -146,7 +148,7 @@ build:fedora36-ubsan:
     - .cmake_build_linux
     - .linux_builder_tags
     - .cmake_build_artifacts
-    - .run_automatically
+    - .rules
 
 test:fedora36-ubsan:
   extends:
@@ -154,7 +156,7 @@ test:fedora36-ubsan:
     - .cmake_memcheck_linux
     - .linux_tester_priv_tags
     - .cmake_annotation_artifacts
-    - .run_automatically
+    - .rules
   needs:
     - build:fedora36-ubsan
 
@@ -164,7 +166,7 @@ build:windows_vs2022_debug:
     - .windows_tags
     - .cmake_build_windows
     - .cmake_build_artifacts
-    - .run_automatically
+    - .rules
 
 test:windows_vs2022_debug:
   extends:
@@ -172,7 +174,7 @@ test:windows_vs2022_debug:
     - .windows_tags
     - .cmake_test_windows
     - .cmake_annotation_artifacts
-    - .run_automatically
+    - .rules
   needs:
     - build:windows_vs2022_debug
 
@@ -182,7 +184,7 @@ build:windows_vs2022_release:
     - .windows_tags
     - .cmake_build_windows
     - .cmake_build_artifacts
-    - .run_automatically
+    - .rules
 
 test:windows_vs2022_release:
   extends:
@@ -190,6 +192,6 @@ test:windows_vs2022_release:
     - .windows_tags
     - .cmake_test_windows
     - .cmake_annotation_artifacts
-    - .run_automatically
+    - .rules
   needs:
     - build:windows_vs2022_release
