@@ -26,7 +26,6 @@
 #include "time.hpp"
 
 #include "thread.hpp"
-
 #include "coroutine.hpp"
 #include "utils.hpp"
 
@@ -249,7 +248,6 @@ namespace diy
       inline void   load(int i);
       void          unload(std::vector<int>& loaded)
       {
-          auto block_info_access = block_info_.access();
           for(unsigned i = 0; i < loaded.size(); ++i)
               unload(loaded[i]);
           loaded.clear();
@@ -339,7 +337,6 @@ namespace diy
 
       //! call `f` and `g` with every block
       // 'f' is the compute callback, 'g' is the callback to get the amount of work that 'f' takes
-      // template<class Block>
       template<class F, class G>
       void          dynamic_foreach_(const F& f, // const Callback<Block>& f,
                                      const G& g, // const WCallback<Block>& g,
@@ -348,6 +345,29 @@ namespace diy
                                      float quantile,
                                      std::vector<detail::MoveInfo>& moved_blocks,
                                      const Skip& s = NeverSkip());
+
+// dynamic_foreach requires threads, otherwise generate compile-time error
+#ifdef DIY_NO_THREADS
+
+#include <type_traits>
+      template<class F>
+      struct always_false : std::false_type {};
+
+      template<class F, class G>
+      void          dynamic_foreach(const F& f,
+                                    const G& g,
+                                    DynamicAssigner& dynamic_assigner,
+                                    float sample_frac,
+                                    float quantile,
+                                    std::vector<detail::MoveInfo>& moved_blocks,
+                                    const Skip& s = NeverSkip())
+      {
+          DIY_UNUSED(f); DIY_UNUSED(g); DIY_UNUSED(dynamic_assigner); DIY_UNUSED(sample_frac);
+          DIY_UNUSED(quantile); DIY_UNUSED(moved_blocks); DIY_UNUSED(s);
+          static_assert(always_false<F>::value, "Error: dynamic_foreach() is not available because 'threads' is OFF in CMake.");
+      }
+
+#else
 
       template<class F, class G>
       void          dynamic_foreach(const F& f,
@@ -360,6 +380,8 @@ namespace diy
       {
           dynamic_foreach_<F, G>(f, g, dynamic_assigner, sample_frac, quantile, moved_blocks, s);
       }
+
+#endif
 
       inline void   execute();
       inline void   dynamic_execute(detail::AuxBlock& aux_block);
@@ -769,6 +791,27 @@ foreach_(const Callback<Block>& f, const Skip& skip)
         execute();
 }
 
+// dynamic_foreach_ requires threads, otherwise generate compile-time error
+#ifdef DIY_NO_THREADS
+
+template<class F, class G>
+void
+diy::Master::
+dynamic_foreach_(const F&                         f,
+                 const G&                         get_block_work,
+                 DynamicAssigner&                 dynamic_assigner,
+                 float                            sample_frac,
+                 float                            quantile,
+                 std::vector<detail::MoveInfo>&   moved_blocks,
+                 const Skip&                      skip)
+{
+    DIY_UNUSED(f); DIY_UNUSED(get_block_work); DIY_UNUSED(dynamic_assigner); DIY_UNUSED(sample_frac);
+    DIY_UNUSED(quantile); DIY_UNUSED(moved_blocks); DIY_UNUSED(skip);
+    static_assert(always_false<F>::value, "Error: dynamic_foreach_() is not available because 'threads' is OFF in CMake.");
+}
+
+#else
+
 template<class F, class G>
 void
 diy::Master::
@@ -820,6 +863,8 @@ dynamic_foreach_(const F&                         f,
     // dynamic_execute(aux_block);
     // t1.join();
 }
+
+#endif
 
 void
 diy::Master::

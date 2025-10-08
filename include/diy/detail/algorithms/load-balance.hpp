@@ -2,7 +2,6 @@
 
 #include "diy/dynamic-point.hpp"
 #include <cstdlib>
-#include <stdatomic.h>
 
 namespace diy
 {
@@ -131,7 +130,15 @@ struct AuxBlock
         }
         if (retval >= 0)
         {
-            std::swap((*free_blocks_access)[heaviest_idx], (*free_blocks_access).back());
+            // sanity check, free_blocks should not be empty
+            if ((*free_blocks_access).empty())
+            {
+                fmt::print(stderr, "Error: grab_heaviest_block(): free_blocks is empty. This should not happen.\n");
+                abort();
+            }
+            if ((*free_blocks_access).size() > 1)
+                std::swap((*free_blocks_access)[heaviest_idx], (*free_blocks_access).back());
+
             proc_work           -= (*free_blocks_access).back().work;
             free_block.gid      = (*free_blocks_access).back().gid;
             free_block.work     = (*free_blocks_access).back().work;
