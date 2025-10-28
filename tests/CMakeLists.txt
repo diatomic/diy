@@ -41,9 +41,15 @@ compile_test                (collective-balance-test    collective-balance.cpp)
 compile_test                (sampling-balance-test      sampling-balance.cpp)
 compile_test                (dynamic-balance-test       dynamic-balance.cpp)
 
+
+set(MAYBE_UNIX_PATH_PREFIX)
+if (UNIX)
+     set(MAYBE_UNIX_PATH_PREFIX "./")
+endif()
+
 if (NOT build_diy_mpi_lib)
     compile_test            (mpi-type-conversions mpi-type-conversions.cpp)
-    add_test                (NAME mpi-type-conversions COMMAND mpi-type-conversions)
+    add_test                (NAME mpi-type-conversions COMMAND $<TARGET_FILE_NAME:mpi-type-conversions>)
 endif()
 
 if                          (MSVC AND NOT(MSVC_VERSION LESS 1400))
@@ -60,64 +66,64 @@ endif                       ()
 ## Run the tests
 foreach                     (b 2 4 8 64)
     add_test                (NAME kd-tree-test-b${b}
-                             COMMAND kd-tree-test -b ${b}
+                             COMMAND $<TARGET_FILE_NAME:kd-tree-test> -b ${b}
                             )
     add_test                (NAME kd-tree-test-sampling-b${b}
-                             COMMAND kd-tree-test -s -b ${b}
+                             COMMAND $<TARGET_FILE_NAME:kd-tree-test> -s -b ${b}
                             )
     add_test                (NAME kd-tree-test-sampling-exponential-b${b}
-                             COMMAND kd-tree-test -s -e -b ${b}
+                             COMMAND $<TARGET_FILE_NAME:kd-tree-test> -s -e -b ${b}
                             )
 endforeach                  ()
 
 foreach                     (b 2 4 8 16 32 64)
     foreach                 (n 128 256 512)
         add_test                (NAME kd-tree-test2-b${b}-n${n}
-                                 COMMAND kd-tree-test2 -b ${b} -f ${CMAKE_CURRENT_SOURCE_DIR}/kd-tree-dataset.csv
+                                 COMMAND $<TARGET_FILE_NAME:kd-tree-test2> -b ${b} -f ${CMAKE_CURRENT_SOURCE_DIR}/kd-tree-dataset.csv
                                 )
     endforeach              ()
 endforeach                  ()
 
 add_test                    (NAME decomposer-test
-                             COMMAND decomposer-test
+                             COMMAND $<TARGET_FILE_NAME:decomposer-test>
                             )
 
 add_test                    (NAME partners-test
-                             COMMAND partners-test
+                             COMMAND $<TARGET_FILE_NAME:partners-test>
                             )
 
 add_test                    (NAME grid-test
-                             COMMAND grid-test
+                             COMMAND $<TARGET_FILE_NAME:grid-test>
                             )
 
 add_test                    (NAME serialization-test
-                             COMMAND serialization-test
+                             COMMAND $<TARGET_FILE_NAME:serialization-test>
                             )
 
 if                          (mpi)
     # currently, I/O is only supported when built with MPI support.
     add_test                (NAME io-test
-                             COMMAND io-test
+                             COMMAND $<TARGET_FILE_NAME:io-test>
                             )
     add_test                (NAME custom-bounds-test
-                             COMMAND custom-bounds-test
+                             COMMAND $<TARGET_FILE_NAME:custom-bounds-test>
                             )
     add_test                (NAME custom-bounds-load-test
-                             COMMAND custom-bounds-load-test
+                             COMMAND $<TARGET_FILE_NAME:custom-bounds-load-test>
                             )
     set_tests_properties    (custom-bounds-load-test PROPERTIES DEPENDS custom-bounds-test)
 endif                       (mpi)
 
 foreach                     (b 2 4 8 9 12 24 36 44 48 56 64)
     add_test                (NAME swap-reduce-test-b${b}
-                             COMMAND swap-reduce-test -b ${b}
+                             COMMAND $<TARGET_FILE_NAME:swap-reduce-test> -b ${b}
                             )
     add_test                (NAME swap-reduce-test-k4-b${b}
-                             COMMAND swap-reduce-test -k 4 -b ${b}
+                             COMMAND $<TARGET_FILE_NAME:swap-reduce-test> -k 4 -b ${b}
                             )
 endforeach                  ()
 
-if                          (mpi AND MPIEXEC)
+if                          (mpi AND MPIEXEC_EXECUTABLE)
 
   set                       (maxp 3)
   if                        (APPLE)
@@ -127,32 +133,32 @@ if                          (mpi AND MPIEXEC)
   # mpi collectives test only makes sense when built with MPI support
   foreach                   (p RANGE 1 ${maxp})
       add_test              (NAME mpi-collectives-test-p${p}
-                            COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:mpi-collectives-test>
+                             COMMAND ${MPIEXEC_EXECUTABLE} -np ${p} ${MAYBE_UNIX_PATH_PREFIX}mpi-collectives-test
                             )
   endforeach                (p)
 
   foreach                   (p RANGE 1 ${maxp})
       add_test              (NAME mpi-window-test-p${p}
-                            COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:mpi-window-test>
+                            COMMAND ${MPIEXEC_EXECUTABLE} -np ${p} ${MAYBE_UNIX_PATH_PREFIX}mpi-window-test
                             )
   endforeach                (p)
 
   foreach                   (p RANGE 1 ${maxp})
       add_test              (NAME dynamic-assigner-test-p${p}
-                            COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:dynamic-assigner-test>
+                            COMMAND ${MPIEXEC_EXECUTABLE} -np ${p} ${MAYBE_UNIX_PATH_PREFIX}dynamic-assigner-test
                             )
   endforeach                (p)
 
   foreach                   (p RANGE 1 ${maxp})
       foreach               (b 2 4 8 9 12 24 36 44 48 56 64)
           add_test          (NAME merge-swap-reduce-test-p${p}-b${b}
-                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:merge-swap-reduce-test> -b ${b}
+                             COMMAND ${MPIEXEC_EXECUTABLE} -np ${p} ${MAYBE_UNIX_PATH_PREFIX}merge-swap-reduce-test -b ${b}
                             )
           add_test          (NAME merge-swap-reduce-test-p${p}-m1-b${b}
-                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:merge-swap-reduce-test> -m 1 -b ${b}
+                             COMMAND ${MPIEXEC_EXECUTABLE} -np ${p} ${MAYBE_UNIX_PATH_PREFIX}merge-swap-reduce-test -m 1 -b ${b}
                             )
           add_test          (NAME merge-swap-reduce-test-p${p}-t2-b${b}
-                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:merge-swap-reduce-test> -t 2 -b ${b}
+                             COMMAND ${MPIEXEC_EXECUTABLE} -np ${p} ${MAYBE_UNIX_PATH_PREFIX}merge-swap-reduce-test -t 2 -b ${b}
                             )
       endforeach            (b)
   endforeach                (p)
@@ -160,12 +166,12 @@ if                          (mpi AND MPIEXEC)
   foreach                   (p 2 3)
       math                  (EXPR b "${p} + 1")
       add_test              (NAME simple-test-p${p}-b${b}
-                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:simple-test> -b ${b}
+                             COMMAND ${MPIEXEC_EXECUTABLE} -np ${p} ${MAYBE_UNIX_PATH_PREFIX}simple-test -b ${b}
                             )
       set_tests_properties  (simple-test-p${p}-b${b} PROPERTIES TIMEOUT 300 RUN_SERIAL ON)
 
       add_test              (NAME simple-test-p${p}-b${b}-c
-                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:simple-test> -b ${b} -c
+                             COMMAND ${MPIEXEC_EXECUTABLE} -np ${p} ${MAYBE_UNIX_PATH_PREFIX}simple-test -b ${b} -c
                             )
       set_tests_properties  (simple-test-p${p}-b${b}-c PROPERTIES TIMEOUT 300 RUN_SERIAL ON)
   endforeach                (p)
@@ -173,7 +179,7 @@ if                          (mpi AND MPIEXEC)
   foreach                   (p 2 3)
       math                  (EXPR b "${p} + 1")
       add_test              (NAME blobs-test-p${p}-b${b}
-                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:blobs-test> -b ${b}
+                             COMMAND ${MPIEXEC_EXECUTABLE} -np ${p} ${MAYBE_UNIX_PATH_PREFIX}blobs-test -b ${b}
                             )
       set_tests_properties  (blobs-test-p${p}-b${b} PROPERTIES TIMEOUT 300 RUN_SERIAL ON)
   endforeach                (p)
@@ -181,13 +187,13 @@ if                          (mpi AND MPIEXEC)
   foreach                   (p RANGE 1 ${maxp})
       foreach               (b 2 4 8 9 12 24 36)
           add_test          (NAME rexchange-test-p${p}-b${b}
-                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:rexchange-test> -b ${b}
+                             COMMAND ${MPIEXEC_EXECUTABLE} -np ${p} ${MAYBE_UNIX_PATH_PREFIX}rexchange-test -b ${b}
                             )
           add_test          (NAME rexchange-test-p${p}-m1-b${b}
-                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:rexchange-test> -m 1 -b ${b}
+                             COMMAND ${MPIEXEC_EXECUTABLE} -np ${p} ${MAYBE_UNIX_PATH_PREFIX}rexchange-test -m 1 -b ${b}
                             )
           add_test          (NAME rexchange-test-p${p}-t2-b${b}
-                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:rexchange-test> -t 2 -b ${b}
+                             COMMAND ${MPIEXEC_EXECUTABLE} -np ${p} ${MAYBE_UNIX_PATH_PREFIX}rexchange-test -t 2 -b ${b}
                             )
       endforeach            (b)
   endforeach                (p)
@@ -195,74 +201,74 @@ if                          (mpi AND MPIEXEC)
   foreach                   (p RANGE 1 ${maxp})
       foreach               (b 2 4 8 9 12 24 36)
           add_test          (NAME iexchange-test-p${p}-b${b}
-                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:iexchange-test> -b ${b}
+                             COMMAND ${MPIEXEC_EXECUTABLE} -np ${p} ${MAYBE_UNIX_PATH_PREFIX}iexchange-test -b ${b}
                             )
       endforeach            (b)
   endforeach                (p)
 
   foreach                   (p RANGE 1 ${maxp})
           add_test          (NAME two-masters-p${p}
-                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:two-masters>
+                             COMMAND ${MPIEXEC_EXECUTABLE} -np ${p} ${MAYBE_UNIX_PATH_PREFIX}two-masters
                             )
   endforeach                (p)
 
   foreach                   (p RANGE 1 ${maxp})
           add_test          (NAME double-foreach-p${p}
-                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:double-foreach>
+                             COMMAND ${MPIEXEC_EXECUTABLE} -np ${p} ${MAYBE_UNIX_PATH_PREFIX}double-foreach
                             )
   endforeach                (p)
 
   foreach                   (p 3 4)
           add_test          (NAME collective-balance-test-p${p}
-                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:collective-balance-test> -i 3
+                             COMMAND ${MPIEXEC_EXECUTABLE} -np ${p} ${MAYBE_UNIX_PATH_PREFIX}collective-balance-test -i 3
                             )
           add_test          (NAME sampling-balance-test-p${p}
-                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:sampling-balance-test> -i 3
+                             COMMAND ${MPIEXEC_EXECUTABLE} -np ${p} ${MAYBE_UNIX_PATH_PREFIX}sampling-balance-test -i 3
                             )
           add_test          (NAME dynamic-balance-test-p${p}
-                             COMMAND ${MPIEXEC} -np ${p} $<TARGET_FILE:dynamic-balance-test> -i 3
+                             COMMAND ${MPIEXEC_EXECUTABLE} -np ${p} ${MAYBE_UNIX_PATH_PREFIX}dynamic-balance-test -i 3
                             )
   endforeach                (p)
 
-else                        (mpi AND MPIEXEC)
+else                        (mpi AND MPIEXEC_EXECUTABLE)
 
   add_test                  (NAME dynamic-assigner-test-p${p}
-                            COMMAND dynamic-assigner-test
+                            COMMAND $<TARGET_FILE_NAME:dynamic-assigner-test>
                             )
 
   add_test                  (NAME mpi-window-test-p${p}
-                            COMMAND mpi-window-test
+                            COMMAND $<TARGET_FILE_NAME:mpi-window-test>
                             )
 
   foreach                   (b 2 4 8 9 12 24 36 44 48 56 64)
       add_test              (NAME merge-swap-reduce-test-nompi-b${b}
-                             COMMAND merge-swap-reduce-test -b ${b}
+                             COMMAND $<TARGET_FILE_NAME:merge-swap-reduce-test> -b ${b}
                             )
       add_test              (NAME merge-swap-reduce-test-nompi-m1-b${b}
-                             COMMAND merge-swap-reduce-test -m 1 -b ${b}
+                             COMMAND $<TARGET_FILE_NAME:merge-swap-reduce-test> -m 1 -b ${b}
                             )
       add_test              (NAME merge-swap-reduce-test-nompi-t2-b${b}
-                             COMMAND merge-swap-reduce-test -t 2 -b ${b}
+                             COMMAND $<TARGET_FILE_NAME:merge-swap-reduce-test> -t 2 -b ${b}
                             )
   endforeach                (b)
 
   foreach                   (b 3 4)
       add_test              (NAME simple-test-nompi-b${b}
-                             COMMAND simple-test -b ${b}
+                             COMMAND $<TARGET_FILE_NAME:simple-test> -b ${b}
                             )
       set_tests_properties  (simple-test-nompi-b${b} PROPERTIES TIMEOUT 300 RUN_SERIAL ON)
   endforeach                (b)
 
   foreach                   (b 2 4 8 9 12 24 36)
       add_test              (NAME rexchange-test-nompi-b${b}
-                             COMMAND rexchange-test -b ${b}
+                             COMMAND $<TARGET_FILE_NAME:rexchange-test> -b ${b}
                             )
       add_test              (NAME rexchange-test-nompi-m1-b${b}
-                             COMMAND rexchange-test -m 1 -b ${b}
+                             COMMAND $<TARGET_FILE_NAME:rexchange-test> -m 1 -b ${b}
                             )
       add_test              (NAME rexchange-test-nompi-t2-b${b}
-                             COMMAND rexchange-test -t 2 -b ${b}
+                             COMMAND $<TARGET_FILE_NAME:rexchange-test> -t 2 -b ${b}
                             )
   endforeach                (b)
 
-endif                       (mpi AND MPIEXEC)
+endif                       (mpi AND MPIEXEC_EXECUTABLE)
