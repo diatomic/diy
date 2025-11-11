@@ -1,18 +1,21 @@
 ---
 # Lists of paths for artifacts of various stages.
+.cmake_annotation_artifacts:
+  artifacts:
+    expire_in: 1d
+    when: always
+    reports:
+      annotations:
+        - build/annotations.json
+
 .cmake_build_artifacts:
   artifacts:
     expire_in: 1d
+    when: always
+    reports:
+      annotations:
+        - build/annotations.json
     paths:
-      # The artifacts of the build.
-      # Generated headers.
-      - build/examples/**
-      - build/tests/*
-      - build/tests/backward/*
-      # CTest files.
-      - build/CTestTestfile.cmake
-      - build/*/CTestTestfile.cmake
-      - build/**/CTestTestfile.cmake
-      - build/Testing/
-      # CDash files.
-      - build/DartConfiguration.tcl
+      - build/
+    exclude:
+      - build/**/*.o

@@ -22,12 +22,14 @@ stages:
 #   - a build script
 #   - tags for the jobs
 #     - already provided for upload and CI update jobs
-#   - rules for when to run the job
+#   - the `.rules` block
+#     - see `.gitlab/rules.yml` for variables jobs may set to control when the
+#       job is executed
 #
 # Additionally, jobs may also contain:
 #
 #   - artifacts
-#   - dependency/needs jobs for required jobs
+#   - needs jobs for required jobs
 ################################################################################
 
 # CI strategy for DIY.
@@ -45,22 +47,44 @@ stages:
 # - Checkers
 #   - clang-tidy?
 
+.linux_builder_tags:
+  tags:
+    - diy
+    - build
+    - docker
+    - linux-x86_64
+
+.linux_tester_priv_tags:
+  tags:
+    - diy
+    - docker
+    - linux-x86_64
+    - privileged
+
+.windows_tags:
+  tags:
+    - diy
+    - nonconcurrent
+    - windows-x86_64
+    - shell
+    - vs2022
+    - msvc-19.33
+
 build:fedora36-mpich:
   extends:
     - .fedora36_mpich
     - .cmake_build_linux
     - .linux_builder_tags
     - .cmake_build_artifacts
-    - .run_automatically
+    - .rules
 
 test:fedora36-mpich:
   extends:
     - .fedora36_mpich
     - .cmake_test_linux
     - .linux_builder_tags
-    - .run_automatically
-  dependencies:
-    - build:fedora36-mpich
+    - .cmake_annotation_artifacts
+    - .rules
   needs:
     - build:fedora36-mpich
 
@@ -70,16 +94,15 @@ build:fedora36-mpich-nothreads:
     - .cmake_build_linux
     - .linux_builder_tags
     - .cmake_build_artifacts
-    - .run_automatically
+    - .rules
 
 test:fedora36-mpich-nothreads:
   extends:
     - .fedora36_mpich_nothreads
     - .cmake_test_linux
     - .linux_builder_tags
-    - .run_automatically
-  dependencies:
-    - build:fedora36-mpich-nothreads
+    - .cmake_annotation_artifacts
+    - .rules
   needs:
     - build:fedora36-mpich-nothreads
 
@@ -89,17 +112,15 @@ build:fedora36-openmpi:
     - .cmake_build_linux
     - .linux_builder_tags
     - .cmake_build_artifacts
-    - .run_automatically
+    - .rules
 
 test:fedora36-openmpi:
   extends:
     - .fedora36_openmpi
     - .cmake_test_linux
     - .linux_builder_tags
-    - .cmake_build_artifacts
-    - .run_automatically
-  dependencies:
-    - build:fedora36-openmpi
+    - .cmake_annotation_artifacts
+    - .rules
   needs:
     - build:fedora36-openmpi
 
@@ -109,17 +130,15 @@ build:fedora36-asan:
     - .cmake_build_linux
     - .linux_builder_tags
     - .cmake_build_artifacts
-    - .run_automatically
+    - .rules
 
 test:fedora36-asan:
   extends:
     - .fedora36_asan
     - .cmake_memcheck_linux
     - .linux_tester_priv_tags
-    - .cmake_build_artifacts
-    - .run_automatically
-  dependencies:
-    - build:fedora36-asan
+    - .cmake_annotation_artifacts
+    - .rules
   needs:
     - build:fedora36-asan
 
@@ -129,17 +148,15 @@ build:fedora36-ubsan:
     - .cmake_build_linux
     - .linux_builder_tags
     - .cmake_build_artifacts
-    - .run_automatically
+    - .rules
 
 test:fedora36-ubsan:
   extends:
     - .fedora36_ubsan
     - .cmake_memcheck_linux
     - .linux_tester_priv_tags
-    - .cmake_build_artifacts
-    - .run_automatically
-  dependencies:
-    - build:fedora36-ubsan
+    - .cmake_annotation_artifacts
+    - .rules
   needs:
     - build:fedora36-ubsan
 
@@ -148,16 +165,16 @@ build:windows_vs2022_debug:
     - .windows_debug
     - .windows_tags
     - .cmake_build_windows
-    - .run_automatically
+    - .cmake_build_artifacts
+    - .rules
 
 test:windows_vs2022_debug:
   extends:
     - .windows_debug
     - .windows_tags
     - .cmake_test_windows
-    - .run_automatically
-  dependencies:
-    - build:windows_vs2022_debug
+    - .cmake_annotation_artifacts
+    - .rules
   needs:
     - build:windows_vs2022_debug
 
@@ -166,15 +183,15 @@ build:windows_vs2022_release:
     - .windows_release
     - .windows_tags
     - .cmake_build_windows
-    - .run_automatically
+    - .cmake_build_artifacts
+    - .rules
 
 test:windows_vs2022_release:
   extends:
     - .windows_release
     - .windows_tags
     - .cmake_test_windows
-    - .run_automatically
-  dependencies:
-    - build:windows_vs2022_release
+    - .cmake_annotation_artifacts
+    - .rules
   needs:
     - build:windows_vs2022_release

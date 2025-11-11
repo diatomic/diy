@@ -1,15 +1,6 @@
 ---
 # yamllint disable rule:colons
 # yamllint disable rule:line-length
-.windows_tags:
-  tags:
-    - diy
-    - nonconcurrent
-    - windows-x86_64
-    - shell
-    - vs2022
-    - msvc-19.33
-
 .windows_build:
   variables:
     CCACHE_INSTALL_DIR: "$CI_PROJECT_DIR\\.gitlab"
@@ -54,11 +45,6 @@
     - *before_script_windows_build
     - "ctest -VV -S .gitlab/ci/ctest_configure.cmake"
     - "ctest -VV -S .gitlab/ci/ctest_build.cmake"
-  artifacts:
-    expire_in: 24 hours
-    when: always
-    paths:
-      - build
 
 .cmake_test_windows: &cmake_test_windows
   extends:
