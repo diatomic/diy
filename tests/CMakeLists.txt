@@ -39,7 +39,11 @@ compile_test                (custom-bounds-test     custom-bounds.cpp)
 compile_test                (custom-bounds-load-test    custom-bounds-load.cpp)
 compile_test                (collective-balance-test    collective-balance.cpp)
 compile_test                (sampling-balance-test      sampling-balance.cpp)
-compile_test                (dynamic-balance-test       dynamic-balance.cpp)
+
+# dynamic balance test requires threads
+if                          (threads)
+    compile_test            (dynamic-balance-test       dynamic-balance.cpp)
+endif()
 
 
 set(MAYBE_UNIX_PATH_PREFIX)
@@ -225,9 +229,12 @@ if                          (mpi AND MPIEXEC_EXECUTABLE)
           add_test          (NAME sampling-balance-test-p${p}
                              COMMAND ${MPIEXEC_EXECUTABLE} -np ${p} ${MAYBE_UNIX_PATH_PREFIX}sampling-balance-test -i 3
                             )
+    # dynamic balance test requires threads
+    if                      (threads)
           add_test          (NAME dynamic-balance-test-p${p}
                              COMMAND ${MPIEXEC_EXECUTABLE} -np ${p} ${MAYBE_UNIX_PATH_PREFIX}dynamic-balance-test -i 3
                             )
+    endif()
   endforeach                (p)
 
 else                        (mpi AND MPIEXEC_EXECUTABLE)

@@ -119,7 +119,7 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
         // serialize the block and the link and remove the block from the master
         diy::Link* send_link = master.link(move_lid);
         diy::LinkFactory::save(link_bb, send_link);
-        void* send_block = master.dynamic_release(move_gid);
+        void* send_block = master.release(move_gid);
         master.saver()(send_block, block_bb);
         master.destroyer()(send_block);
 

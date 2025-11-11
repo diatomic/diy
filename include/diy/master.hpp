@@ -26,7 +26,6 @@
 #include "time.hpp"
 
 #include "thread.hpp"
-
 #include "coroutine.hpp"
 #include "utils.hpp"
 
@@ -225,8 +224,7 @@ namespace diy
       public:
       inline int    add(int gid, void* b, Link* l);     //!< add a block
       inline int    add(int gid, void* b, const Link& l){ return add(gid, b, l.clone()); }
-      inline void*  release(int i);                     //!< release ownership of the block
-      inline void*  dynamic_release(int gid);           // dynamic thread-safe version TODO: eventually replace release with this one
+      inline void*  release(int gid);
 
       //!< return the `i`-th block
       inline void*  block(int i) const                  { return block_info_.const_access()->blocks_.find(i); }
@@ -250,7 +248,6 @@ namespace diy
       inline void   load(int i);
       void          unload(std::vector<int>& loaded)
       {
-          auto block_info_access = block_info_.access();
           for(unsigned i = 0; i < loaded.size(); ++i)
               unload(loaded[i]);
           loaded.clear();
@@ -340,7 +337,6 @@ namespace diy
 
       //! call `f` and `g` with every block
       // 'f' is the compute callback, 'g' is the callback to get the amount of work that 'f' takes
-      // template<class Block>
       template<class F, class G>
       void          dynamic_foreach_(const F& f, // const Callback<Block>& f,
                                      const G& g, // const WCallback<Block>& g,
@@ -349,6 +345,29 @@ namespace diy
                                      float quantile,
                                      std::vector<detail::MoveInfo>& moved_blocks,
                                      const Skip& s = NeverSkip());
+
+// dynamic_foreach requires threads, otherwise generate compile-time error
+#ifdef DIY_NO_THREADS
+
+#include <type_traits>
+      template<class F>
+      struct always_false : std::false_type {};
+
+      template<class F, class G>
+      void          dynamic_foreach(const F& f,
+                                    const G& g,
+                                    DynamicAssigner& dynamic_assigner,
+                                    float sample_frac,
+                                    float quantile,
+                                    std::vector<detail::MoveInfo>& moved_blocks,
+                                    const Skip& s = NeverSkip())
+      {
+          DIY_UNUSED(f); DIY_UNUSED(g); DIY_UNUSED(dynamic_assigner); DIY_UNUSED(sample_frac);
+          DIY_UNUSED(quantile); DIY_UNUSED(moved_blocks); DIY_UNUSED(s);
+          static_assert(always_false<F>::value, "Error: dynamic_foreach() is not available because 'threads' is OFF in CMake.");
+      }
+
+#else
 
       template<class F, class G>
       void          dynamic_foreach(const F& f,
@@ -361,6 +380,8 @@ namespace diy
       {
           dynamic_foreach_<F, G>(f, g, dynamic_assigner, sample_frac, quantile, moved_blocks, s);
       }
+
+#endif
 
       inline void   execute();
       inline void   dynamic_execute(detail::AuxBlock& aux_block);
@@ -711,30 +732,7 @@ add(int gid__, void* b, Link* l)
 
 void*
 diy::Master::
-release(int i)
-{
-  auto block_info_access = block_info_.access();
-  void* b = block_info_access->blocks_.release(i);
-
-  expected_ -= block_info_access->links_[i]->size_unique();
-  delete link(i);   block_info_access->links_[i] = 0;
-  std::swap(block_info_access->links_[i], block_info_access->links_.back());
-  block_info_access->links_.pop_back();
-
-  block_info_access->lids_.erase(gid(i));
-
-  std::swap(block_info_access->gids_[i], block_info_access->gids_.back());
-  block_info_access->gids_.pop_back();
-  block_info_access->lids_[gid(i)] = i;
-
-  return b;
-}
-
-// new dynamic thread-safe version of release
-// TODO: eventually replace release, for now renamed to dynamic_release
-void*
-diy::Master::
-dynamic_release(int gid)
+release(int gid)
 {
 
   auto block_info_access = block_info_.access();
@@ -744,17 +742,21 @@ dynamic_release(int gid)
 
   void* b = block_info_access->blocks_.release(lid);
 
+  // update links
   expected_ -= block_info_access->links_[lid]->size_unique();
   delete link(lid);
   block_info_access->links_[lid] = 0;
   std::swap(block_info_access->links_[lid], block_info_access->links_.back());
   block_info_access->links_.pop_back();
 
-  block_info_access->lids_.erase(gid);
-
+  // update gids
+  int swapped_gid = block_info_access->gids_.back();
   std::swap(block_info_access->gids_[lid], block_info_access->gids_.back());
   block_info_access->gids_.pop_back();
-  block_info_access->lids_[this->gid(lid)] = lid;    // NB this->gid(lid) != gid because of the swap
+
+  // update lids
+  block_info_access->lids_[swapped_gid] = lid;
+  block_info_access->lids_.erase(gid);
 
   return b;
 }
@@ -788,6 +790,27 @@ foreach_(const Callback<Block>& f, const Skip& skip)
     if (immediate())
         execute();
 }
+
+// dynamic_foreach_ requires threads, otherwise generate compile-time error
+#ifdef DIY_NO_THREADS
+
+template<class F, class G>
+void
+diy::Master::
+dynamic_foreach_(const F&                         f,
+                 const G&                         get_block_work,
+                 DynamicAssigner&                 dynamic_assigner,
+                 float                            sample_frac,
+                 float                            quantile,
+                 std::vector<detail::MoveInfo>&   moved_blocks,
+                 const Skip&                      skip)
+{
+    DIY_UNUSED(f); DIY_UNUSED(get_block_work); DIY_UNUSED(dynamic_assigner); DIY_UNUSED(sample_frac);
+    DIY_UNUSED(quantile); DIY_UNUSED(moved_blocks); DIY_UNUSED(skip);
+    static_assert(always_false<F>::value, "Error: dynamic_foreach_() is not available because 'threads' is OFF in CMake.");
+}
+
+#else
 
 template<class F, class G>
 void
@@ -840,6 +863,8 @@ dynamic_foreach_(const F&                         f,
     // dynamic_execute(aux_block);
     // t1.join();
 }
+
+#endif
 
 void
 diy::Master::
