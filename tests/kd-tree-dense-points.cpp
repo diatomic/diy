@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-#include <cstring>
+#include <string>
 #include <cstdlib>
 
 #include <diy/master.hpp>
@@ -65,7 +65,7 @@ diy::ContinuousBounds compute_bounds(std::vector<PointT> points)
   return bds;
 }
 
-std::vector<PointT> read_csv(const char *filename)
+std::vector<PointT> read_csv(const std::string& filename)
 {
   std::vector<PointT> points;
   std::ifstream ifs(filename);
@@ -97,7 +97,7 @@ int main (int argc, char* argv[])
   bool help;
   int nblocks = 1;
   int bins = 128;
-  char filename[512];
+  std::string filename = "";
 
   // get command line arguments
   using namespace opts;
