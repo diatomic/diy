@@ -230,6 +230,7 @@ inline void dynamic_recv(const diy::Master::ProxyWithLink&  cp,                 
 }
 
 // callback function for iexchange to execute dynamic load balancing
+inline
 bool iexchange_balance(AuxBlock*                           ab,                     // auxiliary block
                        const diy::Master::ProxyWithLink&   cp,                     // communication proxy for aux_master
                        diy::Master&                        master,                 // the real master with multiple blocks per process
@@ -282,6 +283,7 @@ bool iexchange_balance(AuxBlock*                           ab,                  
     return(!ab->any_free_blocks());
 }
 
+inline
 void dynamic_balance(diy::Master*                    master,                 // the real master with multiple blocks per process
                      diy::Master*                    aux_master,             // auxiliary master with 1 block per process for communicating between procs
                      diy::DynamicAssigner*           dynamic_assigner,       // dynamic assigner
