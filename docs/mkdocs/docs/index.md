@@ -79,7 +79,9 @@ Complete examples of working programs can be found in the [Examples](examples) p
  - [Serialization](serialization)
  - [MPI convenience wrapper](mpi)
  - [Algorithms](algorithms)
+ - [Dynamic load balancing](load_balancing)
  - [Writing out-of-core algorithms](ooc)
+ - [Coroutines](coroutines)
  - [Automatic block threading](threads)
  - [Examples](examples)
 

@@ -14,7 +14,9 @@ nav:
     - Serialization: serialization.md
     - MPI convenience wrapper: mpi.md
     - Algorithms: algorithms.md
+    - Dynamic load balancing: load_balancing.md
     - Writing out-of-core algorithms: ooc.md
+    - Coroutines: coroutine.md
     - Automatic block threading: threads.md
     - Examples: examples.md
 theme: material
