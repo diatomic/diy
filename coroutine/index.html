@@ -8,11 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://example.com/examples/">
+        <link rel="canonical" href="https://example.com/coroutine/">
       
       
-        <link rel="prev" href="../threads/">
+        <link rel="prev" href="../ooc/">
       
+      
+        <link rel="next" href="../threads/">
       
       
         
@@ -23,7 +25,7 @@
     
     
       
-        <title>Examples - DIY</title>
+        <title>Coroutines - DIY</title>
       
     
     
@@ -63,6 +65,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#coroutines" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -95,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Examples
+              Coroutines
             
           </span>
         </div>
@@ -624,10 +631,37 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../coroutine/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Coroutines
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -643,6 +677,81 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#foreach_exchange" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        foreach_exchange()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#yield" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        yield()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage-pattern-and-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage Pattern and Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-to-use-coroutines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Use Coroutines
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -678,17 +787,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../examples/" class="md-nav__link">
         
   
   
@@ -704,7 +806,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -726,6 +827,71 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#foreach_exchange" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        foreach_exchange()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#yield" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        yield()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage-pattern-and-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage Pattern and Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-to-use-coroutines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Use Coroutines
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -742,205 +908,72 @@
 
 
 
-  <h1>Examples</h1>
-
-<p>The best way to learn DIY is by example, and the examples directory contains
-numerous complete programs that demonstrate most of the concepts in DIY.
-Example names preceded by the heading (<em>commented</em>) have ample comments
-embedded in the source code, meaning they are good starting points. The
-remaining, uncommented examples are easier to understand once the commented
-ones are clear.</p>
+<h1 id="coroutines">Coroutines</h1>
+<p>Coroutines in DIY enable interleaving computation with communication, allowing blocks to yield control during execution and resume after message exchanges. This is particularly useful for algorithms that require multiple communication rounds between different phases of computation.</p>
+<h2 id="overview">Overview</h2>
+<p>In traditional DIY workflows, you typically execute computation phases and message exchanges sequentially:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">master</span><span class="p">.</span><span class="n">foreach</span><span class="p">(</span><span class="o">&amp;</span><span class="n">phase1</span><span class="p">);</span><span class="w">       </span><span class="c1">// Process all blocks</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">master</span><span class="p">.</span><span class="n">exchange</span><span class="p">();</span><span class="w">             </span><span class="c1">// Exchange messages</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">master</span><span class="p">.</span><span class="n">foreach</span><span class="p">(</span><span class="o">&amp;</span><span class="n">phase2</span><span class="p">);</span><span class="w">       </span><span class="c1">// Process all blocks again</span>
+</code></pre></div>
+<p>With coroutines, you can interleave these operations within a single callback function:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">master</span><span class="p">.</span><span class="n">foreach_exchange</span><span class="p">([](</span><span class="n">Block</span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">ProxyWithLink</span><span class="o">&amp;</span><span class="w"> </span><span class="n">cp</span><span class="p">)</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="p">{</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="n">phase1</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">cp</span><span class="p">);</span><span class="w">            </span><span class="c1">// First phase of processing</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="n">cp</span><span class="p">.</span><span class="n">yield</span><span class="p">();</span><span class="w">               </span><span class="c1">// Yield for message exchange</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="n">phase2</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">cp</span><span class="p">);</span><span class="w">            </span><span class="c1">// Second phase of processing</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="p">});</span>
+</code></pre></div>
+<p>This approach simplifies code that requires multiple communication rounds and enables more natural expression of iterative algorithms.</p>
 <ul>
-<li>
-<p><a href="https://github.com/diatomic/diy/tree/master/examples/simple">Simple</a>:
-  includes common operations such as initializing DIY, adding links to form block
-  neighborhoods, creating callback functions for each block, communicating
-  between block neighbors, performing collectives over all blocks, and writing
-  and reading blocks to and from a DIY file. These examples also show how to
-  create, destroy, and serialize blocks in (<em>commented</em>) <a href="https://github.com/diatomic/diy/tree/master/examples/simple/block.h">block.h</a>.</p>
+<li><code>master.foreach_exchange()</code>: Executes a callback function with coroutine support, automatically handling multiple exchange rounds</li>
+<li><code>cp.yield()</code>: Yields control from the current block to trigger a message exchange round</li>
+<li>Automatic lifecycle management: Coroutines are created and managed automatically for each block</li>
+</ul>
+<h2 id="foreach_exchange">foreach_exchange()</h2>
+<p>The <code>foreach_exchange()</code> method combines block processing with automatic message exchange handling:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">foreach_exchange</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">F</span><span class="o">&amp;</span><span class="w">     </span><span class="n">callback</span><span class="p">,</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">                      </span><span class="kt">bool</span><span class="w">         </span><span class="n">remote</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">,</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">                      </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">stack_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">16</span><span class="o">*</span><span class="mi">1024</span><span class="o">*</span><span class="mi">1024</span><span class="p">);</span>
+</code></pre></div>
+<p>Parameters:</p>
 <ul>
-<li>
-<p>(<em>commented</em>) <a href="https://github.com/diatomic/diy/blob/master/examples/simple/simple.cpp">simple.cpp</a>: exercises
-simple neighbor communication by creating a linear chain of blocks, each
-connected to two neighbors (predecessor and successor), except for the
-first and the last blocks, which have only one or the other. Each block
-computes an average of its values and those of its neighbors. The average is
-stored in the block, and the blocks are written to a file in storage.</p>
-</li>
-<li>
-<p><a href="https://github.com/diatomic/diy/blob/master/examples/simple/until-done.cpp">until-done.cpp</a>: shows how to use
-collectives in the DIY model, i.e., block-based collectives that can run
-in-/out-of-core and single/multithreaded. The same result can be
-accomplished using the reduction patterns in
-<a href="https://github.com/diatomic/diy/tree/master/examples/reduce">examples/reduce</a>,
-but using DIY collectives can be easier for simple "one-line" reductions
-such as global sums or boolean ands. This example shows how to do an all_reduce()
-in order to determine whether all blocks have finished processing.</p>
-</li>
-<li>
-<p><a href="https://github.com/diatomic/diy/blob/master/examples/simple/read-blocks.cpp">read-blocks.cpp</a>: shows how to read
-a DIY file back into memory and create a new DIY master and assignment of
-blocks to processes that may be different than when the blocks were written.
-The blocks from <a href="https://github.com/diatomic/diy/blob/master/examples/simple/simple.cpp">simple.cpp</a> are read back into
-memory from the file, and their values are printed.</p>
-</li>
+<li><code>callback</code>: Function object called for each block with signature <code>void(Block*, const ProxyWithLink&amp;)</code></li>
+<li><code>remote</code>: Whether to include remote communication (default: false)</li>
+<li><code>stack_size</code>: Stack size allocated for each coroutine in bytes (default: 16MB)</li>
 </ul>
-</li>
-<li>
-<p><a href="https://github.com/diatomic/diy/tree/master/examples/decomposition">Decomposition</a>:
-  demonstrates how to decompose a regular grid into blocks and create links between them.</p>
+<h2 id="yield">yield()</h2>
+<p>The <code>yield()</code> method is called within the callback to trigger a message exchange round:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">yield</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+</code></pre></div>
+<p>When <code>yield()</code> is called:</p>
 <ul>
-<li>
-<p>(<em>commented</em>) <a href="https://github.com/diatomic/diy/blob/master/examples/decomposition/regular-decomposer-long.cpp">regular-decomposer-long.cpp</a>:
-blocks are defined via a lambda function provided to the decomposer. This
-example shows how to set shared faces, ghost regions, and periodic boundaries
-in the decomposition. It also shows both how to create a <code>RegularDecomposer</code>
-and call its <code>decompose</code> member function, as well as how to combine those two
-steps using one helper function.</p>
-</li>
-<li>
-<p>(<em>commented</em>) <a href="https://github.com/diatomic/diy/blob/master/examples/decomposition/regular-decomposer-short.cpp">regular-decomposer-short.cpp</a>:
-domain can be decomposed just by providing a <code>Master</code> object to the
-decomposer.</p>
-</li>
+<li>The current block pauses execution</li>
+<li>DIY performs a message exchange between all active blocks</li>
+<li>Execution resumes at the line following the <code>yield()</code> call</li>
 </ul>
-</li>
-<li>
-<p><a href="https://github.com/diatomic/diy/tree/master/examples/serialization">Serialization</a>:
-  blocks that are loaded and saved in and out of core are serialized by DIY. This
-  example shows how to write the <code>load</code> and <code>save</code> functions for two data
-  structures. Both require just a one-line definition because DIY can serialize
-  such structures automatically.</p>
+<h2 id="usage-pattern-and-example">Usage Pattern and Example</h2>
+<p>Replace traditional foreach/exchange pattern with coroutine-based execution:</p>
+<p><strong>Traditional approach:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">master</span><span class="p">.</span><span class="n">foreach</span><span class="p">(</span><span class="o">&amp;</span><span class="n">local_sum</span><span class="p">);</span><span class="w">          </span><span class="c1">// First computation phase</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">master</span><span class="p">.</span><span class="n">exchange</span><span class="p">();</span><span class="w">                   </span><span class="c1">// Message exchange</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">master</span><span class="p">.</span><span class="n">foreach</span><span class="p">(</span><span class="o">&amp;</span><span class="n">average_neighbors</span><span class="p">);</span><span class="w">  </span><span class="c1">// Second computation phase</span>
+</code></pre></div></p>
+<p><strong>Coroutine approach:</strong> from <code>examples/simple/simple.cpp</code>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">master</span><span class="p">.</span><span class="n">foreach_exchange</span><span class="p">([](</span><span class="n">Block</span><span class="o">*</span><span class="w"> </span><span class="k">const</span><span class="o">&amp;</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">diy</span><span class="o">::</span><span class="n">Master</span><span class="o">::</span><span class="n">ProxyWithLink</span><span class="o">&amp;</span><span class="w"> </span><span class="n">cp</span><span class="p">)</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="p">{</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="n">local_sum</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">cp</span><span class="p">);</span><span class="w">                </span><span class="c1">// First computation phase</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="n">cp</span><span class="p">.</span><span class="n">yield</span><span class="p">();</span><span class="w">                      </span><span class="c1">// Trigger message exchange</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="n">average_neighbors</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">cp</span><span class="p">);</span><span class="w">        </span><span class="c1">// Second computation phase</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="p">});</span>
+</code></pre></div></p>
+<h2 id="when-to-use-coroutines">When to Use Coroutines</h2>
+<p>Coroutines are beneficial when:</p>
 <ul>
-<li><a href="https://github.com/diatomic/diy/blob/master/examples/serialization/test-serialization.cpp">test-serialization.cpp</a>:
-a 3-d <code>Point</code> and an n-d <code>PointVec</code> are serialized automatically, and the
-main program tests loading and saving both structures.</li>
-</ul>
-</li>
-<li>
-<p><a href="https://github.com/diatomic/diy/tree/master/examples/mpi">MPI</a>:
-  shows DIY's convenience wrapper for MPI. It exists only to make the
-  code simpler; the user is free to use it or the original MPI routines
-  interchangeably.</p>
-<ul>
-<li><a href="https://github.com/diatomic/diy/blob/master/examples/mpi/test-mpi.cpp">test-mpi.cpp</a>: this example exercises <code>send</code>,
-<code>receive</code>, <code>iprobe</code>, <code>broadcast</code>, <code>reduce</code>, <code>scan</code>, and <code>all_gather</code>.</li>
-</ul>
-</li>
-<li>
-<p><a href="https://github.com/diatomic/diy/tree/master/examples/io">I/O</a>: illustrates
-  BOV (brick of values) and NumPy I/O, both built on top of MPI-IO and MPI
-  sub-array types.</p>
-<ul>
-<li><a href="https://github.com/diatomic/diy/blob/master/examples/io/test-io.cpp">test-io.cpp</a>: tests the readers and writers for
-BOV and NumPy. The reader would typically be called from the <code>create</code>
-callback passed to diy::decompose and tell the reader to read a specific
-block of data that the decomposer chose. Blocks can read data collectively if
-the number of blocks on each processor is the same. Same goes for the
-writers. The writer would typically be called from the <code>foreach</code> callback for
-each block.</li>
-</ul>
-</li>
-<li>
-<p><a href="https://github.com/diatomic/diy/tree/master/examples/reduce">Reduction</a>:
-  DIY supports general reductions to implement more complex global operations
-  than the collective one-liners. These reductions are general-purpose (any
-  global communication pattern can be implemented); they operate over blocks,
-  which cycle in and out of core as necessary; the
-  operations are (multi-)threaded automatically using the same mechanism as
-  <code>diy::Master::foreach()</code>. Although any global communication can
-  be expressed using the reduction mechanism, all the reductions included in DIY
-  operate in rounds over a k-ary reduction tree. The value of k used in each round
-  can vary, but if it's fixed, the number of rounds is log_k(nblocks).</p>
-<ul>
-<li>
-<p>(<em>commented</em>) <a href="https://github.com/diatomic/diy/blob/master/examples/reduce/merge-reduce.cpp">merge-reduce.cpp</a>:
-merges blocks together, computing a sum of their values. At each
-round, one block of a group of k blocks is the root of the group. The other
-blocks send their data to the root, which computes the sum, and the
-root block (only) proceeds to the next round. After <code>log_k(numblocks)</code> rounds,
-one block contains the global sum of the values. Calling merge-reduce
-is done by creating <code>diy::RegularMergePartners</code> and then calling
-<code>diy::reduce</code>. For regular grids of blocks, groups can be formed by either
-"distance-doubling" or "distance-halving" depending on the value of the
-<code>contiguous</code> parameter in <code>diy::RegularMergePartners</code>.</p>
-</li>
-<li>
-<p>(<em>commented</em>) <a href="https://github.com/diatomic/diy/blob/master/examples/reduce/swap-reduce.cpp">swap-reduce.cpp</a>: unlike
-merge-reduce, the swap-reduction does not idle blocks from one round to the
-next and does not aggregate all the results to a single block. Rather, block
-data are split into k pieces that are swapped between the k members of
-a group. This particular example begins with an unsorted set of points that
-do not lie in the bounds of the blocks, and the swap reduction is used to
-sort the points in the correct blocks with respect to the block bounds.</p>
-</li>
-<li>
-<p><a href="https://github.com/diatomic/diy/blob/master/examples/reduce/all-to-all.cpp">all-to-all.cpp</a>: this example solves
-the same problem as <a href="https://github.com/diatomic/diy/blob/master/examples/reduce/swap-reduce.cpp">swap-reduce.cpp</a>: sorts
-points in blocks. The difference is that
-<a href="https://github.com/diatomic/diy/blob/master/examples/reduce/swap-reduce.cpp">swap-reduce.cpp</a> does everything manually;
-whereas in <a href="https://github.com/diatomic/diy/blob/master/examples/reduce/all-to-all.cpp">all-to-all.cpp</a>, the user only
-specifies how to enqueue data (from each block to each block) at the start
-and how to dequeue data at the end. <code>diy::all_to_all()</code> takes care of all the
-intermediate rounds, routing the data appropriately.</p>
-</li>
-<li>
-<p>(<em>commented</em>) <a href="https://github.com/diatomic/diy/blob/master/examples/reduce/all-done.cpp">all-done.cpp</a>: this is another example of using
-<code>diy::all_to_all()</code> for a very common case: to determine globally whether any blocks have
-any local work left to do.</p>
-</li>
-<li>
-<p><a href="https://github.com/diatomic/diy/blob/master/examples/reduce/sort.cpp">sort.cpp</a>: shows how to use reduction to sort
-a 1-d vector of integers. The algorithm is a histogram-based sort that
-combines both merge and swap reductions. It merges histograms of local data
-distributions, computes quantiles of the histograms, and then swaps data
-values among blocks based on the quantiles.</p>
-</li>
-</ul>
-</li>
-<li>
-<p><a href="https://github.com/diatomic/diy/tree/master/examples/reduce">Algorithms</a>:
-  Examples of the following algorithms are included.</p>
-<ul>
-<li>
-<p><a href="https://github.com/diatomic/diy/blob/master/examples/reduce/sample-sort.cpp">sample-sort.cpp</a>: This example calls the parallel
-sample sort algorithm of [Blelloch 1998] that's included in DIY.
-The built-in  <code>diy::sort</code> used in this example is easier to use than
-the manual sort implemented by the example above, and we are in the process of comparing the
-performance of the two versions. Note that
-<a href="\ref reduce/sort.cpp">sort.cpp</a> can only sort arithmetic types (to be able
-to compute the histograms), whereas <code>diy::sort</code> supports any type, which has
-a user-supplied comparison operation.</p>
-</li>
-<li>
-<p><a href="https://github.com/diatomic/diy/blob/master/examples/reduce/kd-tree.cpp">kd-tree.cpp</a>: Like the swap-reduce example above, this
-example begins with an unsorted set of points that do not lie in the bounds
-of any blocks, but the points are sorted into kd-tree of blocks with
-approximately equal numbers of points in each block.</p>
-</li>
-</ul>
-</li>
-<li>
-<p><a href="https://github.com/diatomic/diy/tree/master/examples/load_balancing">Load Balancing</a>:
-  Automatically redistributes blocks across processes during a computation to balance computational workload.</p>
-<ul>
-<li><a href="https://github.com/diatomic/diy/blob/master/examples/load_balancing/dynamic.cpp">dynamic.cpp</a>: Dynamic load balancing replaces the <code>foreach</code> operation with <code>dynamic_foreach</code> that automatically combines dynamic load balancing with block computation.
-The <code>dynamic_foreach()</code> method executes blocks while monitoring workload and moving blocks between processes as needed.</li>
-</ul>
-</li>
-</ul>
-<p>Various other open-source projects have been DIY'ed, and these are also good, albeit more involved, places to learn DIY. Here are a few suggestions:</p>
-<ul>
-<li><a href="https://github.com/tpeterka/cian2">cian2</a> is a suite of benchmarks that test
-  various HPC tasks. The <a href="https://github.com/tpeterka/cian2/tree/master/communication">communication</a> part of cian
-  tests common communication patterns including most of the above reductions and
-  neighbor communication.</li>
-<li><a href="https://github.com/diatomic/tess2">tess2</a> is a parallel Voronoi and Delaunay tessellation library that is parallelized using DIY.<ul>
-<li>The <a href="https://github.com/diatomic/tess2/tree/master/src">src</a> directory is the library code that uses DIY to compute the tessellation in parallel and write it to disk in the DIY block format.</li>
-<li>The <a href="https://github.com/diatomic/tess2/tree/master/examples">examples</a> directory contains numerous DIY programs that use the tess library.</li>
-<li>The <a href="https://github.com/diatomic/tess2/tree/master/tools">tools</a> directory contains a serial rendering program <code>draw.cpp</code> that reads the DIY block format from disk and uses it to draw the tessellation.</li>
-</ul>
-</li>
+<li>Your algorithm requires multiple communication rounds between computation phases</li>
+<li>You want to express iterative algorithms more naturally within a single callback</li>
+<li>You need to pause execution at specific points to exchange messages</li>
+<li>You want to reduce code complexity compared to separate foreach/exchange calls</li>
 </ul>
 
 
