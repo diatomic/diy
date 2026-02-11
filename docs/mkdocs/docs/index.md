@@ -81,7 +81,7 @@ Complete examples of working programs can be found in the [Examples](examples) p
  - [Algorithms](algorithms)
  - [Dynamic load balancing](load_balancing)
  - [Writing out-of-core algorithms](ooc)
- - [Coroutines](coroutines)
+ - [Coroutines](coroutine)
  - [Automatic block threading](threads)
  - [Examples](examples)
 
