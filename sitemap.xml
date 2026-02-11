@@ -2,77 +2,70 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://example.com/</loc>
-         <lastmod>2023-01-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-02-11</lastmod>
     </url>
     <url>
          <loc>https://example.com/algorithms/</loc>
-         <lastmod>2023-01-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-02-11</lastmod>
     </url>
     <url>
          <loc>https://example.com/async_comm/</loc>
-         <lastmod>2023-01-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-02-11</lastmod>
     </url>
     <url>
          <loc>https://example.com/callbacks/</loc>
-         <lastmod>2023-01-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-02-11</lastmod>
+    </url>
+    <url>
+         <loc>https://example.com/coroutine/</loc>
+         <lastmod>2026-02-11</lastmod>
     </url>
     <url>
          <loc>https://example.com/decomposition/</loc>
-         <lastmod>2023-01-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-02-11</lastmod>
     </url>
     <url>
          <loc>https://example.com/examples/</loc>
-         <lastmod>2023-01-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-02-11</lastmod>
     </url>
     <url>
          <loc>https://example.com/initialization/</loc>
-         <lastmod>2023-01-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-02-11</lastmod>
     </url>
     <url>
          <loc>https://example.com/io/</loc>
-         <lastmod>2023-01-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-02-11</lastmod>
+    </url>
+    <url>
+         <loc>https://example.com/load_balancing/</loc>
+         <lastmod>2026-02-11</lastmod>
     </url>
     <url>
          <loc>https://example.com/local_comm/</loc>
-         <lastmod>2023-01-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-02-11</lastmod>
     </url>
     <url>
          <loc>https://example.com/mpi/</loc>
-         <lastmod>2023-01-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-02-11</lastmod>
     </url>
     <url>
          <loc>https://example.com/ooc/</loc>
-         <lastmod>2023-01-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-02-11</lastmod>
     </url>
     <url>
          <loc>https://example.com/reduce_comm/</loc>
-         <lastmod>2023-01-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-02-11</lastmod>
     </url>
     <url>
          <loc>https://example.com/remote_comm/</loc>
-         <lastmod>2023-01-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-02-11</lastmod>
     </url>
     <url>
          <loc>https://example.com/serialization/</loc>
-         <lastmod>2023-01-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-02-11</lastmod>
     </url>
     <url>
          <loc>https://example.com/threads/</loc>
-         <lastmod>2023-01-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-02-11</lastmod>
     </url>
 </urlset>
