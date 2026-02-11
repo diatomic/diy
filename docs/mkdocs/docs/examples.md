@@ -144,6 +144,12 @@ ones are clear.
     of any blocks, but the points are sorted into kd-tree of blocks with
     approximately equal numbers of points in each block.
 
+- [Load Balancing](https://github.com/diatomic/diy/tree/master/examples/load_balancing):
+  Automatically redistributes blocks across processes during a computation to balance computational workload.
+
+    - [dynamic.cpp](https://github.com/diatomic/diy/blob/master/examples/load_balancing/dynamic.cpp): Dynamic load balancing replaces the `foreach` operation with `dynamic_foreach` that automatically combines dynamic load balancing with block computation.
+    The `dynamic_foreach()` method executes blocks while monitoring workload and moving blocks between processes as needed.
+
 Various other open-source projects have been DIY'ed, and these are also good, albeit more involved, places to learn DIY. Here are a few suggestions:
 
 - [cian2](https://github.com/tpeterka/cian2) is a suite of benchmarks that test

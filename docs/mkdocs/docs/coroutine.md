@@ -25,30 +25,18 @@ master.foreach_exchange([](Block* b, const ProxyWithLink& cp)
 
 This approach simplifies code that requires multiple communication rounds and enables more natural expression of iterative algorithms.
 
-## Key Components
-
-### High-level API (Primary Usage)
-
 - `master.foreach_exchange()`: Executes a callback function with coroutine support, automatically handling multiple exchange rounds
 - `cp.yield()`: Yields control from the current block to trigger a message exchange round
 - Automatic lifecycle management: Coroutines are created and managed automatically for each block
 
-### Low-level API (Advanced Usage)
-
-- `diy::coroutine` namespace: Core functions for manual coroutine management
-- `co_create()`, `co_switch()`, `co_delete()`: Manual coroutine creation, switching, and cleanup
-- `diy::coroutine::argument()`: Thread-local argument passing mechanism
-
-## High-level API
-
-### foreach_exchange()
+## foreach_exchange()
 
 The `foreach_exchange()` method combines block processing with automatic message exchange handling:
 
 ```cpp
-void foreach_exchange(const F& callback,
-                    bool remote = false,
-                    unsigned int stack_size = 16*1024*1024);
+void foreach_exchange(const F&     callback,
+                      bool         remote = false,
+                      unsigned int stack_size = 16*1024*1024);
 ```
 
 Parameters:
@@ -57,7 +45,7 @@ Parameters:
 - `remote`: Whether to include remote communication (default: false)
 - `stack_size`: Stack size allocated for each coroutine in bytes (default: 16MB)
 
-### yield()
+## yield()
 
 The `yield()` method is called within the callback to trigger a message exchange round:
 
@@ -71,9 +59,9 @@ When `yield()` is called:
 - DIY performs a message exchange between all active blocks
 - Execution resumes at the line following the `yield()` call
 
-### Usage Pattern
+## Usage Pattern and Example
 
-Replace traditional foreach/exchange patterns with coroutine-based execution:
+Replace traditional foreach/exchange pattern with coroutine-based execution:
 
 **Traditional approach:**
 ```cpp
@@ -82,7 +70,7 @@ master.exchange();                   // Message exchange
 master.foreach(&average_neighbors);  // Second computation phase
 ```
 
-**Coroutine approach:**
+**Coroutine approach:** from `examples/simple/simple.cpp`
 ```cpp
 master.foreach_exchange([](Block* const& b, const diy::Master::ProxyWithLink& cp)
 {
@@ -90,136 +78,6 @@ master.foreach_exchange([](Block* const& b, const diy::Master::ProxyWithLink& cp
     cp.yield();                      // Trigger message exchange
     average_neighbors(b, cp);        // Second computation phase
 });
-```
-
-## Low-level API
-
-The low-level API provides direct control over coroutine creation and management. This is useful for advanced use cases requiring fine-grained control.
-
-### Core Functions
-
-```cpp
-namespace diy::coroutine {
-    using cothread_t = void*;
-
-    cothread_t  co_active();                     // Get current coroutine
-    cothread_t  co_create(unsigned int stack_size, void (*entry)(void));
-    void        co_delete(cothread_t cothread);
-    void        co_switch(cothread_t cothread);
-    void*&      argument();                      // Thread-local argument storage
-}
-```
-
-### Basic Usage Pattern
-
-```cpp
-// Create coroutine
-auto coro = diy::coroutine::co_create(stack_size, &coroutine_function);
-
-// Set up arguments
-struct Info { diy::coroutine::cothread_t main; int value; };
-Info info = { diy::coroutine::co_active(), 42 };
-diy::coroutine::argument() = &info;
-
-// Switch to coroutine
-diy::coroutine::co_switch(coro);
-
-// Clean up when done
-diy::coroutine::co_delete(coro);
-```
-
-### Coroutine Function Structure
-
-```cpp
-void coroutine_function()
-{
-    Info* info = static_cast<Info*>(diy::coroutine::argument());
-    diy::coroutine::cothread_t main = info->main;
-
-    // First execution phase
-    std::cout << info->value << std::endl;
-
-    // Return to main
-    diy::coroutine::co_switch(main);
-
-    // Resume execution here
-    std::cout << "Resumed execution" << std::endl;
-
-    // Return to main and complete
-    diy::coroutine::co_switch(main);
-}
-```
-
-## Usage Examples
-
-### High-level Example
-
-From `examples/simple/simple.cpp`, the coroutine-based execution:
-
-```cpp
-master.foreach_exchange([](Block* const& b, const diy::Master::ProxyWithLink& cp)
-{
-    // First phase: sum local values
-    local_sum(b, cp);
-    cp.yield();                    // Yield for message exchange
-
-    // Second phase: compute averages of received values
-    average_neighbors(b, cp);
-});
-```
-
-### Low-level Example
-
-Simplified from `examples/coroutine/coroutine.cpp`, showing direct coroutine management:
-
-```cpp
-#include <diy/coroutine.hpp>
-namespace dc = diy::coroutine;
-
-struct Info
-{
-    dc::cothread_t  main;
-    int             value;
-};
-
-void coroutine_function()
-{
-    Info* info = static_cast<Info*>(dc::argument());
-    dc::cothread_t main = info->main;
-    int x = info->value;
-
-    // First execution
-    std::cout << x << std::endl;
-    x += 1;
-
-    // Return to main
-    dc::co_switch(main);
-
-    // Resume execution
-    std::cout << x << std::endl;
-    dc::co_switch(main);
-}
-
-int main()
-{
-    // Create coroutine with 4MB stack
-    auto coro = dc::co_create(4*1024*1024, &coroutine_function);
-
-    Info info;
-    info.main = dc::co_active();
-    info.value = 5;
-
-    dc::argument() = &info;
-
-    std::cout << "Jumping to coroutine" << std::endl;
-    dc::co_switch(coro);           // First switch
-    std::cout << "Back in main" << std::endl;
-
-    dc::co_switch(coro);           // Second switch
-    dc::co_delete(coro);           // Clean up
-
-    std::cout << "Done" << std::endl;
-}
 ```
 
 ## When to Use Coroutines
