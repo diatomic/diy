@@ -9,6 +9,9 @@ namespace diy
     // record master gids in assigner and then lookup the procs for all gids in the links
     inline void    fix_links(diy::Master& master, diy::DynamicAssigner& assigner);
 
+    // lookup the procs for all gids not in the links and update them
+    inline void    fix_queues(diy::Master& master, diy::DynamicAssigner& assigner);
+
     // auxiliary functions; could stick them into detail namespace, but they might be useful on their own
     inline void    record_local_gids(const diy::Master& master, diy::DynamicAssigner& assigner);
     inline void    update_links(diy::Master& master, const diy::DynamicAssigner& assigner);
@@ -67,6 +70,53 @@ fix_links(diy::Master& master, diy::DynamicAssigner& assigner)
     record_local_gids(master, assigner);
     master.communicator().barrier();        // make sure everyone has set ranks
     update_links(master, assigner);
+}
+
+void
+diy::
+fix_queues(diy::Master& master, diy::DynamicAssigner& assigner)
+{
+    for (int i = 0; i < (int)master.size(); ++i)
+    {
+        // update procs in outgoing queues
+
+        Master::OutgoingQueues& outgoing_queues  = master.outgoing(master.gid(i));
+        Master::OutgoingQueues  new_outgoing_queues;
+
+        // TODO: switching lock_guard on outgoing_queues to recursive_mutex would save locking every emplace operation
+        // however, I can't get that to compile (TP 2/26/26)
+        for (auto it = outgoing_queues.begin(); it != outgoing_queues.end(); it++)
+        {
+            int changed_proc = -1;      // no change in proc
+            auto target_bid = it->first;
+
+            // if target_bid is in the link, update proc from link, otherwise lookup dynamic assigner
+            int neighbor = master.link(i)->find(target_bid.gid);
+            if (neighbor != -1)
+            {
+                if (target_bid.proc != master.link(i)->neighbors()[neighbor].proc)
+                    changed_proc = master.link(i)->neighbors()[neighbor].proc;
+            }
+            else
+            {
+                int current_proc = assigner.rank(target_bid.gid);
+                if (target_bid.proc != current_proc)
+                    changed_proc = current_proc;
+            }
+
+            if (changed_proc != -1)
+            {
+                target_bid.proc = changed_proc;
+                auto access = it->second.access();
+                auto queue_record = std::move(*access);
+                new_outgoing_queues.emplace(target_bid, std::move(queue_record));
+            }
+            else
+                new_outgoing_queues.emplace(std::move(*it));
+        }
+        lock_guard<fast_mutex> lo(outgoing_queues.mutex_);
+        std::swap(outgoing_queues, new_outgoing_queues);
+    }
 }
 
 #endif

@@ -101,18 +101,15 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
         Master::IncomingQueues &in_qs = master.incoming(move_gid);
         for (auto &x : in_qs)
         {
-            int from = x.first;
             for (Master::QueueRecord &qr : *x.second.access())
-            {
-                // debug
-                fmt::print(stderr, "Enqueuing incoming queue: {} <- {}", move_gid, from);
-
                 cp.enqueue(dest_block, qr.buffer());
-            }
         }
 
+        // NB: don't send the outgoing queues because messages in those queues can be sent
+        // from the master of the original proc
+
         // debug
-        // fmt::print(stderr, "src {} -> gid {} -> dst {}\n", master.communicator().rank(), move_gid, dst_proc);
+//         fmt::print(stderr, "dynamic_send_block: src proc {} -> gid {} -> dst proc {}\n", master.communicator().rank(), move_gid, dst_proc);
 
         diy::MemoryBuffer block_bb, link_bb;
 
@@ -183,20 +180,19 @@ inline void dynamic_recv(const diy::Master::ProxyWithLink&  cp,                 
                     Master::IncomingQueues &in_qs = master.incoming(move_gid);
                     for (auto &x : in_qs)
                     {
-                        int from = x.first;
                         auto access = x.second.access();
                         if (!access->empty())
                         {
                             // NB: we only load the front queue, TODO: is this correct?
                             auto& qr = access->front();
 
-                            // debug
-                            fmt::print(stderr, "Loading queue: {} <- {}\n", move_gid, from);
-
                             cp.dequeue(gid, bb.buffer);
                             qr.buffer() = std::move(bb);
                         }
                     }
+
+                    // NB: we didn't send the outgoing queues in dynamic_send_block
+                    // so no outgoing queues to receive here
 
                     // dequeue the block
                     diy::MemoryBuffer block_bb;
@@ -297,7 +293,6 @@ void dynamic_balance(diy::Master*                    master,                 // 
     AuxBlock* ab = static_cast<AuxBlock*>(aux_master->block(0));
     ab->iexchange_done = true;
 
-    // fix links
     diy::fix_links(*master, *dynamic_assigner);
 }
 

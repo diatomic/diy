@@ -86,6 +86,10 @@ struct diy::concurrent_map
     void            clear()                 { lock_guard<fast_mutex> l(mutex_); map_.clear(); }
     bool            empty()                 { lock_guard<fast_mutex> l(mutex_); return map_.empty(); }
 
+    template<class... Args>
+    void            emplace(Args&&... args)
+                                            { lock_guard<fast_mutex> l(mutex_); map_.emplace(std::forward<Args>(args)...); }
+
     Map                 map_;
     mutable fast_mutex  mutex_;
 };
