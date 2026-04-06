@@ -1,5 +1,5 @@
 site_name: DIY
-site_url: https://example.com/
+site_url: https://diatomic.github.io/diy/
 nav:
     - Home: index.md
     - Initialization: initialization.md
