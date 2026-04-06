@@ -49,7 +49,7 @@ void average_neighbors(Block* b,                             // local block
 
     // for all neighbor blocks, dequeue data received from this neighbor block in the last exchange
     int total = 0;
-    for (int i = 0; i < l.size(); ++i)
+    for (int i = 0; i < l->size(); ++i)
     {
         int v;
         cp.dequeue(l->target(i).gid, v);
