@@ -115,8 +115,7 @@ fix_queues(diy::Master& master, diy::DynamicAssigner& assigner)
             else
                 new_outgoing_queues.emplace(std::move(*it));
         }
-        lock_guard<fast_mutex> lo(outgoing_queues.mutex_);
-        std::swap(outgoing_queues, new_outgoing_queues);
+        outgoing_queues.swap(new_outgoing_queues);
     }
 }
 

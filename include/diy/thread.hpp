@@ -13,6 +13,7 @@
 
 #include <thread>
 #include <mutex>
+#include <utility>
 
 namespace diy
 {
@@ -49,6 +50,33 @@ struct diy::concurrent_map
 {
     using Map       = std::map<T,U>;
     using SharedPtr = std::shared_ptr<lock_guard<fast_mutex>>;
+
+                    concurrent_map() = default;
+                    concurrent_map(const concurrent_map&) = delete;
+    concurrent_map& operator=(const concurrent_map&) = delete;
+
+                    concurrent_map(concurrent_map&& other)
+                    {
+                        lock_guard<fast_mutex> l(other.mutex_);
+                        map_ = std::move(other.map_);
+                    }
+
+    concurrent_map& operator=(concurrent_map&& other)
+                    {
+                        swap(other);
+                        return *this;
+                    }
+
+    void            swap(concurrent_map& other)
+                    {
+                        if (this == &other)
+                            return;
+
+                        lock_guard<fast_mutex> l(mutex_,       std::defer_lock);
+                        lock_guard<fast_mutex> r(other.mutex_, std::defer_lock);
+                        std::lock(l, r);
+                        map_.swap(other.map_);
+                    }
 
     template<class MapIterator>
     struct iterator_
@@ -93,6 +121,15 @@ struct diy::concurrent_map
     Map                 map_;
     mutable fast_mutex  mutex_;
 };
+
+namespace diy
+{
+    template<class T, class U>
+    void swap(concurrent_map<T,U>& x, concurrent_map<T,U>& y)
+    {
+        x.swap(y);
+    }
+}
 #endif // !defined(DIY_NO_THREADS)
 
 #endif
