@@ -12,7 +12,7 @@ include:
 stages:
   - build
   - test
-  - trigger
+  - external
 
 ################################################################################
 # Job declarations
@@ -48,8 +48,8 @@ stages:
 # - Checkers
 #   - clang-tidy?
 
-trigger:spack:
-  stage: trigger
+external:spack:
+  stage: external
   needs: []
   rules:
     - if: '$CI_MERGE_REQUEST_ID'
@@ -64,12 +64,13 @@ trigger:spack:
     - apk add --no-cache curl
   script:
     - |
-      curl --fail --silent --request POST \
+      test -n "$SPACK_TRIGGER_TOKEN" || { echo "SPACK_TRIGGER_TOKEN is not set"; exit 1; }
+      curl --fail --show-error --request POST \
         --form "token=$SPACK_TRIGGER_TOKEN" \
         --form "ref=$CI_COMMIT_REF_NAME" \
         --form "variables[UPSTREAM_PROJECT_ID]=$CI_PROJECT_ID" \
         --form "variables[UPSTREAM_COMMIT_SHA]=$CI_COMMIT_SHA" \
-        "https://gitlab.spack.io/api/v4/projects/diatomic%2Fdiy/trigger/pipeline"
+        "https://gitlab.spack.io/api/v4/projects/48/trigger/pipeline"
 
 .linux_builder_tags:
   tags:
