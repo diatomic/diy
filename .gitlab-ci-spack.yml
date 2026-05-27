@@ -12,10 +12,7 @@ stages:
 
 .linux_builder_tags:
   tags:
-    - medium
-    - uo
-    - public
-    - x86_64
+    - hpsf-x86_64
 
 build:fedora36-mpich:
   extends:
@@ -23,13 +20,13 @@ build:fedora36-mpich:
     - .cmake_build_linux
     - .linux_builder_tags
     - .cmake_build_artifacts
-    - .run_automatically
+    - .rules
 
 test:fedora36-mpich:
   extends:
     - .fedora36_mpich
     - .cmake_test_linux
     - .linux_builder_tags
-    - .run_automatically
+    - .rules
   needs:
     - build:fedora36-mpich
