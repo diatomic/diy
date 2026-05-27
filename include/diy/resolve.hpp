@@ -72,6 +72,9 @@ fix_links(diy::Master& master, diy::DynamicAssigner& assigner)
     update_links(master, assigner);
 }
 
+// fix_queues requires threads
+#ifndef DIY_NO_THREADS
+
 void
 diy::
 fix_queues(diy::Master& master, diy::DynamicAssigner& assigner)
@@ -83,8 +86,6 @@ fix_queues(diy::Master& master, diy::DynamicAssigner& assigner)
         Master::OutgoingQueues& outgoing_queues  = master.outgoing(master.gid(i));
         Master::OutgoingQueues  new_outgoing_queues;
 
-        // TODO: switching lock_guard on outgoing_queues to recursive_mutex would save locking every emplace operation
-        // however, I can't get that to compile (TP 2/26/26)
         for (auto it = outgoing_queues.begin(); it != outgoing_queues.end(); it++)
         {
             int changed_proc = -1;      // no change in proc
@@ -118,5 +119,7 @@ fix_queues(diy::Master& master, diy::DynamicAssigner& assigner)
         std::swap(outgoing_queues, new_outgoing_queues);
     }
 }
+
+#endif  // DIY_NO_THREADS
 
 #endif
