@@ -12,6 +12,7 @@ include:
 stages:
   - build
   - test
+  - trigger
 
 ################################################################################
 # Job declarations
@@ -46,6 +47,29 @@ stages:
 #   - macOS
 # - Checkers
 #   - clang-tidy?
+
+trigger:spack:
+  stage: trigger
+  needs: []
+  rules:
+    - if: '$CI_MERGE_REQUEST_ID'
+  variables:
+    GIT_STRATEGY: none
+  image: alpine:latest
+  tags:
+    - diy
+    - docker
+    - linux-x86_64
+  before_script:
+    - apk add --no-cache curl
+  script:
+    - |
+      curl --fail --silent --request POST \
+        --form "token=$SPACK_TRIGGER_TOKEN" \
+        --form "ref=$CI_COMMIT_REF_NAME" \
+        --form "variables[UPSTREAM_PROJECT_ID]=$CI_PROJECT_ID" \
+        --form "variables[UPSTREAM_COMMIT_SHA]=$CI_COMMIT_SHA" \
+        "https://gitlab.spack.io/api/v4/projects/diatomic%2Fdiy/trigger/pipeline"
 
 .linux_builder_tags:
   tags:

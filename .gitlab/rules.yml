@@ -3,6 +3,9 @@
 # When to even consider running a pipeline
 workflow:
     rules:
+        # Allow pipelines triggered via API (e.g., from Kitware CI for MRs).
+        - if: '$CI_PIPELINE_SOURCE == "trigger"'
+          when: always
         # Run for merge requests.
         - if: '$CI_MERGE_REQUEST_ID'
           when: always

@@ -10,6 +10,35 @@ stages:
   - build
   - test
 
+.report_kitware:
+  stage: .post
+  tags:
+    - hpsf-x86_64
+  image: alpine:latest
+  variables:
+    GIT_STRATEGY: none
+  before_script:
+    - apk add --no-cache curl
+  script:
+    - |
+      test -n "$UPSTREAM_COMMIT_SHA" || exit 0
+      curl --fail --silent --request POST \
+        --header "PRIVATE-TOKEN: $KITWARE_API_TOKEN" \
+        "https://gitlab.kitware.com/api/v4/projects/${UPSTREAM_PROJECT_ID}/statuses/${UPSTREAM_COMMIT_SHA}" \
+        --data "state=${STATE}&name=spack-ci&target_url=${CI_PIPELINE_URL}"
+
+report:kitware-success:
+  extends: .report_kitware
+  when: on_success
+  variables:
+    STATE: success
+
+report:kitware-failure:
+  extends: .report_kitware
+  when: on_failure
+  variables:
+    STATE: failed
+
 .linux_builder_tags:
   tags:
     - hpsf-x86_64
