@@ -3,6 +3,8 @@
 
 #include "thread.hpp"
 
+#include <utility>
+
 namespace diy
 {
   template<class T, class Mutex>
@@ -40,6 +42,22 @@ namespace diy
                             x_(x)                           {}
                         critical_resource(T&& x):
                             x_(std::move(x))                {}
+                        critical_resource(const critical_resource&) = delete;
+                        critical_resource& operator=(const critical_resource&) = delete;
+
+                        critical_resource(critical_resource&& other):
+                            x_(std::move(*other.access()))  {}
+
+     critical_resource& operator=(critical_resource&& other)
+                        {
+                          if (this != &other)
+                          {
+                            auto x = access();
+                            auto y = other.access();
+                            *x = std::move(*y);
+                          }
+                          return *this;
+                        }
 
       accessor          access()                            { return accessor(x_, m_); }
       const_accessor    const_access() const                { return const_accessor(x_, m_); }

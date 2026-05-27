@@ -78,16 +78,33 @@ struct Block
          //            iter, gid, pred_work, act_work, noise_factor * perturb);
      }
 
-    void compute(const diy::Master::ProxyWithLink&,                         // communication proxy (unused)
-                 int                                max_time,               // maximum time for a block to compute
-                 int)                                                       // curent iteration (unused)
+    void compute(const diy::Master::ProxyWithLink&  cp,                     // communication proxy
+                 int                                max_time)               // maximum time for a block to compute
     {
         unsigned int usec = max_time * act_work * 10000L;
+
+        // test some communication between neighoring blocks, eg, send the amount of local work (not sending actual work, just a number)
+        diy::Link*    l = cp.link();
+        for (int i = 0; i < l->size(); ++i)
+            cp.enqueue(l->target(i), act_work);
 
         // debug
 //         fmt::print(stderr, "iteration {} block gid {} computing for {} s.\n", iter, gid, double(usec) / 1e6);
 
         std::this_thread::sleep_for(std::chrono::microseconds(usec));
+    }
+
+    void recv_comm(const diy::Master::ProxyWithLink&  cp)                   // communication proxy
+    {
+        diy::Link*    l = cp.link();
+
+        // for all neighbor blocks, dequeue data received from this neighbor block in the last exchange
+        for (int i = 0; i < l->size(); ++i)
+        {
+            int v;
+            cp.dequeue(l->target(i).gid, v);
+//             fmt::print(stderr, "Block {} received message with contents {} from gid {}\n", gid, v, l->target(i).gid);
+        }
     }
 
     // the block data

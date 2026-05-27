@@ -121,9 +121,9 @@ int main(int argc, char* argv[])
 
     // copy dynamic assigner from master
     diy::DynamicAssigner    dynamic_assigner(world, world.size(), nblocks);
-    diy::record_local_gids(master, dynamic_assigner);
-    world.barrier();                                                    // barrier to synchronize dynamic assigner and clocks across procs, do not remove
 
+    // debug: timing
+    world.barrier();
     wall_time = MPI_Wtime();
 
     // perform some iterative algorithm
@@ -153,12 +153,19 @@ int main(int argc, char* argv[])
 
         // some block computation
         master.dynamic_foreach(
-                [&](Block* b, const diy::Master::ProxyWithLink& cp) { b->compute(cp, max_time, n); },
+                [&](Block* b, const diy::Master::ProxyWithLink& cp) { b->compute(cp, max_time); },
                 &get_block_work,
                 dynamic_assigner,
                 sample_frac,
                 quantile,
                 moved_blocks);
+
+        // exchange any communication between blocks
+        master.exchange();
+
+        // receive the communication
+        master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
+                { b->recv_comm(cp); });
 
         // for record keeping, append the block work to the moved blocks
         int lid;
@@ -181,7 +188,8 @@ int main(int argc, char* argv[])
         }
     }
 
-    world.barrier();                                    // barrier to synchronize clocks over procs, do not remove
+    // debug: timing
+    world.barrier();
     wall_time = MPI_Wtime() - wall_time;
     if (world.rank() == 0)
         fmt::print(stderr, "Total elapsed wall time {:.3} sec.\n", wall_time);

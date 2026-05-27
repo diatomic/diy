@@ -76,22 +76,36 @@ struct Block
          // act_work = pred_work +- noise_factor * rand[0,  pred_work]
          int perturb = static_cast<int>(double(std::rand()) / RAND_MAX * 2 * pred_work) - pred_work;
          act_work = static_cast<diy::Work>(pred_work + noise_factor * perturb);
-
-         // debug
-         // fmt::print(stderr, "assign_work: iter {} gid {} pred_work {} act_work {} noise_factor * perturb {}\n",
-         //            iter, gid, pred_work, act_work, noise_factor * perturb);
      }
 
-    void compute(const diy::Master::ProxyWithLink&,                         // communication proxy (unused)
+    void compute(const diy::Master::ProxyWithLink&  cp,                     // communication proxy
                  int                                max_time,               // maximum time for a block to compute
                  int)                                                       // curent iteration (unused)
     {
         unsigned int usec = max_time * act_work * 10000L;
 
+        // test some communication between neighoring blocks, eg, send the amount of local work (not sending actual work, just a number)
+        diy::Link*    l = cp.link();
+        for (int i = 0; i < l->size(); ++i)
+            cp.enqueue(l->target(i), act_work);
+
         // debug
 //         fmt::print(stderr, "iteration {} block gid {} computing for {} s.\n", iter, gid, double(usec) / 1e6);
 
         std::this_thread::sleep_for(std::chrono::microseconds(usec));
+    }
+
+    void recv_comm(const diy::Master::ProxyWithLink&  cp)                   // communication proxy
+    {
+        diy::Link*    l = cp.link();
+
+        // for all neighbor blocks, dequeue data received from this neighbor block in the last exchange
+        for (int i = 0; i < l->size(); ++i)
+        {
+            int v;
+            cp.dequeue(l->target(i).gid, v);
+//             fmt::print(stderr, "Block {} received message with contents {} from gid {}\n", gid, v, l->target(i).gid);
+        }
     }
 
     // the block data
@@ -110,7 +124,7 @@ diy::Work get_block_work(Block* block,
     return block->pred_work;
 }
 
-// print DynamicAssigner
+// debug: print DynamicAssigner
 void print_dynamic_assigner(const diy::Master&            master,
                             const diy::DynamicAssigner&   dynamic_assigner)
 {
@@ -120,7 +134,7 @@ void print_dynamic_assigner(const diy::Master&            master,
     fmt::print(stderr, "\n");
 }
 
-// print the link for each block
+// debug: print the link for each block
 void print_links(const diy::Master& master)
 {
     for (auto i = 0; i < master.size(); i++)
@@ -132,6 +146,14 @@ void print_links(const diy::Master& master)
             fmt::print(stderr, "[gid, proc] = [{}, {}] ", link->target(j).gid, link->target(j).proc);
         fmt::print(stderr, "\n");
     }
+}
+
+// debug: print master lids of gids
+void print_lids_gids(const diy::Master& master)
+{
+    fmt::print(stderr, "print_lids_gids: master has size {}\n", master.size());
+    for (auto i = 0; i < master.size(); i++)
+        fmt::print(stderr, "print_lids_gids: lid(gid {}) = {}\n", master.gid(i), master.lid(master.gid(i)));
 }
 
 // gather information from all processes in order to collect summary stats
@@ -182,21 +204,6 @@ void gather_stats(const diy::Master&                  master,
         if (i < counts.size() - 1)
             offsets[i + 1] = offsets[i] + counts[i];
     }
-
-    // debug
-//     if (master.communicator().rank() == 0)
-//     {
-//         fmt::print(stderr, "counts: [ ");
-//         for (auto i = 0; i < counts.size(); i++)
-//             fmt::print(stderr, "{} ", counts[i]);
-//         fmt::print(stderr, "]\n");
-//         fmt::print(stderr, "offsets: [ ");
-//         for (auto i = 0; i < offsets.size(); i++)
-//             fmt::print(stderr, "{} ", offsets[i]);
-//         fmt::print(stderr, "]\n");
-//
-//         fmt::print(stderr, "num_move_info {} tot_num_move_info {}\n", num_move_info, tot_num_move_info);
-//     }
 
     // gather move info
     if (master.communicator().rank() == 0)

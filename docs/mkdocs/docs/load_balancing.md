@@ -87,10 +87,6 @@ Parameters:
 - `world.size()`: Total number of MPI processes
 - `nblocks`: Total number of blocks in the global domain
 
-```{.cpp}
-diy::record_local_gids(master, dynamic_assigner)
-```
-
 ## Complete Example
 
 Below are the key snippets from `examples/load_balancing/dynamic.cpp` showing the essential load balancing components.
@@ -144,8 +140,6 @@ void Block::compute(const diy::Master::ProxyWithLink&, int max_time, int)
 ```{.cpp}
 // Create and initialize dynamic assigner
 diy::DynamicAssigner dynamic_assigner(world, world.size(), nblocks);
-diy::record_local_gids(master, dynamic_assigner);
-world.barrier();
 
 // Execute with dynamic load balancing
 master.dynamic_foreach(

@@ -734,7 +734,6 @@ void*
 diy::Master::
 release(int gid)
 {
-
   auto block_info_access = block_info_.access();
   int lid = this->lid(gid);
 
@@ -842,9 +841,6 @@ dynamic_foreach_(const F&                         f,
     aux_master.add(gid, &aux_block, link);
     aux_block.init_free_blocks<G>(get_block_work);        // initialize free blocks
 
-    // debug
-    // aux_block.print_free_blocks();
-
     exchange_round_annotation.set(exchange_round_);
 
     auto scoped = prof.scoped("foreach");
@@ -862,6 +858,10 @@ dynamic_foreach_(const F&                         f,
     // std::thread t1(detail::dynamic_balance, this, &aux_master, &dynamic_assigner, sample_frac, quantile);
     // dynamic_execute(aux_block);
     // t1.join();
+
+    // NB: fix_queues must be done after the threads join (not inside dynamic_balance) so that the user's compute thread
+    // doesn't enqueue any more messages after the queues for any migrated blocks have been fixed
+    diy::fix_queues(*this, dynamic_assigner);
 }
 
 #endif
@@ -1229,6 +1229,7 @@ send_outgoing_queues(GidSendOrder&   gid_order,
             load_outgoing(from_gid);
 
             OutgoingQueues& outgoing = outgoing_[from_gid];
+
             for (auto& x : outgoing)
             {
                 BlockID to_block    = x.first;

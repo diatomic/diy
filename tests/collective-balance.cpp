@@ -154,7 +154,7 @@ int main(int argc, char* argv[])
 
         // some block computation
         master.foreach([&](Block* b, const diy::Master::ProxyWithLink& cp)
-                { b->compute(cp, max_time, n); });
+                { b->compute(cp, max_time); });
 
         // timing
         world.barrier();
