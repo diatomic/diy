@@ -10,23 +10,63 @@ stages:
   - build
   - test
 
+# DIY_UPSTREAM_REPO_TOKEN: a GitLab project access token for the Kitware GitLab
+# instance (gitlab.kitware.com) with `api` scope.
+# Create it at https://gitlab.kitware.com/diatomic/diy/-/settings/access_tokens
+# and store it as a CI/CD variable (MASKED and non-protected) in the spack project so it
+# is accessible from MR pipelines triggered by non-protected branches.
+.report_kitware_job:
+  after_script:
+    - |
+      if [ "$CI_JOB_STATUS" = "success" ]; then STATE="success"; else STATE="failed"; fi
+      curl --silent --request POST \
+        --header "PRIVATE-TOKEN: $DIY_UPSTREAM_REPO_TOKEN" \
+        "https://gitlab.kitware.com/api/v4/projects/diatomic%2Fdiy/statuses/${CI_COMMIT_SHA}" \
+        --data "state=${STATE}&name=spack-ci:${CI_JOB_NAME}&target_url=${CI_JOB_URL}" || true
+  environment: kitware
+
 .linux_builder_tags:
   tags:
     - hpsf-x86_64
 
-build:fedora36-mpich:
+.linux_builder_tags_arm64:
+  tags:
+    - hpsf-aarch64
+
+build:fedora42-mpich-x86_64:
   extends:
-    - .fedora36_mpich
+    - .fedora42_mpich
     - .cmake_build_linux
     - .linux_builder_tags
     - .cmake_build_artifacts
     - .rules
+    - .report_kitware_job
 
-test:fedora36-mpich:
+test:fedora42-mpich-x86_64:
   extends:
-    - .fedora36_mpich
+    - .fedora42_mpich
     - .cmake_test_linux
     - .linux_builder_tags
     - .rules
+    - .report_kitware_job
   needs:
-    - build:fedora36-mpich
+    - build:fedora42-mpich-x86_64
+
+build:fedora42-mpich-arm64:
+  extends:
+    - .fedora42_mpich
+    - .cmake_build_linux
+    - .linux_builder_tags_arm64
+    - .cmake_build_artifacts
+    - .rules
+    - .report_kitware_job
+
+test:fedora42-mpich-arm64:
+  extends:
+    - .fedora42_mpich
+    - .cmake_test_linux
+    - .linux_builder_tags_arm64
+    - .rules
+    - .report_kitware_job
+  needs:
+    - build:fedora42-mpich-arm64

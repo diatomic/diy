@@ -7,9 +7,17 @@ readonly version="3.19.7"
 case "$( uname -s )" in
     Linux)
         shatool="sha256sum"
-        sha256sum="ba4a5f46aab500e0d8d952ee735dcfb0c870d326e851addc037c99eb1ea4b66c"
         platform="Linux"
-        arch="x86_64"
+        case "$( uname -m )" in
+            aarch64)
+                sha256sum="eb1cf718eca1d5bc212a0ef76d19a977b6b6481a795985b8741c31f866c88e09"
+                arch="aarch64"
+                ;;
+            *)
+                sha256sum="ba4a5f46aab500e0d8d952ee735dcfb0c870d326e851addc037c99eb1ea4b66c"
+                arch="x86_64"
+                ;;
+        esac
         ;;
     *)
         echo "Unrecognized platform $( uname -s )"
