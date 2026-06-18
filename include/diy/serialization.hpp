@@ -187,6 +187,8 @@ namespace diy
   template<class T>
   void                  save(BinaryBuffer& bb, const T* x, size_t n)
   {
+    if (n == 0)
+      return;
     if (!detail::is_default< Serialization<T> >::value)
       for (size_t i = 0; i < n; ++i)
         diy::save(bb, x[i]);
@@ -197,6 +199,8 @@ namespace diy
   template<class T>
   void                  load(BinaryBuffer& bb, T* x, size_t n)
   {
+    if (n == 0)
+      return;
     if (!detail::is_default< Serialization<T> >::value)
       for (size_t i = 0; i < n; ++i)
         diy::load(bb, x[i]);

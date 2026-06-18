@@ -175,6 +175,36 @@ TEST_CASE_METHOD(SimpleFixture, "MPI Collectives Test", "[mpi-collectives]")
         fmt::print(stderr, "[rank {}] received sum {}\n", world.rank(), sum);
         CHECK(sum == 210 * world.size());
     }
+
+    vector<int> maybe_empty_vec;
+    if (world.rank() != 0)
+        maybe_empty_vec.push_back(world.rank());
+
+    mpi::gather(world, maybe_empty_vec, gathered_simple_vec, 0);
+    if (world.rank() == 0)
+    {
+        REQUIRE(gathered_simple_vec.size() == world_size);
+        CHECK(gathered_simple_vec[0].empty());
+        for (size_t j = 1; j < world_size; ++j)
+        {
+            REQUIRE(gathered_simple_vec[j].size() == 1);
+            CHECK(gathered_simple_vec[j][0] == static_cast<int>(j));
+        }
+    }
+
+    vector< vector<int> > all_gathered_simple_vec;
+    mpi::all_gather(world, maybe_empty_vec, all_gathered_simple_vec);
+    REQUIRE(all_gathered_simple_vec.size() == world_size);
+    CHECK(all_gathered_simple_vec[0].empty());
+    for (size_t j = 1; j < world_size; ++j)
+    {
+        REQUIRE(all_gathered_simple_vec[j].size() == 1);
+        CHECK(all_gathered_simple_vec[j][0] == static_cast<int>(j));
+    }
+
+    vector<int> empty_in;
+    vector<int> empty_out;
+    mpi::all_to_all(world, empty_in, empty_out, 0);
 }
 
 int main(int argc, char* argv[])

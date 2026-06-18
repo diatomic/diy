@@ -52,7 +52,9 @@ struct SampleSort
                 if (skip_self && rp.in_link().target(i).gid == rp.gid()) continue;
                 MemoryBuffer& in = rp.incoming(rp.in_link().target(i).gid);
                 size_t incoming_sz = in.size() / sizeof(T);
-                T* bg = (T*) &in.buffer[0];
+                if (incoming_sz == 0)
+                    continue;
+                T* bg = (T*) in.buffer.data();
                 std::copy(bg, bg + incoming_sz, &v[end]);
                 end += incoming_sz;
             }
@@ -95,8 +97,9 @@ struct SampleSort<Block,T,Cmp>::Sampler
         if (k_in == 0)
         {
             // draw random samples
-            for (size_t i = 0; i < num_samples; ++i)
-                samps.push_back((b->*values)[std::rand() % (b->*values).size()]);
+            if (!(b->*values).empty())
+                for (size_t i = 0; i < num_samples; ++i)
+                    samps.push_back((b->*values)[std::rand() % (b->*values).size()]);
         } else
             dequeue_values(samps, srp, false);
 
@@ -105,9 +108,16 @@ struct SampleSort<Block,T,Cmp>::Sampler
             // pick subsamples that separate quantiles
             std::sort(samps.begin(), samps.end(), cmp);
             std::vector<T>  subsamples(srp.nblocks() - 1);
+            if (samps.empty())
+            {
+                (b->*dividers).swap(subsamples);
+                return;
+            }
             size_t step = samps.size() / srp.nblocks();       // NB: subsamples.size() + 1
+            if (step == 0)
+                step = 1;
             for (size_t i = 0; i < subsamples.size(); ++i)
-                subsamples[i] = samps[(i+1)*step];
+                subsamples[i] = samps[std::min((i+1)*step, samps.size() - 1)];
             (b->*dividers).swap(subsamples);
         }
         else
@@ -115,7 +125,7 @@ struct SampleSort<Block,T,Cmp>::Sampler
             for (int i = 0; i < k_out; ++i)
             {
                 MemoryBuffer& out = srp.outgoing(srp.out_link().target(i));
-                save(out, &samps[0], samps.size());
+                save(out, samps.data(), samps.size());
             }
         }
     }

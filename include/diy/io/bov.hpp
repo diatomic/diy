@@ -36,9 +36,12 @@ namespace io
             shape_.push_back(shape[i]);
             stride_.push_back(1);
         }
-        for (auto i = shape_.size() - 2; i ==  0; --i)
-          stride_[i] = stride_[i+1] * shape_[i+1];
-        stride_[0] = stride_[1] * shape_[1];
+        size_t stride = 1;
+        for (size_t i = shape_.size(); i > 0; --i)
+        {
+          stride_[i - 1] = stride;
+          stride *= static_cast<size_t>(shape_[i - 1]);
+        }
       }
 
       const Shape&  shape() const                                       { return shape_; }

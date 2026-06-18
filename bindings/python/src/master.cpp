@@ -1,5 +1,6 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/functional.h>
+#include <stdexcept>
 namespace py = pybind11;
 
 #include <diy/master.hpp>
@@ -30,9 +31,12 @@ void init_master(py::module& m)
                        Create               create,
                        Destroy              destroy,
                        Save                 save,
-                       Load                 load)
-                       //FileStorage*         storage)
-                       {
+                        Load                 load)
+                        //FileStorage*         storage)
+                        {
+                           if (limit != -1)
+                               throw std::runtime_error("Python Master does not support limit without bound storage");
+
                            return new Master(comm,
                                              threads,
                                              limit,
@@ -70,9 +74,15 @@ void init_master(py::module& m)
                         , py::keep_alive<1, 3>()      // keep the object alive as long as master is alive
                         //, py::keep_alive<1, 4>()       // keep the link alive as long as master is alive
                         )
-      .def("release",   &Master::release)
-      .def("block",     [](const Master& m, int i)  { return m.block<py::object>(i); })
-      .def("get",       [](Master& m, int i)        { return m.get<py::object>(i); })
+      .def("release",   [](Master& m, int gid)
+                        {
+                            auto* b = static_cast<py::object*>(m.release(gid));
+                            py::object result = *b;
+                            delete b;
+                            return result;
+                        })
+      .def("block",     [](const Master& m, int i)  { return *m.block<py::object>(i); })
+      .def("get",       [](Master& m, int i)        { return *m.get<py::object>(i); })
       .def("communicator",  [](const Master& m)     { return m.communicator(); })
       .def("communicator",  [](Master& m)           { return m.communicator(); })
       .def("lid",       &Master::lid)

@@ -126,11 +126,17 @@ void all_to_all(const communicator& comm,
         std::partial_sum(counts.begin(), counts.end() - 1, offsets.begin() + 1);
       }
 
-      int elem_size = count(in[0]);     // size of 1 vector element in units of mpi datatype
+      std::vector<int> elem_counts;
+      if (comm.rank() == root)
+      {
+        elem_counts.resize(static_cast<size_t>(comm.size()));
+      }
+      Collectives<int,void*>::gather(comm, static_cast<int>(in.size()), elem_counts, root);
+
       std::vector<T> buffer;
       if (comm.rank() == root)
       {
-        buffer.resize((offsets.back() + counts.back()) / elem_size);
+        buffer.resize(std::accumulate(elem_counts.begin(), elem_counts.end(), 0));
       }
 
       detail::gather_v(comm, address(in), count(in), datatype_of(in),
@@ -143,8 +149,11 @@ void all_to_all(const communicator& comm,
           size_t offset = 0;
           for (size_t i = 0; i < out.size(); ++i)
           {
-            auto count = static_cast<size_t>(counts[i] / elem_size);
-            out[i].insert(out[i].end(), buffer.data() + offset, buffer.data() + offset + count);
+            auto count = static_cast<size_t>(elem_counts[i]);
+            if (count == 0)
+                out[i].clear();
+            else
+                out[i].assign(buffer.data() + offset, buffer.data() + offset + count);
             offset += count;
           }
       }
@@ -172,12 +181,14 @@ void all_to_all(const communicator& comm,
       std::vector<int>  counts(static_cast<size_t>(comm.size()));
       Collectives<int,void*>::all_gather(comm, count(in), counts);
 
+      std::vector<int>  elem_counts(static_cast<size_t>(comm.size()));
+      Collectives<int,void*>::all_gather(comm, static_cast<int>(in.size()), elem_counts);
+
       std::vector<int>  offsets(counts.size());
       offsets[0] = 0;
       std::partial_sum(counts.begin(), counts.end() - 1, offsets.begin() + 1);
 
-      int elem_size = count(in[0]);     // size of 1 vector element in units of mpi datatype
-      std::vector<T> buffer((offsets.back() + counts.back()) / elem_size);
+      std::vector<T> buffer(std::accumulate(elem_counts.begin(), elem_counts.end(), 0));
       detail::all_gather_v(comm,
                            address(in), count(in), datatype_of(in),
                            address(buffer),
@@ -188,8 +199,11 @@ void all_to_all(const communicator& comm,
       size_t offset = 0;
       for (size_t i = 0; i < out.size(); ++i)
       {
-          auto count = static_cast<size_t>(counts[i] / elem_size);
-          out[i].insert(out[i].end(), buffer.data() + offset, buffer.data() + offset + count);
+          auto count = static_cast<size_t>(elem_counts[i]);
+          if (count == 0)
+              out[i].clear();
+          else
+              out[i].assign(buffer.data() + offset, buffer.data() + offset + count);
           offset += count;
       }
     }
@@ -243,7 +257,7 @@ void all_to_all(const communicator& comm,
       // n specifies how many elements go to/from every process from every process;
       // the sizes of in and out are expected to be n * comm.size()
 
-      int elem_size = count(in[0]);               // size of 1 vector element in units of mpi datatype
+      int elem_size = in.empty() ? 0 : count(in[0]);  // size of 1 vector element in units of mpi datatype
       // NB: this will fail if T is a vector
       detail::all_to_all(comm, address(in), elem_size * n, datatype_of(in), address(out));
     }
