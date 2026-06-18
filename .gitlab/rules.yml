@@ -9,6 +9,11 @@ workflow:
           auto_cancel:
               # Cancel all pipeline jobs if a new commit comes in on the branch/tag.
               on_new_commit: interruptible
+        # Run for push pipelines on the spack GitLab instance only.
+        - if: '$CI_PIPELINE_SOURCE == "push" && $CI_SERVER_URL == "https://gitlab.spack.io"'
+          when: always
+          auto_cancel:
+              on_new_commit: interruptible
         # If this is not a MR, do not run for other projects.
         - if: '$CI_PROJECT_PATH != "diatomic/diy"'
           when: never

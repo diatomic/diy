@@ -37,7 +37,7 @@ stages:
 # Builders:
 #
 # - Fedora 34
-#   * ci/docker/fedora36
+#   * ci/docker/fedora42
 #     - includes mpich and openmpi
 # - Windows 10 VS2022
 #
@@ -46,6 +46,33 @@ stages:
 #   - macOS
 # - Checkers
 #   - clang-tidy?
+#
+# DIY_SPACK_REPO_TOKEN: a GitLab project access token for the spack GitLab
+# instance (gitlab.spack.io) with `write_repository` scope.
+# Create it at https://gitlab.spack.io/diatomic/diy/-/settings/access_tokens
+# and store it as a CI/CD variable (Masked and non-protected) in the Kitware project.
+
+external:spack:
+  stage: .pre
+  needs: []
+  extends:
+    - .rules
+  image: alpine:latest
+  environment: spack
+  variables:
+    GIT_STRATEGY: fetch
+  tags:
+    - diy
+    - build
+    - docker
+    - linux-x86_64
+  before_script:
+    - apk add --no-cache git
+  script:
+    - |
+      test -n "$DIY_SPACK_REPO_TOKEN" || { echo "DIY_SPACK_REPO_TOKEN is not set"; exit 1; }
+      git push --force "https://spack-ci-bot:$DIY_SPACK_REPO_TOKEN@gitlab.spack.io/diatomic/diy.git" \
+        "HEAD:refs/heads/$CI_COMMIT_REF_NAME"
 
 .linux_builder_tags:
   tags:
@@ -70,95 +97,95 @@ stages:
     - vs2022
     - msvc-19.33
 
-build:fedora36-mpich:
+build:fedora42-mpich:
   extends:
-    - .fedora36_mpich
+    - .fedora42_mpich
     - .cmake_build_linux
     - .linux_builder_tags
     - .cmake_build_artifacts
     - .rules
 
-test:fedora36-mpich:
+test:fedora42-mpich:
   extends:
-    - .fedora36_mpich
+    - .fedora42_mpich
     - .cmake_test_linux
     - .linux_builder_tags
     - .cmake_annotation_artifacts
     - .rules
   needs:
-    - build:fedora36-mpich
+    - build:fedora42-mpich
 
-build:fedora36-mpich-nothreads:
+build:fedora42-mpich-nothreads:
   extends:
-    - .fedora36_mpich_nothreads
+    - .fedora42_mpich_nothreads
     - .cmake_build_linux
     - .linux_builder_tags
     - .cmake_build_artifacts
     - .rules
 
-test:fedora36-mpich-nothreads:
+test:fedora42-mpich-nothreads:
   extends:
-    - .fedora36_mpich_nothreads
+    - .fedora42_mpich_nothreads
     - .cmake_test_linux
     - .linux_builder_tags
     - .cmake_annotation_artifacts
     - .rules
   needs:
-    - build:fedora36-mpich-nothreads
+    - build:fedora42-mpich-nothreads
 
-build:fedora36-openmpi:
+build:fedora42-openmpi:
   extends:
-    - .fedora36_openmpi
+    - .fedora42_openmpi
     - .cmake_build_linux
     - .linux_builder_tags
     - .cmake_build_artifacts
     - .rules
 
-test:fedora36-openmpi:
+test:fedora42-openmpi:
   extends:
-    - .fedora36_openmpi
+    - .fedora42_openmpi
     - .cmake_test_linux
     - .linux_builder_tags
     - .cmake_annotation_artifacts
     - .rules
   needs:
-    - build:fedora36-openmpi
+    - build:fedora42-openmpi
 
-build:fedora36-asan:
+build:fedora42-asan:
   extends:
-    - .fedora36_asan
+    - .fedora42_asan
     - .cmake_build_linux
     - .linux_builder_tags
     - .cmake_build_artifacts
     - .rules
 
-test:fedora36-asan:
+test:fedora42-asan:
   extends:
-    - .fedora36_asan
+    - .fedora42_asan
     - .cmake_memcheck_linux
     - .linux_tester_priv_tags
     - .cmake_annotation_artifacts
     - .rules
   needs:
-    - build:fedora36-asan
+    - build:fedora42-asan
 
-build:fedora36-ubsan:
+build:fedora42-ubsan:
   extends:
-    - .fedora36_ubsan
+    - .fedora42_ubsan
     - .cmake_build_linux
     - .linux_builder_tags
     - .cmake_build_artifacts
     - .rules
 
-test:fedora36-ubsan:
+test:fedora42-ubsan:
   extends:
-    - .fedora36_ubsan
+    - .fedora42_ubsan
     - .cmake_memcheck_linux
     - .linux_tester_priv_tags
     - .cmake_annotation_artifacts
     - .rules
   needs:
-    - build:fedora36-ubsan
+    - build:fedora42-ubsan
 
 build:windows_vs2022_debug:
   extends:

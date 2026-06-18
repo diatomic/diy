@@ -10,24 +10,31 @@
     CCACHE_RESHARE:           "true"
     CCACHE_INSTALL_DIR:       "$CI_PROJECT_DIR/.gitlab"
 
-.fedora36:
+.fedora42:
   extends: .linux
-  image: "diatomic/diy:ci-diy-fedora36-20221031"
+  image: "diatomic/diy:ci-diy-fedora-20260609"
 
-.fedora36_mpich: &fedora36_mpich
-  extends: .fedora36
+.fedora42_mpich: &fedora42_mpich
+  extends: .fedora42
   variables:
-    CMAKE_CONFIGURATION: fedora36_mpich
+    CMAKE_CONFIGURATION: fedora42_mpich
+    # MPICH POSIX SHM iqueue calls glibc SVE memset (__memset_sve_zva64) on a
+    # shared memory region whose page attributes are incompatible with the ZVA
+    # instruction in Docker containers, causing a bus error on MPI_Init.
+    MPIR_CVAR_ENABLE_SHM: 0
+    # Exclude PSM3/psmx3 libfabric provider — causes bus errors on MPI_Init
+    # when libfabric probes OmniPath hardware unavailable in containers.
+    FI_PROVIDER: "^psm3,psmx3"
 
-.fedora36_mpich_nothreads: &fedora36_mpich_nothreads
-  extends: .fedora36_mpich
+.fedora42_mpich_nothreads: &fedora42_mpich_nothreads
+  extends: .fedora42_mpich
   variables:
-    CMAKE_CONFIGURATION: fedora36_mpich_nothreads
+    CMAKE_CONFIGURATION: fedora42_mpich_nothreads
 
-.fedora36_openmpi: &fedora36_openmpi
-  extends: .fedora36
+.fedora42_openmpi: &fedora42_openmpi
+  extends: .fedora42
   variables:
-    CMAKE_CONFIGURATION: fedora36_openmpi
+    CMAKE_CONFIGURATION: fedora42_openmpi
     OMPI_ALLOW_RUN_AS_ROOT: 1
     OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: 1
     # Force BTL as the PML
@@ -36,27 +43,29 @@
     OMPI_MCA_btl: "self,tcp"
     # Use TCP BTL as UCX backend (as opposed to libfabric)
     UCX_TLS: "tcp"
+    # Provide explicit path to prterun required by OpenMPI 5.x
+    OMPI_PRTERUN: /usr/lib64/openmpi/bin/prterun
     # Ignore hwloc warnings
     HWLOC_HIDE_ERRORS: 0
     # Be verbose
     OMPI_MCA_btl_base_verbose: 20
 
-.fedora36_memcheck: &fedora36_memcheck
-  extends: .fedora36_mpich
+.fedora42_memcheck: &fedora42_memcheck
+  extends: .fedora42_mpich
   variables:
     CMAKE_BUILD_TYPE: RelWithDebInfo
 
-.fedora36_asan: &fedora36_asan
-  extends: .fedora36_memcheck
+.fedora42_asan: &fedora42_asan
+  extends: .fedora42_memcheck
   variables:
-    CMAKE_CONFIGURATION: fedora36_asan
+    CMAKE_CONFIGURATION: fedora42_asan
     CTEST_MEMORYCHECK_TYPE: AddressSanitizer
 
-.fedora36_ubsan: &fedora36_ubsan
-  extends: .fedora36_memcheck
+.fedora42_ubsan: &fedora42_ubsan
+  extends: .fedora42_memcheck
 
   variables:
-    CMAKE_CONFIGURATION: fedora36_ubsan
+    CMAKE_CONFIGURATION: fedora42_ubsan
     CTEST_MEMORYCHECK_TYPE: UndefinedBehaviorSanitizer
 
 ## Linux-specific scripts
