@@ -485,7 +485,7 @@ append_binary(const char* x, size_t count)
     {
         size_t cur_size = buffer.size() - position;
         size_t new_size = cur_size + count;
-        if (new_size * growth_multiplier() <= buffer.capacity())        // we have enough space in this buffer, copy in place
+        if (static_cast<double>(new_size) * static_cast<double>(growth_multiplier()) <= static_cast<double>(buffer.capacity()))        // we have enough space in this buffer, copy in place
         {
             // copy the data to the beginning of the buffer and reduce its size
             for (size_t i = 0; i < cur_size; ++i)

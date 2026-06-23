@@ -61,7 +61,7 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
             break;
         }
     }
-    if (my_work_idx < quantile * ab->sample_work_info.size())
+    if (static_cast<float>(my_work_idx) < quantile * static_cast<float>(ab->sample_work_info.size()))
         return;
 
     // pick the destination process to be the mirror image of my work location in the samples
@@ -251,7 +251,7 @@ bool iexchange_balance(AuxBlock*                           ab,                  
     if (ab->any_free_blocks() && ab->nsent_reqs == 0)   // I have work and have not already sent requests
     {
         // pick a random sample of processes, w/o duplicates, and excluding myself
-        nsamples = static_cast<int>(sample_frac * (nprocs - 1));
+        nsamples = static_cast<int>(sample_frac * static_cast<float>(nprocs - 1));
         for (auto i = 0; i < nsamples; i++)
         {
             int rand_proc;

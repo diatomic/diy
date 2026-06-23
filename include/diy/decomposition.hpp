@@ -60,11 +60,11 @@ namespace detail
   {
     using Coordinate = typename Bounds::Coordinate;
 
-    static Coordinate   from(int i, int n, Coordinate min, Coordinate max, bool)      { return min + (max - min)/n * i; }
-    static Coordinate   to  (int i, int n, Coordinate min, Coordinate max, bool)      { return min + (max - min)/n * (i+1); }
+    static Coordinate   from(int i, int n, Coordinate min, Coordinate max, bool)      { return min + (max - min) / static_cast<Coordinate>(n) * static_cast<Coordinate>(i); }
+    static Coordinate   to  (int i, int n, Coordinate min, Coordinate max, bool)      { return min + (max - min) / static_cast<Coordinate>(n) * static_cast<Coordinate>(i + 1); }
 
-    static int          lower(Coordinate x, int n, Coordinate min, Coordinate max, bool)   { Coordinate width = (max - min)/n; auto res = static_cast<int>(std::floor((x - min)/width)); if (min + res*width == x) return (res - 1); else return res; }
-    static int          upper(Coordinate x, int n, Coordinate min, Coordinate max, bool)   { Coordinate width = (max - min)/n; auto res = static_cast<int>(std::ceil ((x - min)/width)); if (min + res*width == x) return (res + 1); else return res; }
+    static int          lower(Coordinate x, int n, Coordinate min, Coordinate max, bool)   { Coordinate width = (max - min) / static_cast<Coordinate>(n); auto res = static_cast<int>(std::floor((x - min)/width)); if (min + static_cast<Coordinate>(res)*width == x) return (res - 1); else return res; }
+    static int          upper(Coordinate x, int n, Coordinate min, Coordinate max, bool)   { Coordinate width = (max - min) / static_cast<Coordinate>(n); auto res = static_cast<int>(std::ceil ((x - min)/width)); if (min + static_cast<Coordinate>(res)*width == x) return (res + 1); else return res; }
   };
 }
 

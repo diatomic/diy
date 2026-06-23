@@ -63,7 +63,7 @@ void redistribute(Block* b,                                 // local block
     for (size_t i = 0; i < b->points.size(); ++i) // for all points
     {
         auto loc = static_cast<size_t>(floor((b->points[i][cur_dim] - b->box.min[cur_dim]) /
-                                             (b->box.max[cur_dim] - b->box.min[cur_dim]) * group_size));
+                                             (b->box.max[cur_dim] - b->box.min[cur_dim]) * static_cast<float>(group_size)));
         out_points[loc].push_back(b->points[i]);
     }
     int pos = -1;
@@ -85,9 +85,9 @@ void redistribute(Block* b,                                 // local block
 
     // step 3: readjust box boundaries for next round
     float new_min = b->box.min[cur_dim] + (b->box.max[cur_dim] -
-                                           b->box.min[cur_dim])/group_size*pos;
+                                           b->box.min[cur_dim]) / static_cast<float>(group_size) * static_cast<float>(pos);
     float new_max = b->box.min[cur_dim] + (b->box.max[cur_dim] -
-                                           b->box.min[cur_dim])/group_size*(pos + 1);
+                                           b->box.min[cur_dim]) / static_cast<float>(group_size) * static_cast<float>(pos + 1);
     b->box.min[cur_dim] = new_min;
     b->box.max[cur_dim] = new_max;
 }

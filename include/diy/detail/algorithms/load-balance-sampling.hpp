@@ -56,7 +56,7 @@ inline void exchange_sample_work_info(diy::Master&             master,          
     auto my_proc = master.communicator().rank();    // rank of my proc
 
     // pick a random sample of processes, w/o duplicates, and excluding myself
-    int nsamples = static_cast<int>(sample_frac * (nprocs - 1));
+    int nsamples = static_cast<int>(sample_frac * static_cast<float>(nprocs - 1));
     std::set<int> sample_procs;
     for (auto i = 0; i < nsamples; i++)
     {
@@ -122,7 +122,7 @@ inline void send_block(AuxBlock*,                                              /
     }
 
     // send my heaviest block if it passes the quantile cutoff
-    if (my_work_idx >= quantile * sample_work_info.size())
+    if (static_cast<float>(my_work_idx) >= quantile * static_cast<float>(sample_work_info.size()))
     {
         // pick the destination process to be the mirror image of my work location in the samples
         // ie, the heavier my process, the lighter the destination process

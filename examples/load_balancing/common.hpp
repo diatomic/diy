@@ -75,7 +75,7 @@ struct Block
          // actual work is a perturbation of the predicted work
          // act_work = pred_work +- noise_factor * rand[0,  pred_work]
          int perturb = static_cast<int>(double(std::rand()) / RAND_MAX * 2 * pred_work) - pred_work;
-         act_work = static_cast<diy::Work>(pred_work + noise_factor * perturb);
+         act_work = static_cast<diy::Work>(static_cast<float>(pred_work) + noise_factor * static_cast<float>(perturb));
      }
 
     void compute(const diy::Master::ProxyWithLink&  cp,                     // communication proxy
@@ -242,8 +242,8 @@ void print_stats(const diy::Master&                     master,
             tot_work += all_work_info[i].proc_work;
         }
 
-        avg_work        = float(tot_work) / all_work_info.size();
-        rel_imbalance   = float(max_work - min_work) / max_work;
+        avg_work        = float(tot_work) / static_cast<float>(all_work_info.size());
+        rel_imbalance   = float(max_work - min_work) / static_cast<float>(max_work);
 
         if (master.communicator().rank() == 0)
         {
