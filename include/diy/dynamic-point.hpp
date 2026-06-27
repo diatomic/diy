@@ -26,8 +26,10 @@ class DynamicPoint: public itlib::small_vector<Coordinate_, static_size>
     public:
                             DynamicPoint(size_t dim, Coordinate x = 0):
                                 Parent(dim, x)                      {}
-        template<class T>   DynamicPoint(const DynamicPoint<T>& p)  { for (size_t i = 0; i < dimension(); ++i) (*this)[i] = p[i]; }
-        template<class T>   DynamicPoint(const T* a, size_t dim)       { for (size_t i = 0; i < dim; ++i) (*this)[i] = a[i]; }
+        template<class T>   DynamicPoint(const DynamicPoint<T>& p):
+                                Parent(p.dimension())               { for (size_t i = 0; i < dimension(); ++i) (*this)[i] = p[i]; }
+        template<class T>   DynamicPoint(const T* a, size_t dim):
+                                Parent(dim)                         { for (size_t i = 0; i < dim; ++i) (*this)[i] = a[i]; }
         template<class T>   DynamicPoint(const std::vector<T>& a):
                                 Parent(a.begin(), a.end())          {}
                             DynamicPoint(std::initializer_list<Coordinate> lst):

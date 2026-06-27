@@ -1,6 +1,7 @@
 #include <vector>
 #include <chrono>
 #include <thread>
+#include <diy/mpi/datatypes.hpp>
 
 #define WORK_MAX    100                 // maximum work a block can have (in some user-defined units)
 
@@ -173,7 +174,7 @@ void gather_stats(const diy::Master&                  master,
     // gather work info
     all_work_info.resize(nprocs);
     diy::mpi::detail::gather(master.communicator(), &my_work_info.proc_rank,
-            sizeof(WorkInfo) / sizeof(WorkInfo::proc_rank), MPI_INT, &all_work_info[0].proc_rank, 0);  // assumes all elements of WorkInfo are sizeof(int)
+            sizeof(WorkInfo) / sizeof(WorkInfo::proc_rank), diy::mpi::detail::get_mpi_datatype<int>(), &all_work_info[0].proc_rank, 0);  // assumes all elements of WorkInfo are sizeof(int)
 
     // empty moved_blocks list still needs to send something to the gather
     if (moved_blocks.size() == 0)
@@ -187,7 +188,7 @@ void gather_stats(const diy::Master&                  master,
     int tot_num_move_info = 0;
     std::vector<int> counts(master.communicator().size());
     std::vector<int> offsets(master.communicator().size(), 0);
-    diy::mpi::detail::gather(master.communicator(), &num_move_info, 1, MPI_INT, &counts[0], 0);
+    diy::mpi::detail::gather(master.communicator(), &num_move_info, 1, diy::mpi::detail::get_mpi_datatype<int>(), &counts[0], 0);
     for (auto i = 0; i < counts.size(); i++)
     {
         tot_num_move_info += counts[i];
@@ -204,7 +205,7 @@ void gather_stats(const diy::Master&                  master,
     diy::mpi::detail::gather_v(master.communicator(),
                              &moved_blocks[0].move_gid,
                              num_move_info * sizeof(diy::detail::MoveInfo) / sizeof(diy::detail::MoveInfo::move_gid),
-                             MPI_INT,
+                             diy::mpi::detail::get_mpi_datatype<int>(),
                              &all_moved_blocks[0].move_gid,
                              &counts[0],
                              &offsets[0],

@@ -345,6 +345,7 @@ namespace diy
     {
       size_t s;
       diy::load(bb, s);
+      m.clear();
       for (size_t i = 0; i < s; ++i)
       {
         K k;
@@ -372,6 +373,7 @@ namespace diy
     {
       size_t s;
       diy::load(bb, s);
+      m.clear();
       for (size_t i = 0; i < s; ++i)
       {
         T p;
@@ -399,6 +401,7 @@ namespace diy
     {
       size_t s;
       diy::load(bb, s);
+      m.clear();
       for (size_t i = 0; i < s; ++i)
       {
         std::pair<K,V> p;
@@ -426,6 +429,7 @@ namespace diy
     {
       size_t s;
       diy::load(bb, s);
+      m.clear();
       for (size_t i = 0; i < s; ++i)
       {
         T p;

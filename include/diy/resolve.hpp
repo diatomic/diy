@@ -1,11 +1,12 @@
 #ifndef DIY_RESOLVE_HPP
 #define DIY_RESOLVE_HPP
 
-#include "master.hpp"
 #include "assigner.hpp"
 
 namespace diy
 {
+    class Master;
+
     // record master gids in assigner and then lookup the procs for all gids in the links
     inline void    fix_links(diy::Master& master, diy::DynamicAssigner& assigner);
 
@@ -16,6 +17,8 @@ namespace diy
     inline void    record_local_gids(const diy::Master& master, diy::DynamicAssigner& assigner);
     inline void    update_links(diy::Master& master, const diy::DynamicAssigner& assigner);
 }
+
+#include "master.hpp"
 
 void
 diy::

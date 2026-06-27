@@ -3,6 +3,7 @@
 
 #include <diy/assigner.hpp>
 #include <diy/decomposition.hpp>
+#include <diy/dynamic-point.hpp>
 
 void  test(int gid,                                         // block global id
            const diy::ContinuousBounds&,                    // block bounds without any ghost added
@@ -64,5 +65,30 @@ TEST_CASE("RegularDecomposer", "[decomposition]")
             diy::ContiguousAssigner assigner(1, nblocks);
             decomposer.decompose(0, assigner, test_interval);
         }
+    }
+}
+
+TEST_CASE("DynamicPoint constructors", "[dynamic-point]")
+{
+    SECTION("converts between coordinate types")
+    {
+        diy::DynamicPoint<int> p { 1, 2, 3 };
+        diy::DynamicPoint<double> q(p);
+
+        REQUIRE(q.dimension() == 3);
+        REQUIRE(q[0] == Approx(1.));
+        REQUIRE(q[1] == Approx(2.));
+        REQUIRE(q[2] == Approx(3.));
+    }
+
+    SECTION("constructs from pointer and dimension")
+    {
+        double values[] = { 4., 5., 6. };
+        diy::DynamicPoint<double> p(values, 3);
+
+        REQUIRE(p.dimension() == 3);
+        REQUIRE(p[0] == Approx(4.));
+        REQUIRE(p[1] == Approx(5.));
+        REQUIRE(p[2] == Approx(6.));
     }
 }
