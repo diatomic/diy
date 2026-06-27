@@ -182,8 +182,8 @@ namespace diy
       using IncomingQueues = concurrent_map<int,      RecordQueue>;       // gid  -> [(size, external, buffer), ...]
       using OutgoingQueues = concurrent_map<BlockID,  RecordQueue>;       // bid  -> [(size, external, buffer), ...]
 
-      using IncomingQueuesMap = std::map<int, IncomingQueues>;      // gid  -> {  gid -> [(size, external, buffer), ...]}
-      using OutgoingQueuesMap = std::map<int, OutgoingQueues>;      // gid  -> {  bid -> [(size, external, buffer), ...]}
+      using IncomingQueuesMap = concurrent_map<int, IncomingQueues>;      // gid  -> {  gid -> [(size, external, buffer), ...]}
+      using OutgoingQueuesMap = concurrent_map<int, OutgoingQueues>;      // gid  -> {  bid -> [(size, external, buffer), ...]}
 
       struct IncomingRound
       {
