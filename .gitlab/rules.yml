@@ -38,6 +38,9 @@ workflow:
 # Generic rules block to apply if the pipeline would be run
 .rules:
     rules:
+        # Temporarly avoid running pre stage jobs (SPACK CI sync) in Merge-requests.
+        - if: '$CI_MERGE_REQUEST_ID && $CI_JOB_STAGE == ".pre"'
+          when: never
         # Normal jobs run automatically.
         - if: '$CI_MERGE_REQUEST_ID'
           when: on_success
