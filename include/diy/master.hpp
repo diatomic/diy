@@ -11,6 +11,8 @@
 #include <memory>
 #include <chrono>
 #include <climits>
+#include <atomic>
+#include <exception>
 #include <random>
 
 #include "assigner.hpp"
@@ -944,18 +946,6 @@ iexchange_(const ICallback<Block>& f, MemoryManagement mem)
     IExchangeInfoCollective iex(comm_, prof);
     iex.add_work(size());                 // start with one work unit for each block
 
-    thread comm_thread;
-    if (threads() > 1)
-        comm_thread = thread([this,&iex,mem]()
-        {
-            while(!iex.all_done())
-            {
-                icommunicate(&iex, mem);
-                iex.control();
-                //std::this_thread::sleep_for(std::chrono::microseconds(1));
-            }
-        });
-
     auto empty_incoming = [this](int gid)
     {
         for (auto& x : incoming(gid))
@@ -964,56 +954,108 @@ iexchange_(const ICallback<Block>& f, MemoryManagement mem)
         return true;
     };
 
-    std::map<int, bool> done_result;
-    do
+    auto run_callbacks = [this, &empty_incoming, &f, &iex, mem]
+                         (bool progress_on_this_thread, const std::atomic<bool>* stop_callbacks)
     {
-        size_t work_done = 0;
-        DIY_UNUSED(work_done);
-        for (int i = 0; i < static_cast<int>(size()); i++)     // for all blocks
+        std::map<int, bool> done_result;
+        do
         {
-            int gid = this->gid(i);
-            stats::Annotation::Guard g( stats::Annotation("diy.block").set(gid) );
-
-            if (threads() == 1)
-                icommunicate(&iex, mem);
-            bool done = done_result[gid];
-            if (!done || !empty_incoming(gid))
+            size_t work_done = 0;
+            DIY_UNUSED(work_done);
+            for (int i = 0; i < static_cast<int>(size()); i++)     // for all blocks
             {
-                prof << "callback";
-                iex.inc_work();       // even if we remove the queues, when constructing the proxy, we still have work to do
-                {
-                    ProxyWithLink cp = proxy(i, &iex);
-                    done = f(block<Block>(i), cp);
-                    if (done_result[gid] ^ done)        // status changed
-                    {
-                        if (done)
-                            iex.dec_work();
-                        else
-                            iex.inc_work();
-                    }
-                }   // NB: we need cp to go out of scope and copy out its queues before we can decrement the work
-                iex.dec_work();
-                prof >> "callback";
-                ++work_done;
-            }
-            done_result[gid] = done;
-            log->debug("Done: {}", done);
-        }
+                if (stop_callbacks && stop_callbacks->load())
+                    return;
 
-        if (threads() == 1)
-        {
-            prof << "iexchange-control";
-            iex.control();
-            prof >> "iexchange-control";
-        }
-        //else
-        //if (work_done == 0)
-        //    std::this_thread::sleep_for(std::chrono::microseconds(1));
-    } while (!iex.all_done());
-    log->info("[{}] ==== Leaving iexchange ====\n", iex.comm.rank());
+                int gid = this->gid(i);
+                stats::Annotation::Guard g( stats::Annotation("diy.block").set(gid) );
+
+                if (progress_on_this_thread)
+                    icommunicate(&iex, mem);
+                bool done = done_result[gid];
+                if (!done || !empty_incoming(gid))
+                {
+                    prof << "callback";
+                    iex.inc_work();       // even if we remove the queues, when constructing the proxy, we still have work to do
+                    {
+                        ProxyWithLink cp = proxy(i, &iex);
+                        done = f(block<Block>(i), cp);
+                        if (done_result[gid] ^ done)        // status changed
+                        {
+                            if (done)
+                                iex.dec_work();
+                            else
+                                iex.inc_work();
+                        }
+                    }   // NB: we need cp to go out of scope and copy out its queues before we can decrement the work
+                    iex.dec_work();
+                    prof >> "callback";
+                    ++work_done;
+                }
+                done_result[gid] = done;
+                log->debug("Done: {}", done);
+            }
+
+            if (progress_on_this_thread)
+            {
+                prof << "iexchange-control";
+                iex.control();
+                prof >> "iexchange-control";
+            }
+            //else
+            //if (work_done == 0)
+            //    std::this_thread::sleep_for(std::chrono::microseconds(1));
+        } while (!iex.all_done() && !(stop_callbacks && stop_callbacks->load()));
+    };
 
     if (threads() > 1)
-        comm_thread.join();
+    {
+        // The default environment requests MPI_THREAD_FUNNELED, where only the
+        // initializing/calling thread may call MPI. Keep all DIY MPI progress
+        // and termination control here, and preserve overlap by moving only the
+        // user callback loop to a worker thread.
+        std::atomic<bool> callbacks_done(false);
+        std::atomic<bool> stop_callbacks(false);
+        std::exception_ptr callback_exception;
+        thread callback_thread([&]()
+        {
+            try
+            {
+                run_callbacks(false, &stop_callbacks);
+            } catch (...)
+            {
+                // std::thread cannot propagate exceptions directly; capture
+                // callback failures, join below, then rethrow on the caller.
+                callback_exception = std::current_exception();
+            }
+            callbacks_done.store(true);
+        });
+
+        try
+        {
+            while (!iex.all_done() && !callbacks_done.load())
+            {
+                icommunicate(&iex, mem);
+                iex.control();
+                //std::this_thread::sleep_for(std::chrono::microseconds(1));
+            }
+        } catch (...)
+        {
+            // If communication/control throws after the worker has started,
+            // stop the callback loop and join before rethrowing. Otherwise the
+            // thread destructor would terminate the process during unwinding.
+            stop_callbacks.store(true);
+            callback_thread.join();
+            throw;
+        }
+
+        callback_thread.join();
+        if (callback_exception)
+            std::rethrow_exception(callback_exception);
+    } else
+        run_callbacks(true, nullptr);
+
+    log->info("[{}] ==== Leaving iexchange ====\n", iex.comm.rank());
 
     //comm_.barrier();        // TODO: this is only necessary for DUD
     prof >> "consensus-time";

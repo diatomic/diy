@@ -16,6 +16,9 @@ Items from the code review, with completed items checked off.
 - [x] **4. `Master::Skip` callback behavior needed documentation.**
   Documented the intended behavior in `include/diy/detail/master/execution.hpp`: skipping avoids loading an unloaded block but does not suppress callbacks, because `foreach()` callbacks may still need to perform queue or bookkeeping work. No behavior was changed.
 
+- [x] **5. Threaded `Master::iexchange()` could violate MPI thread guarantees.**
+  Fixed threaded `iexchange()` by keeping DIY MPI progress and termination control on the calling thread, while running user callbacks on a worker thread when `threads() > 1`. This preserves communication/compute overlap without requiring `MPI_THREAD_MULTIPLE`, so the default `MPI_THREAD_FUNNELED` environment no longer causes DIY to call MPI from a spawned communication thread.
+
 - [x] **7. `DynamicPoint` constructors were broken.**
   Fixed the converting and pointer constructors by sizing the underlying vector before assigning coordinates. Added tests covering cross-type construction and pointer-based construction.
 
@@ -29,9 +32,6 @@ Items from the code review, with completed items checked off.
   Fixed `std::map`, `std::set`, `std::unordered_map`, and `std::unordered_set` deserialization to clear the destination before loading serialized entries. Added tests that load into containers with stale contents.
 
 ## Open
-
-- [ ] **5. Threaded `Master::iexchange()` can violate MPI thread guarantees.**
-  `diy::mpi::environment` requests `MPI_THREAD_FUNNELED` by default, but `Master::iexchange_()` can start a background communication thread when `threads() > 1`, causing MPI calls from a non-initializing thread. Proposed fix: add a DIY wrapper around `MPI_Query_thread`, only enable the background MPI progress thread when MPI provides at least `MPI_THREAD_MULTIPLE`, and otherwise fall back to main-thread MPI progress even when worker threads are enabled. Do not request `MPI_THREAD_MULTIPLE` by default; let users opt into it through `diy::mpi::environment(..., MPI_THREAD_MULTIPLE)`.
 
 - [ ] **6. Dynamic load balancing can corrupt pending incoming queues.**
   Block migration sends pending incoming queue buffers as raw bytes without queue metadata or counts, while the receiver decides how many buffers to consume from local state. Proposed fix: serialize explicit queue metadata with each moved block, including queue count and source/key information for every pending queue, then reconstruct the receiver's incoming queues from that metadata before reading the block/link payload. Add tests with pending incoming messages during dynamic migration.
@@ -71,3 +71,6 @@ Items from the code review, with completed items checked off.
 
 - [ ] **22. Travis CI configuration is stale and misleading.**
   `.travis.yml` uses obsolete Python/Ubuntu versions and the configured matrix only exercises docs. Proposed fix: remove the stale Travis config if it is unused, or replace it with a maintained CI configuration that builds and tests the supported C++ and Python configurations.
+
+- [ ] **23. Python threaded `iexchange()` needs explicit GIL handling.**
+  Threaded C++ `iexchange()` now runs user callbacks on a worker thread while the calling thread drives MPI progress. The Python binding must either reject threaded `iexchange()` clearly, or release the GIL around the C++ call and acquire the GIL inside the worker-thread callback before touching Python objects. Add Python coverage for `Master(..., threads > 1).iexchange(...)` once the binding policy is chosen.
