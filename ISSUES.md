@@ -19,6 +19,9 @@ Items from the code review, with completed items checked off.
 - [x] **5. Threaded `Master::iexchange()` could violate MPI thread guarantees.**
   Fixed threaded `iexchange()` by keeping DIY MPI progress and termination control on the calling thread, while running user callbacks on a worker thread when `threads() > 1`. This preserves communication/compute overlap without requiring `MPI_THREAD_MULTIPLE`, so the default `MPI_THREAD_FUNNELED` environment no longer causes DIY to call MPI from a spawned communication thread.
 
+- [x] **6. Dynamic load balancing could corrupt pending incoming queues.**
+  Fixed migrated-block queue transfer to serialize explicit incoming queue metadata: source gid count, source gid, record count, and every queued buffer for each source. Queue buffers now carry their data bytes, read position, blob position, and unconsumed blob payloads, so the receiver reconstructs migrated pending queues from the payload instead of guessing from local state. Dynamic migration loads external incoming queue records before serializing them. Added dynamic-balance regression coverage for multiple sources, multiple records, preserved read positions, preserved blob positions, external queue storage, and blob payloads.
+
 - [x] **7. `DynamicPoint` constructors were broken.**
   Fixed the converting and pointer constructors by sizing the underlying vector before assigning coordinates. Added tests covering cross-type construction and pointer-based construction.
 
@@ -32,9 +35,6 @@ Items from the code review, with completed items checked off.
   Fixed `std::map`, `std::set`, `std::unordered_map`, and `std::unordered_set` deserialization to clear the destination before loading serialized entries. Added tests that load into containers with stale contents.
 
 ## Open
-
-- [ ] **6. Dynamic load balancing can corrupt pending incoming queues.**
-  Block migration sends pending incoming queue buffers as raw bytes without queue metadata or counts, while the receiver decides how many buffers to consume from local state. Proposed fix: serialize explicit queue metadata with each moved block, including queue count and source/key information for every pending queue, then reconstruct the receiver's incoming queues from that metadata before reading the block/link payload. Add tests with pending incoming messages during dynamic migration.
 
 - [ ] **11. Python callbacks are unsafe with `threads > 1`.**
   Python `Master` exposes a thread count, but callbacks can execute on DIY worker threads without correct GIL handling. Proposed fix: either conservatively reject `threads > 1` in the Python `Master` constructor, or fully support it by releasing the GIL around long-running `foreach`/`iexchange` calls and acquiring the GIL inside every callback that touches Python objects. Ensure Python callables and `py::object` instances are also destroyed while holding the GIL.

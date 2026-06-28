@@ -268,6 +268,7 @@ namespace diy
       inline void   unload_outgoing(int gid);
       inline void   load_queues(int i);
       inline void   load_incoming(int gid);
+      inline void   load_all_incoming(int gid);
       inline void   load_outgoing(int gid);
 
       //! return the MPI communicator
@@ -671,6 +672,26 @@ load_incoming(int gid__)
           // NB: we only load the front queue, if we want to use out-of-core
           //     machinery with iexchange, this will require changes
           auto& qr = access->front();
+          if (qr.external())
+          {
+            log->debug("Loading queue: {} <- {}", gid__, from);
+            qr.load(storage_);
+          }
+      }
+  }
+}
+
+void
+diy::Master::
+load_all_incoming(int gid__)
+{
+  IncomingQueues& in_qs = incoming_[exchange_round_].map[gid__];
+  for (auto& x : in_qs)
+  {
+      int from = x.first;
+      auto access = x.second.access();
+      for (QueueRecord& qr : *access)
+      {
           if (qr.external())
           {
             log->debug("Loading queue: {} <- {}", gid__, from);
