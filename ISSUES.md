@@ -22,6 +22,9 @@ Items from the code review, with completed items checked off.
 - [x] **8. `LinkFactory` could not reliably reload saved links.**
   Fixed built-in link serialization to write stable IDs for plain links, common regular links, and AMR links. `LinkFactory` now recognizes those stable IDs plus legacy same-compiler `typeid` IDs when loading, while preserving existing registered-link behavior for custom link types. Added serialization tests covering plain, regular, AMR, stable, and legacy IDs.
 
+- [x] **9. Point-to-GID queries mishandled wrapped or out-of-domain points.**
+  Fixed point queries to clear output gids, return no gids for non-wrapped points outside the domain, normalize wrapped coordinates into the periodic domain, wrap generated division coordinates modulo the decomposition, and return `-1` from `point_to_gid()`/`lowest_gid()` when no block owns the point. Added decomposer tests covering wrapped, below-domain, above-domain, ghost-boundary, and discrete coordinates.
+
 - [x] **10. Associative container deserialization left stale entries.**
   Fixed `std::map`, `std::set`, `std::unordered_map`, and `std::unordered_set` deserialization to clear the destination before loading serialized entries. Added tests that load into containers with stale contents.
 
@@ -32,9 +35,6 @@ Items from the code review, with completed items checked off.
 
 - [ ] **6. Dynamic load balancing can corrupt pending incoming queues.**
   Block migration sends pending incoming queue buffers as raw bytes without queue metadata or counts, while the receiver decides how many buffers to consume from local state. Proposed fix: serialize explicit queue metadata with each moved block, including queue count and source/key information for every pending queue, then reconstruct the receiver's incoming queues from that metadata before reading the block/link payload. Add tests with pending incoming messages during dynamic migration.
-
-- [ ] **9. Point-to-GID queries mishandle wrapped or out-of-domain points.**
-  Wrapped axes are not modulo-normalized, upper out-of-domain coordinates can produce invalid gids, and `lowest_gid()` assumes `point_to_gids()` returns a non-empty result. Proposed fix: normalize wrapped coordinates into the domain before computing divisions, clamp or reject non-wrapped out-of-domain points consistently, and make `lowest_gid()` handle empty results explicitly. Add tests for wrapped, below-domain, above-domain, and boundary coordinates.
 
 - [ ] **11. Python callbacks are unsafe with `threads > 1`.**
   Python `Master` exposes a thread count, but callbacks can execute on DIY worker threads without correct GIL handling. Proposed fix: either conservatively reject `threads > 1` in the Python `Master` constructor, or fully support it by releasing the GIL around long-running `foreach`/`iexchange` calls and acquiring the GIL inside every callback that touches Python objects. Ensure Python callables and `py::object` instances are also destroyed while holding the GIL.
