@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <typeinfo>
 
 #include "types.hpp"
 #include "serialization.hpp"
@@ -48,6 +49,8 @@ namespace diy
 
       virtual Link* clone() const                   { return new Link(*this); }
 
+      std::string id() const override               { return "diy::Link"; }
+
       virtual void  save(BinaryBuffer& bb) const    { diy::save(bb, neighbors_); }
       virtual void  load(BinaryBuffer& bb)          { diy::load(bb, neighbors_); }
 
@@ -60,6 +63,26 @@ namespace diy
 
   using RegularGridLink         = RegularLink<DiscreteBounds>;
   using RegularContinuousLink   = RegularLink<ContinuousBounds>;
+
+  namespace detail
+  {
+      template<class Bounds>
+      inline std::string regular_link_id()          { return typeid(RegularLink<Bounds>).name(); }
+
+      template<>
+      inline std::string regular_link_id<DiscreteBounds>()   { return "diy::RegularLink<diy::DiscreteBounds>"; }
+
+      template<>
+      inline std::string regular_link_id<ContinuousBounds>() { return "diy::RegularLink<diy::ContinuousBounds>"; }
+
+      template<>
+      inline std::string regular_link_id<Bounds<double>>()   { return "diy::RegularLink<diy::Bounds<double>>"; }
+
+      template<>
+      inline std::string regular_link_id<Bounds<long>>()     { return "diy::RegularLink<diy::Bounds<long>>"; }
+
+      inline Link* create_builtin_link(const std::string& name);
+  }
 
   // for a regular decomposition, it makes sense to address the neighbors by direction
   // and store local and neighbor bounds
@@ -234,6 +257,8 @@ namespace diy
     public:
       static Link*          create(std::string name)
       {
+          if (Link* link = detail::create_builtin_link(name))
+              return link;
           return Link::make(name);
       }
 
@@ -243,6 +268,38 @@ namespace diy
 
   namespace detail
   {
+      inline Link* create_builtin_link(const std::string& name)
+      {
+          if (name == "diy::Link" || name == typeid(Link).name())
+              return new Link;
+          if (name == regular_link_id<DiscreteBounds>() || name == typeid(RegularLink<DiscreteBounds>).name())
+              return new RegularLink<DiscreteBounds>;
+          if (name == regular_link_id<ContinuousBounds>() || name == typeid(RegularLink<ContinuousBounds>).name())
+              return new RegularLink<ContinuousBounds>;
+          if (name == regular_link_id<Bounds<double>>() || name == typeid(RegularLink<Bounds<double>>).name())
+              return new RegularLink<Bounds<double>>;
+          if (name == regular_link_id<Bounds<long>>() || name == typeid(RegularLink<Bounds<long>>).name())
+              return new RegularLink<Bounds<long>>;
+          if (name == "diy::AMRLink" || name == typeid(AMRLink).name())
+              return new AMRLink;
+          return 0;
+      }
+
+      inline std::string serialized_link_id(const Link* link)
+      {
+          if (typeid(*link) == typeid(RegularLink<DiscreteBounds>))
+              return regular_link_id<DiscreteBounds>();
+          if (typeid(*link) == typeid(RegularLink<ContinuousBounds>))
+              return regular_link_id<ContinuousBounds>();
+          if (typeid(*link) == typeid(RegularLink<Bounds<double>>))
+              return regular_link_id<Bounds<double>>();
+          if (typeid(*link) == typeid(RegularLink<Bounds<long>>))
+              return regular_link_id<Bounds<long>>();
+          if (typeid(*link) == typeid(AMRLink))
+              return "diy::AMRLink";
+          return link->id();
+      }
+
       inline void instantiate_common_regular_links()
       {
           // Instantiate the common types to register them
@@ -279,7 +336,7 @@ void
 diy::LinkFactory::
 save(BinaryBuffer& bb, const Link* l)
 {
-    diy::save(bb, l->id());
+    diy::save(bb, detail::serialized_link_id(l));
     l->save(bb);
 }
 

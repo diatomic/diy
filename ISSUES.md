@@ -19,6 +19,9 @@ Items from the code review, with completed items checked off.
 - [x] **7. `DynamicPoint` constructors were broken.**
   Fixed the converting and pointer constructors by sizing the underlying vector before assigning coordinates. Added tests covering cross-type construction and pointer-based construction.
 
+- [x] **8. `LinkFactory` could not reliably reload saved links.**
+  Fixed built-in link serialization to write stable IDs for plain links, common regular links, and AMR links. `LinkFactory` now recognizes those stable IDs plus legacy same-compiler `typeid` IDs when loading, while preserving existing registered-link behavior for custom link types. Added serialization tests covering plain, regular, AMR, stable, and legacy IDs.
+
 - [x] **10. Associative container deserialization left stale entries.**
   Fixed `std::map`, `std::set`, `std::unordered_map`, and `std::unordered_set` deserialization to clear the destination before loading serialized entries. Added tests that load into containers with stale contents.
 
@@ -29,9 +32,6 @@ Items from the code review, with completed items checked off.
 
 - [ ] **6. Dynamic load balancing can corrupt pending incoming queues.**
   Block migration sends pending incoming queue buffers as raw bytes without queue metadata or counts, while the receiver decides how many buffers to consume from local state. Proposed fix: serialize explicit queue metadata with each moved block, including queue count and source/key information for every pending queue, then reconstruct the receiver's incoming queues from that metadata before reading the block/link payload. Add tests with pending incoming messages during dynamic migration.
-
-- [ ] **8. `LinkFactory` cannot reliably reload saved links.**
-  Built-in links rely on `typeid(...).name()` and registration side effects, so plain `diy::Link` and common regular links may not reload. Proposed fix: register built-in link constructors explicitly with stable serialized IDs for `diy::Link`, `diy::RegularLink<DiscreteBounds>`, `diy::RegularLink<ContinuousBounds>`, and `diy::AMRLink`, and ensure registration happens before load. Preserve compatibility with old same-compiler files by accepting legacy `typeid` names as aliases where possible.
 
 - [ ] **9. Point-to-GID queries mishandle wrapped or out-of-domain points.**
   Wrapped axes are not modulo-normalized, upper out-of-domain coordinates can produce invalid gids, and `lowest_gid()` assumes `point_to_gids()` returns a non-empty result. Proposed fix: normalize wrapped coordinates into the domain before computing divisions, clamp or reject non-wrapped out-of-domain points consistently, and make `lowest_gid()` handle empty results explicitly. Add tests for wrapped, below-domain, above-domain, and boundary coordinates.
