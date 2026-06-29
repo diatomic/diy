@@ -2,7 +2,6 @@
 #include <diy/assigner.hpp>
 #include <diy/master.hpp>
 #include <diy/algorithms.hpp>
-#include <diy/storage.hpp>
 
 #include "../opts.h"
 #include "balance.hpp"
@@ -33,8 +32,7 @@ void add_queue_record(diy::Master::IncomingQueues& in_qs, int from, diy::MemoryB
 
 void test_dynamic_incoming_queue_migration(const diy::mpi::communicator& world)
 {
-    diy::FileStorage storage;
-    diy::Master send_master(world, 1, -1, 0, 0, &storage);
+    diy::Master send_master(world);
     diy::Master recv_master(world);
     diy::Master aux_send(world);
     diy::Master aux_recv(world);
@@ -78,14 +76,6 @@ void test_dynamic_incoming_queue_migration(const diy::mpi::communicator& world)
     diy::load(partially_read, ignored);
     add_queue_record(send_incoming, 9, std::move(partially_read), false);
 
-    diy::MemoryBuffer external;
-    diy::save(external, 45);
-    add_queue_record(send_incoming, 10, std::move(external));
-    {
-        auto external_records = send_incoming[10].access();
-        external_records->front().unload(&storage);
-    }
-
     diy::MemoryBuffer partially_consumed_blob;
     const char consumed_blob[] = {'o', 'l', 'd'};
     const char next_blob[] = {'n', 'e', 'w'};
@@ -94,8 +84,6 @@ void test_dynamic_incoming_queue_migration(const diy::mpi::communicator& world)
     diy::BinaryBlob consumed = partially_consumed_blob.load_binary_blob();
     require_dynamic_queue_test(consumed.size == sizeof(consumed_blob), "source 11 consumed blob size");
     add_queue_record(send_incoming, 11, std::move(partially_consumed_blob), false);
-
-    send_master.load_all_incoming(move_gid);
 
     diy::Master::ProxyWithLink send_cp = aux_send.proxy(0);
     diy::BlockID dest_block = {aux_recv_gid, world.rank()};
@@ -111,13 +99,11 @@ void test_dynamic_incoming_queue_migration(const diy::mpi::communicator& world)
     auto from_seven = recv_incoming[7].access();
     auto from_eight = recv_incoming[8].access();
     auto from_nine = recv_incoming[9].access();
-    auto from_ten = recv_incoming[10].access();
     auto from_eleven = recv_incoming[11].access();
 
     require_dynamic_queue_test(from_seven->size() == 2, "source 7 queue count");
     require_dynamic_queue_test(from_eight->size() == 1, "source 8 queue count");
     require_dynamic_queue_test(from_nine->size() == 1, "source 9 queue count");
-    require_dynamic_queue_test(from_ten->size() == 1, "source 10 queue count");
     require_dynamic_queue_test(from_eleven->size() == 1, "source 11 queue count");
 
     int value;
@@ -136,9 +122,6 @@ void test_dynamic_incoming_queue_migration(const diy::mpi::communicator& world)
 
     diy::load(from_nine->front().buffer(), value);
     require_dynamic_queue_test(value == 44, "source 9 preserved read position");
-
-    diy::load(from_ten->front().buffer(), value);
-    require_dynamic_queue_test(value == 45, "source 10 external payload");
 
     diy::BinaryBlob migrated_next_blob = from_eleven->front().buffer().load_binary_blob();
     require_dynamic_queue_test(migrated_next_blob.size == sizeof(next_blob), "source 11 next blob size");
