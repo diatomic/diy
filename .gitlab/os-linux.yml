@@ -86,7 +86,7 @@
     - ccache -z
     - ccache -s
     - ctest -VV -S .gitlab/ci/ctest_configure.cmake
-    - ctest -VV -S .gitlab/ci/ctest_build.cmake
+    - ctest -VV -S .gitlab/ci/ctest_build.cmake | tee build/ctest_build_output.log 2>&1
     - ccache -s
   interruptible: true
 
@@ -94,7 +94,7 @@
   stage: test
   script:
     - *before_script_linux
-    - ctest -V --output-on-failure -S .gitlab/ci/ctest_test.cmake
+    - ctest -V --output-on-failure -S .gitlab/ci/ctest_test.cmake | tee build/ctest_test_output.log 2>&1
   interruptible: true
 
 .cmake_memcheck_linux:
