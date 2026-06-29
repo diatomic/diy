@@ -44,7 +44,7 @@
   script:
     - *before_script_windows_build
     - "ctest -VV -S .gitlab/ci/ctest_configure.cmake"
-    - "ctest -VV -S .gitlab/ci/ctest_build.cmake 2>&1 | Tee-Object -FilePath ctest_build_output.log"
+    - "ctest -VV -S .gitlab/ci/ctest_build.cmake 2>&1 | Tee-Object -FilePath build/ctest_build_output.log"
 
 .cmake_test_windows: &cmake_test_windows
   extends:
@@ -54,4 +54,4 @@
   interruptible: true
   script:
     - *before_script_windows_test
-    - "ctest -VV -C $Env:CMAKE_BUILD_TYPE -S .gitlab/ci/ctest_test.cmake 2>&1 | Tee-Object -FilePath ctest_test_output.log"
+    - "ctest -VV -C $Env:CMAKE_BUILD_TYPE -S .gitlab/ci/ctest_test.cmake 2>&1 | Tee-Object -FilePath build/ctest_test_output.log"
