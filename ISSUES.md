@@ -34,6 +34,9 @@ Items from the code review, with completed items checked off.
 - [x] **10. Associative container deserialization left stale entries.**
   Fixed `std::map`, `std::set`, `std::unordered_map`, and `std::unordered_set` deserialization to clear the destination before loading serialized entries. Added tests that load into containers with stale contents.
 
+- [x] **21. Dense kd-tree test matrix did not vary `n`.**
+  Fixed the CMake test matrix to pass `-n ${n}` to `kd-tree-test2` and use the full target path for the executable. Hardened the dense CSV reader so missing or malformed datasets fail clearly instead of hanging or adding bogus points.
+
 ## Open
 
 - [ ] **11. Python callbacks are unsafe with `threads > 1`.**
@@ -65,9 +68,6 @@ Items from the code review, with completed items checked off.
 
 - [ ] **20. MPI CTest commands are fragile for multi-config generators.**
   MPI tests invoke bare executable names instead of target paths, which can fail when binaries live in configuration subdirectories. Proposed fix: replace bare executable names in `tests/CMakeLists.txt` with `$<TARGET_FILE:target>` generator expressions for all MPI-driven tests. Verify with Ninja Multi-Config, Xcode, or another multi-config generator.
-
-- [ ] **21. Dense kd-tree test matrix does not vary `n`.**
-  The CMake loop names tests with different `n` values but never passes `-n ${n}` to the test executable. Proposed fix: add the missing `-n ${n}` argument and confirm the intended matrix runs distinct cases.
 
 - [ ] **22. Travis CI configuration is stale and misleading.**
   `.travis.yml` uses obsolete Python/Ubuntu versions and the configured matrix only exercises docs. Proposed fix: remove the stale Travis config if it is unused, or replace it with a maintained CI configuration that builds and tests the supported C++ and Python configurations.

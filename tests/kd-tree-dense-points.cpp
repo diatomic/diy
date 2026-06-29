@@ -2,6 +2,8 @@
 #include <fstream>
 #include <string>
 #include <cstdlib>
+#include <cctype>
+#include <stdexcept>
 
 #include <diy/master.hpp>
 #include <diy/link.hpp>
@@ -69,23 +71,55 @@ std::vector<PointT> read_csv(const std::string& filename)
 {
   std::vector<PointT> points;
   std::ifstream ifs(filename);
+  if (!ifs)
+    throw std::runtime_error("Failed to open " + filename);
 
-  char line[256];
-  while (!ifs.eof())
+  std::string line;
+  while (std::getline(ifs, line))
   {
-    ifs.getline(line, 256);
+    bool blank = true;
+    for (char c : line)
+      if (!std::isspace(static_cast<unsigned char>(c)))
+        blank = false;
+    if (blank)
+      continue;
+
     PointT p;
-    char* token = strtok(line, ",");
+
+    size_t start = 0;
     int i = 0;
-    while (token != nullptr)
+    while (start <= line.size())
     {
-      p.coords[i++] = std::strtof(token, nullptr);
-      token = strtok(nullptr, ",");
+      if (i == 3)
+        throw std::runtime_error("Too many coordinates in " + filename);
+
+      size_t end = line.find(',', start);
+      std::string token = line.substr(start, end == std::string::npos ? std::string::npos : end - start);
+
+      char* parse_end = nullptr;
+      p.coords[i] = std::strtof(token.c_str(), &parse_end);
+      while (parse_end != nullptr && *parse_end != '\0' && std::isspace(static_cast<unsigned char>(*parse_end)))
+        ++parse_end;
+      if (parse_end == token.c_str() || *parse_end != '\0')
+        throw std::runtime_error("Invalid coordinate in " + filename + ": " + token);
+
+      ++i;
+      if (end == std::string::npos)
+        break;
+      start = end + 1;
     }
+
+    if (i == 0)
+      continue;
+    if (i != 3)
+      throw std::runtime_error("Expected three coordinates in " + filename);
+
     points.push_back(p);
   }
 
-  ifs.close();
+  if (points.empty())
+    throw std::runtime_error("No points loaded from " + filename);
+
   return points;
 }
 
@@ -120,29 +154,37 @@ int main (int argc, char* argv[])
     return 1;
   }
 
-  diy::Master master(comm, 1, -1, []() { return static_cast<void*>(new BlockT); },
-    [](void* b) { delete static_cast<BlockT*>(b); });
-
-  diy::ContiguousAssigner cuts_assigner(comm.size(), nblocks);
-
-  auto points = read_csv(filename);
-
-  const auto gdomain = compute_bounds(points);
-
-  std::vector<int> gids;
-  cuts_assigner.local_gids(comm.rank(), gids);
-  for (const int gid : gids)
+  try
   {
-    auto block = new BlockT();
-    if (gid == gids[0])
-    {
-      block->AddPoints(std::move(points));
-    }
-    auto link = new diy::RegularContinuousLink(3, gdomain, gdomain);
-    master.add(gid, block, link);
-  }
+    diy::Master master(comm, 1, -1, []() { return static_cast<void*>(new BlockT); },
+      [](void* b) { delete static_cast<BlockT*>(b); });
 
-  diy::kdtree(master, cuts_assigner, 3, gdomain, &BlockT::Points, bins);
+    diy::ContiguousAssigner cuts_assigner(comm.size(), nblocks);
+
+    auto points = read_csv(filename);
+
+    const auto gdomain = compute_bounds(points);
+
+    std::vector<int> gids;
+    cuts_assigner.local_gids(comm.rank(), gids);
+    for (const int gid : gids)
+    {
+      auto block = new BlockT();
+      if (gid == gids[0])
+      {
+        block->AddPoints(std::move(points));
+      }
+      auto link = new diy::RegularContinuousLink(3, gdomain, gdomain);
+      master.add(gid, block, link);
+    }
+
+    diy::kdtree(master, cuts_assigner, 3, gdomain, &BlockT::Points, bins);
+  } catch (const std::exception& e)
+  {
+    if (comm.rank() == 0)
+      std::cerr << "Error: " << e.what() << std::endl;
+    return 1;
+  }
 
   return 0;
 }

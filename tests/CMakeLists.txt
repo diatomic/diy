@@ -83,8 +83,8 @@ endforeach                  ()
 foreach                     (b 2 4 8 16 32 64)
     foreach                 (n 128 256 512)
         add_test                (NAME kd-tree-test2-b${b}-n${n}
-                                 COMMAND $<TARGET_FILE_NAME:kd-tree-test2> -b ${b} -f ${CMAKE_CURRENT_SOURCE_DIR}/kd-tree-dataset.csv
-                                )
+                                  COMMAND $<TARGET_FILE:kd-tree-test2> -b ${b} -n ${n} -f ${CMAKE_CURRENT_SOURCE_DIR}/kd-tree-dataset.csv
+                                 )
     endforeach              ()
 endforeach                  ()
 
