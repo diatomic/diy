@@ -35,7 +35,7 @@ Items from the code review, with completed items checked off.
   Fixed `std::map`, `std::set`, `std::unordered_map`, and `std::unordered_set` deserialization to clear the destination before loading serialized entries. Added tests that load into containers with stale contents.
 
 - [x] **21. Dense kd-tree test matrix did not vary `n`.**
-  Fixed the CMake test matrix to pass `-n ${n}` to `kd-tree-test2` and use the full target path for the executable. Hardened the dense CSV reader so missing or malformed datasets fail clearly instead of hanging or adding bogus points.
+  Fixed the CMake test matrix to pass `-n ${n}` to `kd-tree-test2`, keep the same CTest executable resolution style as the other kd-tree tests, and apply MSVC `/bigobj` to the dense kd-tree source like the other template-heavy tests. Hardened the dense CSV reader so missing or malformed datasets fail clearly instead of hanging or adding bogus points.
 
 ## Open
 
