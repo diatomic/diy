@@ -7,6 +7,8 @@
     reports:
       annotations:
         - build/annotations.json
+    paths:
+      - build/*.log
 
 .cmake_build_artifacts:
   artifacts:
