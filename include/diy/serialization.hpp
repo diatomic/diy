@@ -187,6 +187,8 @@ namespace diy
   template<class T>
   void                  save(BinaryBuffer& bb, const T* x, size_t n)
   {
+    if (n == 0)
+      return;
     if (!detail::is_default< Serialization<T> >::value)
       for (size_t i = 0; i < n; ++i)
         diy::save(bb, x[i]);
@@ -197,6 +199,8 @@ namespace diy
   template<class T>
   void                  load(BinaryBuffer& bb, T* x, size_t n)
   {
+    if (n == 0)
+      return;
     if (!detail::is_default< Serialization<T> >::value)
       for (size_t i = 0; i < n; ++i)
         diy::load(bb, x[i]);
@@ -341,6 +345,7 @@ namespace diy
     {
       size_t s;
       diy::load(bb, s);
+      m.clear();
       for (size_t i = 0; i < s; ++i)
       {
         K k;
@@ -368,6 +373,7 @@ namespace diy
     {
       size_t s;
       diy::load(bb, s);
+      m.clear();
       for (size_t i = 0; i < s; ++i)
       {
         T p;
@@ -395,6 +401,7 @@ namespace diy
     {
       size_t s;
       diy::load(bb, s);
+      m.clear();
       for (size_t i = 0; i < s; ++i)
       {
         std::pair<K,V> p;
@@ -422,6 +429,7 @@ namespace diy
     {
       size_t s;
       diy::load(bb, s);
+      m.clear();
       for (size_t i = 0; i < s; ++i)
       {
         T p;
@@ -481,7 +489,7 @@ append_binary(const char* x, size_t count)
     {
         size_t cur_size = buffer.size() - position;
         size_t new_size = cur_size + count;
-        if (new_size * growth_multiplier() <= buffer.capacity())        // we have enough space in this buffer, copy in place
+        if (static_cast<double>(new_size) * static_cast<double>(growth_multiplier()) <= static_cast<double>(buffer.capacity()))        // we have enough space in this buffer, copy in place
         {
             // copy the data to the beginning of the buffer and reduce its size
             for (size_t i = 0; i < cur_size; ++i)

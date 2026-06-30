@@ -59,6 +59,7 @@ endif()
 if                          (MSVC AND NOT(MSVC_VERSION LESS 1400))
     set_source_files_properties (double-foreach.cpp     PROPERTIES COMPILE_FLAGS "/bigobj")
     set_source_files_properties (kd-tree.cpp            PROPERTIES COMPILE_FLAGS "/bigobj")
+    set_source_files_properties (kd-tree-dense-points.cpp PROPERTIES COMPILE_FLAGS "/bigobj")
     set_source_files_properties (merge-swap-reduce.cpp  PROPERTIES COMPILE_FLAGS "/bigobj")
     set_source_files_properties (swap-reduce.cpp        PROPERTIES COMPILE_FLAGS "/bigobj")
     set_source_files_properties (rexchange.cpp          PROPERTIES COMPILE_FLAGS "/bigobj")
@@ -83,8 +84,8 @@ endforeach                  ()
 foreach                     (b 2 4 8 16 32 64)
     foreach                 (n 128 256 512)
         add_test                (NAME kd-tree-test2-b${b}-n${n}
-                                 COMMAND $<TARGET_FILE_NAME:kd-tree-test2> -b ${b} -f ${CMAKE_CURRENT_SOURCE_DIR}/kd-tree-dataset.csv
-                                )
+                                  COMMAND $<TARGET_FILE_NAME:kd-tree-test2> -b ${b} -n ${n} -f ${CMAKE_CURRENT_SOURCE_DIR}/kd-tree-dataset.csv
+                                 )
     endforeach              ()
 endforeach                  ()
 

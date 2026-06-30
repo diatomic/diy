@@ -36,6 +36,13 @@ TEST_CASE("Test BOV", "[io]")
             writer.write(sub_box, &block2[0][0], sub_box);
         }
 
+        {
+            diy::mpi::io::file out(world, "test-shapes.bin", diy::mpi::io::file::wronly | diy::mpi::io::file::create);
+            diy::io::BOV writer(out);
+            writer.set_shape(std::vector<int>{4});
+            writer.set_shape(std::vector<int>{4, 3, 2});
+        }
+
         std::ifstream in("test.bin", std::ios::binary);
         in.read((char*) (void*) restored_data, 4*3*sizeof(int));
 

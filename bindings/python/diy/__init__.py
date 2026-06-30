@@ -1,4 +1,5 @@
 from ._diy import *
+import atexit
 
 # Monkey-patch the constructor to accept a normal mpi4py communicator
 
@@ -18,9 +19,12 @@ mpi.MPIComm.__init__ = convert_mpi_comm
 
 class InitFinalize:
     def __init__(self):
-        mpi.init()
+        self._owns_mpi = mpi.init()
 
-    def __del__(self):
-        mpi.finalize()
+    def finalize(self):
+        if self._owns_mpi:
+            mpi.finalize()
+            self._owns_mpi = False
 
 init_finalize = InitFinalize()
+atexit.register(init_finalize.finalize)

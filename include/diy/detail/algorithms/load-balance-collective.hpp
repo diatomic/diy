@@ -2,6 +2,7 @@
 
 #include <queue>
 #include "load-balance.hpp"
+#include "diy/mpi/collectives.hpp"
 
 namespace diy
 {
@@ -16,7 +17,7 @@ inline void exchange_work_info(diy::Master&            master,
 {
     auto nprocs = master.communicator().size();     // global number of procs
     all_work_info.resize(nprocs);
-    diy::mpi::detail::all_gather(master.communicator(), &my_work_info, sizeof(WorkInfo), MPI_BYTE, &all_work_info[0]);
+    diy::mpi::detail::all_gather(master.communicator(), &my_work_info, sizeof(WorkInfo), diy::mpi::detail::get_mpi_datatype<char>(), &all_work_info[0]);
 }
 
 // determine move info from work info

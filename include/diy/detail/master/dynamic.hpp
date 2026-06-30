@@ -4,14 +4,120 @@
 #include <diy/assigner.hpp>
 #include <diy/resolve.hpp>
 #include <diy/fmt/format.h>
+#include <algorithm>
+#include <cassert>
 #include <cstdio>
 #include <iterator>
+#include <memory>
+#include <vector>
 
 namespace diy
 {
 
 namespace detail
 {
+
+inline void dynamic_send_queue_buffer(const diy::Master::ProxyWithLink& cp,
+                                      const diy::BlockID&               dest_block,
+                                      const diy::MemoryBuffer&          bb)
+{
+    cp.enqueue(dest_block, bb.position);
+    cp.enqueue(dest_block, bb.buffer);
+    cp.enqueue(dest_block, bb.blob_position);
+
+    size_t num_blobs = bb.blobs.size();
+    cp.enqueue(dest_block, num_blobs);
+    assert(bb.blob_position <= num_blobs);
+    for (size_t i = 0; i < num_blobs; ++i)
+    {
+        const auto& blob = bb.blobs[i];
+        std::vector<char> blob_buffer;
+        if (i >= bb.blob_position && blob.size > 0)
+        {
+            assert(blob.pointer);
+            blob_buffer.assign(blob.pointer.get(), blob.pointer.get() + blob.size);
+        }
+        cp.enqueue(dest_block, blob_buffer);
+    }
+}
+
+inline diy::MemoryBuffer dynamic_recv_queue_buffer(const diy::Master::ProxyWithLink& cp,
+                                                   int                               gid)
+{
+    diy::MemoryBuffer bb;
+    cp.dequeue(gid, bb.position);
+    cp.dequeue(gid, bb.buffer);
+    cp.dequeue(gid, bb.blob_position);
+
+    size_t num_blobs;
+    cp.dequeue(gid, num_blobs);
+    for (size_t i = 0; i < num_blobs; ++i)
+    {
+        std::vector<char> blob_buffer;
+        cp.dequeue(gid, blob_buffer);
+
+        size_t blob_size = blob_buffer.size();
+        std::unique_ptr<char[]> blob(new char[blob_size ? blob_size : 1]);
+        if (blob_size > 0)
+            std::copy(blob_buffer.begin(), blob_buffer.end(), blob.get());
+        bb.save_binary_blob(blob.release(), blob_size, [](const char x[]) { delete[] x; });
+    }
+
+    return bb;
+}
+
+inline void dynamic_send_incoming_queues(const diy::Master::ProxyWithLink& cp,
+                                         const diy::BlockID&               dest_block,
+                                         diy::Master::IncomingQueues&      in_qs)
+{
+    size_t num_sources = 0;
+    for (auto& x : in_qs)
+        if (!x.second.access()->empty())
+            ++num_sources;
+
+    cp.enqueue(dest_block, num_sources);
+    for (auto& x : in_qs)
+    {
+        auto access = x.second.access();
+        if (access->empty())
+            continue;
+
+        cp.enqueue(dest_block, x.first);
+
+        size_t num_records = access->size();
+        cp.enqueue(dest_block, num_records);
+        for (diy::Master::QueueRecord& qr : *access)
+        {
+            assert(!qr.external());
+            dynamic_send_queue_buffer(cp, dest_block, qr.buffer());
+        }
+    }
+}
+
+inline void dynamic_recv_incoming_queues(const diy::Master::ProxyWithLink& cp,
+                                         diy::Master&                      master,
+                                         int                               gid,
+                                         int                               move_gid)
+{
+    size_t num_sources;
+    cp.dequeue(gid, num_sources);
+
+    // Preserve any queues for this gid that arrived independently before the
+    // block payload; migrated queues are appended from explicit metadata.
+    diy::Master::IncomingQueues& in_qs = master.incoming(move_gid);
+    for (size_t i = 0; i < num_sources; ++i)
+    {
+        int source_gid;
+        cp.dequeue(gid, source_gid);
+
+        size_t num_records;
+        cp.dequeue(gid, num_records);
+
+        auto access = in_qs[source_gid].access();
+        for (size_t j = 0; j < num_records; ++j)
+            access->emplace_back(dynamic_recv_queue_buffer(cp, gid));
+    }
+}
 
 // send requests for work info
 inline void dynamic_send_req(const diy::Master::ProxyWithLink&  cp,                        // communication proxy
@@ -61,7 +167,7 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
             break;
         }
     }
-    if (my_work_idx < quantile * ab->sample_work_info.size())
+    if (static_cast<float>(my_work_idx) < quantile * static_cast<float>(ab->sample_work_info.size()))
         return;
 
     // pick the destination process to be the mirror image of my work location in the samples
@@ -96,14 +202,11 @@ inline void dynamic_send_block(const diy::Master::ProxyWithLink&   cp,          
         // enqueue the origin_proc of the moving block
         cp.enqueue(dest_block, origin_proc);
 
-        // enqueue the incoming queues
+        // enqueue the incoming queues with explicit source/count metadata
         // derived from Master::unload_incoming(), but only current exchange round TODO: is this correct?
+        master.load_all_incoming(move_gid);
         Master::IncomingQueues &in_qs = master.incoming(move_gid);
-        for (auto &x : in_qs)
-        {
-            for (Master::QueueRecord &qr : *x.second.access())
-                cp.enqueue(dest_block, qr.buffer());
-        }
+        dynamic_send_incoming_queues(cp, dest_block, in_qs);
 
         // NB: don't send the outgoing queues because messages in those queues can be sent
         // from the master of the original proc
@@ -174,22 +277,9 @@ inline void dynamic_recv(const diy::Master::ProxyWithLink&  cp,                 
                     int origin_proc;
                     cp.dequeue(gid, origin_proc);
 
-                    // dequeue the incoming queues
+                    // dequeue the incoming queues from explicit source/count metadata
                     // derived from Master::load_incoming(), but only current exchange round TODO: is this correct?
-                    diy::MemoryBuffer bb;
-                    Master::IncomingQueues &in_qs = master.incoming(move_gid);
-                    for (auto &x : in_qs)
-                    {
-                        auto access = x.second.access();
-                        if (!access->empty())
-                        {
-                            // NB: we only load the front queue, TODO: is this correct?
-                            auto& qr = access->front();
-
-                            cp.dequeue(gid, bb.buffer);
-                            qr.buffer() = std::move(bb);
-                        }
-                    }
+                    dynamic_recv_incoming_queues(cp, master, gid, move_gid);
 
                     // NB: we didn't send the outgoing queues in dynamic_send_block
                     // so no outgoing queues to receive here
@@ -251,7 +341,7 @@ bool iexchange_balance(AuxBlock*                           ab,                  
     if (ab->any_free_blocks() && ab->nsent_reqs == 0)   // I have work and have not already sent requests
     {
         // pick a random sample of processes, w/o duplicates, and excluding myself
-        nsamples = static_cast<int>(sample_frac * (nprocs - 1));
+        nsamples = static_cast<int>(sample_frac * static_cast<float>(nprocs - 1));
         for (auto i = 0; i < nsamples; i++)
         {
             int rand_proc;

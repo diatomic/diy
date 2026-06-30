@@ -25,6 +25,15 @@ namespace detail
   {
     using Coordinate = typename Bounds::Coordinate;
 
+    static Coordinate   floor_div(Coordinate x, Coordinate y)
+    {
+        Coordinate q = x / y;
+        Coordinate r = x % y;
+        if (r != 0 && ((r < 0) != (y < 0)))
+            --q;
+        return q;
+    }
+
     static Coordinate   from(int i, int n, Coordinate min, Coordinate max, bool)          { return min + (max - min + 1)/n * i; }
     static Coordinate   to  (int i, int n, Coordinate min, Coordinate max, bool shared_face)
     {
@@ -37,18 +46,19 @@ namespace detail
     static int          lower(Coordinate x, int n, Coordinate min, Coordinate max, bool shared)
     {
         Coordinate width = (max - min + 1)/n;
-        Coordinate res = (x - min)/width;
-        if (res >= n) res = n - 1;
+        Coordinate res = floor_div(x - min, width);
+        if (res >= n && x <= max) res = n - 1;
 
-        if (shared && x == from(res, n, min, max, shared))
+        if (res > 0 && shared && x == from(res, n, min, max, shared))
             --res;
         return res;
     }
     static int          upper(Coordinate x, int n, Coordinate min, Coordinate max, bool shared)
     {
         Coordinate width = (max - min + 1)/n;
-        Coordinate res = (x - min)/width + 1;
-        if (shared && x == from(res, n, min, max, shared))
+        Coordinate res = floor_div(x - min, width) + 1;
+        if (res > n && x <= max) res = n;
+        if (res < n && shared && x == from(res, n, min, max, shared))
             ++res;
         return res;
     }
@@ -60,12 +70,75 @@ namespace detail
   {
     using Coordinate = typename Bounds::Coordinate;
 
-    static Coordinate   from(int i, int n, Coordinate min, Coordinate max, bool)      { return min + (max - min)/n * i; }
-    static Coordinate   to  (int i, int n, Coordinate min, Coordinate max, bool)      { return min + (max - min)/n * (i+1); }
+    static Coordinate   from(int i, int n, Coordinate min, Coordinate max, bool)      { return min + (max - min) / static_cast<Coordinate>(n) * static_cast<Coordinate>(i); }
+    static Coordinate   to  (int i, int n, Coordinate min, Coordinate max, bool)      { return min + (max - min) / static_cast<Coordinate>(n) * static_cast<Coordinate>(i + 1); }
 
-    static int          lower(Coordinate x, int n, Coordinate min, Coordinate max, bool)   { Coordinate width = (max - min)/n; auto res = static_cast<int>(std::floor((x - min)/width)); if (min + res*width == x) return (res - 1); else return res; }
-    static int          upper(Coordinate x, int n, Coordinate min, Coordinate max, bool)   { Coordinate width = (max - min)/n; auto res = static_cast<int>(std::ceil ((x - min)/width)); if (min + res*width == x) return (res + 1); else return res; }
+    static int          lower(Coordinate x, int n, Coordinate min, Coordinate max, bool)   { Coordinate width = (max - min) / static_cast<Coordinate>(n); auto res = static_cast<int>(std::floor((x - min)/width)); if (min + static_cast<Coordinate>(res)*width == x) return (res - 1); else return res; }
+    static int          upper(Coordinate x, int n, Coordinate min, Coordinate max, bool)   { Coordinate width = (max - min) / static_cast<Coordinate>(n); auto res = static_cast<int>(std::ceil ((x - min)/width)); if (min + static_cast<Coordinate>(res)*width == x) return (res + 1); else return res; }
   };
+
+  template<class Coordinate>
+  typename std::enable_if<std::is_integral<Coordinate>::value, Coordinate>::type
+  wrap_period(Coordinate min, Coordinate max)
+  {
+      return max - min + 1;
+  }
+
+  template<class Coordinate>
+  typename std::enable_if<std::is_floating_point<Coordinate>::value, Coordinate>::type
+  wrap_period(Coordinate min, Coordinate max)
+  {
+      return max - min;
+  }
+
+  template<class Coordinate>
+  typename std::enable_if<std::is_integral<Coordinate>::value, int>::type
+  wrap_shift(Coordinate x, Coordinate min, Coordinate max)
+  {
+      Coordinate size = wrap_period(min, max);
+      Coordinate q = (x - min) / size;
+      Coordinate r = (x - min) % size;
+      if (r != 0 && ((r < 0) != (size < 0)))
+          --q;
+      return static_cast<int>(q);
+  }
+
+  template<class Coordinate>
+  typename std::enable_if<std::is_floating_point<Coordinate>::value, int>::type
+  wrap_shift(Coordinate x, Coordinate min, Coordinate max)
+  {
+      return static_cast<int>(std::floor((x - min) / wrap_period(min, max)));
+  }
+
+  template<class Coordinate>
+  typename std::enable_if<std::is_integral<Coordinate>::value, Coordinate>::type
+  normalize_wrap(Coordinate x, Coordinate min, Coordinate max)
+  {
+      Coordinate size = wrap_period(min, max);
+      Coordinate offset = (x - min) % size;
+      if (offset < 0)
+          offset += size;
+      return min + offset;
+  }
+
+  template<class Coordinate>
+  typename std::enable_if<std::is_floating_point<Coordinate>::value, Coordinate>::type
+  normalize_wrap(Coordinate x, Coordinate min, Coordinate max)
+  {
+      Coordinate size = wrap_period(min, max);
+      Coordinate offset = std::fmod(x - min, size);
+      if (offset < 0)
+          offset += size;
+      return min + offset;
+  }
+
+  inline int normalize_coord(int coord, int size)
+  {
+      coord %= size;
+      if (coord < 0)
+          coord += size;
+      return coord;
+  }
 }
 
   //! \ingroup Decomposition
@@ -611,7 +684,6 @@ factor(std::vector<unsigned>& factors, int n)
 }
 
 // Point to GIDs
-// TODO: deal with wrap correctly
 // TODO: add an optional ghosts argument to ignore ghosts (if we want to find the true owners, or something like that)
 template<class Bounds>
 template<class Point>
@@ -619,16 +691,26 @@ void
 diy::RegularDecomposer<Bounds>::
 point_to_gids(std::vector<int>& gids, const Point& p) const
 {
+    gids.clear();
+
     std::vector< std::pair<int, int> > ranges(dim);
     for (int i = 0; i < dim; ++i)
+    {
         top_bottom(ranges[i].second, ranges[i].first, p, i);
+        if (ranges[i].second <= ranges[i].first)
+            return;
+    }
 
     // look up gids for all combinations
     DivisionsVector coords(dim), location(dim);
     while(location.back() < ranges.back().second - ranges.back().first)
     {
         for (int i = 0; i < dim; ++i)
+        {
             coords[i] = ranges[i].first + location[i];
+            if (wrap[i])
+                coords[i] = detail::normalize_coord(coords[i], divisions[i]);
+        }
         gids.push_back(coords_to_gid(coords, divisions));
 
         location[0]++;
@@ -651,8 +733,14 @@ point_to_gid(const Point& p) const
     int gid = 0;
     for (int axis = dim - 1; axis >= 0; --axis)
     {
-      int bottom  = detail::BoundsHelper<Bounds>::lower(p[axis], divisions[axis], domain.min[axis], domain.max[axis], share_face[axis]);
-          bottom  = (std::max)(0, bottom);
+      Coordinate x = p[axis];
+      if (wrap[axis])
+          x = detail::normalize_wrap(x, domain.min[axis], domain.max[axis]);
+      else if (x < domain.min[axis] || x > domain.max[axis])
+          return -1;
+
+      int bottom  = detail::BoundsHelper<Bounds>::lower(x, divisions[axis], domain.min[axis], domain.max[axis], share_face[axis]);
+          bottom  = (std::max)(0, (std::min)(divisions[axis] - 1, bottom));
 
       // coupled with coords_to_gid
       gid *= divisions[axis];
@@ -684,14 +772,39 @@ void
 diy::RegularDecomposer<Bounds>::
 top_bottom(int& top, int& bottom, const Point& p, int axis) const
 {
-    Coordinate l = p[axis] - ghosts[axis];
-    Coordinate r = p[axis] + ghosts[axis];
-
-    top     = detail::BoundsHelper<Bounds>::upper(r, divisions[axis], domain.min[axis], domain.max[axis], share_face[axis]);
-    bottom  = detail::BoundsHelper<Bounds>::lower(l, divisions[axis], domain.min[axis], domain.max[axis], share_face[axis]);
-
-    if (!wrap[axis])
+    Coordinate x = p[axis];
+    if (wrap[axis])
+        x = detail::normalize_wrap(x, domain.min[axis], domain.max[axis]);
+    else if (x < domain.min[axis] || x > domain.max[axis])
     {
+        bottom = 0;
+        top = 0;
+        return;
+    }
+
+    Coordinate l = x - ghosts[axis];
+    Coordinate r = x + ghosts[axis];
+
+    if (wrap[axis])
+    {
+        Coordinate period = detail::wrap_period(domain.min[axis], domain.max[axis]);
+        int l_shift = detail::wrap_shift(l, domain.min[axis], domain.max[axis]);
+        int r_shift = detail::wrap_shift(r, domain.min[axis], domain.max[axis]);
+        Coordinate l_wrapped = l - static_cast<Coordinate>(l_shift) * period;
+        Coordinate r_wrapped = r - static_cast<Coordinate>(r_shift) * period;
+
+        bottom = l_shift * divisions[axis] + detail::BoundsHelper<Bounds>::lower(l_wrapped, divisions[axis], domain.min[axis], domain.max[axis], share_face[axis]);
+        top    = r_shift * divisions[axis] + detail::BoundsHelper<Bounds>::upper(r_wrapped, divisions[axis], domain.min[axis], domain.max[axis], share_face[axis]);
+
+        if (top - bottom > divisions[axis])
+        {
+            bottom = 0;
+            top = divisions[axis];
+        }
+    } else
+    {
+        top     = detail::BoundsHelper<Bounds>::upper(r, divisions[axis], domain.min[axis], domain.max[axis], share_face[axis]);
+        bottom  = detail::BoundsHelper<Bounds>::lower(l, divisions[axis], domain.min[axis], domain.max[axis], share_face[axis]);
         bottom  = (std::max)(0, bottom);
         top     = (std::min)(divisions[axis], top);
     }
@@ -707,6 +820,8 @@ lowest_gid(const Point& p) const
     // TODO: optimize - no need to compute all gids
     std::vector<int> gids;
     point_to_gids(gids, p);
+    if (gids.empty())
+        return -1;
     std::sort(gids.begin(), gids.end());
     return gids[0];
 }

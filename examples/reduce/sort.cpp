@@ -105,7 +105,7 @@ void compute_local_histogram(void* b_, const diy::ReduceProxy& srp)
 
     // compute and enqueue local histogram
     Histogram histogram(static_cast<size_t>(b->bins));
-    float width = ((float)b->max - (float)b->min) / b->bins;
+    float width = ((float)b->max - (float)b->min) / static_cast<float>(b->bins);
     for (size_t i = 0; i < b->values.size(); ++i)
     {
         Value x = b->values[i];
@@ -158,11 +158,11 @@ void enqueue_exchange(void* b_, const diy::ReduceProxy& srp, const Histogram& hi
     std::vector<Value>  splits;
     splits.push_back(b->min);
     size_t cur = 0;
-    float width = ((float)b->max - (float)b->min) / b->bins;
+    float width = ((float)b->max - (float)b->min) / static_cast<float>(b->bins);
     for (size_t i = 0; i < histogram.size(); ++i)
     {
         if (cur + histogram[i] > total/k*splits.size())
-            splits.push_back(b->min + width*i + width/2);   // mid-point of the bin
+            splits.push_back(b->min + width * static_cast<float>(i) + width/2);   // mid-point of the bin
 
         cur += histogram[i];
 

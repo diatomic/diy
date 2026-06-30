@@ -1,6 +1,7 @@
 #pragma once
 
 #include "load-balance.hpp"
+#include "diy/mpi/point-to-point.hpp"
 
 namespace diy
 {
@@ -56,7 +57,7 @@ inline void exchange_sample_work_info(diy::Master&             master,          
     auto my_proc = master.communicator().rank();    // rank of my proc
 
     // pick a random sample of processes, w/o duplicates, and excluding myself
-    int nsamples = static_cast<int>(sample_frac * (nprocs - 1));
+    int nsamples = static_cast<int>(sample_frac * static_cast<float>(nprocs - 1));
     std::set<int> sample_procs;
     for (auto i = 0; i < nsamples; i++)
     {
@@ -81,12 +82,12 @@ inline void exchange_sample_work_info(diy::Master&             master,          
     int work_info_tag = 0;
     std::vector<diy::mpi::request> reqs(req_procs.size());
     for (auto i = 0; i < req_procs.size(); i++)
-        reqs[i] = mpi::detail::isend(MPI_Comm(master.communicator()), req_procs[i], work_info_tag, &my_work_info, sizeof(WorkInfo), MPI_BYTE);
+        reqs[i] = mpi::detail::isend(master.communicator().handle(), req_procs[i], work_info_tag, &my_work_info, sizeof(WorkInfo), diy::mpi::detail::get_mpi_datatype<char>());
 
     // receive work info
     sample_work_info.resize(nsamples);
     for (auto i = 0; i < nsamples; i++)
-        mpi::detail::recv(MPI_Comm(master.communicator()), diy::mpi::any_source, work_info_tag, &sample_work_info[i], sizeof(WorkInfo), MPI_BYTE);
+        mpi::detail::recv(master.communicator().handle(), diy::mpi::any_source, work_info_tag, &sample_work_info[i], sizeof(WorkInfo), diy::mpi::detail::get_mpi_datatype<char>());
 
     // ensure all the send requests cleared
     for (auto i = 0; i < req_procs.size(); i++)
@@ -122,7 +123,7 @@ inline void send_block(AuxBlock*,                                              /
     }
 
     // send my heaviest block if it passes the quantile cutoff
-    if (my_work_idx >= quantile * sample_work_info.size())
+    if (static_cast<float>(my_work_idx) >= quantile * static_cast<float>(sample_work_info.size()))
     {
         // pick the destination process to be the mirror image of my work location in the samples
         // ie, the heavier my process, the lighter the destination process

@@ -81,7 +81,7 @@ void average_neighbors(Block* b,                             // local block
     }
 
     // compute average and print it
-    b->average = float(total) / in.size();
+    b->average = float(total) / static_cast<float>(in.size());
     std::cout << "Average   (" << cp.gid() << "): " << b->average   << std::endl;
 }
 

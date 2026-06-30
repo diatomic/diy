@@ -2,6 +2,7 @@
 #define DIY_MPI_NO_MPI_HPP
 
 #include <cassert> // std::assert
+#include <chrono> // std::chrono::steady_clock
 #include <cstdint> // uintptr_t
 #include <stdexcept> // std::runtime_error
 
@@ -50,6 +51,12 @@ using MPI_Request = int;
 
 #define DIY_UNSUPPORTED_MPI_CALL(name) \
   throw std::runtime_error("`" #name "` not supported when DIY_HAS_MPI is false.");
+
+static inline double MPI_Wtime()
+{
+  using clock = std::chrono::steady_clock;
+  return std::chrono::duration<double>(clock::now().time_since_epoch()).count();
+}
 
 /* define operations */
 using MPI_Op = int;

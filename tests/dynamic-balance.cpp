@@ -6,13 +6,135 @@
 #include "../opts.h"
 #include "balance.hpp"
 
+#include <cstdlib>
+#include <cstring>
+
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
+
+namespace
+{
+void require_dynamic_queue_test(bool condition, const char* message)
+{
+    if (!condition)
+    {
+        fmt::print(stderr, "dynamic queue migration test failed: {}\n", message);
+        std::abort();
+    }
+}
+
+void add_queue_record(diy::Master::IncomingQueues& in_qs, int from, diy::MemoryBuffer&& bb, bool reset = true)
+{
+    if (reset)
+        bb.reset();
+    in_qs[from].access()->emplace_back(std::move(bb));
+}
+
+void test_dynamic_incoming_queue_migration(const diy::mpi::communicator& world)
+{
+    diy::Master send_master(world);
+    diy::Master recv_master(world);
+    diy::Master aux_send(world);
+    diy::Master aux_recv(world);
+
+    int send_block = 0;
+    int recv_block = 0;
+    int aux_send_block = 0;
+    int aux_recv_block = 0;
+
+    const int move_gid = 1000 + world.rank();
+    const int recv_move_gid = 2000 + world.rank();
+    const int aux_send_gid = 3000 + world.rank();
+    const int aux_recv_gid = 4000 + world.rank();
+
+    send_master.add(move_gid, &send_block, new diy::Link);
+    recv_master.add(recv_move_gid, &recv_block, new diy::Link);
+    aux_send.add(aux_send_gid, &aux_send_block, new diy::Link);
+    aux_recv.add(aux_recv_gid, &aux_recv_block, new diy::Link);
+
+    diy::Master::IncomingQueues& send_incoming = send_master.incoming(move_gid);
+
+    diy::MemoryBuffer first;
+    diy::save(first, 41);
+    add_queue_record(send_incoming, 7, std::move(first));
+
+    diy::MemoryBuffer second;
+    diy::save(second, 42);
+    add_queue_record(send_incoming, 7, std::move(second));
+
+    diy::MemoryBuffer with_blob;
+    diy::save(with_blob, 43);
+    const char blob_data[] = {'d', 'i', 'y'};
+    with_blob.save_binary_blob(blob_data, sizeof(blob_data));
+    add_queue_record(send_incoming, 8, std::move(with_blob));
+
+    diy::MemoryBuffer partially_read;
+    diy::save(partially_read, 0);
+    diy::save(partially_read, 44);
+    partially_read.reset();
+    int ignored;
+    diy::load(partially_read, ignored);
+    add_queue_record(send_incoming, 9, std::move(partially_read), false);
+
+    diy::MemoryBuffer partially_consumed_blob;
+    const char consumed_blob[] = {'o', 'l', 'd'};
+    const char next_blob[] = {'n', 'e', 'w'};
+    partially_consumed_blob.save_binary_blob(consumed_blob, sizeof(consumed_blob));
+    partially_consumed_blob.save_binary_blob(next_blob, sizeof(next_blob));
+    diy::BinaryBlob consumed = partially_consumed_blob.load_binary_blob();
+    require_dynamic_queue_test(consumed.size == sizeof(consumed_blob), "source 11 consumed blob size");
+    add_queue_record(send_incoming, 11, std::move(partially_consumed_blob), false);
+
+    diy::Master::ProxyWithLink send_cp = aux_send.proxy(0);
+    diy::BlockID dest_block = {aux_recv_gid, world.rank()};
+    diy::detail::dynamic_send_incoming_queues(send_cp, dest_block, send_incoming);
+    diy::MemoryBuffer wire(std::move(send_cp.outgoing(dest_block)));
+    wire.reset();
+
+    diy::Master::ProxyWithLink recv_cp = aux_recv.proxy(0);
+    recv_cp.incoming(aux_send_gid) = std::move(wire);
+    diy::detail::dynamic_recv_incoming_queues(recv_cp, recv_master, aux_send_gid, recv_move_gid);
+
+    diy::Master::IncomingQueues& recv_incoming = recv_master.incoming(recv_move_gid);
+    auto from_seven = recv_incoming[7].access();
+    auto from_eight = recv_incoming[8].access();
+    auto from_nine = recv_incoming[9].access();
+    auto from_eleven = recv_incoming[11].access();
+
+    require_dynamic_queue_test(from_seven->size() == 2, "source 7 queue count");
+    require_dynamic_queue_test(from_eight->size() == 1, "source 8 queue count");
+    require_dynamic_queue_test(from_nine->size() == 1, "source 9 queue count");
+    require_dynamic_queue_test(from_eleven->size() == 1, "source 11 queue count");
+
+    int value;
+    diy::load(from_seven->front().buffer(), value);
+    require_dynamic_queue_test(value == 41, "first source 7 value");
+    from_seven->pop_front();
+
+    diy::load(from_seven->front().buffer(), value);
+    require_dynamic_queue_test(value == 42, "second source 7 value");
+
+    diy::load(from_eight->front().buffer(), value);
+    require_dynamic_queue_test(value == 43, "source 8 value");
+    diy::BinaryBlob blob = from_eight->front().buffer().load_binary_blob();
+    require_dynamic_queue_test(blob.size == sizeof(blob_data), "source 8 blob size");
+    require_dynamic_queue_test(std::memcmp(blob.pointer.get(), blob_data, blob.size) == 0, "source 8 blob contents");
+
+    diy::load(from_nine->front().buffer(), value);
+    require_dynamic_queue_test(value == 44, "source 9 preserved read position");
+
+    diy::BinaryBlob migrated_next_blob = from_eleven->front().buffer().load_binary_blob();
+    require_dynamic_queue_test(migrated_next_blob.size == sizeof(next_blob), "source 11 next blob size");
+    require_dynamic_queue_test(std::memcmp(migrated_next_blob.pointer.get(), next_blob, migrated_next_blob.size) == 0, "source 11 next blob contents");
+}
+}
 
 int main(int argc, char* argv[])
 {
     diy::mpi::environment     env(argc, argv);                          // diy equivalent of MPI_Init
     diy::mpi::communicator    world;                                    // diy equivalent of MPI communicator
+    test_dynamic_incoming_queue_migration(world);
+
     int                       bpr = 4;                                  // blocks per rank
     int                       iters = 1;                                // number of iterations to run
     int                       max_time = 1;                             // maximum time to compute a block (sec.)

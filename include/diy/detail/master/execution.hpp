@@ -58,6 +58,9 @@ struct diy::Master::ProcessBlock
           }
       }
 
+      // For unloaded blocks, skip avoids loading the block; it does not suppress
+      // callbacks. foreach() callbacks may still need to process queues/bookkeeping,
+      // and receive a null block pointer when skip is active.
       for (auto& cmd : master.commands_)
       {
           cmd->execute(skip ? 0 : master.block(i), master.proxy(i));

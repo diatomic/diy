@@ -344,6 +344,6 @@ int main(int argc, char* argv[])
   {
     size_t min = master.proxy(master.loaded_block()).get<size_t>();
     size_t max = master.proxy(master.loaded_block()).get<size_t>();
-    std::cout << "min = " << min << "; max = " << max << "; max/avg = " << float(max) / num_points << std::endl;
+    std::cout << "min = " << min << "; max = " << max << "; max/avg = " << float(max) / static_cast<float>(num_points) << std::endl;
   }
 }

@@ -373,7 +373,7 @@ compute_local_histogram(Block* b, const diy::ReduceProxy& srp, int dim) const
     // compute and enqueue local histogram
     Histogram histogram(bins_);
 
-    float   width = (link->core().max[udim] - link->core().min[udim])/bins_;
+    float   width = (link->core().max[udim] - link->core().min[udim]) / static_cast<float>(bins_);
     for (size_t i = 0; i < (b->*points_).size(); ++i)
     {
         float x = (b->*points_)[i][udim];
@@ -446,7 +446,7 @@ enqueue_exchange(Block* b, const diy::ReduceProxy& srp, int dim, const Histogram
     log->trace("Histogram total: {}", total);
 
     size_t cur   = 0;
-    float  width = (link->core().max[dim] - link->core().min[dim])/bins_;
+    float  width = (link->core().max[dim] - link->core().min[dim]) / static_cast<float>(bins_);
     float  split = 0;
 
     // scope-block for variable `i`
@@ -462,7 +462,7 @@ enqueue_exchange(Block* b, const diy::ReduceProxy& srp, int dim, const Histogram
             ++i;
         else if (i >= histogram.size() - 1)
             i = histogram.size() - 2;
-        split = link->core().min[dim] + width*i;
+        split = link->core().min[dim] + width * static_cast<float>(i);
         log->trace("Found split: {} (dim={}) in {} - {}", split, dim, link->core().min[dim], link->core().max[dim]);
     }
 
