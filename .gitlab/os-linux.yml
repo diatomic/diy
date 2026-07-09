@@ -12,7 +12,9 @@
 
 .fedora42:
   extends: .linux
-  image: "diatomic/diy:ci-diy-fedora-20260609"
+  image:
+    name: "diatomic/diy:ci-diy-fedora-20260609"
+    pull_policy: "always"
 
 .fedora42_mpich: &fedora42_mpich
   extends: .fedora42
